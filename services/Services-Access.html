@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Services Access &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Services Access Roles &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Websockets communication" href="../developers/Websockets-communication.html" />
-    <link rel="prev" title="Internal messages structure" href="../developers/Messages-structure.html" /> 
+    <link rel="next" title="Unit Tests" href="../developers/Running-tests.html" />
+    <link rel="prev" title="Login &amp; Authentication" href="../developers/Login-and-authentication.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,21 +57,28 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Services Access Roles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#access-roles-association">Access roles association</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#opentera-projects-and-sites-roles">OpenTera projects and sites roles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#services-and-projects-association">Services and projects association</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -88,7 +95,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Services Access</li>
+      <li class="breadcrumb-item active">Services Access Roles</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/services/Services-Access.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,17 +105,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="services-access">
-<h1>Services Access<a class="headerlink" href="#services-access" title="Permalink to this heading"></a></h1>
-<p><img alt=" " src="../_images/coming_soon.PNG" /></p>
+  <section id="services-access-roles">
+<h1>Services Access Roles<a class="headerlink" href="#services-access-roles" title="Permalink to this heading"></a></h1>
+<p>Each service can define its own roles that are not limited to “admin” or “user”. Specific services roles are stored in
+the OpenTera service in the <code class="docutils literal notranslate"><span class="pre">TeraServiceRole</span></code> database model.</p>
+<p>Service can further refine those roles by optionally attaching them to a specific project or site.</p>
+<section id="access-roles-association">
+<h2>Access roles association<a class="headerlink" href="#access-roles-association" title="Permalink to this heading"></a></h2>
+<p>Access roles can be attached to either of the following: user group, device or participant group. This architecture
+allows to adapt to various configurations, but adds more complexity to the use or implementation. The
+<code class="docutils literal notranslate"><span class="pre">TeraServiceAccess</span></code> database model in the OpenTera service defines those relationship.</p>
+<p>Specific uses case includes associating an user group as “Admin” of a videoconferencing service, for example, allowing
+that user group to have additional access in that service.</p>
+<section id="opentera-projects-and-sites-roles">
+<h3>OpenTera projects and sites roles<a class="headerlink" href="#opentera-projects-and-sites-roles" title="Permalink to this heading"></a></h3>
+<p>OpenTera main server (TeraServer) uses that mechanism to define access to projects and sites. On the creation of a new
+site or project, the server creates “admin” and “user” roles for the OpenTera service and the specific site or project.</p>
+</section>
+</section>
+<section id="services-and-projects-association">
+<h2>Services and projects association<a class="headerlink" href="#services-and-projects-association" title="Permalink to this heading"></a></h2>
+<p>Each service can be associated to projects. This association is defined in the <code class="docutils literal notranslate"><span class="pre">TeraServiceProject</span></code> database model in
+the OpenTera service. This association allows to expose only some of the services in the system to a specific project,
+limiting the options for services linked to Session Types and allowing to use a single server instead for various
+projects that depends on different services.</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../developers/Messages-structure.html" class="btn btn-neutral float-left" title="Internal messages structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../developers/Websockets-communication.html" class="btn btn-neutral float-right" title="Websockets communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../developers/Login-and-authentication.html" class="btn btn-neutral float-left" title="Login &amp; Authentication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../developers/Running-tests.html" class="btn btn-neutral float-right" title="Unit Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

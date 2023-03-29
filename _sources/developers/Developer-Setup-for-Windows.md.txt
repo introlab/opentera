@@ -22,10 +22,10 @@ The install process is straightforward. The `postgresql` should be noted as the 
 
 Stack Builder is not required for the simple setup.
 
-The PostgreSQL should be run as a system service, though you could also manually launch it before running the [OpenTera main script](../services/teraserver/TeraServer-Service).
+The PostgreSQL should be run as a system service, though you could also manually launch it before running the [OpenTera main script](../services/teraserver/teraserver.rst).
 
 ### Installing Redis Server
-Make sure to install the server as a service or to properly manually launch it before running the [OpenTera main script](../services/teraserver/TeraServer-Service).
+Make sure to install the server as a service or to properly manually launch it before running the [OpenTera main script](../services/teraserver/teraserver.rst).
 
 If you are setting a user and a password, you will need to adjust the [configuration files](../Configuration-files) accordingly.
 
@@ -101,7 +101,7 @@ The `teraagent` user should have been created.
 
 ### Creating databases
 Each system service will requires its own database. The default database that needs to be created are as follow:
-* `opentera`, the [main OpenTera service](../services/teraserver/TeraServer-Service) database
+* `opentera`, the [main OpenTera service](../services/teraserver/teraserver.rst) database
 * `openterafiles`, the database for the [file transfer](../services/FileTransfer-Service) service
 * `openteralogs`, the database for the [logging service](../services/Logging-Service)
 

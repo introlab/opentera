@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Running Unit Tests &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Unit Tests &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Translations" href="Translations.html" />
-    <link rel="prev" title="Websockets communication" href="Websockets-communication.html" /> 
+    <link rel="prev" title="Services Access Roles" href="../services/Services-Access.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,21 +57,30 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Unit Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#self-contained-environment">Self-contained environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-unit-tests">Creating unit tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-unit-tests">Running unit tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#manual-testing">Manual testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automatic-testing-on-pull-requests">Automatic testing on pull requests</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -88,7 +97,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Running Unit Tests</li>
+      <li class="breadcrumb-item active">Unit Tests</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Running-tests.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,16 +107,64 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="running-unit-tests">
-<h1>Running Unit Tests<a class="headerlink" href="#running-unit-tests" title="Permalink to this heading"></a></h1>
-<p><img alt=" " src="../_images/coming_soon.PNG" /></p>
+  <section id="unit-tests">
+<h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading"></a></h1>
+<p>OpenTera aims to deploy robust and tested releases. To do so, unit tests are designed to test the various components of
+the system, such as <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database models</span></a> and various <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">APIs</span></a>.</p>
+<p>Tests are based on <a class="reference external" href="https://www.pytest.org">PyTest</a> and <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> and
+are located in the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/tests">tests folder</a> of the project.</p>
+<p>While it’s hard to develop tests that cover every situation, effort is being put into each new features and releases to
+ensure that features are tested before being deployed on a production server.</p>
+<section id="self-contained-environment">
+<h2>Self-contained environment<a class="headerlink" href="#self-contained-environment" title="Permalink to this heading"></a></h2>
+<p>Unit tests are designed to run even if the server itself is not running. By creating a local
+<a class="reference external" href="https://flask.palletsprojects.com">Flask</a> component to serve the OpenTera API and using a local
+<a class="reference external" href="https://www.sqlite.org">SqlLite database</a>, tests are self-contained and do no interact with an actual OpenTera server
+instance. However, a <a class="reference external" href="https://redis.io/">redis</a> server is still required to run the tests.</p>
+<p>More specifically, each test class setups a new database, ensuring that changes made by the tests functions do not
+have a larger scope than the class itself, which helps prevent unwanted cross-interactions and tests in another class
+that would fail because the database data changed.</p>
+</section>
+<section id="creating-unit-tests">
+<h2>Creating unit tests<a class="headerlink" href="#creating-unit-tests" title="Permalink to this heading"></a></h2>
+<p>Developers are encouraged to develop unit tests while expanding OpenTera core service (and also in their own services,
+even if this is beyond the scope of this documentation).</p>
+<p>A few guidelines need to be followed while doing so:</p>
+<ol class="arabic simple">
+<li><p>Each class needs to be self-contained and not depends on external components. If testing API features, the test class
+should inherits from the related base test class (such as <code class="docutils literal notranslate"><span class="pre">BaseUserAPITest</span></code> for the user API tests).</p></li>
+<li><p>Each test function should ensure that the changed data in the database is set back to its initial
+value after performing the test. If, for example, a test deleted some object in the database, they should be recreated
+to prevent following tests in the same class to fail. Remember that the data is persistent for the class only - it is
+not recreated automatically after each test.</p></li>
+<li><p>Always ensure to run the full tests after adding new features or modifying existing ones. Some changes can have
+unexpected impacts on other parts of the project, considering the large codebase of the OpenTera server.</p></li>
+</ol>
+</section>
+<section id="running-unit-tests">
+<h2>Running unit tests<a class="headerlink" href="#running-unit-tests" title="Permalink to this heading"></a></h2>
+<p>While developing features, it is recommended to run (and update) manual tests once in a while to ensure the quality of
+the modifications. An automatic testing feature is also automated on GitHub.</p>
+<section id="manual-testing">
+<h3>Manual testing<a class="headerlink" href="#manual-testing" title="Permalink to this heading"></a></h3>
+<p>Tests can be manually run simply by running the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> command in a python console, followed by the path containing
+the tests to be executed. It is possible to run all the tests with the base <code class="docutils literal notranslate"><span class="pre">tests</span></code> path.</p>
+<p>If using <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm IDE</a>, tests can be simply run with the contextual menu (displayed
+by right-clicking on a test folder) and selecting the <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">pytest</span> <span class="pre">in...</span></code> option.</p>
+</section>
+<section id="automatic-testing-on-pull-requests">
+<h3>Automatic testing on pull requests<a class="headerlink" href="#automatic-testing-on-pull-requests" title="Permalink to this heading"></a></h3>
+<p>GitHub automation is used to run all the tests on every pull request (and changes made to it). If a pull request does
+not successfully run the tests, it will not be merged.</p>
+</section>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Websockets-communication.html" class="btn btn-neutral float-left" title="Websockets communication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../services/Services-Access.html" class="btn btn-neutral float-left" title="Services Access Roles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Translations.html" class="btn btn-neutral float-right" title="Translations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

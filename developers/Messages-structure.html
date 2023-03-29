@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Services Access" href="../services/Services-Access.html" />
-    <link rel="prev" title="Login &amp; Authentification" href="Login-and-authentication.html" /> 
+    <link rel="next" title="Inter-service communication" href="Internal-services-communication-module.html" />
+    <link rel="prev" title="Internal Form Structure" href="Form-Structure.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,16 +57,14 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal messages structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#message-wrappers">Message wrappers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#general-message-wrapper-teramessage">General message wrapper (TeraMessage)</a></li>
@@ -76,32 +74,35 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#specific-events-messages">Specific events messages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#users-participants-and-devices">Users, participants and devices</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#deviceevent"><code class="docutils literal notranslate"><span class="pre">DeviceEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#participantevent"><code class="docutils literal notranslate"><span class="pre">ParticipantEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#userevent"><code class="docutils literal notranslate"><span class="pre">UserEvent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deviceevent">DeviceEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#participantevent">ParticipantEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#userevent">UserEvent</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#sessions">Sessions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#joinsessionevent"><code class="docutils literal notranslate"><span class="pre">JoinSessionEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joinsessionreplyevent"><code class="docutils literal notranslate"><span class="pre">JoinSessionReplyEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#leavesessionevent"><code class="docutils literal notranslate"><span class="pre">LeaveSessionEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#stopsessionevent"><code class="docutils literal notranslate"><span class="pre">StopSessionEvent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#joinsessionevent">JoinSessionEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#joinsessionreplyevent">JoinSessionReplyEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#leavesessionevent">LeaveSessionEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stopsessionevent">StopSessionEvent</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#opentera-modules-system-services">OpenTera modules &amp; system services</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#databaseevent"><code class="docutils literal notranslate"><span class="pre">DatabaseEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#logevent"><code class="docutils literal notranslate"><span class="pre">LogEvent</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#rpcmessage"><code class="docutils literal notranslate"><span class="pre">RPCMessage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#databaseevent">DatabaseEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#logevent">LogEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#loginevent">LoginEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rpcmessage">RPCMessage</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -130,28 +131,41 @@
              
   <section id="internal-messages-structure">
 <h1>Internal messages structure<a class="headerlink" href="#internal-messages-structure" title="Permalink to this heading"></a></h1>
-<p><a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">Communication between the various modules and service</span></a> and <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">between the server and the clients</span></a> is based on standardized messages and events. All of the messages and events are serialized and defined with the <a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers (probuf)</a> mechanism.</p>
-<p>Since clients could be implemented in any language and will need to reuse the messages structure, an external repository, <a class="reference external" href="https://github.com/introlab/opentera_messages">opentera-messages</a>, is used for that purpose.</p>
+<p><a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">Communication between the various modules and service</span></a> and
+<a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">between the server and the clients</span></a> is based on standardized messages and events. All of the
+messages and events are serialized and defined with the
+<a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers (probuf)</a> mechanism.</p>
+<p>Since clients could be implemented in any language and will need to reuse the messages structure, an external repository,
+<a class="reference external" href="https://github.com/introlab/opentera_messages">opentera-messages</a>, is used for that purpose.</p>
 <section id="message-wrappers">
 <h2>Message wrappers<a class="headerlink" href="#message-wrappers" title="Permalink to this heading"></a></h2>
+<p>Wrappers are used to encapsulate message in a standard way, providing common fields and header for each message.</p>
 <section id="general-message-wrapper-teramessage">
 <h3>General message wrapper (TeraMessage)<a class="headerlink" href="#general-message-wrapper-teramessage" title="Permalink to this heading"></a></h3>
-<p>All messages that are going out through the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket channels</span></a> to the clients are wrapped in the <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/TeraMessage.proto"><code class="docutils literal notranslate"><span class="pre">TeraMessage</span></code></a> structure.</p>
-<p>The wrapper is quite simple and only contains an <code class="docutils literal notranslate"><span class="pre">Any</span></code> field. Since protobuf’s Any allows for type detection, this allows the client to identify the type of the content of the message without explicitly having to try to cast to any known type and see if it makes senses.</p>
-<p><code class="docutils literal notranslate"><span class="pre">TeraMessage</span></code> wrapper is currently not used for internal message communications.</p>
+<p>All messages that are going out through the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket channels</span></a> to the clients are wrapped in
+the <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/TeraMessage.proto">TeraMessage</a> structure.</p>
+<p>The wrapper is quite simple and only contains an <code class="docutils literal notranslate"><span class="pre">Any</span></code> field. Since protobuf’s Any allows for type detection, this
+allows the client to identify the type of the content of the message without explicitly having to try to cast to any
+known type and see if it makes senses.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TeraMessage</span></code> wrapper is currently not used for internal message communications, only for communications with clients
+over websockets.</p>
 </section>
 <section id="event-wrapper-teraevent">
 <h3>Event wrapper (TeraEvent)<a class="headerlink" href="#event-wrapper-teraevent" title="Permalink to this heading"></a></h3>
-<p>All events going in and out of the OpenTera server are wrapped in a <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/TeraEvent.proto"><code class="docutils literal notranslate"><span class="pre">TeraEvent</span></code></a> structure.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Header</span></code> part of the event is self-explanatory. The <code class="docutils literal notranslate"><span class="pre">topic</span></code> field is used as a way to identify the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a> topic being used to send that event.</p>
+<p>All events going in and out of the OpenTera server are wrapped in a
+<a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/TeraEvent.proto">TeraEvent</a> structure.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Header</span></code> part of the event is self-explanatory. The <code class="docutils literal notranslate"><span class="pre">topic</span></code> field is used as a way to identify the
+<a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a> topic being used to send that event.</p>
 <p>A single <code class="docutils literal notranslate"><span class="pre">TeraEvent</span></code> wrapper can contains multiple events, if needed.</p>
 <p>Same as with <code class="docutils literal notranslate"><span class="pre">TeraMessage</span></code>, the <code class="docutils literal notranslate"><span class="pre">Any</span></code> field in that structure allows for easier type detection in the receiver.</p>
 </section>
 <section id="module-message-wrapper-teramodulemessage">
 <h3>Module message wrapper (TeraModuleMessage)<a class="headerlink" href="#module-message-wrapper-teramodulemessage" title="Permalink to this heading"></a></h3>
-<p>Message that are adressed to one of the module are wrapped in a <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/TeraModuleMessage.proto"><code class="docutils literal notranslate"><span class="pre">TeraModuleMessage</span></code></a>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Header</span></code> part of the message is self-explanatory. <code class="docutils literal notranslate"><span class="pre">seq</span></code> is a unique sequence number, while <code class="docutils literal notranslate"><span class="pre">source</span></code> contains who is sending the message to the module, while the <code class="docutils literal notranslate"><span class="pre">dest</span></code> contains the specific module topic.</p>
-<p>A single <code class="docutils literal notranslate"><span class="pre">TeraModuleMessage</span></code> can contain multiple, if needed.</p>
+<p>Message that are addressed to one of the module are wrapped in a
+<a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/TeraModuleMessage.proto">TeraModuleMessage</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Header</span></code> part of the message is self-explanatory. <code class="docutils literal notranslate"><span class="pre">seq</span></code> is a unique sequence number, while <code class="docutils literal notranslate"><span class="pre">source</span></code> contains who is
+sending the message to the module, while the <code class="docutils literal notranslate"><span class="pre">dest</span></code> contains the specific module topic.</p>
+<p>A single <code class="docutils literal notranslate"><span class="pre">TeraModuleMessage</span></code> can contain multiple messages, if needed.</p>
 <p>Same as with <code class="docutils literal notranslate"><span class="pre">TeraMessage</span></code>, the <code class="docutils literal notranslate"><span class="pre">Any</span></code> field in that structure allows for easier type detection in the receiver.</p>
 </section>
 </section>
@@ -159,37 +173,39 @@
 <h2>Specific events messages<a class="headerlink" href="#specific-events-messages" title="Permalink to this heading"></a></h2>
 <section id="users-participants-and-devices">
 <h3>Users, participants and devices<a class="headerlink" href="#users-participants-and-devices" title="Permalink to this heading"></a></h3>
-<p>Those events indicate a status change in users, participants or devices. The specific status are defined and described in each of the messages proto below.</p>
+<p>Those events indicate a status change in users, participants or devices. The specific status are defined and described
+in each of the messages proto below.</p>
 <section id="deviceevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/DeviceEvent.proto"><code class="docutils literal notranslate"><span class="pre">DeviceEvent</span></code></a><a class="headerlink" href="#deviceevent" title="Permalink to this heading"></a></h4>
-<p>Device event.</p>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/DeviceEvent.proto">DeviceEvent</a><a class="headerlink" href="#deviceevent" title="Permalink to this heading"></a></h4>
+<p>Device event, describing a device state (online / offline, busy / not busy) or status change (such as battery level).</p>
 </section>
 <section id="participantevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/ParticipantEvent.proto"><code class="docutils literal notranslate"><span class="pre">ParticipantEvent</span></code></a><a class="headerlink" href="#participantevent" title="Permalink to this heading"></a></h4>
-<p>Participant event.</p>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/ParticipantEvent.proto">ParticipantEvent</a><a class="headerlink" href="#participantevent" title="Permalink to this heading"></a></h4>
+<p>Participant event, describing a state change (online / offline, busy / not busy).</p>
 </section>
 <section id="userevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/UserEvent.proto"><code class="docutils literal notranslate"><span class="pre">UserEvent</span></code></a><a class="headerlink" href="#userevent" title="Permalink to this heading"></a></h4>
-<p>User event.</p>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/UserEvent.proto">UserEvent</a><a class="headerlink" href="#userevent" title="Permalink to this heading"></a></h4>
+<p>User event, describing a state change (online / offline, busy / not busy).</p>
 </section>
 </section>
 <section id="sessions">
 <h3>Sessions<a class="headerlink" href="#sessions" title="Permalink to this heading"></a></h3>
 <p>Those events are generated with session management services.</p>
 <section id="joinsessionevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/JoinSessionEvent.proto"><code class="docutils literal notranslate"><span class="pre">JoinSessionEvent</span></code></a><a class="headerlink" href="#joinsessionevent" title="Permalink to this heading"></a></h4>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/JoinSessionEvent.proto">JoinSessionEvent</a><a class="headerlink" href="#joinsessionevent" title="Permalink to this heading"></a></h4>
 <p>Event to invite a specific user, participant and/or device to join a session.</p>
 </section>
 <section id="joinsessionreplyevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/JoinSessionReplyEvent.proto"><code class="docutils literal notranslate"><span class="pre">JoinSessionReplyEvent</span></code></a><a class="headerlink" href="#joinsessionreplyevent" title="Permalink to this heading"></a></h4>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/JoinSessionReplyEvent.proto">JoinSessionReplyEvent</a><a class="headerlink" href="#joinsessionreplyevent" title="Permalink to this heading"></a></h4>
 <p>Event indicating that a specific user, participant or device replied to a <code class="docutils literal notranslate"><span class="pre">JoinSessionEvent</span></code></p>
 </section>
 <section id="leavesessionevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/LeaveSessionEvent.proto"><code class="docutils literal notranslate"><span class="pre">LeaveSessionEvent</span></code></a><a class="headerlink" href="#leavesessionevent" title="Permalink to this heading"></a></h4>
-<p>Event indicating that a specific user, participant or device left the session. Also use to indicate to a user, participant or device that it needs to leave the session now.</p>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/LeaveSessionEvent.proto">LeaveSessionEvent</a><a class="headerlink" href="#leavesessionevent" title="Permalink to this heading"></a></h4>
+<p>Event indicating that a specific user, participant or device left the session. Also use to indicate to a user,
+participant or device that it needs to leave the session now.</p>
 </section>
 <section id="stopsessionevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/StopSessionEvent.proto"><code class="docutils literal notranslate"><span class="pre">StopSessionEvent</span></code></a><a class="headerlink" href="#stopsessionevent" title="Permalink to this heading"></a></h4>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/StopSessionEvent.proto">StopSessionEvent</a><a class="headerlink" href="#stopsessionevent" title="Permalink to this heading"></a></h4>
 <p>Event indicating that a specific session was terminated.</p>
 </section>
 </section>
@@ -197,15 +213,21 @@
 <h3>OpenTera modules &amp; system services<a class="headerlink" href="#opentera-modules-system-services" title="Permalink to this heading"></a></h3>
 <p>Those events are generated or used to communicate with some of the modules and systems service in the OpenTera platform.</p>
 <section id="databaseevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/DatabaseEvent.proto"><code class="docutils literal notranslate"><span class="pre">DatabaseEvent</span></code></a><a class="headerlink" href="#databaseevent" title="Permalink to this heading"></a></h4>
-<p>Event generated when a database change (update, delete, create) occurred. Also see the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a> for the model names.</p>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/DatabaseEvent.proto">DatabaseEvent</a><a class="headerlink" href="#databaseevent" title="Permalink to this heading"></a></h4>
+<p>Event generated when a database change (update, delete, create) occurred. Also see the
+<a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database objects</span></a> for the model names.</p>
 </section>
 <section id="logevent">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/LogEvent.proto"><code class="docutils literal notranslate"><span class="pre">LogEvent</span></code></a><a class="headerlink" href="#logevent" title="Permalink to this heading"></a></h4>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/LogEvent.proto">LogEvent</a><a class="headerlink" href="#logevent" title="Permalink to this heading"></a></h4>
 <p>Event sent to the <a class="reference internal" href="../services/Logging-Service.html"><span class="doc std std-doc">logging service</span></a> to add a system log in the log archive.</p>
 </section>
+<section id="loginevent">
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/LoginEvent.proto">LoginEvent</a><a class="headerlink" href="#loginevent" title="Permalink to this heading"></a></h4>
+<p>Event sent to the <a class="reference internal" href="../services/Logging-Service.html"><span class="doc std std-doc">logging service</span></a> to add a login event (successful or not) in the log
+archive.</p>
+</section>
 <section id="rpcmessage">
-<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/RPCMessage.proto"><code class="docutils literal notranslate"><span class="pre">RPCMessage</span></code></a><a class="headerlink" href="#rpcmessage" title="Permalink to this heading"></a></h4>
+<h4><a class="reference external" href="https://github.com/introlab/opentera_messages/blob/main/proto/RPCMessage.proto">RPCMessage</a><a class="headerlink" href="#rpcmessage" title="Permalink to this heading"></a></h4>
 <p>Event used to make <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">remote procedure calls (RPC)</span></a> with another service.</p>
 </section>
 </section>
@@ -216,8 +238,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Login-and-authentication.html" class="btn btn-neutral float-left" title="Login &amp; Authentification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../services/Services-Access.html" class="btn btn-neutral float-right" title="Services Access" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Form-Structure.html" class="btn btn-neutral float-left" title="Internal Form Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Internal-services-communication-module.html" class="btn btn-neutral float-right" title="Inter-service communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

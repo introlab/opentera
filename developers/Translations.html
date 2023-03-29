@@ -19,7 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Running Unit Tests" href="Running-tests.html" /> 
+    <link rel="next" title="Websockets communication" href="Websockets-communication.html" />
+    <link rel="prev" title="Unit Tests" href="Running-tests.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -56,21 +57,26 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Translations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#client-translation-selection">Client translation selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-editing-translations">Creating/editing translations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-generating-translations">Compiling/generating translations</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Translations</a></li>
 </ul>
 
         </div>
@@ -99,14 +105,47 @@
              
   <section id="translations">
 <h1>Translations<a class="headerlink" href="#translations" title="Permalink to this heading"></a></h1>
-<p><img alt=" " src="../_images/coming_soon.PNG" /></p>
+<p>OpenTera uses <a class="reference external" href="https://python-babel.github.io/flask-babel/">Flask-Babel</a> to translate the various API messages. Each
+<a class="reference internal" href="../services/OpenTera_Services.html"><span class="doc std std-doc">core services</span></a> has an associated portable object file (.po) containing the text
+translations.</p>
+<p>While it could have been possible to uses specific keys throughout the code for each string that needed to be
+translated, it was decided to write each string as a textual English text and then translate from that English text to
+a localized text. This has the advantage of making code more readable and easier to write (without having to refer to
+a dictionary), but has the disadvantage of having to redo some translations if the underlying text changes.</p>
+<p>Each translation file can be found in the related service <code class="docutils literal notranslate"><span class="pre">translations</span></code> folder, with a sub folder for each language
+(such a <code class="docutils literal notranslate"><span class="pre">en</span></code> for English and <code class="docutils literal notranslate"><span class="pre">fr</span></code> for French). The <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">core TeraServer service</span></a>
+has its translations in <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/translations">this path</a>.</p>
+<section id="client-translation-selection">
+<h2>Client translation selection<a class="headerlink" href="#client-translation-selection" title="Permalink to this heading"></a></h2>
+<p>Client can select the server response language by setting the <code class="docutils literal notranslate"><span class="pre">Accept-Language</span></code> value in the request header. Fallback
+will occurs in English if the selected language is not valid (no translation existing for this language) or if that
+header value is not found in the request.</p>
+<p>By default, browsers will set this field automatically, so any web-based application will be correctly localized. It
+is however possible to change that value manually and to set it, as required, if other client are used.</p>
+</section>
+<section id="creating-editing-translations">
+<h2>Creating/editing translations<a class="headerlink" href="#creating-editing-translations" title="Permalink to this heading"></a></h2>
+<p>An integration with the <a class="reference external" href="https://cmake.org/">cmake</a> script is done to automatically runs the <code class="docutils literal notranslate"><span class="pre">pybabel</span></code> utility and
+extract all the strings to translate in the services. By running <code class="docutils literal notranslate"><span class="pre">cmake</span></code> with one of the target ending with the
+<code class="docutils literal notranslate"><span class="pre">translations</span></code> keyword, all strings encapsulated with the <code class="docutils literal notranslate"><span class="pre">gettext</span></code> function will be detected, and the translation
+file (.po) will be updated accordingly.</p>
+<p>Each of the .po file can be manually edited in a text editor to update the translation, but a tool such as
+<a class="reference external" href="https://poedit.net/">PoEdit</a> is suggested to ease the translation process.</p>
+</section>
+<section id="compiling-generating-translations">
+<h2>Compiling/generating translations<a class="headerlink" href="#compiling-generating-translations" title="Permalink to this heading"></a></h2>
+<p>OpenTera will use a compiled translation file (.mo). It is possible to manually generates such a file, but the <code class="docutils literal notranslate"><span class="pre">cmake</span></code>
+integration will also automatically generates such a translation when selecting a target ending with the
+<code class="docutils literal notranslate"><span class="pre">translations</span></code> keyword.</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Running-tests.html" class="btn btn-neutral float-left" title="Running Unit Tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Running-tests.html" class="btn btn-neutral float-left" title="Unit Tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Websockets-communication.html" class="btn btn-neutral float-right" title="Websockets communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

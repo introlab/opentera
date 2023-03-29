@@ -9,7 +9,6 @@ This section configures the depending packages and software before installing th
 <hr>
 
 ### Postgresql
-
 <hr>
 
 1. Install Postgresql package: `sudo apt-get install postgresql`
@@ -32,6 +31,7 @@ This section configures the depending packages and software before installing th
 6. Don't forget to quit the postgres console: `\q`
 
 <hr>
+
 ### Redis
 <hr>
 
@@ -44,6 +44,7 @@ This section configures the depending packages and software before installing th
     ```
 
 <hr>
+
 ### nginx
 <hr>
 Only basic configuration is done here - specific OpenTera configuration is done below
@@ -51,28 +52,35 @@ Only basic configuration is done here - specific OpenTera configuration is done 
 1. Install nginx: `sudo apt-get install nginx`
 
 <hr>
+
 ### Python environment (using miniconda)
 <hr>
+
 1. Follow the instructions [here­](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) to download and install miniconda
 2. When requested, execute the `conda init` command
 3. Close your shell and restart it again
 
 <hr>
+
 ### Build environment
 <hr>
+
 1. Install git: `sudo apt-get install git`
 2. Install cmake: `sudo apt-get install cmake`
 3. Install g++: `sudo apt-get install g++`
 4. Install nodejs / npm: `sudo apt-get install npm`
 
 <hr>
+
 ## OpenTera installation
 
-This section proceeds to the installation of the OpenTera server
+This section proceeds to the installation of the OpenTera server in itself.
 
 <hr>
+
 ### Installation
 <hr>
+
 1. Fetch the OpenTera code with submodules using git: `git clone --recurse-submodules https://github.com/introlab/opentera.git`
 2. `cd opentera/teraserver` (or the location that you cloned the project)
 3. Initialize cmake environment: `cmake .`
@@ -84,8 +92,10 @@ This section proceeds to the installation of the OpenTera server
     ```
 
 <hr>
+
 ### Configuration
 <hr>
+
 #### Config files
 There is a few config files to edit. You should edit each of them and put the correct parameters, according to your setup and the passwords you've set previously. Here is the list of the files:
 
@@ -128,23 +138,56 @@ KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
-
 ```
 2. Enable service: `sudo systemctl enable opentera.service`
 3. Start service: `sudo systemctl start opentera.service`
 
 <hr>
+
 ## Post installation
 Optional post installation steps.
 
 <hr>
+
 ### Local TURN/STUN server
 <hr>
-TODO. coturn setup instructions.
+
+If required and to prevent using the default Google TURN/STUN server, a local server can be set up.
+
+A simple way to do so is the install the [coturn server](https://github.com/coturn/coturn), setting the appropriate ports, rules and password as described in the project documentation.
+
+Basic settings for a working setup are provided below (all other settings can be left to the default ones):
+```
+# Base encrypted listening port, adjust according to firewall rules
+tls-listening-port=5349
+
+# Base external IP of the server - replace x.x.x.x with correct value
+external-ip=x.x.x.x
+
+# Min and max ports for UDP relay, adjust according to your firewall rules
+min-port=49152
+max-port=65535
+
+# Password protect the STUN/TURN server (optional but strongly recommanded)
+lt-cred-mech
+
+# Authentication to access the server (generate password with the turnadmin tool)
+# Don't forget to set the realm before generating the password!!
+user=opentera:(generated password)
+
+# Realm of the server. Typically the DNS name of the server (but can also be something else)
+realm=example.com
+
+# SSL encryption certificates. The same certificate used by nginx can be used if hosted on the same server.
+cert=(path to public certificate file)
+key=(path to private key file)
+```
 
 <hr>
+
 ### SSL certificate with LetsEncrypt
 <hr>
+
 1. Install certbot agent: `sudo apt-get install certbot`
 2. Install nginx plugin: `sudo apt-get install python3-certbot-nginx`
 3. Run certbot: `sudo certbot --nginx -d (your_host_name)`

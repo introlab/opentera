@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creating a new service based on OpenTera &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Creating a new service &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Code structure" href="Code-Structure.html" />
-    <link rel="prev" title="VideoRehab Service" href="../services/Videorehab-Service.html" /> 
+    <link rel="next" title="Database Structure" href="Database-Structure.html" />
+    <link rel="prev" title="Code structure" href="Code-Structure.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,21 +57,29 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating a new service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#service-creation-steps">Service creation steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nginx-configuration">NGINX configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-service-structure">Basic service structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-backend-and-frontend">Service backend and frontend</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -88,7 +96,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Creating a new service based on OpenTera</li>
+      <li class="breadcrumb-item active">Creating a new service</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Service-Creation.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,17 +106,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="creating-a-new-service-based-on-opentera">
-<h1>Creating a new service based on OpenTera<a class="headerlink" href="#creating-a-new-service-based-on-opentera" title="Permalink to this heading"></a></h1>
-<p><img alt=" " src="../_images/coming_soon.PNG" /></p>
+  <section id="creating-a-new-service">
+<h1>Creating a new service<a class="headerlink" href="#creating-a-new-service" title="Permalink to this heading"></a></h1>
+<p>Since the OpenTera <a class="reference internal" href="../Architecture-Overview.html"><span class="doc std std-doc">architecture</span></a> allows for stand-alone services, there is not imposed
+constraints on the technical choices behind the creation of new services.</p>
+<section id="service-creation-steps">
+<h2>Service creation steps<a class="headerlink" href="#service-creation-steps" title="Permalink to this heading"></a></h2>
+<p>To create a new service using OpenTera, the following general steps should be used:</p>
+<ol class="arabic simple">
+<li><p>Assign a local listening port for the service and adjust the
+<a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/opentera.conf">NGINX config file</a> accordingly.</p></li>
+<li><p>Create the basic service structure (using the <a class="reference external" href="https://pypi.org/project/opentera/">OpenTera PyPi package</a> if
+developing in Python).</p></li>
+<li><p>Develop the service backend and, optionally, the frontend</p></li>
+</ol>
+<section id="nginx-configuration">
+<h3>NGINX configuration<a class="headerlink" href="#nginx-configuration" title="Permalink to this heading"></a></h3>
+<p>If your service expose a public API / front end, you will need to modify the NGINX config file.</p>
+<p>Basically, you will need to add a new endpoint url and the correct local listening port for your service in the NGINX
+config file.</p>
+<p>Of course, if you are developing a local service that doesn’t have public access (such as a service to process data
+without any user interaction), this step might not be required.</p>
+</section>
+<section id="basic-service-structure">
+<h3>Basic service structure<a class="headerlink" href="#basic-service-structure" title="Permalink to this heading"></a></h3>
+<p>There is no imposed service structure, as long as the service uses the <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">service API</span></a> and
+the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">communication mechanisms</span></a> to communicate and exchange data with the core
+<a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">TeraServer service</span></a>.</p>
+<p>To ease the creation of new services,
+<a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/examples">examples</a> can be found in the main OpenTera
+project. Those examples can serve as a building block to create your own services.</p>
+<p>Also, providing some basic authentication and applying the communication mechanisms can be facilitated by using the
+<a class="reference external" href="https://pypi.org/project/opentera/">OpenTera PyPi package</a> which only needs to be imported in your Python project.</p>
+</section>
+<section id="service-backend-and-frontend">
+<h3>Service backend and frontend<a class="headerlink" href="#service-backend-and-frontend" title="Permalink to this heading"></a></h3>
+<p>A service can provide a backend (such as a REST API) and a frontend.</p>
+<p>While there’s many way to do so, services source files are usually structured in two folders: <code class="docutils literal notranslate"><span class="pre">Frontend</span></code>, which should
+contain the necessary files for the service frontend (whether it is based on a web framework such as Angular or React or
+something else) and a <code class="docutils literal notranslate"><span class="pre">Backend</span></code> folder containing the required source files to process data and present a REST API
+(based on Flask or something else) to the user.</p>
+</section>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../services/Videorehab-Service.html" class="btn btn-neutral float-left" title="VideoRehab Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Code-Structure.html" class="btn btn-neutral float-right" title="Code structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Code-Structure.html" class="btn btn-neutral float-left" title="Code structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Database-Structure.html" class="btn btn-neutral float-right" title="Database Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

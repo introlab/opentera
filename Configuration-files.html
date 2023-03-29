@@ -52,7 +52,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#core-module-configuration-file">Core module - Configuration file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-service-configuration-file">Core service - Configuration file</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#server-section">Server section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#database-section">Database section</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#redis-section">Redis section</a></li>
@@ -70,21 +70,21 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -113,12 +113,12 @@
              
   <section id="configuration-files">
 <h1>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading"></a></h1>
-<p>Each service, including the core module, <a class="reference internal" href="services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">TeraServer</span></a>, has an associated config file.</p>
+<p>Each service, including the core service, <a class="reference internal" href="services/teraserver/teraserver.html"><span class="std std-doc">TeraServer</span></a>, has an associated config file.</p>
 <p>The details of those files are presented in each of the service.</p>
-<p>For the core module, <a class="reference internal" href="services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">TeraServer</span></a>, there are 2 configuration files: the main configuration file and the NGINX configuration files.</p>
-<section id="core-module-configuration-file">
-<h2>Core module - Configuration file<a class="headerlink" href="#core-module-configuration-file" title="Permalink to this heading"></a></h2>
-<p>The development configuration file can be found <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/TeraServerConfig.ini">here</a>. It is a JSON-formatted file, separated in different sections. The following describe the required sections, and the parameters in each of them.</p>
+<p>For the core service, <a class="reference internal" href="services/teraserver/teraserver.html"><span class="std std-doc">TeraServer</span></a>, there are 2 configuration files: the main configuration file and the NGINX configuration files.</p>
+<section id="core-service-configuration-file">
+<h2>Core service - Configuration file<a class="headerlink" href="#core-service-configuration-file" title="Permalink to this heading"></a></h2>
+<p>The base configuration file can be found <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/TeraServerConfig.ini">here</a>. It is a JSON-formatted file, separated in different sections. The following describe the required sections, and the parameters in each of them.</p>
 <section id="server-section">
 <h3>Server section<a class="headerlink" href="#server-section" title="Permalink to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the server name. Only used for display purpose. On a <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deployed server</span></a>, this should be the internal name of the server, not the DNS of it.</p>
@@ -126,15 +126,16 @@
 <p><code class="docutils literal notranslate"><span class="pre">port</span></code> - the internal port that the server will listen to. The external port that the server will respond to is managed by NGINX itself. Unless a very specific configuration needs to be put in place, this should be changed from the default value (4040).</p>
 <p><code class="docutils literal notranslate"><span class="pre">ssl_path</span></code> - the path where the SSL certificates are stored on the server. Defaults to the “certificates” folder. Used when generating local certificates.</p>
 <p><code class="docutils literal notranslate"><span class="pre">debug_mode</span></code> - if set to true, the server will be more verbose, especially on SQL and REST API queries.</p>
+<p><code class="docutils literal notranslate"><span class="pre">enable_docs</span></code> - if set to true, the server will display the documentation for the REST API at a doc page located on <a class="reference external" href="https://server_url:port/doc">https://server_url:port/doc</a>. It is recommended to set to false on production servers.</p>
 <p>The other parameters still left in the config file are deprecated and will be removed soon, if not already.</p>
 </section>
 <section id="database-section">
 <h3>Database section<a class="headerlink" href="#database-section" title="Permalink to this heading"></a></h3>
-<p><code class="docutils literal notranslate"><span class="pre">db_type</span></code> - the type of database used. This parameter, while in this config file, is currently unused since only <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database are used right now (except for <a class="reference internal" href="developers/Running-tests.html"><span class="doc std std-doc">unit tests</span></a>, which use a local <a class="reference external" href="https://www.sqlite.org">SqlLite</a> database).</p>
+<p><code class="docutils literal notranslate"><span class="pre">db_type</span></code> - the type of database used. This parameter, while in this config file, is currently unused since only <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> databases are used right now (except for <a class="reference internal" href="developers/Running-tests.html"><span class="doc std std-doc">unit tests</span></a>, which use a local <a class="reference external" href="https://www.sqlite.org">SqlLite</a> database).</p>
 <p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the name of the database used by the core module.</p>
 <p><code class="docutils literal notranslate"><span class="pre">url</span></code> - the URL of the database server. Typically, should be left to 127.0.0.1 unless running the database engine on a different server.</p>
 <p><code class="docutils literal notranslate"><span class="pre">port</span></code> - the port to connect to the database server. Default should be 5432 for PostgreSQL database.</p>
-<p><code class="docutils literal notranslate"><span class="pre">username</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">password</span></code> - the username and password used to connect to the database server. <strong>Please ensure that the user has full access to the database</strong>, as errors will occur. See <a class="reference internal" href="developers/Database-Structure.html"><span class="doc std std-doc">database structure</span></a> for more information on how to create the initial database.</p>
+<p><code class="docutils literal notranslate"><span class="pre">username</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">password</span></code> - the username and password used to connect to the database server. <strong>Please ensure that the user has full access to the database</strong>, as errors will occur. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deployment instructions</span></a> for more information on how to create the initial database.</p>
 </section>
 <section id="redis-section">
 <h3>Redis section<a class="headerlink" href="#redis-section" title="Permalink to this heading"></a></h3>

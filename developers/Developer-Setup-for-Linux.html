@@ -79,21 +79,21 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -225,7 +225,7 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 <h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this heading"></a></h3>
 <p>Each system service will requires its own database. The default database that needs to be created are as follow:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="../services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">main OpenTera service</span></a> database</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">main OpenTera service</span></a> database</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">openterafiles</span></code>, the database for the <a class="reference internal" href="../services/FileTransfer-Service.html"><span class="doc std std-doc">file transfer</span></a> service</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">openteralogs</span></code>, the database for the <a class="reference internal" href="../services/Logging-Service.html"><span class="doc std std-doc">logging service</span></a></p></li>
 </ul>

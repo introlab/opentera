@@ -46,7 +46,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Home.html">About OpenTera</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">OpenTera Architecture Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#core-module-opentera-teraserver">Core module (OpenTera - TeraServer)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-service-opentera-teraserver">Core service (OpenTera - TeraServer)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#login-and-usermanager-module">Login and UserManager module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#login-module">Login module</a></li>
@@ -80,21 +80,21 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers/Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -127,16 +127,16 @@
 <p><img alt=" " src="_images/OpenTera_Global.png" /></p>
 <p>A modular architecture based on open-source projects and standards is used. Each of the component of that architecture is described below.</p>
 <hr class="docutils" />
-<section id="core-module-opentera-teraserver">
-<h2>Core module (OpenTera - TeraServer)<a class="headerlink" href="#core-module-opentera-teraserver" title="Permalink to this heading"></a></h2>
-<p>The core module is simply the manager of all the other components of the system. Internally, it is itself represented as a service, especially when it comes to <a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access and roles</span></a>.</p>
+<section id="core-service-opentera-teraserver">
+<h2>Core service (OpenTera - TeraServer)<a class="headerlink" href="#core-service-opentera-teraserver" title="Permalink to this heading"></a></h2>
+<p>The core service is simply the manager of all the other components of the system. Internally, it is itself represented as a service, especially when it comes to <a class="reference internal" href="services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access and roles</span></a>.</p>
 <p>OpenTera server is fully written in Python, and the main script (TeraServer.py) basically starts and configure the components of the system based on the <a class="reference internal" href="Configuration-files.html"><span class="doc std std-doc">configuration file</span></a>.</p>
-<p>More information on this module can be found <a class="reference internal" href="services/teraserver/TeraServer-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+<p>More information on this service can be found <a class="reference internal" href="services/teraserver/teraserver.html"><span class="std std-doc">here</span></a>.</p>
 </section>
 <hr class="docutils" />
 <section id="modules">
 <h2>Modules<a class="headerlink" href="#modules" title="Permalink to this heading"></a></h2>
-<p>Components that are used internally by the core module and do not need to be directly referenced or accessed by other services in the system are called modules. Each of the specific module has a defined role and can communicate with other modules or services in the system using the <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>.</p>
+<p>Components that are used internally by the core service and do not need to be directly referenced or accessed by other services in the system are called modules. Each of the specific module has a defined role and can communicate with other modules or services in the system using the <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal services communication module</span></a>.</p>
 <section id="login-and-usermanager-module">
 <h3>Login and UserManager module<a class="headerlink" href="#login-and-usermanager-module" title="Permalink to this heading"></a></h3>
 <p>As hinted by their names, those modules provides the required login validation check and keep a registry of currently logged-in users, participants and devices. See <a class="reference internal" href="developers/Login-and-authentication.html"><span class="doc std std-doc">Login and authentication</span></a> for further information on the available login types and sequence.</p>
@@ -146,7 +146,7 @@
 </section>
 <section id="usermanager-module">
 <h4>UserManager module<a class="headerlink" href="#usermanager-module" title="Permalink to this heading"></a></h4>
-<p>This module is a registry of user, participants and devices states (online, busy, status). By subscribing and publishing into various topics (see <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">Internal services communication module</span></a>), this module monitors topics generated by the <a class="reference internal" href="developers/Websockets-communication.html"><span class="doc std std-doc">websockets</span></a> to toggle states. It also support a remote process call interface (RPC) to query the various information in the registry.</p>
+<p>This module is a registry of users, participants and devices states (online, busy, status). By subscribing and publishing into various topics (see <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">Internal services communication module</span></a>), this module monitors topics generated by the <a class="reference internal" href="developers/Websockets-communication.html"><span class="doc std std-doc">websockets</span></a> to toggle states. It also support a remote process call interface (RPC) to query the various information in the registry.</p>
 <p>More information on this module can be found <a class="reference internal" href="services/teraserver/UserManager-module.html"><span class="doc std std-doc">here</span></a>.</p>
 </section>
 </section>
@@ -184,7 +184,7 @@
 </section>
 <section id="logging-service">
 <h3>Logging service<a class="headerlink" href="#logging-service" title="Permalink to this heading"></a></h3>
-<p>The logging service acts as a central log repository. Using messages with the <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>, every module and service interacting with OpenTera can log information in that service. More specifically, the service process the <a class="reference internal" href="developers/Messages-structure.html"><span class="doc std std-doc">LogEvent</span></a> message.</p>
+<p>The logging service acts as a central log repository. Using messages with the <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>, every module and service interacting with OpenTera can log information in that service.</p>
 <p>More information on this service can be found <a class="reference internal" href="services/Logging-Service.html"><span class="doc std std-doc">here</span></a>.</p>
 </section>
 <section id="videorehab-service">
@@ -197,11 +197,8 @@
 <section id="external-services">
 <h2>External services<a class="headerlink" href="#external-services" title="Permalink to this heading"></a></h2>
 <p>OpenTera is built as an extensible system onto which various services to address specific needs can be added.</p>
-<p>As of now, there’s many such services in development, not all of them being public-ready. To name a few:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/introlab/opentera-teleop-service">Robot teleoperation service</a>, which aims to provide an integrated robot teleoperation system in OpenTera</p></li>
-<li><p><a class="reference external" href="https://github.com/introlab/opentera-webportal-service">Web portal</a>, which aims to provide a customized portal for participants (with personalized shortcuts to other OpenTera services or external websites) and for users (to provide a web dashboard of a project).</p></li>
-</ul>
+<p>For a list of current available services, see the <a class="reference internal" href="index.html"><span class="doc std std-doc">related open source projects</span></a>.
+For more information on creating a new service, see the <a class="reference internal" href="developers/Service-Creation.html"><span class="doc std std-doc">service creation</span></a> topic.</p>
 </section>
 <hr class="docutils" />
 <section id="clients">

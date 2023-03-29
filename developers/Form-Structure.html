@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Inter-service communication" href="Internal-services-communication-module.html" />
+    <link rel="next" title="Internal messages structure" href="Messages-structure.html" />
     <link rel="prev" title="Database Structure" href="Database-Structure.html" /> 
 </head>
 
@@ -57,12 +57,12 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Internal Form Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#forms-hierarchy">Forms hierarchy</a></li>
@@ -75,13 +75,13 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -110,9 +110,15 @@
              
   <section id="internal-form-structure">
 <h1>Internal Form Structure<a class="headerlink" href="#internal-form-structure" title="Permalink to this heading"></a></h1>
-<p>To ease <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database structure</span></a> updates, a form definition language was created to serialize the various data entry points to prevent each client to be updated each time a new field is added (or changed) on the OpenTera platform.</p>
-<p>By querying the <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">form API</span></a>, a client can request a form structure definition for a specific data type. Furthermore, when that form definition contains lists, that <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API</span></a> can also be used to filter only relevant data for the current context.</p>
-<p>Forms are serialized using JSON-formatted strings. Implementation on the OpenTera server can be found in the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/forms/TeraForm.py"><code class="docutils literal notranslate"><span class="pre">TeraForm</span></code></a>, and the implementation for each data type can be found in the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/opentera/forms"><code class="docutils literal notranslate"><span class="pre">forms</span></code></a> folder.</p>
+<p>To ease <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database structure</span></a> updates and to provide a dynamic way to provide client form entry
+(which could also includes tests structure), a form definition language was created to serialize forms definition.</p>
+<p>By querying the <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">form API</span></a>, a client can request a form structure definition for a
+specific data type. Furthermore, when that form definition contains lists, that <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API</span></a>
+can also be used to filter only relevant data for the current context.</p>
+<p>Forms are serialized using JSON-formatted strings. Implementation on the OpenTera server can be found in the
+<a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/opentera/forms/TeraForm.py"><code class="docutils literal notranslate"><span class="pre">TeraForm</span></code></a>, and the
+implementation for each data type can be found in the
+<a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/opentera/forms"><code class="docutils literal notranslate"><span class="pre">forms</span></code></a> folder.</p>
 <section id="forms-hierarchy">
 <h2>Forms hierarchy<a class="headerlink" href="#forms-hierarchy" title="Permalink to this heading"></a></h2>
 <p>Forms follow the following hierarchy:</p>
@@ -131,40 +137,50 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Basically, a form can have multiple sections each of them having multiple items (fields). It is up to the client implementation to properly display those sections and items.</p>
+<p>Basically, a form can have multiple sections each of them having multiple items (fields). It is up to the client
+implementation to properly display those sections and items.</p>
 </section>
 <section id="form-sections">
 <h2>Form sections<a class="headerlink" href="#form-sections" title="Permalink to this heading"></a></h2>
-<p>A form section is a logical way to organize items. In most forms, there will only be one section, but it is possible to define as many sections as required. <strong>At least one form section is required for any form</strong>.</p>
-<p>The form section section(!) has the following fields:</p>
+<p>A form section is a logical way to organize items. In most forms, there will only be one section, but it is possible to
+define as many sections as required. <strong>At least one form section is required for any form</strong>.</p>
+<p>The form section <code class="docutils literal notranslate"><span class="pre">sections</span></code> has the following fields:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>, the section internal id. Could be anything, only to help with display purpose client-side</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>, the section label that needs to be displayed on the form. <a class="reference internal" href="Translations.html"><span class="doc std std-doc">Translated</span></a> on the server when queried.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>, the section label that needs to be displayed on the form. <a class="reference internal" href="Translations.html"><span class="doc std std-doc">Translated</span></a> on the server when
+queried.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">_order</span></code>, the order into which to display that particular section. Lower numbers are displayed first.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">items</span></code>, a list of the various items part of that section (see below).</p></li>
 </ul>
 </section>
 <section id="form-items">
 <h2>Form items<a class="headerlink" href="#form-items" title="Permalink to this heading"></a></h2>
-<p>An item represents a field. This is the most complicated element of a form, as conditions, default values and various flags can be added to an item.</p>
+<p>An item represents a field. This is the most complicated element of a form, as conditions, default values and various
+flags can be added to an item.</p>
 <p>The items each have the following describing fields:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>, the id of that item. If directly linked to a <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database object</span></a>, this is the name of the field in the database.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>, the item label that needs to be displayed on the form in the client. <a class="reference internal" href="Translations.html"><span class="doc std std-doc">Translated</span></a> on the server when queried.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>, the id of that item. If directly linked to a <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database object</span></a>, this is the name of the
+field in the database.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>, the item label that needs to be displayed on the form in the client. <a class="reference internal" href="Translations.html"><span class="doc std std-doc">Translated</span></a> on the server
+when queried.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>, the item type (see below)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">condition</span></code>, a specific condition to display that field or not. See below for that condition format.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">confirm</span></code>, indicating that this item should be confirmed by entering it again (such as with password fields).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">default</span></code>, the default value to display. Should be set accordingly to the data type.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">read_only</span></code>, indicating if a field should displayed but in a read-only state (can’t be modified by the user).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">required</span></code>, a boolean flag indicating if the field is mandatory or not. This required flag should be checked on the client before sending the values of the form back to the server.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">values</span></code>, if the item type is a list or a type that requires multiple values to be display, this field indicates a list of value. See below for the exact format of those values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">required</span></code>, a boolean flag indicating if the field is mandatory or not. This required flag should be checked on the
+client before sending the values of the form back to the server.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">values</span></code>, if the item type is a list or a type that requires multiple values to be display, this field indicates a
+list of value. See below for the exact format of those values.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">_order</span></code>, the order into which to display that particular item in that section. Lower numbers are displayed first.</p></li>
 </ul>
 <section id="item-types">
 <h3>Item types<a class="headerlink" href="#item-types" title="Permalink to this heading"></a></h3>
-<p>The item types indicates the type of field that needs to be displayed on the client-side. The following field types are currently defined:</p>
+<p>The item types indicates the type of field that needs to be displayed on the client-side. The following field types are
+currently defined:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">array</span></code>: a list of items, typically displayed as a drop-down list on the client. See items values below for the format of the values to display (in the <code class="docutils literal notranslate"><span class="pre">values</span></code> field of the item).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">array</span></code>: a list of items, typically displayed as a drop-down list on the client. See items values below for the format
+of the values to display (in the <code class="docutils literal notranslate"><span class="pre">values</span></code> field of the item).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">audioinputs</span></code>: list of all the available audio inputs on the client</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">boolean</span></code>: a boolean value, typically displayed as a checkbox on the client.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">checklist</span></code>: a list of items that can be all checked. This could be displayed as multiple checkbox items by the client.</p></li>
@@ -172,9 +188,12 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">datetime</span></code>: a date / time field.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">duration</span></code>: a duration field, representing a time duration field.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">hidden</span></code>: an hidden field value that should be sent with the form data but not displayed to the end-user by the client.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>: a text display field which is not user-editable. If combined with the <code class="docutils literal notranslate"><span class="pre">read_only</span></code> flag, data should not be allowed to be copied from that text display field.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">longtext</span></code>: a text field into which longer text could be entered. This should be displayed as a multi-line text box on the client.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">numeric</span></code>: a numerical value, either decimal or floating point. Could be displayed as a text field on the client, but requires validation to ensure the field value is numeric.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>: a text display field which is not user-editable. If combined with the <code class="docutils literal notranslate"><span class="pre">read_only</span></code> flag, data should not be
+allowed to be copied from that text display field.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">longtext</span></code>: a text field into which longer text could be entered. This should be displayed as a multi-line text box on
+the client.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numeric</span></code>: a numerical value, either decimal or floating point. Could be displayed as a text field on the client, but
+requires validation to ensure the field value is numeric.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">password</span></code>: a password field. Input mask should be used with that field on the client.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: a standard text input field. Should be displayed as a short text field (1 line) on the client.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">videoinputs</span></code>: list of all the available video inputs on the client</p></li>
@@ -182,18 +201,30 @@
 </section>
 <section id="items-conditions">
 <h3>Items conditions<a class="headerlink" href="#items-conditions" title="Permalink to this heading"></a></h3>
-<p>Items conditions are operations / equations that need to be computed to find out if an item should be displayed or not. Those needs to be dynamically computed on the client when a related item is updated.</p>
+<p>Items conditions are operations / validation equations that need to be computed to find out if an item should be
+displayed or not. Those needs to be dynamically computed on the client when a related item is updated.</p>
 <p>The following keys define the condition:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">item</span></code>, the id of the item that is used to check that condition</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>, the operator with which to perform the check. Currently, the following values are defined: <code class="docutils literal notranslate"><span class="pre">=</span></code> (equal), <code class="docutils literal notranslate"><span class="pre">&lt;&gt;</span></code> (not equal), <code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code> (not empty) and <code class="docutils literal notranslate"><span class="pre">CONTAINS</span></code> (item value containing the following text).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">condition</span></code>, the condition value to compare with. Depending on the item type, this can be of various type. A special key word, <code class="docutils literal notranslate"><span class="pre">changed</span></code>, can be specified here to trigger the condition when the value was changed (or not, depending on the operator).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">hook</span></code>, an API call (URL) to process when the condition is met. Currently, only one argument is supported, and that url should end with <code class="docutils literal notranslate"><span class="pre">=</span></code>. The client should then make the request appending the related <code class="docutils literal notranslate"><span class="pre">item</span></code> value to the query.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>, the operator with which to perform the check. Currently, the following values are defined:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">=</span></code> (equal)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;&gt;</span></code> (not equal)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NOT</span> <span class="pre">NULL</span></code> (not empty)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONTAINS</span></code> (item value containing the following text).</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">condition</span></code>, the condition value to compare with. Depending on the item type, this can be of various type.
+A special key word, <code class="docutils literal notranslate"><span class="pre">changed</span></code>, can be specified here to trigger the condition when the value was changed (or not,
+depending on the operator).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hook</span></code>, an API call (URL) to process when the condition is met. Currently, only one argument is supported, and that
+url should end with <code class="docutils literal notranslate"><span class="pre">=</span></code>. The client should then make the request appending the related <code class="docutils literal notranslate"><span class="pre">item</span></code> value to the query.</p></li>
 </ul>
 </section>
 <section id="item-values">
 <h3>Item values<a class="headerlink" href="#item-values" title="Permalink to this heading"></a></h3>
-<p>Item values represents the values to be displayed in an <code class="docutils literal notranslate"><span class="pre">array</span></code> or <code class="docutils literal notranslate"><span class="pre">checklist</span></code> item types (or any other types that would require a list.</p>
+<p>Item values represents the values to be displayed in an <code class="docutils literal notranslate"><span class="pre">array</span></code> or <code class="docutils literal notranslate"><span class="pre">checklist</span></code> item types (or any other types that would
+require a list.</p>
 <p>Each of the value has the following keys:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>, the id of the value, which will be the data needed to be stored when sending back a filled out form to the server</p></li>
@@ -208,7 +239,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Database-Structure.html" class="btn btn-neutral float-left" title="Database Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Internal-services-communication-module.html" class="btn btn-neutral float-right" title="Inter-service communication" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Messages-structure.html" class="btn btn-neutral float-right" title="Internal messages structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

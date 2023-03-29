@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Services" href="services.html" />
+    <link rel="next" title="Core Services" href="services.html" />
     <link rel="prev" title="Getting Started for Developers - Ubuntu-based Linux distros" href="../developers/Developer-Setup-for-Linux.html" /> 
 </head>
 
@@ -58,35 +58,29 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">OpenTera Services Structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#general-structure-and-definition">General structure and definition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#communication-mecanisms">Communication mecanisms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#communication-mechanisms">Communication mechanisms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#system-services">System services</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#teraserver-service">TeraServer service</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#services-access-roles">Services Access roles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#access-roles-association">Access roles association</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#opentera-projects-and-sites-roles">OpenTera projects and sites roles</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#services-and-projects-association">Services and projects association</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#services-configuration">Services configuration</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -115,57 +109,40 @@
              
   <section id="opentera-services-structure">
 <h1>OpenTera Services Structure<a class="headerlink" href="#opentera-services-structure" title="Permalink to this heading"></a></h1>
+<p>The core of OpenTera is based on (micro)-services. This allow for extensibility and freedom for the developers to create
+new features according to needs in a separate way.</p>
 <section id="general-structure-and-definition">
 <h2>General structure and definition<a class="headerlink" href="#general-structure-and-definition" title="Permalink to this heading"></a></h2>
-<p>To document.</p>
+<p>A service can be defined as a standalone software (which could be written using any framework / programming language)
+that provides features that goes beyond the scope of the <a class="reference internal" href="services.html"><span class="std std-doc">core services</span></a> in OpenTera. Each service can manage
+its own database and API, and provides client implementations (or not).</p>
+<p>Basic service architecture is described in the <a class="reference internal" href="../Architecture-Overview.html"><span class="doc std std-doc">architecture overview</span></a>.</p>
 </section>
-<section id="communication-mecanisms">
-<h2>Communication mecanisms<a class="headerlink" href="#communication-mecanisms" title="Permalink to this heading"></a></h2>
-<p>To document.</p>
+<section id="communication-mechanisms">
+<h2>Communication mechanisms<a class="headerlink" href="#communication-mechanisms" title="Permalink to this heading"></a></h2>
+<p>Services can communicate with each other using a specific <a class="reference internal" href="teraserver/api/API.html"><span class="doc std std-doc">service API</span></a>, but also using
+<a class="reference internal" href="../developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal communication structure</span></a>.</p>
 </section>
 <section id="system-services">
 <h2>System services<a class="headerlink" href="#system-services" title="Permalink to this heading"></a></h2>
-<p>Those services are internal services that are not meant to be exposed directly to the end-users. Those services are
-critical to the system, and cannot be configured or accessed like the other services.</p>
+<p>Those services are internal services that are available in the core OpenTera. Those services provides common features to
+the system, and should not be disabled unless specific requirements call for (such as never providing file transfer
+capability to a server setup).</p>
 <p>Currently, the system services are the following:</p>
 <ul class="simple">
-<li><p><strong>Logging Service</strong>, used for internal technical and access logging</p></li>
-<li><p><strong>FileTransfer Service</strong>, used to manage the various files required to be stored on the system as assets</p></li>
+<li><p><a class="reference internal" href="FileTransfer-Service.html"><span class="doc std std-doc"><strong>FileTransfer Service</strong></span></a>, used to manage the various files required to be stored on the system
+as assets</p></li>
+<li><p><a class="reference internal" href="Logging-Service.html"><span class="doc std std-doc"><strong>Logging Service</strong></span></a>, used for internal technical and access logging</p></li>
+<li><p><a class="reference internal" href="Videorehab-Service.html"><span class="doc std std-doc"><strong>VideoRehab Service</strong></span></a>, used to provide synchronous video conferencing capabilities in a
+rehabilitation context.</p></li>
 </ul>
 <section id="teraserver-service">
 <h3>TeraServer service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h3>
 <p>The OpenTera main server (TeraServer) is considered to be a specific case of system service. It is the base service
 and is mandatory in any deployed solution.</p>
-<p>Considering TeraServer as a service allows to properly manage project and site access (see below), and can be adressed
-in communication mecanisms, if needed.</p>
+<p>Considering TeraServer as a service allows to properly manage <a class="reference internal" href="Services-Access.html"><span class="doc std std-doc">project and site access</span></a>, and can be addressed
+in communication mechanisms, if needed.</p>
 </section>
-</section>
-<section id="services-access-roles">
-<h2>Services Access roles<a class="headerlink" href="#services-access-roles" title="Permalink to this heading"></a></h2>
-<p>Each service can define its own roles that are not limited to “admin” or “user”. Specific services roles are stored in
-the OpenTera service in the <code class="docutils literal notranslate"><span class="pre">TeraServiceRole</span></code> database model.</p>
-<p>Service can further refine those roles by optionally attaching them to a specific project or site.</p>
-<section id="access-roles-association">
-<h3>Access roles association<a class="headerlink" href="#access-roles-association" title="Permalink to this heading"></a></h3>
-<p>Access roles can be attached to either of the following: user group, device or participant group. This architecture
-allows to adapt to various configurations, but adds more complexity to the use or implementation. The
-<code class="docutils literal notranslate"><span class="pre">TeraServiceAccess</span></code> database model in the OpenTera service defines those relationship.</p>
-<p>Specific uses case includes associating an user group as “Admin” of a videoconferencing service, for example, allowing
-that user group to have additionnal access in that service.</p>
-</section>
-<section id="opentera-projects-and-sites-roles">
-<h3>OpenTera projects and sites roles<a class="headerlink" href="#opentera-projects-and-sites-roles" title="Permalink to this heading"></a></h3>
-<p>OpenTera main server (TeraServer) uses that mechanism to define access to projects and sites. On the creation of a new
-site or project, the server creates “admin” and “user” roles for the OpenTera service and the specific site or project
-.</p>
-</section>
-</section>
-<section id="services-and-projects-association">
-<h2>Services and projects association<a class="headerlink" href="#services-and-projects-association" title="Permalink to this heading"></a></h2>
-<p>Each service can be associated to projects. This association is defined in the <code class="docutils literal notranslate"><span class="pre">TeraServiceProject</span></code> database model on
-the OpenTera service. This association allows to expose only some of the services in the system to a specific project,
-limiting the options for services linked to Session Types and allowing to use a single server instead for various
-projects that depends on different services.</p>
 </section>
 <section id="services-configuration">
 <h2>Services configuration<a class="headerlink" href="#services-configuration" title="Permalink to this heading"></a></h2>
@@ -178,8 +155,8 @@ values such as specific devices to use or a specific UI configuration. Default c
 <p>The typical configuration structure is the following:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">Globals</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                </span><span class="c1">// Put &quot;default&quot; config values here with format:</span>
-<span class="w">                </span><span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="p">....</span><span class="w"> </span><span class="p">}</span>
-<span class="w">             </span><span class="p">},</span>
+<span class="w">                </span><span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">value</span><span class="p">}</span>
+<span class="w">             </span><span class="p">}</span>
 <span class="w">    </span><span class="nx">Specifics</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">                    </span><span class="p">{</span>
 <span class="w">                        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="nx">xxxx</span><span class="p">,</span><span class="w"> </span><span class="c1">// Specific id of that config, for example hardware ID</span>
@@ -188,12 +165,12 @@ values such as specific devices to use or a specific UI configuration. Default c
 <span class="w">                    </span><span class="p">{</span>
 <span class="w">                        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="nx">xxxx</span><span class="p">,</span><span class="w"> </span><span class="c1">// Specific id of that config, for example hardware ID</span>
 <span class="w">                        </span><span class="c1">// Put &quot;overriden&quot; config values here for that config id</span>
-<span class="w">                    </span><span class="p">},</span><span class="w"> </span><span class="p">...</span>
+<span class="w">                    </span><span class="p">},</span>
 <span class="w">               </span><span class="p">]</span>
 <span class="w">  </span><span class="p">}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">Globals</span></code> section provides default values independant of specific configuration (such as client ids or specific
+<p>The <code class="docutils literal notranslate"><span class="pre">Globals</span></code> section provides default values independent of specific configuration (such as client ids or specific
 hardware). The <code class="docutils literal notranslate"><span class="pre">Specifics</span></code> section provides override value tied to a specific system. The <code class="docutils literal notranslate"><span class="pre">id</span></code> used to identify the
 specific configuration is client-defined, and could refer to a PC unique identifier, for example.</p>
 </section>
@@ -204,7 +181,7 @@ specific configuration is client-defined, and could refer to a PC unique identif
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../developers/Developer-Setup-for-Linux.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Ubuntu-based Linux distros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="services.html" class="btn btn-neutral float-right" title="Services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="services.html" class="btn btn-neutral float-right" title="Core Services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -62,21 +62,21 @@
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service based on OpenTera</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Form-Structure.html">Internal Form Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Messages-structure.html">Internal messages structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Running Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Internal-services-communication-module.html">Inter-service communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Login-and-authentication.html">Login &amp; Authentication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Translations.html">Translations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Websockets-communication.html">Websockets communication</a></li>
 </ul>
 
         </div>
@@ -105,28 +105,29 @@
              
   <section id="developers-setup-guide">
 <h1>Developers setup guide<a class="headerlink" href="#developers-setup-guide" title="Permalink to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-</div>
-<p>## What you will need?
-OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
+<p>OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
 <p>Using standard modules and technology is useful to maintain such a project over long term, but it also brings some complexity to building up a development setup. Whatever your platform of choice, you’ll need the following tools:</p>
 <ul class="simple">
 <li><p><strong>A Python environment</strong>, Python being the language used to develop the backend
-* [Miniconda](<a class="reference external" href="https://conda.io/miniconda.html">https://conda.io/miniconda.html</a>) is used to setup the Python environment
-* [CMake](<a class="reference external" href="https://cmake.org/">https://cmake.org/</a>) tool is used to automate the environment building and translations management
-* [QT Creator](<a class="reference external" href="https://www.qt.io/product/development-tools">https://www.qt.io/product/development-tools</a>) is recommended to simplify the build process, but not required
-* [PyCharm](<a class="reference external" href="https://www.jetbrains.com/pycharm/">https://www.jetbrains.com/pycharm/</a>) is used as the IDE for Python, recommended, but not required as you can use any IDE you like</p></li>
+* <a class="reference external" href="https://conda.io/miniconda.html">Miniconda</a> is used to setup the Python environment
+* <a class="reference external" href="https://cmake.org/">CMake</a> tool is used to automate the environment building and translations management
+* <a class="reference external" href="https://www.qt.io/product/development-tools">QT Creator</a> is recommended to simplify the build process especially on Windows, but not required
+* <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> is used as the IDE for Python, recommended, but not required as you can use any IDE you like</p></li>
 <li><p><strong>A Postgresql database</strong>
-* [Postgresql](<a class="reference external" href="https://www.postgresql.org/">https://www.postgresql.org/</a>). While OpenTera being based on [SQL Alchemy](<a class="reference external" href="https://www.sqlalchemy.org/">https://www.sqlalchemy.org/</a>) could, in theory, be used with other SQL database types (such as MySQL), the open nature of this project and of Postgresql made it the suggested database system. Thus, no support is currently explicitly provided for other databases type.</p></li>
+* <a class="reference external" href="https://www.postgresql.org/">Postgresql</a>. While OpenTera being based on <a class="reference external" href="https://www.sqlalchemy.org/">SQL Alchemy</a> could, in theory, be used with other SQL database types (such as MySQL), the open nature of this project and of Postgresql made it the suggested database system. Thus, no support is currently explicitly provided for other databases type.</p></li>
 <li><p><strong>Redis server</strong>
-* [Redis](<a class="reference external" href="https://redis.io/">https://redis.io/</a>) is used to provide a common storage for publish/subscribe mechanism between modules and services</p></li>
+* <a class="reference external" href="https://redis.io/">Redis</a> is used to provide a common storage for publish/subscribe mechanism between modules and services</p></li>
 <li><p><strong>NGINX</strong>
-* [NGINX](<a class="reference external" href="https://www.nginx.com/">https://www.nginx.com/</a>) is used to redirect requests to the appropriate service and to expose only one external port. It could also be used as a load-balancing server if required</p></li>
+* <a class="reference external" href="https://www.nginx.com/">NGINX</a> is used to redirect requests to the appropriate service and to expose only one external port. It could also be used as a load-balancing server if required</p></li>
 </ul>
-<p>## Specific platform setup guides</p>
-<p>### [Developer Setup for Windows](Developer-Setup-for-Windows)
-### [Developer Setup for MAC](Developer-Setup-for-Mac)
-### [Developer Setup for Linux](Developer-Setup-for-Linux)</p>
+<p>See the following sections for platform specific instructions:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
+</ul>
+</div>
 </section>
 
 
