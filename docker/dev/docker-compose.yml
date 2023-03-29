@@ -60,6 +60,7 @@ services:
       - ./teraserver/FileTransferService.json:/root/teraserver/python/services/FileTransferService/FileTransferService.json
       - ./teraserver/LoggingService.json:/root/teraserver/python/services/LoggingService/LoggingService.json
       - ./teraserver/VideoRehabService.json:/root/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - files:/root/teraserver/python/services/FileTransferService/files
       # - certificates:/root/teraserver/python/certificates
       # - opentera-config:/root/teraserver/python/config
     networks:
@@ -84,6 +85,9 @@ volumes:
     driver: local
 
   opentera-config:
+    driver: local
+
+  files:
     driver: local
 
 networks:

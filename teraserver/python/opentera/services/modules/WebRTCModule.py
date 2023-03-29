@@ -150,7 +150,12 @@ class WebRTCModule(BaseModule):
                            self.config.webrtc_config['script'],
                            '--port=' + str(port),
                            '--key=' + str(key),
-                           '--debug=' + str(1)]
+                           '--debug=' + str(1), 
+                           '--redis_hostname=' + str(self.config.redis_config['hostname']), 
+                           '--redis_port=' + str(self.config.redis_config['port']),
+                           '--redis_db=' + str(self.config.redis_config['db']),
+                           '--redis_username=' + str(self.config.redis_config['username']),
+                           '--redis_password=' + str(self.config.redis_config['password'])]
 
         # stdout=os.subprocess.PIPE, stderr=os.subprocess.PIPE)
         try:

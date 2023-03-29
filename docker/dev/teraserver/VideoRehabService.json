@@ -6,7 +6,7 @@
 		"debug_mode": false
 	},
 	"Backend": {
-		"hostname": "opentera-server",
+		"hostname": "proxy",
 		"port": 40075
 	},
 	"Redis": {

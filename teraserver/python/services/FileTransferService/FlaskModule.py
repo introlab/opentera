@@ -168,6 +168,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_TYPE': 'redis'})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         # TODO set upload folder in config
         flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['files_directory']})
