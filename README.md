@@ -11,6 +11,9 @@ OpenTera is a micro-services based backend primarily built to support research p
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
 
+## Documentation
+* https://introlab.github.io/opentera/
+
 ## What can OpenTera do for you?
 
 In its essence, OpenTera provides an adaptable data structure on which you can base your developments. With its modular and service-based design, it is possible to tailor specific needs based on the OpenTera framework.
