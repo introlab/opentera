@@ -1,4 +1,5 @@
 version: '3.8'
+name: opentera-dev
 services:
   db:
     image: postgres:14.1-alpine
@@ -7,7 +8,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '5432:5433'
+      - '5433:5432'
     volumes:
       - db:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
@@ -18,7 +19,7 @@ services:
     image: redis:6.2-alpine
     restart: always
     ports:
-      - '6379:6380'
+      - '6380:6379'
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
@@ -63,6 +64,8 @@ services:
       - files:/root/teraserver/python/services/FileTransferService/files
       # - certificates:/root/teraserver/python/certificates
       # - opentera-config:/root/teraserver/python/config
+    ports:
+    - '222:22'
     networks:
       - app-network
     depends_on:

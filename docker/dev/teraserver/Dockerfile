@@ -5,7 +5,7 @@ SHELL ["/bin/bash", "-c"]
 
 # Install build dependencies
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl
+	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl openssh-server
 
 # Set system locale
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
@@ -14,7 +14,19 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN ["/bin/bash", "-c", "cat /proc/version"]
+# Create dev user with no password
+RUN ["/bin/bash", "-c", "useradd -m -s /bin/bash dev"]
+RUN ["/bin/bash", "-c", "echo 'dev:dev' | chpasswd"]
+RUN ["/bin/bash", "-c", "echo 'dev ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"]
+
+# Enable open-ssh server
+RUN ["/bin/bash", "-c", "mkdir /var/run/sshd"]
+RUN ["/bin/bash", "-c", "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config"]
+RUN ["/bin/bash", "-c", "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config"]
+RUN ["/bin/bash", "-c", "echo 'PermitEmptyPasswords yes' >> /etc/ssh/sshd_config"]
+RUN ["/bin/bash", "-c", "echo 'PermitUserEnvironment yes' >> /etc/ssh/sshd_config"]
+RUN ["/bin/bash", "-c", "echo 'X11Forwarding yes' >> /etc/ssh/sshd_config"]
+
 
 # Install miniconda
 WORKDIR /root
@@ -49,5 +61,8 @@ ENV PYTHONPATH /root/teraserver/python
 
 # RUN SERVER
 WORKDIR /root/teraserver/python
-CMD $PYTHON3_EXEC TeraServer.py
+
+# RUN SSH SERVER AND TERA SERVER
+CMD ["/bin/bash", "-c", "/usr/sbin/sshd -D; $PYTHON3_EXEC TeraServer.py"]
+
 
