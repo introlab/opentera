@@ -62,8 +62,7 @@ services:
       - ./teraserver/LoggingService.json:/root/teraserver/python/services/LoggingService/LoggingService.json
       - ./teraserver/VideoRehabService.json:/root/teraserver/python/services/VideoRehabService/VideoRehabService.json
       - files:/root/teraserver/python/services/FileTransferService/files
-      # - certificates:/root/teraserver/python/certificates
-      # - opentera-config:/root/teraserver/python/config
+      #- ../../teraserver/python:/home/dev/workspace:cached
     ports:
     - '222:22'
     networks:

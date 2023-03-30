@@ -18,6 +18,8 @@ ENV LC_ALL en_US.UTF-8
 RUN ["/bin/bash", "-c", "useradd -m -s /bin/bash dev"]
 RUN ["/bin/bash", "-c", "echo 'dev:dev' | chpasswd"]
 RUN ["/bin/bash", "-c", "echo 'dev ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"]
+RUN ["/bin/bash", "-c", "passwd -d dev"]
+RUN ["/bin/bash", "-c", "passwd -d root"]
 
 # Enable open-ssh server
 RUN ["/bin/bash", "-c", "mkdir /var/run/sshd"]
@@ -52,7 +54,7 @@ RUN ["/bin/bash", "-c", "npm install"]
 # Build environment
 WORKDIR /root/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
-RUN ["/bin/bash", "-c", "make python-env"]
+RUN ["/bin/bash", "-c", "make python-all"]
 
 ENV PYTHON3_EXEC /root/teraserver/python/env/python-3.10/bin/python3
 
@@ -63,6 +65,8 @@ ENV PYTHONPATH /root/teraserver/python
 WORKDIR /root/teraserver/python
 
 # RUN SSH SERVER AND TERA SERVER
-CMD ["/bin/bash", "-c", "/usr/sbin/sshd -D; $PYTHON3_EXEC TeraServer.py"]
+# CMD ["/bin/bash", "-c", "/usr/sbin/sshd -D; $PYTHON3_EXEC TeraServer.py"]
 
+# RUN SSH SERVER ONLY
+CMD  ["/bin/bash", "-c", "/usr/sbin/sshd -D"]
 
