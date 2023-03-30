@@ -1,5 +1,8 @@
 FROM ubuntu:22.04
 
+# Change default shell to bash
+SHELL ["/bin/bash", "-c"]
+
 # Install build dependencies
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
 	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl
@@ -11,11 +14,13 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+RUN ["/bin/bash", "-c", "cat /proc/version"]
 
 # Install miniconda
 WORKDIR /root
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+
 
 # Install latest npm / nodejs
 RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
@@ -25,15 +30,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 # Add directory from host
 ADD ../../../../teraserver /root/teraserver
 
+# Remove local environment that was copied in the ADD command if it exists
+RUN if [ -d "/root/teraserver/python/env/python-3.10" ]; then rm -rf /root/teraserver/python/env/python-3.10; fi
+
 # Install node-js signaling server
 WORKDIR /root/teraserver/easyrtc
-RUN ["/bin/bash", "-c", "npm install"] 
-
+RUN ["/bin/bash", "-c", "npm install"]
 
 # Build environment
 WORKDIR /root/teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
-RUN ["/bin/bash", "-c", "make python-all"]
+RUN ["/bin/bash", "-c", "make python-env"]
 
 ENV PYTHON3_EXEC /root/teraserver/python/env/python-3.10/bin/python3
 

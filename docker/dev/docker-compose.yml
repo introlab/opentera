@@ -7,26 +7,26 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - '5432:5432'
-    volumes: 
+      - '5432:5433'
+    volumes:
       - db:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       - app-network
- 
+
   cache:
     image: redis:6.2-alpine
     restart: always
     ports:
-      - '6379:6379'
+      - '6379:6380'
     command: redis-server --save 20 1 --loglevel warning
-    volumes: 
+    volumes:
       - cache:/data
     networks:
       - app-network
 
   cert-generator:
-    build: 
+    build:
       context: ../../
       dockerfile: ./docker/dev/certificates/Dockerfile
     image: opentera-cert-generator
@@ -50,7 +50,7 @@ services:
       - app-network
 
   opentera-server:
-    build: 
+    build:
       context: ../../
       dockerfile: ./docker/dev/teraserver/Dockerfile
     image: opentera-server
@@ -81,7 +81,7 @@ volumes:
   certificates:
     driver: local
 
-  nginx-logs: 
+  nginx-logs:
     driver: local
 
   opentera-config:
