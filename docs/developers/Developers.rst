@@ -24,3 +24,4 @@ See the following sections for platform specific instructions:
    Developer-Setup-for-Windows.md
    Developer-Setup-for-Mac.md
    Developer-Setup-for-Linux.md
+   Developer-Setup-for-Docker.rst

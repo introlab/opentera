@@ -25,7 +25,7 @@ Simply execute the following command (or install it using your favorite package 
 ```
 sudo apt-get install postgresql
 ```
-If you need to change the default password, it will also needs to be changed in the [configuration files]((Configuration-files).
+If you need to change the default password, it will also needs to be changed in the [configuration files](../Configuration-files).
 
 ### Installing Redis Server
 Simply execute the following command (or install it using your favorite package manager):
