@@ -1,11 +1,14 @@
-FROM ubuntu:22.04
+FROM python:3.10.10-bullseye
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
 
 # Install build dependencies
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl openssh-server
+	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl python3 
+
+# Install openssh-server
+# RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
 
 # Set system locale
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
@@ -15,58 +18,51 @@ ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Create dev user with no password
-RUN ["/bin/bash", "-c", "useradd -m -s /bin/bash dev"]
-RUN ["/bin/bash", "-c", "echo 'dev:dev' | chpasswd"]
-RUN ["/bin/bash", "-c", "echo 'dev ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"]
-RUN ["/bin/bash", "-c", "passwd -d dev"]
-RUN ["/bin/bash", "-c", "passwd -d root"]
+#RUN ["/bin/bash", "-c", "useradd -m -s /bin/bash dev"]
+#RUN ["/bin/bash", "-c", "echo 'dev:dev' | chpasswd"]
+#RUN ["/bin/bash", "-c", "echo 'dev ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers"]
+#RUN ["/bin/bash", "-c", "passwd -d dev"]
 
 # Enable open-ssh server
-RUN ["/bin/bash", "-c", "mkdir /var/run/sshd"]
-RUN ["/bin/bash", "-c", "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config"]
-RUN ["/bin/bash", "-c", "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config"]
-RUN ["/bin/bash", "-c", "echo 'PermitEmptyPasswords yes' >> /etc/ssh/sshd_config"]
-RUN ["/bin/bash", "-c", "echo 'PermitUserEnvironment yes' >> /etc/ssh/sshd_config"]
-RUN ["/bin/bash", "-c", "echo 'X11Forwarding yes' >> /etc/ssh/sshd_config"]
+#RUN ["/bin/bash", "-c", "mkdir /var/run/sshd"]
+#RUN ["/bin/bash", "-c", "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config"]
+#RUN ["/bin/bash", "-c", "echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config"]
+#RUN ["/bin/bash", "-c", "echo 'PermitEmptyPasswords yes' >> /etc/ssh/sshd_config"]
+#RUN ["/bin/bash", "-c", "echo 'PermitUserEnvironment yes' >> /etc/ssh/sshd_config"]
+#RUN ["/bin/bash", "-c", "echo 'X11Forwarding yes' >> /etc/ssh/sshd_config"]
 
+WORKDIR /
 
-# Install miniconda
-WORKDIR /root
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
-
+# Add requirements (will be cached and build faster)
+ADD ../../../../teraserver/python/env/requirements.txt /requirements.txt
+RUN ["/bin/bash", "-c", "python3 -m pip install -r /requirements.txt"]
 
 # Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
-RUN bash ~/nodesource_setup.sh
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_16.x -o /nodesource_setup.sh
+RUN bash /nodesource_setup.sh
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 
 # Add directory from host
-ADD ../../../../teraserver /root/teraserver
+ADD ../../../../teraserver /teraserver
 
 # Remove local environment that was copied in the ADD command if it exists
-RUN if [ -d "/root/teraserver/python/env/python-3.10" ]; then rm -rf /root/teraserver/python/env/python-3.10; fi
+RUN if [ -d "/teraserver/python/env/python-3.10" ]; then rm -rf /teraserver/python/env/python-3.10; fi
 
 # Install node-js signaling server
-WORKDIR /root/teraserver/easyrtc
+WORKDIR /teraserver/easyrtc
 RUN ["/bin/bash", "-c", "npm install"]
 
 # Build environment
-WORKDIR /root/teraserver
+WORKDIR /teraserver
 RUN ["/bin/bash", "-c", "cmake ."]
-RUN ["/bin/bash", "-c", "make python-all"]
-
-ENV PYTHON3_EXEC /root/teraserver/python/env/python-3.10/bin/python3
+RUN ["/bin/bash", "-c", "make docker-python-all"]
 
 # Set Python path
-ENV PYTHONPATH /root/teraserver/python
+ENV PYTHONPATH /teraserver/python
 
 # RUN SERVER
-WORKDIR /root/teraserver/python
+WORKDIR /teraserver/python
 
 # RUN SSH SERVER AND TERA SERVER
-# CMD ["/bin/bash", "-c", "/usr/sbin/sshd -D; $PYTHON3_EXEC TeraServer.py"]
-
-# RUN SSH SERVER ONLY
-CMD  ["/bin/bash", "-c", "/usr/sbin/sshd -D"]
+CMD ["/bin/bash", "-c", "python3 -m debugpy --listen 0.0.0.0:5678 TeraServer.py"]
 

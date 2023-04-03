@@ -57,16 +57,16 @@ services:
     image: opentera-server
     restart: always
     volumes:
-      - ./teraserver/TeraServerConfig.ini:/root/teraserver/python/config/TeraServerConfig.ini
-      - ./teraserver/FileTransferService.json:/root/teraserver/python/services/FileTransferService/FileTransferService.json
-      - ./teraserver/LoggingService.json:/root/teraserver/python/services/LoggingService/LoggingService.json
-      - ./teraserver/VideoRehabService.json:/root/teraserver/python/services/VideoRehabService/VideoRehabService.json
-      - files:/root/teraserver/python/services/FileTransferService/files
-      #- ../../teraserver/python:/home/dev/workspace:cached
-    ports:
-    - '222:22'
+      - ./teraserver/TeraServerConfig.ini:/teraserver/python/config/TeraServerConfig.ini
+      - ./teraserver/FileTransferService.json:/teraserver/python/services/FileTransferService/FileTransferService.json
+      - ./teraserver/LoggingService.json:/teraserver/python/services/LoggingService/LoggingService.json
+      - ./teraserver/VideoRehabService.json:/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - files:/teraserver/python/services/FileTransferService/files
     networks:
       - app-network
+    # Debug port
+    ports:
+      - '5678:5678'
     depends_on:
       - cert-generator
       - proxy
