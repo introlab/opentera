@@ -38,7 +38,7 @@ A sample [docker-compose.yml](./docker-compose.yml) file is provided that genera
 
 >1. Right-click on the [docker-compose.yml](./docker-compose.yml) and select "Compose Up". This can take several minutes the first time to download all the images and start the containers.
 
->2. Docker compose will create **volumes** (shared disks) to store your databases, configurations, files as specified in the "volume:" section. Those directores are automatically mounted when the containers are started. 
+>2. Docker compose will create **volumes** (shared disks) to store your databases, configurations, files as specified in the "volume:" section. Those directories are automatically mounted when the containers are started. 
 
 >3. When running for the first time, databases with default values are generated.
 
