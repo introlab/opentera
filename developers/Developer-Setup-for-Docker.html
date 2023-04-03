@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Developers setup guide &mdash; OpenTera 1.2.0 documentation</title>
+  <title>Getting Started for Developers - Docker &mdash; OpenTera 1.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Getting Started for Developers - Windows 10" href="Developer-Setup-for-Windows.html" />
-    <link rel="prev" title="Configuration files" href="../Configuration-files.html" /> 
+    <link rel="next" title="OpenTera Services Structure" href="../services/OpenTera_Services.html" />
+    <link rel="prev" title="Getting Started for Developers - Ubuntu-based Linux distros" href="Developer-Setup-for-Linux.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,11 +52,24 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers setup guide</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="Developers.html">Developers setup guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Docker.html">Getting Started for Developers - Docker</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started for Developers - Docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-docker-desktop">Install Docker Desktop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-visual-studio-code">Install Visual Studio Code</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#visual-studio-code-extensions">Visual Studio Code Extensions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sample-docker-configuration-for-developers">Sample Docker configuration for developers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-docker-compose-to-generate-a-full-development-environment">Using docker-compose to generate a full development environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#debugging-with-vs-code">Debugging with VS Code</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -94,9 +107,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Developers setup guide</li>
+          <li class="breadcrumb-item"><a href="Developers.html">Developers setup guide</a></li>
+      <li class="breadcrumb-item active">Getting Started for Developers - Docker</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/developers/Developers.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/developers/Developer-Setup-for-Docker.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -104,40 +118,61 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="developers-setup-guide">
-<h1>Developers setup guide<a class="headerlink" href="#developers-setup-guide" title="Permalink to this heading"></a></h1>
-<p>OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
-<p>Using standard modules and technology is useful to maintain such a project over long term, but it also brings some complexity to building up a development setup. Whatever your platform of choice, you’ll need the following tools:</p>
+  <section id="getting-started-for-developers-docker">
+<h1>Getting Started for Developers - Docker<a class="headerlink" href="#getting-started-for-developers-docker" title="Permalink to this heading"></a></h1>
+<section id="pre-requisites">
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>A Python environment</strong>, Python being the language used to develop the backend
-* <a class="reference external" href="https://conda.io/miniconda.html">Miniconda</a> is used to setup the Python environment
-* <a class="reference external" href="https://cmake.org/">CMake</a> tool is used to automate the environment building and translations management
-* <a class="reference external" href="https://www.qt.io/product/development-tools">QT Creator</a> is recommended to simplify the build process especially on Windows, but not required
-* <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a> is used as the IDE for Python, recommended, but not required as you can use any IDE you like</p></li>
-<li><p><strong>A Postgresql database</strong>
-* <a class="reference external" href="https://www.postgresql.org/">Postgresql</a>. While OpenTera being based on <a class="reference external" href="https://www.sqlalchemy.org/">SQL Alchemy</a> could, in theory, be used with other SQL database types (such as MySQL), the open nature of this project and of Postgresql made it the suggested database system. Thus, no support is currently explicitly provided for other databases type.</p></li>
-<li><p><strong>Redis server</strong>
-* <a class="reference external" href="https://redis.io/">Redis</a> is used to provide a common storage for publish/subscribe mechanism between modules and services</p></li>
-<li><p><strong>NGINX</strong>
-* <a class="reference external" href="https://www.nginx.com/">NGINX</a> is used to redirect requests to the appropriate service and to expose only one external port. It could also be used as a load-balancing server if required</p></li>
+<li><p><a class="reference external" href="https://www.docker.com/products/docker-desktop/">Install Docker Desktop for Windows/Linux/Mac</a></p></li>
+<li><p><a class="reference external" href="https://code.visualstudio.com/download">Install Visual Studio Code</a> (recommended)</p></li>
+<li><p>Enough free space on your disk (10Gb+)</p></li>
 </ul>
-<p>See the following sections for platform specific instructions:</p>
-<div class="toctree-wrapper compound">
+<section id="install-docker-desktop">
+<h3>Install Docker Desktop<a class="headerlink" href="#install-docker-desktop" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Follow installation procedures and use default settings.</p></li>
+</ul>
+</section>
+<section id="install-visual-studio-code">
+<h3>Install Visual Studio Code<a class="headerlink" href="#install-visual-studio-code" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Follow installation procedures and use default settings.</p></li>
+</ul>
+<section id="visual-studio-code-extensions">
+<h4>Visual Studio Code Extensions<a class="headerlink" href="#visual-studio-code-extensions" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p>Install the following extensions:</p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Docker.html">Getting Started for Developers - Docker</a></li>
+<li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a></p></li>
+<li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a></p></li>
+<li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker">Docker</a></p></li>
+<li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=twxs.cmake">CMake</a></p></li>
+<li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown</a></p></li>
 </ul>
-</div>
+</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="sample-docker-configuration-for-developers">
+<h2>Sample Docker configuration for developers<a class="headerlink" href="#sample-docker-configuration-for-developers" title="Permalink to this heading"></a></h2>
+</section>
+<section id="using-docker-compose-to-generate-a-full-development-environment">
+<h2>Using docker-compose to generate a full development environment<a class="headerlink" href="#using-docker-compose-to-generate-a-full-development-environment" title="Permalink to this heading"></a></h2>
+<p>bla</p>
+</section>
+<section id="debugging-with-vs-code">
+<h2>Debugging with VS Code<a class="headerlink" href="#debugging-with-vs-code" title="Permalink to this heading"></a></h2>
+<p>adf</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Configuration-files.html" class="btn btn-neutral float-left" title="Configuration files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Developer-Setup-for-Windows.html" class="btn btn-neutral float-right" title="Getting Started for Developers - Windows 10" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Developer-Setup-for-Linux.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Ubuntu-based Linux distros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../services/OpenTera_Services.html" class="btn btn-neutral float-right" title="OpenTera Services Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
