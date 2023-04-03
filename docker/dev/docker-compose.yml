@@ -1,5 +1,6 @@
 version: '3.8'
-name: opentera-dev
+#Not working on previous version, will use directory name instead
+#name: opentera-dev
 services:
   db:
     image: postgres:14.1-alpine

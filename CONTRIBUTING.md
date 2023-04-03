@@ -1,4 +1,4 @@
-# Contributing to opentera-webrtc
+# Contributing to opentera
 This document is based on [this template](https://github.com/auth0/open-source-template/blob/master/GENERAL-CONTRIBUTING.md).
 
 Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved.

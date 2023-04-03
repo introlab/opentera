@@ -33,8 +33,8 @@ ENV LC_ALL en_US.UTF-8
 
 WORKDIR /
 
-# Add requirements (will be cached and build faster)
-ADD ../../../../teraserver/python/env/requirements.txt /requirements.txt
+# Add requirements (will be cached and build faster, path relative to context)
+ADD ./teraserver/python/env/requirements.txt /requirements.txt
 RUN ["/bin/bash", "-c", "python3 -m pip install -r /requirements.txt"]
 
 # Install latest npm / nodejs
@@ -42,11 +42,14 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x -o /nodesource_setup.sh
 RUN bash /nodesource_setup.sh
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 
-# Add directory from host
-ADD ../../../../teraserver /teraserver
+# Add directory from host (path relative to context)
+ADD ./teraserver /teraserver
 
 # Remove local environment that was copied in the ADD command if it exists
 RUN if [ -d "/teraserver/python/env/python-3.10" ]; then rm -rf /teraserver/python/env/python-3.10; fi
+
+# Cleanup directory of cmake cache (we possibly are using it outside of docker)
+RUN if [ -f "/teraserver/CMakeCache.txt" ]; then rm -f /teraserver/CMakeCache.txt; fi
 
 # Install node-js signaling server
 WORKDIR /teraserver/easyrtc
@@ -65,4 +68,3 @@ WORKDIR /teraserver/python
 
 # RUN SSH SERVER AND TERA SERVER
 CMD ["/bin/bash", "-c", "python3 -m debugpy --listen 0.0.0.0:5678 TeraServer.py"]
-

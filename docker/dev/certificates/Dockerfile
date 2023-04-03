@@ -1,11 +1,11 @@
 FROM python:3.10-bullseye
 
 # Install requirements (not changing often)
-ADD ../../../../teraserver/python/env/requirements.txt /requirements.txt
+ADD ./teraserver/python/env/requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
 # Add directory from host
-ADD ../../../../teraserver ./teraserver
+ADD ./teraserver ./teraserver
 
 # Generate certificates
 WORKDIR /teraserver/python
