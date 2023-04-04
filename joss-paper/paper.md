@@ -1,209 +1,119 @@
 ---
-title: 'OpenTera : A Microservice Framework Allowing Structured and Customized Tele-Health Sessions'
-tags:
-  - Python
-  - Microservices
-  - Tele-Health
-  - Rehabilitation
-  - Robotics
-  - Telepresence
-  - Serious Games
-  - Exergames
-  
-authors:
-  - name: Dominic Létourneau
-    orcid: 0000-0001-7825-7533
-    affiliation: 1
-  - name: Simon Brière
-    orcid: 0009-0000-1224-8001
-    affiliation: 2
-  - name: François Michaud
-    orcid: 0000-0002-3639-7770
-    affiliation: 1
-  - name: Michel Tousignant
-    orcid: 0000-0001-7561-1170
-    affiliation: 2
-affiliations:
-  - name: Interdisciplinary Institute for Technological Innovation (3IT), Université de Sherbrooke, Canada
-    index: 1
-  - name: Research Center on Aging (CDRV), Université de Sherbrooke, Canada
-    index: 2
+title: 'OpenTera : A Microservice Framework Allowing Structured and Customized Tele-Health Sessions And Data Collection for Research' 
+tags: 
+  - Python 
+  - Microservices 
+  - Tele-Health 
+  - Rehabilitation 
+  - Robotics 
+  - Telepresence   
 
-date: March 15 2023
-bibliography: paper.bib
----
+authors: 
+  - name: Dominic Létourneau 
+    orcid: 0000-0001-7825-7533 
+    affiliation: 1 
 
-# Summary
-OpenTera is a micro-services based framework primarily developed to support tele-health research projects and real world
-deployment. This project is based on many years of experience linking at-home participants to remote users (such as
-clinicians) with audio-video-data connections and in-the-field sensor (such as biometrics, activities and robotics
-devices).
+  - name: Simon Brière 
+    orcid: 0009-0000-1224-8001 
+    affiliation: 2 
 
-Most telehealth based research projects requires a common data structure: data collect sites, projects, participants
-and sessions including various recorded data types (from sensors or other sources). Those projects also require many common low-level features: user
-authentification based on various access roles, ability to add new features based on specific projects needs,
-ease of use for the participant and secure data hosting. Some common features are also shared between research projects: videoconferencing
-with specific health related features (angles measurement, timers, etc.), surveys data collection, data analysis and
-export.
+  - name: François Michaud 
+    orcid: 0000-0002-3639-7770 
+    affiliation: 1 
 
-Since many of the available solutions are either costly, features limited, proprietary (e.g. can't be easily adapted for
-research purpose and raw data is harder to access) or hard to deploy in a tele-health context, OpenTera was built to
-allow for extensability over the various projects needs and to provide research project full control over their data and
-hosting.
+  - name: Michel Tousignant 
+    orcid: 0000-0001-7561-1170 
+    affiliation: 2 
 
-Applications of the OpenTera framework are not limited to research projects, and can also be applied in a clinical
-environment, where clinicians have to communicate with patients. Such fields include but are not limited to:
-tele-rehabilibation (physical, social, mental), robotic tele-operation and remote activity monitoring.
+affiliations: 
 
-The project has been open sourced to make it available to a larger audience, but was developed internally since 2013.
+  - name: Interdisciplinary Institute for Technological Innovation (3IT), Université de Sherbrooke, Canada 
+    index: 1 
 
-#### ---- Ideas - remove if not needed ----
-The framework allows the creation of backend services that are written in Python and based on key technologies and open source projects :
-Redis[@redis], Flask[@Flask], SqlAlchemy[@SqlAlchemy], Twisted[@Twisted], NGINX[@NGINX], EasyWebRTC[@EasyWebRTC].
+  - name: Research Center on Aging (CDRV), Université de Sherbrooke, Canada 
+    index: 2 
 
-It is developed as a low cost, secure and easy to deploy alternative to existing proprietary or open source solutions.
+date: April 4 2023 
+bibliography: paper.bib 
+--- 
+# Summary 
 
-Our goal is to have full control of the system and the produced data, alleviating the relevance on external projects and lowering costs.
+OpenTera is a microservice based framework primarily developed to support tele-health research projects and real-world deployment. This project is based on many years of experience linking at-home participants to remote users (such as clinicians, researchers, healthcare professionals) with audio-video-data connections and in-the-field sensors (such as biometrics, activities and robotics devices). 
 
-It can run on embedded devices such as raspberry Pis, local servers or cloud infrastructure.
+ 
+Most telehealth-based research projects require a common data structure: data collection sites, projects, participants and sessions including various recorded data types (from sensors or other sources). Those projects also require many common features: user authentication based on various access roles, ability to add new features based on specific project needs, ease of use for the participant and secure data hosting.  These features are also shared between research projects: videoconferencing with specific health related features (angles measurement, timers, etc.), surveys data collection, data analysis and exportation. 
 
-The project contains the base server (TeraServer) offering a REST API [@REST], useful to manage users,
-participants, devices, sites, projects, sessions, and supports multiple authentication methods.
+Since many of the available solutions are either costly, features limited, proprietary (e.g., can't be easily adapted for research purpose and raw data is harder to access) or hard to deploy in a tele-health context, OpenTera was built to allow for extensibility over the various projects needs and to provide research projects full control over their data and hosting. 
 
-TeraServer also manages authorizations for users, participants and devices, allowing us to have a precise control
-of accessible information, which is required for security reasons.
+Applications of the OpenTera framework are not limited to research projects, and can also be applied in a clinical environment, where clinicians must communicate with patients. Such fields include but are not limited to: tele-rehabilitation (physical, social, mental), robotic tele-operation and remote activity monitoring. 
 
-OpenTera also have some base services : VideoRehab, Logging and FileTransfer.
+ 
+The project has been developed internally since 2013 but published as open-source software on GitHub in 2019 with an Apache-2.0 license along with documentation and examples. 
 
-Those base services allow WebRTC sessions from the web along with appropriate logging and file transfer possiblities.
+# Statement of need 
 
-The project is inspired by years of experience with tele-rehabilitation research with deployments in participant's home where we want to offer simple and effective way for participants and clinicians to communicate and do tele-rehabilitation sessions.
+From our research experience, common features between the different tele-health projects we participated emerged: 
 
-The project have been deployed for robot tele-operation during COVID[@panchea_opentera_2022] and is currently used for multiple rehabilitation projects since 2021.
+* Data structure. Store data in a structured way to ease data extraction and analysis. 
 
-# Statement of need
+* Ecological data capture. Collect data not only in laboratories or controlled environments, but also in homes or institutions. 
 
-From our research experience, common features between the different tele-health projects we participated emerged:
+* Project adaptability. Develop projects specific dashboards and user interfaces while reusing as much as possible of what was done before to reduce development time. Rehabilitation projects may require implementing serious games or exergames while teleoperation projects may require real-time navigation tools. Adapting already existing open-source software when possible is often the key. 
 
-* Data structure. The need to store data in a structured way to ease data analysis.
-* Ecological data capture. The need to collect data not only in a laboratory or controlled environment, but also in the home or institution.
-* Project adaptability. The need to develop projects specific dashboards while reusing as much as possible of what was done before to reduce development time.
-* Security. The need to store and transfer data in a secure and controlled way.
-* Uniformity. The need to have an "all-in-one" integrated solution avoiding the use of multiple windows and tools and focusing attention on the current tele-health task.
-* Ease of use. The need to have an easy to use solution for the user and the participant at all steps of the process (authentification, data collection, data management)
+* Cost effectiveness. Most of the recent commercial cloud tele-health applications available are subscription based and do not offer the flexibility we need. Each vendor offers its own approach tailored for its products and services. We often have data collections from dozens of participants and users and paying the subscription fee would be prohibitive. 
 
-To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
+* Security. Store and transfer data in a secure and controlled way. Access control to information depending on each project requirements. Research projects involving participants must be approved by the ethics committee, and they often require servers hosted locally or in a specific region. 
 
-There are many open-source solutions that can be integrated and could solve the identified needs, but none of those would
-fit those needs completely and would require customization at some level that can quickly gets limitative or complicated.
+* Uniformity. Avoid the use of multiple applications and tools that would require the user to navigate between them (minimizing and restoring them as needed) and focusing attention on the current tele-health task.  
+
+* Ease of use. Implement an easy-to-use solution for the user and the participant at all steps of the process (authentication, data collection, data management).  Avoid long list of "friends" for communication where we need to click the right person and start a conference. 
+
+* Synchronous and asynchronous sessions. Support real-time sessions (synchronous) or on-demand pre-recorded or application-based sessions (asynchronous) with multiple users, devices and participants. 
+
+* No installation. Especially for participants, connecting through a web browser with a personalized link is favored, avoiding complicated installation of apps and login / password / registration steps which is not an easy task for everyone, depending on their technological literacy. In the context of healthcare establishments, support of deployed apps often requires long-term planning and discussions with the IT team, as opposed to web-based applications. 
+
+* Long term availability. Since research projects can extend over a long period of time, it is required that the underlying systems to be supported for that period. No guarantee exists when using a commercial system that it will remain feature compatible for the required duration.  
+
+* Server deployment and management. Installing the system on low-cost hardware (like Raspberry Pis), local servers and cloud infrastructure can be required, depending on the scale of the projects and its location. Deployments should be manageable by a small team. 
+
+ 
+Most of the open-source projects currently available concentrated their efforts on providing videoconferencing alternative to proprietary solutions (i.e., Skype, Google Meet, MS Teams, Zoom, etc.) with chat and file transfer capabilities. Alternative open-source projects include Big Blue Button, NextCloud Talk, Jami, OpenVidu, Jitsi Meet, Kurento. Although excellent solutions for videoconferencing, they are not especially fit for research and do not meet all requirements for tele-health applications and would require customization at some level that can quickly become limitative or complicated.  
+
+Open-source rehabilitation-oriented applications are also available. The OpenRehab [@freitas_openrehab_2017] project lists multiple rehabilitation tools for: upper limb, mobility, fitness, cognition, balance. Such applications are often dedicated to a specific domain and mostly contain pre-recorded videos that are prescribed by the physiotherapists. Most of them do not offer tele-consultation features and remote access to research data. 
+
+Finally, open-source Electronic Health/Medical Records (EHR, EMR) [@neha_intelehealth_2017] are available and can meet some research requirements, but we want to avoid storing personal and sensitive information on participants and prefer to use or connect to existing systems that comply with local regulations like Health Insurance Portability and Accountability Act (HIPPAA).  
+
+OpenTera is specifically designed to address the previously mentioned and required features for research. It is built using a microservice architecture based as much as possible on recognized standards and best practices. This architecture allows scalability, flexibility, resilience, maintainability and technology diversity, all needed in a research context.  
+
+ 
+OpenTera contains the base server (TeraServer) offering a REST API [@fielding_rest_2002], useful to manage users, participants, devices, sites, projects, sessions, and supports multiple authentication methods via user/password, certificates or tokens. TeraServer also manages authorizations for users, participants and devices, allowing a fine-grained access control on resources and assets. 
 
 
+OpenTera also includes base services: Video Rehabilitation, Logging and File Transfer. They allow audio/video WebRTC sessions from the web along with appropriate logging and file transfer capabilities. Structured sessions enable organized information such as survey results, sensor data, metadata and analytics and facilitate the retrieval of information and key statistics. 
 
-- Ease of use through a web browser (for participants) is mandatory. Use participant's mobile or desktop devices. Avoid complicated installation of apps and login / password / registration.
-- Avoid long list of "friends" for communication where we need to click the right person and start a conference.
-- Use unique link to authenticate, automate the start of sessions with clinicians.
-- Explain Asynchronous / Synchonous sessions.
+ 
+Microservices scalability and diversity allows developers to use any technology for backends and frontends. Such microservices can add new features to the system such as serious or exergames, exercises coach / videos and participant calendar / portal. Development of new microservices can leverage on the OpenTera Python library, available on PyPi. 
 
-- Applications are hard to install in healthcare applications and distribution over the web is easier.
-- Network access is complicated, need to minimize non standard ports for easier access.
-- Need central and secured place to put assets and manage backups.
-- Not duplicating the Electronic Health/Medical Record (EHR/EMR) and avoid storing sensitive information if possible.
-- Integration of research surveys
-- Actimetry device integration
-- Long term availablity, not often the case with proprietary solutions.
-- Customization, still require technical knowledge.
-- Need more than tele-consultation (videoconference) with chat and file sharing.
+# Related projects 
 
-https://www.computerworld.com/article/3596891/10-open-source-videoconferencing-tools-for-business.html
+Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under active development and implementing new OpenTera services or underlying libraries. 
+ 
+Table: OpenTera Related Projects \label{tab:opentera-related-projects} 
 
-TODO: Need to chose features to compare
+| GitHub Project Name             | Description                                                                                         | 
+|---------------------------------|-----------------------------------------------------------------------------------------------------| 
+| opentera-webrtc                 | WebRTC library in C++/Javascript/Python with signaling server to allow audio/video/data sessions.   | 
+| opentera-teleop-service         | OpenTera Service managing robots fleet and web front-end for tele-operation.                        | 
+| opentera-webrtc-teleop-frontend | Robot teleoperation front-end made with Vue.js[@vuejs].                                             | 
+| opentera-webrtc-ros             | OpenTera robot device client and ROS integration for remote control and monitoring of mobile robots.| 
+| openteraplus                    | Qt Frontend to manage OpenTera configuration and data.                                              | 
 
-There are several open source videoconferencing systems that could be used in tele-health scenarios. The table \ref{tab:open-source-videoconferencing} summarizes the important features and compares to what is developed in OpenTera.
+ 
+OpenTera has been deployed for robot tele-operation during COVID[@panchea_opentera_2022] and is currently used for multiple rehabilitation projects since its inception. 
 
-Table: Open Source VideoConferencing Solutions Comparison \label{tab:open-source-videoconferencing}
+ 
+# Acknowledgements 
 
-|Project              | Audio | Video | Chat |Max Group | Devices| Organized Data | Rehab Tools | Usage Stats  | Security | Planning     | Web |
-|---------------------|-------|-------|------|----------|--------|----------------|-------------|--------------|----------|--------------|-----|
-| Jitsi               |
-| Big Blue Button     |
-| OpenMeetings        |
-| NextCloud Talk      |
-| Jami                |
-| OpenVidu            |
-| OpenTera            |
+This work was supported by the Natural Sciences and Engineering Research Council of Canada (NSERC), the Fonds de recherche du Québec – Nature et technologies (FRQNT) and the Network of Centres of Excellence of Canada on Aging Gracefully across Environments using Technology to Support Wellness, Engagement, and Long Life (AGE-WELL). 
 
-TODO:  Maybe we should focus on open source rehab solutions
-https://www.goodfirms.co/telemedicine-software/
-https://blog.containerize.com/top-5-open-source-video-conferencing-software-of-2021/
-
-
-Talk about HIPPAA Compliance ?
-
-
-
-[VSee](https://vsee.com/)
-- HIPAA
-- 
-
-- [OpenRehab](https://openrehab.org/)
-  - Web Site with a listing of rehabilitation tools for : Upper Limb, Mobility, Fitness, Cognition, Balance.
-
-  - [VERA](https://www.cmrehabnetwork.nhs.uk/uploadedfiles/documents/Development%20of%20VERA%20Ganesh%20Bavikatte%20Jo%20Haworth%20Nic%20Branscombe%20Charlotte%20Lawrence.pdf):
-    - Open ??? Did not find any web site / source repository.
-
-
-- REHAB
-- [OPEN FEASYO](https://openfeasyo.org/)
-  - Games : https://github.com/openfeasyo/OpenFeasyo using EMG sensors.
-  - 
-  - 
-- 
-- [Intelehealth](https://github.com/Intelehealth)
-- 
-- 
-- [OpenPT]()
-- [PhysiTrack](https://www.physitrack.fr/)
-  - Subscription based
-  - Exercices
-
-- [RehApp]()
-- [RehabMe](https://github.com/djvolz/RehabMe) -->DEPRECATED
-- [PhysioCam]()
-
-
-- Serious games : Games with an additional purpose other than its original objective which is the seeking of enjoyment. For instance, rehabilitation of upper limbs.
-  
-- Exergames : Games that involve physical exertion and are thought of as a form of exercise.
-  
-Focus on live sessions with clinician.
-
-
-Most of the recent commercial cloud tele-health applications provided is subscription based and do not offer the flexibility we need. Each vendor offers its own approch tailored for its products and services.
-
-We often have data collections from dozens of participants and users and paying the subscription fee would be prohibitive.
-
-We do not want to be dependant on services that can be changed over time and we need control on the data we collect.
-
-
-Library to ease development of new micro-services available on PyPi[@pypi_opentera].
-
-
-# Related projects
-Table \autoref{tab:opentera-related-projects} shows related open-source projects that are currently under active developement and implementing new OpenTera services or underlying libraries.
-
-Table: OpenTera Related Projects \label{tab:opentera-related-projects}
-
-| GitHub Project Name             | Description                                                                                         |
-|---------------------------------|-----------------------------------------------------------------------------------------------------|
-| opentera-webrtc                 | WebRTC library in C++/Javascript/Python with signaling server to allow audio/video/data sessions.|
-| opentera-teleop-service         | OpenTera Service managing robots fleet and web front-end for tele-operation.|
-| opentera-webrtc-teleop-frontend | Robot teleoperation front-end made with Vue.js[@vuejs].|
-| opentera-webrtc-ros             | OpenTera robot device client and ROS integration for remote control and monitoring of mobile robots.|
-| openteraplus                    | Qt Frontend to manage OpenTera configuration. Includes a chrome web engine for WebRTC sessions.|
-
-
-# Acknowledgements
-This work was supported by the Natural Sciences and Engineering Research Council of Canada (NSERC), the Fonds de recherche du Québec – Nature et technologies (FRQNT) and the Network of Centres of Excellence of Canada on Aging Gracefully across Environments using Technology to Support Wellness, Engagement, and Long Life (AGE-WELL). It also supported by {FONDS MICHEL}.
-
-# References
-
+# References 
