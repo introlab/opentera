@@ -12,7 +12,6 @@ authors:
   - name: Dominic Létourneau
     orcid: 0000-0001-7825-7533
     affiliation: 1
-
   - name: Simon Brière
     orcid: 0009-0000-1224-8001
     affiliation: 2
