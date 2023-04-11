@@ -33,7 +33,7 @@ authors:
     orcid: 0000-0000-0000-0000
     affiliation: 1
 
-  - name: Ian-Mathiey Joly
+  - name: Ian-Mathieu Joly
     orcid: 0000-0000-0000-0000
     affiliation: 1
 
