@@ -12,12 +12,47 @@ authors:
   - name: Dominic Létourneau
     orcid: 0000-0001-7825-7533
     affiliation: 1
+
   - name: Simon Brière
     orcid: 0009-0000-1224-8001
     affiliation: 2
+
+  - name : Marc-Antoine Maheux
+    orcid : 0000-0002-3983-8754
+    affiliation : 1
+
+  - name: Cérdic Godin
+    orcid : 0000-0000-0000-0000
+    affiliation : 1
+
+  - name : Philippe Warren
+    orcid : 0009-0008-4466-0963
+    affiliation : 1
+
+  - name : Gabriel Lauzier
+    orcid: 0000-0000-0000-0000
+    affiliation: 1
+
+  - name: Ian-Mathiey Joly
+    orcid: 0000-0000-0000-0000
+    affiliation: 1
+
+  - name: Jérémie Bourque
+    orcid: 0000-0000-0000-0000
+    affiliation : 1
+
+  - name: Philippe Arsenault
+    orcid: 0000-0000-0000-0000
+    affiliation: 1
+
+  - name: Cynthia Vilanova
+    orcid : 0000-0000-0000-0000
+    affiliation : 2
+
   - name: Michel Tousignant
     orcid: 0000-0001-7561-1170
     affiliation: 2
+
   - name: François Michaud
     orcid: 0000-0002-3639-7770
     affiliation: 1
