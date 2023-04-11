@@ -21,7 +21,7 @@ authors:
     orcid : 0000-0002-3983-8754
     affiliation : 1
 
-  - name: Cérdic Godin
+  - name: Cédric Godin
     orcid : 0000-0000-0000-0000
     affiliation : 1
 
