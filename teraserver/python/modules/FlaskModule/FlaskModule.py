@@ -86,7 +86,6 @@ class FlaskModule(BaseModule):
         # Use debug mode flag
         flask_app.debug = config.server_config['debug_mode']
 
-
         # Change secret key to use server UUID
         # This is used for session encryption
         flask_app.secret_key = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerUUID)

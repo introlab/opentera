@@ -5,7 +5,7 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 
-from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraParticipant import TeraParticipant
 
@@ -25,6 +25,9 @@ from opentera.forms.TeraServiceConfigForm import TeraServiceConfigForm
 from opentera.forms.TeraVersionsForm import TeraVersionsForm
 from opentera.forms.TeraSessionTypeConfigForm import TeraSessionTypeConfigForm
 from opentera.forms.TeraTestTypeForm import TeraTestTypeForm
+
+from opentera.redis.RedisRPCClient import RedisRPCClient
+import json
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -132,7 +135,20 @@ class UserQueryForms(Resource):
         if args['type'] == 'session_type_config':
             if not args['id']:
                 return gettext('Missing session type id'), 400
-            return TeraSessionTypeConfigForm.get_session_type_config_form(id_session_type=args['id'])
+            session_type: TeraSessionType = TeraSessionType.get_session_type_by_id(args['id'])
+            if session_type:
+                if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value and \
+                        not session_type.session_type_service.service_system:
+                    # External service - must query RPC call to get config form
+                    rpc = RedisRPCClient(self.module.config.redis_config, timeout=5)
+                    answer = rpc.call_service(session_type.session_type_service.service_key, 'session_type_config',
+                                              json.dumps({'id_session_type': session_type.id_session_type}))
+                    if answer:
+                        return answer
+                    else:
+                        return gettext('No reply from service while querying session type config'), 408
+
+                return TeraSessionTypeConfigForm.get_session_type_config_form(session_type)
 
         if args['type'] == 'session':
             return TeraSessionForm.get_session_form(user_access=user_access, specific_session_id=args['id'],
