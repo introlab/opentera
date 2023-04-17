@@ -195,6 +195,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
         # new_service.service_endpoint_device = '/device'
         new_service.service_enabled = True
         new_service.service_editable_config = True
+        new_service.service_system = True
         TeraService.db().session.add(new_service)
 
         new_service = TeraService()

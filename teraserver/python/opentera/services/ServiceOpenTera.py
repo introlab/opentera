@@ -68,8 +68,9 @@ class ServiceOpenTera(RedisClient):
         self.register_to_events()
 
     def setup_rpc_interface(self):
-        # Should be implemented in derived classes
-        pass
+        self.rpc_api['session_type_config'] = {'args': ['int:id_session_type'],
+                                               'returns': 'dict',
+                                               'callback': self.get_session_type_config_form}
 
     def register_to_events(self):
         # Should be implemented in derived classes
@@ -205,3 +206,7 @@ class ServiceOpenTera(RedisClient):
         tera_message.head.source = src
         tera_message.head.dest = dest
         return tera_message
+
+    def get_session_type_config_form(self, id_session_type: int) -> dict:
+        # Default session type config form for services
+        return {}

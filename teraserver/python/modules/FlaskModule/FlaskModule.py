@@ -317,7 +317,8 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
         from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
         from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
-        from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles import ServiceQuerySiteProjectAccessRoles
+        from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles \
+            import ServiceQuerySiteProjectAccessRoles
         from modules.FlaskModule.API.service.ServiceQueryUsers import ServiceQueryUsers
         from modules.FlaskModule.API.service.ServiceQueryServices import ServiceQueryServices
         from modules.FlaskModule.API.service.ServiceQueryProjects import ServiceQueryProjects

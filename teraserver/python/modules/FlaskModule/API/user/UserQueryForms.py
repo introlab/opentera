@@ -137,8 +137,7 @@ class UserQueryForms(Resource):
                 return gettext('Missing session type id'), 400
             session_type: TeraSessionType = TeraSessionType.get_session_type_by_id(args['id'])
             if session_type:
-                if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value and \
-                        not session_type.session_type_service.service_system:
+                if session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value:
                     # External service - must query RPC call to get config form
                     rpc = RedisRPCClient(self.module.config.redis_config, timeout=5)
                     answer = rpc.call_service(session_type.session_type_service.service_key, 'session_type_config',
@@ -148,7 +147,7 @@ class UserQueryForms(Resource):
                     else:
                         return gettext('No reply from service while querying session type config'), 408
 
-                return TeraSessionTypeConfigForm.get_session_type_config_form(session_type)
+                return {}
 
         if args['type'] == 'session':
             return TeraSessionForm.get_session_form(user_access=user_access, specific_session_id=args['id'],

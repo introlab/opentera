@@ -245,7 +245,8 @@ class BaseWebRTCService(ServiceOpenTera):
             self.send_join_message(session_info=session_info)
 
     def setup_rpc_interface(self):
-        # TODO Update rpc interface
+        super().setup_rpc_interface()
+
         self.rpc_api['session_manage'] = {'args': ['str:json_info'],
                                           'returns': 'dict',
                                           'callback': self.session_manage}
