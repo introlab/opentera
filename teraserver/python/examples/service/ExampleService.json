@@ -1,0 +1,30 @@
+{
+  "Service": {
+    "name": "ExampleService",
+    "hostname": "127.0.0.1",
+    "port": 5010,
+    "debug_mode": false
+  },
+  "Backend": {
+    "hostname": "127.0.0.1",
+    "port": 40075
+  },
+  "Redis": {
+    "hostname": "127.0.0.1",
+    "port": 6379,
+    "db": 0,
+    "username": "",
+    "password": ""
+  },
+  "ExampleService" : {
+    "files_directory": "files"
+  },
+  "Database": {
+    "db_type": "QPSQL",
+    "name": "openteraexample",
+    "url": "127.0.0.1",
+    "port": 5432,
+    "username": "teraagent",
+    "password": "tera"
+  }
+}

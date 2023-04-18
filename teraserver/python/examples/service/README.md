@@ -1,6 +1,6 @@
 # Example service using assets, Flask Rest API and views
 
-This is an example service using assets (file storage), Flask Rest API and views. The views can be developped using the 
+This is an example service using Flask Rest API and views. The views can be developped using the 
 internal templating system (jinja) or using external framework such as React or Angular. 
 
 ## Setup

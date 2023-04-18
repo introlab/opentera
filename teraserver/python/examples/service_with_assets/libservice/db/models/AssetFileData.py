@@ -1,10 +1,7 @@
-# FIXME: Uncomment on OpenTera package 1.2.0 release
-from opentera.db.Base import BaseModel
-# FIXME: Comment on OpenTera package 1.2.0 release
-# from libservice.db.Base import BaseModel
+from BaseModel import BaseModel
 
 from sqlalchemy import exc
-from sqlalchemy import Column, ForeignKey, Sequence, Integer, String, BigInteger, TIMESTAMP
+from sqlalchemy import Column, Sequence, Integer, String, BigInteger
 import os
 
 
