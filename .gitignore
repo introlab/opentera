@@ -90,3 +90,4 @@ python-3.10
 venv
 joss-paper/paper.jats
 joss-paper/paper.pdf
+/.vscode
