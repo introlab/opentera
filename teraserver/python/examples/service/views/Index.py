@@ -19,3 +19,4 @@ class Index(MethodView):
         except NotFound:
             # If the file was not found, send the default index file
             return flask_app.send_static_file('default_index.html')
+  
