@@ -2,9 +2,9 @@ name: gen-doc-and-deploy-to-github-pages
 
 on:
   push:
-    branches: [main, joss-paper-draft]
+    branches: [main]
   workflow_dispatch:
-    branches: [main, joss-paper-draft]
+    branches: [main]
 
 jobs:
   build:
