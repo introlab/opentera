@@ -1,4 +1,4 @@
-# OpenTera
+# About OpenTera
 
 [![Actions Status](https://github.com/introlab/opentera/actions/workflows/python-package-pypi.yml/badge.svg)](https://github.com/introlab/opentera/actions)
 
@@ -10,6 +10,9 @@ OpenTera is a micro-services based backend primarily built to support research p
 * Security: The need to store and transfer data in a secure and controlled way
 
 To address those common features, OpenTera was designed with an architecture based as much as possible on recognized standards and best practices.
+
+## Documentation
+* https://introlab.github.io/opentera/
 
 ## What can OpenTera do for you?
 
@@ -65,7 +68,7 @@ You are welcome to participate in this effort. Leave us comments or report [Issu
 
 ## Documentation and getting started
 
-Detailled information is available in the [wiki](https://github.com/introlab/opentera/wiki)
+Detailled information is available in the [docs](https://introlab.github.io/opentera/)
 
 ## License
 

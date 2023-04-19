@@ -166,6 +166,7 @@ class FlaskModule(BaseModule):
         flask_app.secret_key = config.service_config['ServiceUUID']
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
 
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?

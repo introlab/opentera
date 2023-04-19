@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-07 08:35-0500\n"
+"POT-Creation-Date: 2023-03-21 09:06-0400\n"
 "PO-Revision-Date: 2023-03-07 08:35-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: modules/FlaskModule/API/device/DeviceLogin.py:82
 msgid "Unable to get online devices."
@@ -80,9 +80,9 @@ msgstr "Configuration manquante"
 #: modules/FlaskModule/API/user/UserQueryParticipants.py:353
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:198
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:269
-#: modules/FlaskModule/API/user/UserQueryProjects.py:144
-#: modules/FlaskModule/API/user/UserQueryProjects.py:149
-#: modules/FlaskModule/API/user/UserQueryProjects.py:251
+#: modules/FlaskModule/API/user/UserQueryProjects.py:145
+#: modules/FlaskModule/API/user/UserQueryProjects.py:150
+#: modules/FlaskModule/API/user/UserQueryProjects.py:258
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:112
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:117
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:121
@@ -175,9 +175,9 @@ msgstr "Accès refusé"
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:178
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:239
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:280
-#: modules/FlaskModule/API/user/UserQueryProjects.py:189
-#: modules/FlaskModule/API/user/UserQueryProjects.py:204
-#: modules/FlaskModule/API/user/UserQueryProjects.py:269
+#: modules/FlaskModule/API/user/UserQueryProjects.py:190
+#: modules/FlaskModule/API/user/UserQueryProjects.py:205
+#: modules/FlaskModule/API/user/UserQueryProjects.py:276
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:151
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:163
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:185
@@ -239,7 +239,7 @@ msgstr "Erreur de base de données"
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:122
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:109
 #: modules/FlaskModule/API/user/UserQueryDisconnect.py:86
-#: modules/FlaskModule/API/user/UserQueryProjects.py:109
+#: modules/FlaskModule/API/user/UserQueryProjects.py:110
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:80
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:123
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:112
@@ -733,7 +733,7 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:180
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:192
-#: modules/FlaskModule/API/user/UserQueryProjects.py:131
+#: modules/FlaskModule/API/user/UserQueryProjects.py:132
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:179
 msgid "Missing id_project"
 msgstr "Champ manquant : id_project"
@@ -1089,23 +1089,23 @@ msgstr "Nom du rôle ou ID invalide pour ce projet"
 msgid "No project access to delete."
 msgstr "Aucun accès au projet pour supprimer."
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:125
+#: modules/FlaskModule/API/user/UserQueryProjects.py:126
 msgid "Missing project"
 msgstr "Projet manquant"
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:133
+#: modules/FlaskModule/API/user/UserQueryProjects.py:134
 msgid "Missing id_site arguments"
 msgstr "Champ id_site manquant"
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:162
+#: modules/FlaskModule/API/user/UserQueryProjects.py:163
 msgid "No access to a session type for at least one of it"
 msgstr "Pas d'accès à ce type de session pour au moins un projet"
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:174
+#: modules/FlaskModule/API/user/UserQueryProjects.py:175
 msgid "At least one session type is not associated to the project site"
 msgstr "Au moins un type de séance n’est pas associé au site du projet"
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:262
+#: modules/FlaskModule/API/user/UserQueryProjects.py:269
 msgid ""
 "Can't delete project: please delete all participants with sessions before"
 " deleting."
