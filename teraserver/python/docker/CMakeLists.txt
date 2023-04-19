@@ -1,27 +1,53 @@
-# Automate docker setup here
-
-# WORKDIR /opentera/teraserver/python
-# Generate translations
-# RUN pybabel extract -F babel.cfg -o translations.pot .
-# RUN pybabel update -i translations.pot -d translations
-# RUN pybabel compile -d translations
-
-set(translation_pot_file translations.pot)
-set(MESSAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../messages)
+set(MESSAGES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../opentera/messages)
 set(PYBABEL_EXECUTABLE pybabel)
 set(PROTOC_EXECUTABLE protoc)
 set(GOOGLE_PROTO_PATH /usr/include/google/protobuf/)
 
-# Will always be considered out of date...
+
+# Install python packages.
 add_custom_target(
-    docker-translations
-    COMMAND ${PYBABEL_EXECUTABLE} extract -F babel.cfg -o ${translation_pot_file} .
-    COMMAND ${PYBABEL_EXECUTABLE} update -i ${translation_pot_file} -d translations
+    docker-python-packages-install
+    COMMAND python3 -m pip install -r requirements.txt protobuf==3.20.3 debugpy
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../env
+)
+
+# Generate translations for teraserver
+add_custom_target(
+    docker-translations-teraserver
     COMMAND ${PYBABEL_EXECUTABLE} compile -d translations
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
-FILE(GLOB_RECURSE protofiles RELATIVE "${MESSAGES_PATH}" "${MESSAGES_PATH}/*.proto")
+# Generate translations for logging service
+add_custom_target(
+    docker-translations-logging-service
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations -D loggingservice
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../services/LoggingService
+)
+
+# Generate translations for filetransfer service
+add_custom_target(
+    docker-translations-filetransfer-service
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations -D filetransferservice
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../services/FileTransferService
+)
+
+# Generate translations for videorehab service
+add_custom_target(
+    docker-translations-videorehab-service
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations -D videorehabservice
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../services/VideoRehabService
+)
+
+add_custom_target(
+    docker-translations
+    DEPENDS docker-translations-teraserver 
+    DEPENDS docker-translations-logging-service 
+    DEPENDS docker-translations-filetransfer-service
+    DEPENDS docker-translations-videorehab-service
+)
+
+FILE(GLOB_RECURSE protofiles RELATIVE "${MESSAGES_PATH}" "${MESSAGES_PATH}/proto/*.proto")
 message(STATUS "Docker Protofiles: ${protofiles}")
 message(STATUS "Docker Message path: ${MESSAGES_PATH}")
 
@@ -36,9 +62,8 @@ foreach(file ${protofiles})
     set(output_target docker_${name_without_extension}.proto.target)
     list(APPEND docker_protobuf_python_targets ${output_target})
     #Add command to generate target
-    # message(STATUS "Should run: ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python")
     add_custom_target(${output_target}
-        COMMAND ${PROTOC_EXECUTABLE} ${file} -I. -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
+        COMMAND ${PROTOC_EXECUTABLE} ${file} -I./proto -I${GOOGLE_PROTO_PATH} --python_out ${MESSAGES_PATH}/python
         WORKING_DIRECTORY ${MESSAGES_PATH}
         DEPENDS ${MESSAGES_PATH}/${file} )
 endforeach(file)
@@ -49,7 +74,6 @@ add_custom_target(
     WORKING_DIRECTORY ${MESSAGES_PATH}
 )
 
-
-add_custom_target(docker-all
-    DEPENDS docker-translations docker-messages
+add_custom_target(docker-python-all
+    DEPENDS docker-python-packages-install docker-translations docker-messages
 )

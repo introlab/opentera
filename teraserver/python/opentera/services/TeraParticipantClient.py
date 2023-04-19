@@ -16,11 +16,11 @@ class TeraParticipantClient:
         backend_hostname = config_man.backend_config["hostname"]
         backend_port = str(config_man.backend_config["port"])
 
-        if 'X-Externalhost' in request.headers:
-            backend_hostname = request.headers['X-Externalhost']
+        #if 'X-Externalhost' in request.headers:
+        #    backend_hostname = request.headers['X-Externalhost']
 
-        if 'X-Externalport' in request.headers:
-            backend_port = request.headers['X-Externalport']
+        #if 'X-Externalport' in request.headers:
+        #    backend_port = request.headers['X-Externalport']
 
         self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
         self.__config_man = config_man
