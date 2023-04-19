@@ -63,7 +63,7 @@ class RedisRPCClient:
         # Set args
         message.args.extend(rpc_args)
 
-        # Will answer on the replay_to field
+        # Will answer on the reply_to field
         p.subscribe(message.reply_to)
         # First message is for subscribe result
         message1 = p.get_message(timeout=self.timeout)

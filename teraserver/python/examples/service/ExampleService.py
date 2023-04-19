@@ -11,16 +11,16 @@ from twisted.python import log
 import sys
 import os
 
-from opentera.services.ServiceOpenTeraWithAssets import ServiceOpenTeraWithAssets
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
 from FlaskModule import FlaskModule
 import opentera.messages.python as messages
 
 
 # TODO: Rename ExampleService to something more appropriate for you
-class ExampleService(ServiceOpenTeraWithAssets):
+class ExampleService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, this_service_info):
-        ServiceOpenTeraWithAssets.__init__(self, config_man, this_service_info)
+        ServiceOpenTera.__init__(self, config_man, this_service_info)
 
         self.verify_file_upload_directory(config_man)
 
@@ -48,19 +48,6 @@ class ExampleService(ServiceOpenTeraWithAssets):
     # @defer.inlineCallbacks
     def register_to_events(self):
         super().register_to_events()
-
-    def asset_event_received(self, event: messages.DatabaseEvent):
-        # Automatically register to "assets" event so we can manage the files and database accordingly
-        if event.object_type == 'asset':
-            if event.type == messages.DatabaseEvent.DB_DELETE:
-                # TODO: Properly manage delete asset event for your service
-                print("Example Service - Delete Asset Event")
-                asset_info = json.loads(event.object_value)
-                from libservice.db.models.AssetFileData import AssetFileData
-                asset = AssetFileData.get_asset_for_uuid(asset_info['asset_uuid'])
-                if asset:
-                    flask_app.app_context().push()
-                    asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER'])
 
 
 if __name__ == '__main__':

@@ -4,4 +4,3 @@ echo "Activating venv"
 conda activate $PWD/venv
 echo "Installing requirements"
 $PWD/venv/bin/pip install -r $PWD/requirements.txt
-

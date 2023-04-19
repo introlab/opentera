@@ -1,21 +1,14 @@
 import services.VideoRehabService.Globals as Globals
 from opentera.services.modules.WebRTCModule import WebRTCModule
 from opentera.redis.RedisClient import RedisClient
-from opentera.db.models.TeraSession import TeraSessionStatus
 from services.VideoRehabService.ConfigManager import ConfigManager
-from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.redis.RedisVars import RedisVars
-from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-from google.protobuf.json_format import ParseError
-from google.protobuf.message import DecodeError
-from requests import Response
+from opentera.forms.TeraForm import TeraForm, TeraFormSection, TeraFormItem
 
 # Twisted
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.python import log
-import opentera.messages.python as messages
 import sys
-import uuid
 
 # Flask Module
 from services.VideoRehabService.FlaskModule import FlaskModule
@@ -42,6 +35,19 @@ class VideoRehabService(BaseWebRTCService):
 
     def notify_service_messages(self, pattern, channel, message):
         pass
+
+    # Override from ServiceOpenTera
+    def get_session_type_config_form(self, id_session_type: int) -> dict:
+        # Sections
+        form = TeraForm("session_type_config")
+
+        section = TeraFormSection("general", gettext("General configuration"))
+        form.add_section(section)
+        # Items
+        section.add_item(TeraFormItem("session_recordable", gettext("Allow session recording"),
+                                      "boolean", False, item_default=False))
+
+        return form.to_dict()
 
 
 if __name__ == '__main__':
