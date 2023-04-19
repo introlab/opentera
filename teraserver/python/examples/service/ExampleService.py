@@ -11,16 +11,16 @@ from twisted.python import log
 import sys
 import os
 
-from opentera.services.ServiceOpenTeraWithAssets import ServiceOpenTeraWithAssets
+from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
 from FlaskModule import FlaskModule
 import opentera.messages.python as messages
 
 
 # TODO: Rename ExampleService to something more appropriate for you
-class ExampleService(ServiceOpenTeraWithAssets):
+class ExampleService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, this_service_info):
-        ServiceOpenTeraWithAssets.__init__(self, config_man, this_service_info)
+        ServiceOpenTera.__init__(self, config_man, this_service_info)
 
         self.verify_file_upload_directory(config_man)
 
@@ -49,19 +49,6 @@ class ExampleService(ServiceOpenTeraWithAssets):
     def register_to_events(self):
         super().register_to_events()
 
-    def asset_event_received(self, event: messages.DatabaseEvent):
-        # Automatically register to "assets" event so we can manage the files and database accordingly
-        if event.object_type == 'asset':
-            if event.type == messages.DatabaseEvent.DB_DELETE:
-                # TODO: Properly manage delete asset event for your service
-                print("Example Service - Delete Asset Event")
-                asset_info = json.loads(event.object_value)
-                from libservice.db.models.AssetFileData import AssetFileData
-                asset = AssetFileData.get_asset_for_uuid(asset_info['asset_uuid'])
-                if asset:
-                    with flask_app.app_context():
-                        asset.delete_file_asset(flask_app.config['UPLOAD_FOLDER'])
-
 
 if __name__ == '__main__':
     # Very first thing, log to stdout
@@ -86,14 +73,14 @@ if __name__ == '__main__':
                                                  Globals.config_man.service_config['name'])
     import sys
     if service_info is None:
-        sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
-                         'correctly set in this service?')
+        log.err('Error: Unable to get service info from OpenTera Server - is the server running and config '
+                'correctly set in this service?')
         exit(1)
 
     import json
     service_info = json.loads(service_info)
     if 'service_uuid' not in service_info:
-        sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')
+        log.err('OpenTera Server didn\'t return a valid service UUID - aborting.')
         exit(1)
 
     # Update service uuid
@@ -119,7 +106,7 @@ if __name__ == '__main__':
         else:
             Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
     except OperationalError as e:
-        print("Unable to connect to database - please check settings in config file!", e)
+        log.err("Unable to connect to database - please check settings in config file!", str(e))
         quit()
 
     with flask_app.app_context():

@@ -86,14 +86,14 @@ if __name__ == '__main__':
                                                  Globals.config_man.service_config['name'])
     import sys
     if service_info is None:
-        sys.stderr.write('Error: Unable to get service info from OpenTera Server - is the server running and config '
-                         'correctly set in this service?')
+        log.err('Error: Unable to get service info from OpenTera Server - is the server running and config '
+                'correctly set in this service?')
         exit(1)
 
     import json
     service_info = json.loads(service_info)
     if 'service_uuid' not in service_info:
-        sys.stderr.write('OpenTera Server didn\'t return a valid service UUID - aborting.')
+        log.err('OpenTera Server didn\'t return a valid service UUID - aborting.')
         exit(1)
 
     # Update service uuid
@@ -119,7 +119,7 @@ if __name__ == '__main__':
         else:
             Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
     except OperationalError as e:
-        print("Unable to connect to database - please check settings in config file!", e)
+        log.err("Unable to connect to database - please check settings in config file!", str(e))
         quit()
 
     with flask_app.app_context():
