@@ -211,74 +211,90 @@ class UserQueryUserUserGroupsTest(BaseUserAPITest):
             self.assertEqual(len(json_data), target_count)
 
     def test_post_and_delete(self):
-        json_data = {
-            'id_user_group': 2,
-            'id_user': 1
-        }
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing user user group")
-
-        json_data = {
-            'user_user_group': {
+        with self._flask_app.app_context():
+            json_data = {
+                'id_user_group': 2,
+                'id_user': 1
             }
-        }
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            self.assertEqual(response.status_code, 400, msg="Missing user user group")
 
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_user")
-
-        json_data['user_user_group']['id_user'] = 1
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(response.status_code, 400, msg="Missing id_user_group")
-
-        json_data['user_user_group']['id_user_group'] = 2
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(response.status_code, 400, msg="No groups to super admins!")
-
-        json_data['user_user_group']['id_user'] = 2
-        response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4', json=json_data)
-        self.assertEqual(response.status_code, 403, msg="Post denied for user")
-
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
-
-        json_data = response.json[0]
-        self._checkJson(json_data, minimal=True)
-        current_id = json_data['id_user_user_group']
-
-        json_data = {
-            'user_user_group': {
-                'id_user': 2,
-                'id_user_group': 2
+            json_data = {
+                'user_user_group': {
+                }
             }
-        }
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update OK")
-        json_reply = response.json[0]
-        self._checkJson(json_reply, minimal=True)
-        self.assertEqual(json_reply['id_user_user_group'], current_id)  # No change since the same id as before
 
-        json_data = {
-            'user_user_group': {
-                'id_user_user_group': current_id,
-                'id_user': 2,
-                'id_user_group': 3
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            self.assertEqual(response.status_code, 400, msg="Missing id_user")
+
+            json_data['user_user_group']['id_user'] = 1
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            self.assertEqual(response.status_code, 400, msg="Missing id_user_group")
+
+            json_data['user_user_group']['id_user_group'] = 2
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            self.assertEqual(response.status_code, 400, msg="No groups to super admins!")
+
+            json_data['user_user_group']['id_user'] = 2
+            response = self._post_with_user_http_auth(self.test_client, username='user4', password='user4', json=json_data)
+            self.assertEqual(response.status_code, 403, msg="Post denied for user")
+
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data)
+            self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
+
+            json_data = response.json[0]
+            self._checkJson(json_data, minimal=True)
+            current_id = json_data['id_user_user_group']
+
+            json_data = {
+                'user_user_group': {
+                    'id_user': 2,
+                    'id_user_group': 2
+                }
             }
-        }
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(response.status_code, 200, msg="Post update OK")
-        json_reply = response.json[0]
-        self._checkJson(json_reply, minimal=True)
-        self.assertNotEqual(json_reply['id_user_user_group'], current_id)  # New relationship was created
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 200, msg="Post update OK")
+            json_reply = response.json[0]
+            self._checkJson(json_reply, minimal=True)
+            self.assertEqual(json_reply['id_user_user_group'], current_id)  # No change since the same id as before
 
-        response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                    params={'id': current_id})
-        self.assertEqual(response.status_code, 403, msg="Delete denied")
+            json_data = {
+                'user_user_group': {
+                    'id_user_user_group': current_id,
+                    'id_user': 2,
+                    'id_user_group': 3
+                }
+            }
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 200, msg="Post update OK")
+            json_reply = response.json[0]
+            self._checkJson(json_reply, minimal=True)
+            self.assertNotEqual(json_reply['id_user_user_group'], current_id)  # New relationship was created
+            current_id2 = json_reply['id_user_user_group']
+            user: TeraUser = TeraUser.get_user_by_id(2)
+            usergroup_ids = [ug.id_user_group for ug in user.user_user_groups]
+            self.assertTrue(3 in usergroup_ids)
+            self.assertTrue(2 in usergroup_ids)
 
-        response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                    params={'id': current_id})
-        self.assertEqual(response.status_code, 200, msg="Delete OK")
+            response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                        params={'id': current_id})
+            self.assertEqual(response.status_code, 403, msg="Delete denied")
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id})
+            self.assertEqual(response.status_code, 200, msg="Delete OK")
+            usergroup_ids = [ug.id_user_group for ug in user.user_user_groups]
+            self.assertFalse(2 in usergroup_ids)
+            self.assertTrue(3 in usergroup_ids)
+
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params={'id': current_id2})
+            self.assertEqual(response.status_code, 200, msg="Delete OK")
+            usergroup_ids = [ug.id_user_group for ug in user.user_user_groups]
+            self.assertFalse(2 in usergroup_ids)
+            self.assertFalse(3 in usergroup_ids)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

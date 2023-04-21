@@ -47,7 +47,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
     user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
-                                    back_populates="user_group_users", lazy='joined')
+                                    back_populates="user_group_users", passive_deletes=True)
     user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
                                  passive_deletes=True)
 

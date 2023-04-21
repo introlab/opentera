@@ -19,7 +19,7 @@ class ServiceQuerySiteProjectAccessRoles(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Return sessions information.',
+    @api.doc(description='Return access roles information to this service for a specific user.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
