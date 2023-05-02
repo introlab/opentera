@@ -11,9 +11,9 @@ Flask==2.2.3
 Flask-SQLAlchemy==3.0.3
 Flask-Login==0.6.2
 Flask-Login-Multi==0.1.2
-Flask-HTTPAuth==4.7.0
+Flask-HTTPAuth==4.8.0
 Flask-SocketIO==5.3.3
-Flask-Session==0.4.0
+Flask-Session==0.4.1
 flask-restx==1.1.0
 Flask-Security==3.0.0
 Flask-Babel==3.1.0
