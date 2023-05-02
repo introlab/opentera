@@ -34,6 +34,40 @@ class UserQueryProjectsTest(BaseUserAPITest):
             response = self._get_with_user_token_auth(self.test_client)
             self.assertEqual(401, response.status_code)
 
+    def test_query_projects_enabled(self):
+        with self._flask_app.app_context():
+            # Create new project
+            new_project = TeraProject()
+            new_project.id_site = 1
+            new_project.project_name = 'Disabled project'
+            new_project.project_enabled = False
+            TeraProject.insert(new_project)
+
+            # Query all projects
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin')
+            self.assertEqual(200, response.status_code)
+            target_len = TeraProject.get_count()
+            self.assertEqual(target_len, len(response.json))
+
+            # Query only enabled
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'enabled': 1})
+            self.assertEqual(200, response.status_code)
+            target_len = TeraProject.get_count({'project_enabled': True})
+            self.assertEqual(target_len, len(response.json))
+
+            # Query only disabled
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'enabled': 0})
+            self.assertEqual(200, response.status_code)
+            target_len = TeraProject.get_count({'project_enabled': False})
+            self.assertEqual(target_len, len(response.json))
+
+            # Delete created project
+            TeraProject.delete(new_project.id_project)
+
+
+
     def test_query_specific_project_as_admin(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',

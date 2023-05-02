@@ -21,6 +21,8 @@ get_parser.add_argument('id_site', type=int, help='ID of the site from which to 
 get_parser.add_argument('id_service', type=int, help='ID of the service from which to get all projects')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all projects that are accessible')
 get_parser.add_argument('name', type=str, help='Project to query by name')
+get_parser.add_argument('enabled', type=inputs.boolean, help='Flag that limits the returned data to the enabled '
+                                                             'projects')
 get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
 
 post_parser = api.parser()
@@ -90,6 +92,10 @@ class UserQueryProjects(Resource):
             projects_list = []
 
             for project in projects:
+                if args['enabled'] is not None:
+                    if project.project_enabled != args['enabled']:
+                        continue
+
                 if args['list'] is None or args['list'] is False:
                     project_json = project.to_json()
                     project_json['project_role'] = user_access.get_project_role(project.id_project)

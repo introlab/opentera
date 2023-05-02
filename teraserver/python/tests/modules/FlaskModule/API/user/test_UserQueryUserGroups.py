@@ -170,7 +170,8 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                     if id_ug not in ug_ids:
                         ug_ids.append(id_ug)
 
-            projects = TeraProject.query_data({'id_site': 1})
+            # projects = TeraProject.query_data({'id_site': 1})
+            projects = TeraProject.query_with_filters({'id_site': 1})
             for project in projects:
                 services_access = (TeraServiceAccess.get_service_access_for_project(
                     id_service=TeraService.get_openteraserver_service().id_service, id_project=project.id_project))
@@ -204,7 +205,8 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                     if id_ug not in ug_ids:
                         ug_ids.append(id_ug)
 
-            projects = TeraProject.query_data({'id_site': 1})
+            # projects = TeraProject.query_data({'id_site': 1})
+            projects = TeraProject.query_with_filters({'id_site': 1})
             for project in projects:
                 services_access = (TeraServiceAccess.get_service_access_for_project(
                     id_service=TeraService.get_openteraserver_service().id_service, id_project=project.id_project))

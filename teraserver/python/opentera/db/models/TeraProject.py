@@ -1,6 +1,6 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 
@@ -10,6 +10,8 @@ class TeraProject(BaseModel, SoftDeleteMixin):
     id_project = Column(Integer, Sequence('id_project_sequence'), primary_key=True, autoincrement=True)
     id_site = Column(Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
     project_name = Column(String, nullable=False, unique=False)
+    project_enabled = Column(Boolean, nullable=False, default=True)
+    project_description = Column(String, nullable=True)
 
     project_site = relationship("TeraSite", back_populates='site_projects')
     project_participants = relationship("TeraParticipant", cascade='delete', back_populates='participant_project',
@@ -121,23 +123,23 @@ class TeraProject(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def get_project_by_projectname(projectname, with_deleted: bool = False):
-        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+        return TeraProject.query.execution_options(include_deleted=with_deleted) \
             .filter_by(project_name=projectname).first()
 
     @staticmethod
     def get_project_by_id(project_id, with_deleted: bool = False):
-        return TeraProject.query.execution_options(include_deleted=with_deleted)\
+        return TeraProject.query.execution_options(include_deleted=with_deleted) \
             .filter_by(id_project=project_id).first()
 
-    @staticmethod
-    def query_data(filter_args, with_deleted: bool = False):
-        if isinstance(filter_args, tuple):
-            return TeraProject.query.execution_options(include_deleted=with_deleted)\
-                .filter_by(*filter_args).all()
-        if isinstance(filter_args, dict):
-            return TeraProject.query.execution_options(include_deleted=with_deleted)\
-                .filter_by(**filter_args).all()
-        return None
+    # @staticmethod
+    # def query_data(filter_args, with_deleted: bool = False):
+    #     if isinstance(filter_args, tuple):
+    #         return TeraProject.query.execution_options(include_deleted=with_deleted)\
+    #             .filter_by(*filter_args).all()
+    #     if isinstance(filter_args, dict):
+    #         return TeraProject.query.execution_options(include_deleted=with_deleted)\
+    #             .filter_by(**filter_args).all()
+    #     return None
 
     def delete_check_integrity(self) -> IntegrityError | None:
         for participant in self.project_participants:
@@ -145,6 +147,22 @@ class TeraProject(BaseModel, SoftDeleteMixin):
             if cannot_be_deleted_exception:
                 return IntegrityError('Still have participants with session', self.id_project, 't_participants')
         return None
+
+    @classmethod
+    def update(cls, update_id: int, values: dict):
+        # Update general infos
+        super().update(update_id, values)
+
+        # If project is inactive, disable all participants from that project
+        if 'project_enabled' in values and not values['project_enabled']:
+            from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+            project = TeraProject.get_project_by_id(update_id)
+            for participant in project.project_participants:
+                participant.participant_enabled = False  # Set participant inactive
+                devices = TeraDeviceParticipant.query_devices_for_participant(participant.id_participant)
+                for device in devices:
+                    TeraDeviceParticipant.delete(device.id_device_participant)
+            cls.db().session.commit()
 
     @classmethod
     def insert(cls, project):
