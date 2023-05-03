@@ -44,7 +44,7 @@ class ServiceAccessManager:
     service = None
 
     @staticmethod
-    def token_required(allow_dynamic_tokens=True, allow_static_tokens=False, roles=[]):
+    def token_required(allow_dynamic_tokens=True, allow_static_tokens=False):
         def wrap(f):
             def decorated(*args, **kwargs):
                 # We support 3 authentication scheme: token in url, cookie and authorization header
