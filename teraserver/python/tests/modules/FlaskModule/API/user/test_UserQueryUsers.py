@@ -223,7 +223,7 @@ class UserQueryUsersTest(BaseUserAPITest):
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
                                                      params={'id_project': 1})
             self.assertEqual(200, response.status_code)
-            target_count = len(TeraProject.get_project_by_id(1).get_users_in_project())
+            target_count = len(TeraProject.get_project_by_id(1).get_users_in_project(include_site_access=True))
             self.assertEqual(target_count, len(response.json))
 
             for data_item in response.json:

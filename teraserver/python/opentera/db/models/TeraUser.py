@@ -9,6 +9,7 @@ from opentera.db.models.TeraSessionUsers import TeraSessionUsers
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 from passlib.hash import bcrypt
@@ -103,6 +104,24 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         return jwt.encode(payload, token_key, algorithm='HS256')
 
+    def get_service_access_token(self, token_key: str, content: dict, expiration=3600):
+        import time
+        import jwt
+
+        # Creating token with user info
+        now = time.time()
+
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'jti': next(user_jti_generator),
+            'user_uuid': self.user_uuid,
+            'user_access': content
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256')
+
     def get_fullname(self):
         return self.user_firstname + ' ' + self.user_lastname
 
@@ -128,19 +147,27 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     def __repr__(self):
         return self.__str__()
 
-    def get_sites_roles(self) -> dict:
+    def get_sites_roles(self, id_service: int | None = None) -> dict:
         sites_roles = {}
 
         if self.user_superadmin:
             # Super admin - admin role in all sites
-            sites = TeraSite.query.all()
+            if not id_service:
+                sites = TeraSite.query.all()
+            else:
+                all_roles = TeraServiceRole.get_service_roles(service_id=id_service)
+                sites = []
+                for role in all_roles:
+                    if role.id_site:
+                        sites.append(role.service_role_site)
+
             for site in sites:
                 sites_roles[site] = {'site_role': 'admin', 'inherited': True}
             return sites_roles
 
         # Browse all user groups to get roles for those sites
         for user_group in self.user_user_groups:
-            user_group_roles = user_group.get_sites_roles()
+            user_group_roles = user_group.get_sites_roles(service_id=id_service)
             for site, site_role in user_group_roles.items():
                 if site not in sites_roles:
                     # Site not already present
@@ -152,19 +179,27 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         return sites_roles
 
-    def get_projects_roles(self) -> dict:
+    def get_projects_roles(self, id_service: int | None = None) -> dict:
         projects_roles = {}
 
         if self.user_superadmin:
             # Super admin - admin role in all projects
-            projects = TeraProject.query.all()
+            if not id_service:
+                projects = TeraProject.query.all()
+            else:
+                all_roles = TeraServiceRole.get_service_roles(service_id=id_service)
+                projects = []
+                for role in all_roles:
+                    if role.id_project:
+                        projects.append(role.service_role_project)
+
             for project in projects:
                 projects_roles[project] = {'project_role': 'admin', 'inherited': True}
             return projects_roles
 
         # Browse all user groups to get roles for those projects
         for user_group in self.user_user_groups:
-            user_group_roles = user_group.get_projects_roles()
+            user_group_roles = user_group.get_projects_roles(service_id=id_service)
             for project, project_role in user_group_roles.items():
                 if project not in projects_roles:
                     # Project not already present
@@ -175,6 +210,24 @@ class TeraUser(BaseModel, SoftDeleteMixin):
                         projects_roles[project] = project_role
 
         return projects_roles
+
+    def get_services_roles(self, id_service: int) -> list:
+        services_roles = []
+
+        if self.user_superadmin:
+            # Super admin - has all service roles
+            all_roles = TeraServiceRole.get_service_roles(service_id=id_service, globals_only=True)
+            for role in all_roles:
+                services_roles.append(role.service_role_name)
+        else:
+            # Browse all user groups to get roles
+            for user_group in self.user_user_groups:
+                user_group_roles = user_group.get_global_roles()
+                for role in user_group_roles:
+                    if role not in services_roles:
+                        services_roles.append(role)
+
+        return services_roles
 
     @staticmethod
     def encrypt_password(password):

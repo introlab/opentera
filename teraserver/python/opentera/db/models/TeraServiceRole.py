@@ -55,9 +55,13 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
         return json_val
 
     @staticmethod
-    def get_service_roles(service_id: int, with_deleted: bool = False):
-        return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_service=service_id).all()
+    def get_service_roles(service_id: int, globals_only: bool = False, with_deleted: bool = False):
+        query = TeraServiceRole.query.execution_options(include_deleted=with_deleted).filter_by(id_service=service_id)
+
+        if globals_only:
+            query = query.filter_by(id_site=None).filter_by(id_project=None)
+
+        return query.all()
 
     @staticmethod
     def get_service_roles_for_site(service_id: int, site_id: int, with_deleted: bool = False):
