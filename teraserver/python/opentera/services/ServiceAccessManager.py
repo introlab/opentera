@@ -44,7 +44,7 @@ class ServiceAccessManager:
     service = None
 
     @staticmethod
-    def token_required(allow_dynamic_tokens=True, allow_static_tokens=False, roles=[]):
+    def token_required(allow_dynamic_tokens=True, allow_static_tokens=False):
         def wrap(f):
             def decorated(*args, **kwargs):
                 # We support 3 authentication scheme: token in url, cookie and authorization header
@@ -359,9 +359,13 @@ class ServiceAccessManager:
 
                 service_key = ServiceAccessManager.service.service_info['service_key']
 
-                # Check if user is logged in
-                if _request_ctx_stack.top.current_user_client is None:
+                # Check if user is logged in, watch out not None object but LocalProxy cannot use is None...
+                if not current_user_client:
                     return gettext('Forbidden'), 403
+
+                # Super admin pass through
+                if current_user_client.user_superadmin:
+                    return f(*args, **kwargs)
 
                 # Verify if header contains a valid token
                 if 'OpenTeraAccessToken' not in request.headers:

@@ -85,7 +85,7 @@ class FakeLoggingService(ServiceOpenTera):
             self.setup_service_access_manager()
 
             # Redis variables & db must be initialized before
-            ServiceOpenTera.__init__(self, self.config_man, {})
+            ServiceOpenTera.__init__(self, self.config_man, {'service_key': 'LoggingService'})
 
             self.login_module = LoginModule(self.config_man)
 
