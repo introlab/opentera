@@ -38,10 +38,12 @@ class QueryLogEntries(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
+    @ServiceAccessManager.service_user_roles_required(['admin'])
     def get(self):
         args = get_parser.parse_args()
-        # Only allow superadmins to query logs?
-        if current_user_client and current_user_client.user_superadmin:
+        # Access to logs is restricted to admin roles and superadmins
+        # Verified in ServiceAccessManager.service_user_roles_required
+        if current_user_client:
             try:
                 query = LogEntry.query
 
