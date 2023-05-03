@@ -315,6 +315,8 @@ class LoginModule(BaseModule):
         except jwt.exceptions.PyJWTError as e:
             # print(e)
             # self.logger.log_error(self.module_name, 'User Token exception occurred')
+            if not token_value:
+                token_value = ''
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
