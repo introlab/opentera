@@ -42,11 +42,14 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         # Minimal information, delete can not be filtered
         return {'id_user_group': self.id_user_group}
 
-    def get_projects_roles(self, no_inheritance: bool = False) -> dict:
+    def get_projects_roles(self,  service_id: int | None = None, no_inheritance: bool = False) -> dict:
         projects_roles = {}
 
         # Projects
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_project:
                 projects_roles[service_role.service_role_project] = \
                     {'project_role': service_role.service_role_name, 'inherited': False}
@@ -54,6 +57,9 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         # Sites - if we are admin in a site, we are automatically admin in all its project
         if not no_inheritance:
             for service_role in self.user_group_services_roles:
+                if service_id and service_role.id_service != service_id:
+                    # Need to limit to a specific service and this is not one for that
+                    continue
                 if service_role.id_site:
                     if service_role.service_role_name == 'admin':
                         for project in service_role.service_role_site.site_projects:
@@ -61,22 +67,36 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
 
         return projects_roles
 
-    def get_sites_roles(self) -> dict:
+    def get_sites_roles(self, service_id: int | None = None) -> dict:
         sites_roles = {}
         # Sites
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_site:
                 sites_roles[service_role.service_role_site] = \
                     {'site_role': service_role.service_role_name, 'inherited': False}
 
         # Projects - each project's site also provides a "user" access for that site
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_project:
                 project_site = service_role.service_role_project.project_site
                 if project_site not in sites_roles:
                     sites_roles[project_site] = {'site_role': 'user', 'inherited': True}
 
         return sites_roles
+
+    def get_global_roles(self) -> list:
+        global_roles = []
+
+        for service_role in self.user_group_services_roles:
+            if not service_role.id_site and not service_role.id_project:
+                global_roles.append(service_role.service_role_name)
+        return global_roles
 
     @staticmethod
     def get_user_group_by_group_name(name: str, with_deleted: bool = False):

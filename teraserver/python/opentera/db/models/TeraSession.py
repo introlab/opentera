@@ -50,8 +50,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
     session_session_type = relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
     session_events = relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
-    session_assets = relationship('TeraAsset', cascade='delete', back_populates='asset_session')
-    session_tests = relationship('TeraTest', cascade='delete', back_populates='test_session')
+    session_assets = relationship('TeraAsset', cascade='delete', back_populates='asset_session', lazy='joined')
+    session_tests = relationship('TeraTest', cascade='delete', back_populates='test_session', lazy='joined')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -110,9 +110,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
         # Append session stats
         from opentera.db.models.TeraAsset import TeraAsset
-        from opentera.db.models.TeraTest import TeraTest
-        rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
-        rval['session_tests_count'] = TeraTest.get_count({'id_session': self.id_session})
+        # from opentera.db.models.TeraTest import TeraTest
+        # rval['session_assets_count'] = TeraAsset.get_count({'id_session': self.id_session})
+        rval['session_assets_count'] = len(self.session_assets)
+        # rval['session_tests_count'] = TeraTest.get_count({'id_session': self.id_session})
+        rval['session_tests_count'] = len(self.session_tests)
         return rval
 
     def to_json_create_event(self):
