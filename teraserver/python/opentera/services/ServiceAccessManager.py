@@ -351,7 +351,15 @@ class ServiceAccessManager:
         def wrap(f):
             @wraps(f)
             def decorated(*args, **kwargs):
-                # Check if service is logged in
+
+                # Check if service is initialized
+                if ServiceAccessManager.service is None or 'service_key' \
+                        not in ServiceAccessManager.service.service_info:
+                    return gettext('Forbidden'), 403
+
+                service_key = ServiceAccessManager.service.service_info['service_key']
+
+                # Check if user is logged in
                 if _request_ctx_stack.top.current_user_client is None:
                     return gettext('Forbidden'), 403
 
@@ -360,16 +368,33 @@ class ServiceAccessManager:
                     return gettext('Forbidden'), 403
 
                 try:
+                    # 'user_access': {'services': {'service_key': {'projects':
+                    #               [('id_project2', 'admin'), ('id_project3', 'user')],
+                    #                'sites': [('id_site1', 'admin')],
+                    #                'global': ['manager', 'admin']
+                    #                                             }
+                    #                             }
+                    #                }
+
                     token_dict = jwt.decode(request.headers['OpenTeraAccessToken'],
-                                            ServiceAccessManager.api_service_token_key,
+                                            ServiceAccessManager.api_user_token_key,
                                             algorithms='HS256')
 
+                    # TODO Validate jason schema with jsonschema ?
+                    if 'user_access' not in token_dict or 'services' not in token_dict['user_access'] or \
+                        service_key not in token_dict['user_access']['services'] or \
+                            'global' not in token_dict['user_access']['services'][service_key]:
+                        return gettext('Forbidden'), 403
 
+                    # Check if user has the required role
+                    if not any(role in token_dict['user_access']['services'][service_key]['global'] for role in roles):
+                        return gettext('Forbidden'), 403
 
                 except jwt.PyJWTError as e:
                     # Not a service, or invalid token, will continue...
                     return gettext('Forbidden'), 403
 
+                # Everything ok, continue
                 return f(*args, **kwargs)
             return decorated
         return wrap
