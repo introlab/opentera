@@ -2,9 +2,9 @@ from werkzeug.local import LocalProxy
 from functools import wraps
 from flask import _request_ctx_stack, request
 from flask_restx import reqparse
-
+from typing import List
 from enum import Enum
-
+from flask_babel import gettext
 import jwt
 
 from opentera.services.TeraUserClient import TeraUserClient
@@ -68,7 +68,7 @@ class ServiceAccessManager:
                             client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                             os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                             service_uuid=ServiceAccessManager.service.service_uuid)
-                        return 'Forbidden', 403
+                        return gettext('Forbidden'), 403
 
                     # Verify scheme and token
                     if scheme == 'OpenTera':
@@ -118,7 +118,7 @@ class ServiceAccessManager:
                     client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                     os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                     service_uuid=ServiceAccessManager.service.service_uuid)
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
             return decorated
         return wrap
@@ -147,7 +147,7 @@ class ServiceAccessManager:
                         client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                         os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                         service_uuid=ServiceAccessManager.service.service_uuid)
-                    return 'Forbidden', 403
+                    return gettext('Forbidden'), 403
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
@@ -166,7 +166,7 @@ class ServiceAccessManager:
                 client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                 os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                 service_uuid=ServiceAccessManager.service.service_uuid)
-            return 'Forbidden', 403
+            return gettext('Forbidden'), 403
 
         return decorated
 
@@ -194,7 +194,7 @@ class ServiceAccessManager:
                             client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                             os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                             service_uuid=ServiceAccessManager.service.service_uuid)
-                        return 'Forbidden', 403
+                        return gettext('Forbidden'), 403
 
                     # Verify scheme and token
                     if scheme == 'OpenTera':
@@ -249,7 +249,7 @@ class ServiceAccessManager:
                     client_ip=login_infos['client_ip'], os_name=login_infos['os_name'],
                     os_version=login_infos['os_version'], server_endpoint=login_infos['server_endpoint'],
                     service_uuid=ServiceAccessManager.service.service_uuid)
-                return 'Forbidden', 403
+                return gettext('Forbidden'), 403
 
             return decorated
 
@@ -331,7 +331,7 @@ class ServiceAccessManager:
         return False
 
     @staticmethod
-    def validate_service_token(token:str) -> bool:
+    def validate_service_token(token: str) -> bool:
         try:
             token_dict = jwt.decode(token, ServiceAccessManager.api_service_token_key, algorithms='HS256')
         except jwt.PyJWTError as e:
@@ -346,3 +346,30 @@ class ServiceAccessManager:
 
         return False
 
+    @staticmethod
+    def service_user_roles_required(roles: List[str]):
+        def wrap(f):
+            @wraps(f)
+            def decorated(*args, **kwargs):
+                # Check if service is logged in
+                if _request_ctx_stack.top.current_user_client is None:
+                    return gettext('Forbidden'), 403
+
+                # Verify if header contains a valid token
+                if 'OpenTeraAccessToken' not in request.headers:
+                    return gettext('Forbidden'), 403
+
+                try:
+                    token_dict = jwt.decode(request.headers['OpenTeraAccessToken'],
+                                            ServiceAccessManager.api_service_token_key,
+                                            algorithms='HS256')
+
+
+
+                except jwt.PyJWTError as e:
+                    # Not a service, or invalid token, will continue...
+                    return gettext('Forbidden'), 403
+
+                return f(*args, **kwargs)
+            return decorated
+        return wrap
