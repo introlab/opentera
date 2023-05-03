@@ -31,7 +31,7 @@ class UserQueryServiceAccessToken(Resource):
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
-        if 'id_service' not in args:
+        if not args['id_service']:
             return gettext('Missing id_service'), 400
 
         if args['id_service'] not in user_access.get_accessible_services_ids():
@@ -48,7 +48,7 @@ class UserQueryServiceAccessToken(Resource):
 
         user_access = {'services': {}}
         service_info = TeraService.get_service_by_id(args['id_service'])
-        service_global_roles = current_user.get_services_roles(args['id_service'])
+        service_global_roles = current_user.get_service_roles(args['id_service'])
         user_access['services'][service_info.service_key] = {'global': service_global_roles}
 
         if args['with_sites']:

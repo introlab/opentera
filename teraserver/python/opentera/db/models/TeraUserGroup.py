@@ -90,11 +90,11 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
 
         return sites_roles
 
-    def get_global_roles(self) -> list:
+    def get_global_roles(self, service_id: int) -> list:
         global_roles = []
 
         for service_role in self.user_group_services_roles:
-            if not service_role.id_site and not service_role.id_project:
+            if not service_role.id_site and not service_role.id_project and service_role.id_service == service_id:
                 global_roles.append(service_role.service_role_name)
         return global_roles
 

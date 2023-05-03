@@ -211,23 +211,23 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         return projects_roles
 
-    def get_services_roles(self, id_service: int) -> list:
-        services_roles = []
+    def get_service_roles(self, id_service: int) -> list:
+        service_roles = []
 
         if self.user_superadmin:
             # Super admin - has all service roles
             all_roles = TeraServiceRole.get_service_roles(service_id=id_service, globals_only=True)
             for role in all_roles:
-                services_roles.append(role.service_role_name)
+                service_roles.append(role.service_role_name)
         else:
             # Browse all user groups to get roles
             for user_group in self.user_user_groups:
-                user_group_roles = user_group.get_global_roles()
+                user_group_roles = user_group.get_global_roles(service_id=id_service)
                 for role in user_group_roles:
-                    if role not in services_roles:
-                        services_roles.append(role)
+                    if role not in service_roles:
+                        service_roles.append(role)
 
-        return services_roles
+        return service_roles
 
     @staticmethod
     def encrypt_password(password):
