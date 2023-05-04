@@ -53,15 +53,25 @@ class UserQueryServiceAccessToken(Resource):
 
         if args['with_sites']:
             site_roles = current_user.get_sites_roles(id_service=args['id_service'])
-            user_access['services'][service_info.service_key]['sites'] = {
-                [(sr['site'].id_site, sr['site_role']) for sr in site_roles]
-            }
+            user_access['services'][service_info.service_key]['sites'] = \
+                [(site.id_site, role['site_role']) for site, role in site_roles.items()]
+            # Also append TeraServer roles for sites
+            site_roles = current_user.get_sites_roles()
+            if 'OpenTeraServer' not in user_access['services']:
+                user_access['services']['OpenTeraServer'] = {}
+            user_access['services']['OpenTeraServer']['sites'] = \
+                [(site.id_site, role['site_role']) for site, role in site_roles.items()]
 
         if args['with_projects']:
             project_roles = current_user.get_projects_roles(id_service=args['id_service'])
-            user_access['services'][service_info.service_key]['projects'] = {
-                [(pr['project'].id_project, pr['project_role']) for pr in project_roles]
-            }
+            user_access['services'][service_info.service_key]['projects'] = \
+                [(proj.id_project, role['project_role']) for proj, role in project_roles.items()]
+            # Also append TeraServer roles for projects
+            project_roles = current_user.get_projects_roles()
+            if 'OpenTeraServer' not in user_access['services']:
+                user_access['services']['OpenTeraServer'] = {}
+            user_access['services']['OpenTeraServer']['projects'] = \
+                [(proj.id_project, role['project_role']) for proj, role in project_roles.items()]
 
         # Get user token key from redis
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)

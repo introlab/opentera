@@ -106,41 +106,123 @@ class UserQueryServiceAccessTokenTest(BaseUserAPITest):
             self.assertIsNotNone(response.json)
             token = response.json
             token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
-            self._validate_global_structure(token_dict)
-            access = TeraServiceAccess.get_service_access_for_user_group(self.id_test_service, self.id_test_user_group)
-            self.assertEqual(len(access), len(token_dict['user_access']['services'][self.test_service_key]['global']))
-            for acc in access:
-                self.assertTrue(acc.service_access_role.service_role_name in
-                                token_dict['user_access']['services'][self.test_service_key]['global'])
+            self._validate_global_structure(token_dict=token_dict, username='user3')
 
     def test_get_sites_access(self):
-        pass
-        # with self._flask_app.app_context():
-        #     response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-        #                                              params={'id_service': self.id_test_service, 'with_sites': 1})
-        #     self.assertEqual(200, response.status_code)
-        #     self.assertIsNotNone(response.json)
-        #     token = response.json
-        #     token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
-        #     self._validate_global_structure(token_dict)
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'id_service': self.id_test_service, 'with_sites': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='user3')
+            self._validate_sites_structure(token_dict=token_dict, username='user3')
 
     def test_get_sites_access_site_admin(self):
-        pass
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                     params={'id_service': self.id_test_service, 'with_sites': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='siteadmin')
+            self._validate_sites_structure(token_dict=token_dict, username='siteadmin')
 
     def test_get_sites_access_super_admin(self):
-        pass
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_service': self.id_test_service, 'with_sites': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='admin')
+            self._validate_sites_structure(token_dict=token_dict, username='admin')
 
     def test_get_projects_access(self):
-        pass
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'id_service': self.id_test_service, 'with_projects': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='user3')
+            self._validate_projects_structure(token_dict=token_dict, username='user3')
 
     def test_get_projects_access_super_admin(self):
-        pass
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_service': self.id_test_service, 'with_projects': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='admin')
+            self._validate_projects_structure(token_dict=token_dict, username='admin')
 
     def test_get_sites_projects_access(self):
-        pass
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'id_service': self.id_test_service, 'with_projects': 1,
+                                                             'with_sites': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertIsNotNone(response.json)
+            token = response.json
+            token_dict = jwt.decode(token, self.user_token_key, algorithms='HS256')
+            self._validate_global_structure(token_dict=token_dict, username='user3')
+            self._validate_sites_structure(token_dict=token_dict, username='user3')
+            self._validate_projects_structure(token_dict=token_dict, username='user3')
 
-    def _validate_global_structure(self, token_dict: dict):
+    def _validate_global_structure(self, token_dict: dict,  username: str):
         self.assertTrue('user_access' in token_dict)
         self.assertTrue('services' in token_dict['user_access'])
         self.assertTrue(self.test_service_key in token_dict['user_access']['services'])
         self.assertTrue('global' in token_dict['user_access']['services'][self.test_service_key])
+
+        user = TeraUser.get_user_by_username(username)
+        access = user.get_service_roles(self.id_test_service)
+
+        self.assertEqual(len(access), len(token_dict['user_access']['services'][self.test_service_key]['global']))
+        for acc in access:
+            self.assertTrue(acc in token_dict['user_access']['services'][self.test_service_key]['global'])
+
+    def _validate_sites_structure(self, token_dict: dict, username: str):
+        self.assertTrue(self.test_service_key in token_dict['user_access']['services'])
+        self.assertTrue('OpenTeraServer' in token_dict['user_access']['services'])
+        self.assertTrue('sites' in token_dict['user_access']['services'][self.test_service_key])
+        self.assertTrue('sites' in token_dict['user_access']['services']['OpenTeraServer'])
+
+        user = TeraUser.get_user_by_username(username)
+        site_roles = user.get_sites_roles(self.id_test_service)
+        self.assertEqual(len(site_roles), len(token_dict['user_access']['services'][self.test_service_key]['sites']))
+        for site, role in site_roles.items():
+            self.assertTrue([site.id_site, role['site_role']] in
+                            token_dict['user_access']['services'][self.test_service_key]['sites'])
+
+        site_roles = user.get_sites_roles()
+        self.assertEqual(len(site_roles), len(token_dict['user_access']['services']['OpenTeraServer']['sites']))
+        for site, role in site_roles.items():
+            self.assertTrue([site.id_site, role['site_role']] in
+                            token_dict['user_access']['services']['OpenTeraServer']['sites'])
+
+    def _validate_projects_structure(self, token_dict: dict, username: str):
+        self.assertTrue(self.test_service_key in token_dict['user_access']['services'])
+        self.assertTrue('OpenTeraServer' in token_dict['user_access']['services'])
+        self.assertTrue('projects' in token_dict['user_access']['services'][self.test_service_key])
+        self.assertTrue('projects' in token_dict['user_access']['services']['OpenTeraServer'])
+
+        user = TeraUser.get_user_by_username(username)
+        proj_roles = user.get_projects_roles(self.id_test_service)
+        self.assertEqual(len(proj_roles), len(token_dict['user_access']['services'][self.test_service_key]['projects']))
+        for proj, role in proj_roles.items():
+            self.assertTrue([proj.id_project, role['project_role']] in
+                            token_dict['user_access']['services'][self.test_service_key]['sites'])
+
+        proj_roles = user.get_projects_roles()
+        self.assertEqual(len(proj_roles), len(token_dict['user_access']['services']['OpenTeraServer']['projects']))
+        for proj, role in proj_roles.items():
+            self.assertTrue([proj.id_project, role['project_role']] in
+                            token_dict['user_access']['services']['OpenTeraServer']['projects'])
