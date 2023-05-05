@@ -13,9 +13,9 @@
 
     <title>{{ gettext('OpenTera - Error') }}</title>
 </head>
-<body onload="if ('{{participant_token}}' === '') hideElement('btnConnect'); ">
+<body onload="if ('{{participant_token}}' === '') hideElement('btnConnect');">
 <div class="container fluid mt-5">
-    <div class="jumbotron jumbotron-fluid bg-danger" >
+    <div class="jumbotron jumbotron-fluid bg-danger" style="padding: 30px;">
         <div class="container">
             <h3 class="text-warning text-center">{{ gettext('We are sorry, an error has happened') }}</h3>
             <p class="lead display-5 bg-dark text-light p-4">{{error_msg}}</p>

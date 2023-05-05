@@ -49,7 +49,7 @@ class TeraSessionForm:
         if not project_info:
             users = user_access.get_accessible_users()
         else:
-            users = project_info.get_users_in_project(include_site_access=True)
+            users = project_info.get_users_in_project(include_superadmins=True, include_site_access=True)
 
         users_list = []
         users_ids = []

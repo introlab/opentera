@@ -21,7 +21,7 @@ from werkzeug.local import LocalProxy
 from flask_restx import reqparse
 from functools import wraps
 
-from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth, Authorization
 
 from twisted.internet import task
 
@@ -580,8 +580,14 @@ class LoginModule(BaseModule):
 
     def participant_get_user_roles_token(self, user):
         # Verify if we have a token auth
-        if 'token' in user and current_participant:
-            if user['token'] == current_participant.participant_token:
+        token = None
+        if isinstance(user, Authorization):
+            # Authorization header, not a token parameter
+            token = user.token
+        elif 'token' in user:
+            token = user['token']
+        if token and current_participant:
+            if token == current_participant.participant_token:
                 # Using only "access" token, will give limited access
                 return ['limited']
             else:
