@@ -111,19 +111,23 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         service_access = {'service_access': {}}
 
         # Service access are defined in user groups
-        for user_group in self.user_user_groups:
-            for service_role in user_group.user_group_services_roles:
-                service = service_role.service_role_service
-                role_name = service_role.service_role_name
-                service_key = service.service_key
+        if self.user_superadmin:
+            # Superadmin has access to all services
+            service_access['service_access']['*'] = ['admin']
+        else:
+            for user_group in self.user_user_groups:
+                for service_role in user_group.user_group_services_roles:
+                    service = service_role.service_role_service
+                    role_name = service_role.service_role_name
+                    service_key = service.service_key
 
-                if service_role.id_site is None and service_role.id_project is None:
-                    # Global access
-                    # Create entry if not exists
-                    if service_key not in service_access['service_access']:
-                        service_access['service_access'][service_key] = []
-                    # Add role to service
-                    service_access['service_access'][service_key].append(role_name)
+                    if service_role.id_site is None and service_role.id_project is None:
+                        # Global access
+                        # Create entry if not exists
+                        if service_key not in service_access['service_access']:
+                            service_access['service_access'][service_key] = []
+                        # Add role to service
+                        service_access['service_access'][service_key].append(role_name)
 
         payload = {
             'iat': int(now),

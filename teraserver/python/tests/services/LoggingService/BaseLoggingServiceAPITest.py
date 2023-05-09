@@ -73,27 +73,16 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
     @staticmethod
     def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), superadmin=False, expiration=3600):
-        import time
-        import jwt
-        import random
-        import uuid
 
-        # Creating token with user info
-        now = time.time()
         token_key = ServiceAccessManager.api_user_token_key
-
-        payload = {
-            'iat': int(now),
-            'exp': int(now) + expiration,
-            'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
-            'user_uuid': user_uuid,
-            'id_user': 1,
-            'user_fullname': name,
-            'user_superadmin': superadmin
-        }
-
-        return jwt.encode(payload, token_key, algorithm='HS256')
+        from opentera.db.models.TeraUser import TeraUser
+        user: TeraUser = TeraUser()
+        user.user_uuid = user_uuid
+        user.id_user = 1
+        user.user_firstname = name
+        user.user_lastname = name
+        user.user_superadmin = superadmin
+        return user.get_token(token_key, expiration=expiration)
 
     def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:

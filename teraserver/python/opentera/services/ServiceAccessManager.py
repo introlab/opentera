@@ -367,35 +367,11 @@ class ServiceAccessManager:
                 if current_user_client.user_superadmin:
                     return f(*args, **kwargs)
 
-                # Verify if header contains a valid token
-                if 'OpenTeraAccessToken' not in request.headers:
-                    return gettext('Forbidden'), 403
+                # Check if user has the required role (global roles are stored in token)
+                user_roles_from_token = current_user_client.get_roles_for_service(service_key)
 
-                try:
-                    # 'user_access': {'services': {'service_key': {'projects':
-                    #               [('id_project2', 'admin'), ('id_project3', 'user')],
-                    #                'sites': [('id_site1', 'admin')],
-                    #                'global': ['manager', 'admin']
-                    #                                             }
-                    #                             }
-                    #                }
-
-                    token_dict = jwt.decode(request.headers['OpenTeraAccessToken'],
-                                            ServiceAccessManager.api_user_token_key,
-                                            algorithms='HS256')
-
-                    # TODO Validate jason schema with jsonschema ?
-                    if 'user_access' not in token_dict or 'services' not in token_dict['user_access'] or \
-                        service_key not in token_dict['user_access']['services'] or \
-                            'global' not in token_dict['user_access']['services'][service_key]:
-                        return gettext('Forbidden'), 403
-
-                    # Check if user has the required role
-                    if not any(role in token_dict['user_access']['services'][service_key]['global'] for role in roles):
-                        return gettext('Forbidden'), 403
-
-                except jwt.PyJWTError as e:
-                    # Not a service, or invalid token, will continue...
+                # Check if user has the required roles
+                if not all(role in user_roles_from_token for role in roles):
                     return gettext('Forbidden'), 403
 
                 # Everything ok, continue
