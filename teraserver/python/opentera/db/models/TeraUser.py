@@ -16,6 +16,8 @@ from passlib.hash import bcrypt
 import uuid
 import datetime
 import json
+import time
+import jwt
 
 
 # Generator for jti
@@ -84,12 +86,44 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         # Minimal information, delete can not be filtered
         return {'id_user': self.id_user, 'user_uuid': self.user_uuid}
 
-    def get_token(self, token_key: str, expiration=3600):
-        import time
-        import jwt
+    def get_token(self, token_key: str, expiration: int = 3600):
+        """
+        Generates a token for the user. The token will contain the following information:
+        - issue time (iat)
+        - expiration time (exp)
+        - issuer (iss)
+        - token id (jti)
+        - user_uuid (string, user's uuid)
+        - id_user (int, user's id)
+        - user_fullname (string, user's fullname)
+        - user_superadmin (boolean, true if user is superadmin)
+        - service_access dict containing all global services access in a dict of the form:
+            {'service_access': {'service_key': ['access1', 'access2']}}
+
+        :param token_key: Key to use to generate the token
+        :param expiration: Expiration time in seconds
+        """
 
         # Creating token with user info
         now = time.time()
+
+        # Create global access dict for user
+        service_access = {'service_access': {}}
+
+        # Service access are defined in user groups
+        for user_group in self.user_user_groups:
+            for service_role in user_group.user_group_services_roles:
+                service = service_role.service_role_service
+                role_name = service_role.service_role_name
+                service_key = service.service_key
+
+                if service_role.id_site is None and service_role.id_project is None:
+                    # Global access
+                    # Create entry if not exists
+                    if service_key not in service_access['service_access']:
+                        service_access['service_access'][service_key] = []
+                    # Add role to service
+                    service_access['service_access'][service_key].append(role_name)
 
         payload = {
             'iat': int(now),
@@ -99,25 +133,8 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
             'user_fullname': self.get_fullname(),
-            'user_superadmin': self.user_superadmin
-        }
-
-        return jwt.encode(payload, token_key, algorithm='HS256')
-
-    def get_service_access_token(self, token_key: str, content: dict, expiration=3600):
-        import time
-        import jwt
-
-        # Creating token with user info
-        now = time.time()
-
-        payload = {
-            'iat': int(now),
-            'exp': int(now) + expiration,
-            'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
-            'user_uuid': self.user_uuid,
-            'user_access': content
+            'user_superadmin': self.user_superadmin,
+            'service_access': service_access
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256')
