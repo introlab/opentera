@@ -124,11 +124,8 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     def get_service_access_dict(self):
         service_access = {'service_access': {}}
 
-        # Service access are defined in user groups
-        if self.user_superadmin:
-            # Superadmin has access to all services
-            service_access['service_access']['*'] = ['admin']
-        else:
+        # Service access are defined in user groups, not needed for superadmin
+        if not self.user_superadmin:
             for user_group in self.user_user_groups:
                 for service_role in user_group.user_group_services_roles:
                     service = service_role.service_role_service
@@ -144,6 +141,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
                         service_access['service_access'][service_key].append(role_name)
 
         return service_access
+
     def get_fullname(self):
         return self.user_firstname + ' ' + self.user_lastname
 
