@@ -107,7 +107,21 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         # Creating token with user info
         now = time.time()
 
-        # Create global access dict for user
+        payload = {
+            'iat': int(now),
+            'exp': int(now) + expiration,
+            'iss': 'TeraServer',
+            'jti': next(user_jti_generator),
+            'user_uuid': self.user_uuid,
+            'id_user': self.id_user,
+            'user_fullname': self.get_fullname(),
+            'user_superadmin': self.user_superadmin,
+            'service_access': self.get_service_access_dict()
+        }
+
+        return jwt.encode(payload, token_key, algorithm='HS256')
+
+    def get_service_access_dict(self):
         service_access = {'service_access': {}}
 
         # Service access are defined in user groups
@@ -129,20 +143,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
                         # Add role to service
                         service_access['service_access'][service_key].append(role_name)
 
-        payload = {
-            'iat': int(now),
-            'exp': int(now) + expiration,
-            'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
-            'user_uuid': self.user_uuid,
-            'id_user': self.id_user,
-            'user_fullname': self.get_fullname(),
-            'user_superadmin': self.user_superadmin,
-            'service_access': service_access
-        }
-
-        return jwt.encode(payload, token_key, algorithm='HS256')
-
+        return service_access
     def get_fullname(self):
         return self.user_firstname + ' ' + self.user_lastname
 

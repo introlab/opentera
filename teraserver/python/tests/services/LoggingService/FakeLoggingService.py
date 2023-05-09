@@ -101,8 +101,7 @@ class FakeLoggingService(ServiceOpenTera):
         self.flask_module = FakeFlaskModule(self.config_man, self.flask_app)
         self.test_client = self.flask_app.test_client()
 
-        with self.flask_app.app_context():
-            self.service_token = self.generate_service_token()
+        self.service_token = self.generate_service_token()
 
     def generate_service_token(self) -> str:
         with self.flask_app.app_context():
@@ -157,14 +156,12 @@ class FakeLoggingService(ServiceOpenTera):
         ServiceAccessManager.config_man = self.config_man
 
     def get_users_uuids(self):
-        with self.flask_app.app_context():
-            from opentera.db.models.TeraUser import TeraUser
-            return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
+        from opentera.db.models.TeraUser import TeraUser
+        return [user.user_uuid for user in TeraUser.query.all() if user.user_enabled]
 
     def get_enabled_users(self):
-        with self.flask_app.app_context():
-            from opentera.db.models.TeraUser import TeraUser
-            return [user for user in TeraUser.query.all() if user.user_enabled]
+        from opentera.db.models.TeraUser import TeraUser
+        return [user for user in TeraUser.query.all() if user.user_enabled]
 
     @staticmethod
     def convert_to_standard_request_response(flask_response: FlaskResponse):
@@ -176,25 +173,22 @@ class FakeLoggingService(ServiceOpenTera):
         return result
 
     def post_to_opentera(self, api_url: str, json_data: dict) -> Response:
-        with self.flask_app.app_context():
-            # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            answer = self.test_client.post(api_url, headers=request_headers, json=json_data)
-            return FakeLoggingService.convert_to_standard_request_response(answer)
+        # Synchronous call to OpenTera fake backend
+        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+        answer = self.test_client.post(api_url, headers=request_headers, json=json_data)
+        return FakeLoggingService.convert_to_standard_request_response(answer)
 
     def get_from_opentera(self, api_url: str, params: dict) -> Response:
-        with self.flask_app.app_context():
-            # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            answer = self.test_client.get(api_url, headers=request_headers, query_string=params)
-            return FakeLoggingService.convert_to_standard_request_response(answer)
+        # Synchronous call to OpenTera fake backend
+        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+        answer = self.test_client.get(api_url, headers=request_headers, query_string=params)
+        return FakeLoggingService.convert_to_standard_request_response(answer)
 
     def delete_from_opentera(self, api_url: str, params: dict) -> Response:
-        with self.flask_app.app_context():
-            # Synchronous call to OpenTera fake backend
-            request_headers = {'Authorization': 'OpenTera ' + self.service_token}
-            answer = self.test_client.delete(api_url, headers=request_headers, query_string=params)
-            return FakeLoggingService.convert_to_standard_request_response(answer)
+        # Synchronous call to OpenTera fake backend
+        request_headers = {'Authorization': 'OpenTera ' + self.service_token}
+        answer = self.test_client.delete(api_url, headers=request_headers, query_string=params)
+        return FakeLoggingService.convert_to_standard_request_response(answer)
 
 
 if __name__ == '__main__':

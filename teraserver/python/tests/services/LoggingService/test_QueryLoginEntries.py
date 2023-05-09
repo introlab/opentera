@@ -1,5 +1,7 @@
 from BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
+from opentera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.TeraUserClient import TeraUserClient
 from datetime import datetime, timedelta
 import uuid
 
@@ -53,13 +55,19 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     entry.login_message = 'random message'
                     LoginEntry.insert(entry)
 
-                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
-                                                       superadmin=user.user_superadmin, expiration=3600)
-                response = self._get_with_service_token_auth(self.test_client, token=token)
-                self.assertEqual(response.status_code, 200)
+                token_key = ServiceAccessManager.api_user_token_key
+                token = user.get_token(token_key)
+                service_access = user.get_service_access_dict()
 
-                entries = LoginEntry.get_login_entries_by_user_uuid(user.user_uuid)
-                self.assertEqual(len(response.json), len(entries))
+                response = self._get_with_service_token_auth(self.test_client, token=token)
+
+                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
+                                            'admin' in service_access['service_access']['LoggingService']):
+                    self.assertEqual(response.status_code, 200)
+                    entries = LoginEntry.get_login_entries_by_user_uuid(user.user_uuid)
+                    self.assertEqual(len(response.json), len(entries))
+                else:
+                    self.assertEqual(response.status_code, 403)
 
                 # Delete entries
                 for entry in entries:
@@ -100,18 +108,25 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                     'start_date': str(a_week_ago.isoformat()),
                     'end_date': str(current_date.isoformat())
                 }
-                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
-                                                       superadmin=user.user_superadmin, expiration=3600)
+
+                token_key = ServiceAccessManager.api_user_token_key
+                token = user.get_token(token_key)
+                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json), 4)
 
-                params['start_date'] = str(current_date.isoformat())
-                params['end_date'] = str(current_date.isoformat())
-                response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json), 1)
+                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
+                                            'admin' in service_access['service_access']['LoggingService']):
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 4)
+
+                    params['start_date'] = str(current_date.isoformat())
+                    params['end_date'] = str(current_date.isoformat())
+                    response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 1)
+                else:
+                    self.assertEqual(response.status_code, 403)
 
                 # Cleanup
                 LoginEntry.delete(current_entry.id_login_event)
@@ -137,12 +152,18 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 params = {
                     'limit': 10
                 }
-                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
-                                                       superadmin=user.user_superadmin, expiration=3600)
+                token_key = ServiceAccessManager.api_user_token_key
+                token = user.get_token(token_key)
+                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json), 10)
+
+                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
+                                            'admin' in service_access['service_access']['LoggingService']):
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 10)
+                else:
+                    self.assertEqual(response.status_code, 403)
 
                 # Cleanup
                 for entry in all_entries:
@@ -166,8 +187,9 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 params = {
                     'offset': 10
                 }
-                token = self._generate_fake_user_token(name=user.user_username, user_uuid=user.user_uuid,
-                                                       superadmin=user.user_superadmin, expiration=3600)
+                token_key = ServiceAccessManager.api_user_token_key
+                token = user.get_token(token_key)
+                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                 self.assertEqual(response.status_code, 200)
@@ -204,8 +226,8 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                         'user_uuid': user.user_uuid
                     }
 
-                    token = self._generate_fake_user_token(name=admin.user_username, user_uuid=admin.user_uuid,
-                                                           superadmin=admin.user_superadmin, expiration=3600)
+                    token_key = ServiceAccessManager.api_user_token_key
+                    token = admin.get_token(token_key)
 
                     response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                     self.assertEqual(response.status_code, 200)
@@ -243,8 +265,8 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                         'stats': True
                     }
 
-                    token = self._generate_fake_user_token(name=admin.user_username, user_uuid=admin.user_uuid,
-                                                           superadmin=admin.user_superadmin, expiration=3600)
+                    token_key = ServiceAccessManager.api_user_token_key
+                    token = admin.get_token(token_key)
 
                     response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                     self.assertEqual(response.status_code, 200)
@@ -285,8 +307,8 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                         'with_names': True
                     }
 
-                    token = self._generate_fake_user_token(name=admin.user_username, user_uuid=admin.user_uuid,
-                                                           superadmin=admin.user_superadmin, expiration=3600)
+                    token_key = ServiceAccessManager.api_user_token_key
+                    token = admin.get_token(token_key)
 
                     response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
                     self.assertEqual(response.status_code, 200)

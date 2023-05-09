@@ -10,17 +10,6 @@ from FakeLoggingService import FakeLoggingService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 
 
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(user_jti_generator) to get next sequence number
-user_jti_generator = infinite_jti_sequence()
-
-
 class BaseLoggingServiceAPITest(unittest.TestCase):
     _config = None
     _db_man = None
@@ -73,7 +62,6 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
     @staticmethod
     def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), superadmin=False, expiration=3600):
-
         token_key = ServiceAccessManager.api_user_token_key
         from opentera.db.models.TeraUser import TeraUser
         user: TeraUser = TeraUser()
@@ -83,6 +71,11 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         user.user_lastname = name
         user.user_superadmin = superadmin
         return user.get_token(token_key, expiration=expiration)
+
+    @staticmethod
+    def _get_user_access_from_token(token):
+        token_key = ServiceAccessManager.api_user_token_key
+        return ServiceAccessManager.get_user_access_from_token(token, token_key)
 
     def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:
