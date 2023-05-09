@@ -192,8 +192,13 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json), 40)
+
+                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
+                                            'admin' in service_access['service_access']['LoggingService']):
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(len(response.json), 40)
+                else:
+                    self.assertEqual(response.status_code, 403)
 
                 # Cleanup
                 for entry in all_entries:

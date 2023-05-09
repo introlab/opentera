@@ -72,11 +72,6 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         user.user_superadmin = superadmin
         return user.get_token(token_key, expiration=expiration)
 
-    @staticmethod
-    def _get_user_access_from_token(token):
-        token_key = ServiceAccessManager.api_user_token_key
-        return ServiceAccessManager.get_user_access_from_token(token, token_key)
-
     def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:
             params = {}
