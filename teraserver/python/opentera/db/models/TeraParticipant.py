@@ -9,6 +9,7 @@ from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraProject import TeraProject
 
 import uuid
 import jwt
@@ -129,7 +130,10 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             ignore_fields.extend(['participant_username', 'participant_lastonline',
                                   'participant_login_enabled', 'participant_token'])
 
-        return super().to_json(ignore_fields=ignore_fields)
+        participant_json = super().to_json(ignore_fields=ignore_fields)
+        if self.participant_project:
+            participant_json['participant_project_enabled'] = self.participant_project.project_enabled
+        return participant_json
 
     def to_json_create_event(self):
         return self.to_json(minimal=True)
@@ -321,6 +325,12 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
     @classmethod
     def update(cls, update_id: int, values: dict):
+        update_participant = TeraParticipant.get_participant_by_id(update_id)
+        # Check if participant is an enabled project
+        if 'participant_enabled' in values and values['participant_enabled'] and \
+                not update_participant.participant_project.project_enabled:
+            raise IntegrityError('Participant project disabled - no update allowed', update_id, 't_projects')
+
         # Check if username is available
         if 'participant_username' in values:
             if not TeraParticipant.is_participant_username_available(values['participant_username']):
@@ -340,7 +350,6 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
         # Check if we need to generate or delete tokens
         if 'participant_token_enabled' in values:
-            update_participant = TeraParticipant.get_participant_by_id(update_id)
             if values['participant_token_enabled'] != update_participant.participant_token_enabled:
                 if 'participant_enabled' in values:
                     participant_enabled = values['participant_enabled']
@@ -374,6 +383,11 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         # Token must be created after being inserted, since we need to have a valid ID participant into it
         if participant.participant_token_enabled and participant.participant_enabled:
             participant.create_token()
+
+        # Check if participant project is enabled
+        project = TeraProject.get_project_by_id(participant.id_project)
+        if not project or not project.project_enabled:
+            raise IntegrityError('Participant project disabled - no insert allowed', -1, 't_projects')
         TeraParticipant.db().session.commit()
 
     def delete_check_integrity(self) -> IntegrityError | None:

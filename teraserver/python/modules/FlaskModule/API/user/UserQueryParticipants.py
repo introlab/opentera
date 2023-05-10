@@ -277,6 +277,13 @@ class UserQueryParticipants(Resource):
             # Already existing
             try:
                 TeraParticipant.update(json_participant['id_participant'], json_participant)
+            except exc.IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, UserQueryParticipants.__name__, 'update', 400,
+                                               'Integrity error', str(e))
+
+                if 't_projects' in str(e.args):
+                    return gettext('Can\'t update participant: participant\'s project is disabled.'), 400
+
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
@@ -297,6 +304,12 @@ class UserQueryParticipants(Resource):
                 TeraParticipant.insert(new_part)
                 # Update ID for further use
                 json_participant['id_participant'] = new_part.id_participant
+            except exc.IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, UserQueryParticipants.__name__, 'insert', 400,
+                                               'Integrity error', str(e))
+
+                if 't_projects' in str(e.args):
+                    return gettext('Can\'t insert participant: participant\'s project is disabled or invalid.'), 400
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
