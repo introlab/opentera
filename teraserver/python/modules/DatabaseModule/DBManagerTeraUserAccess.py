@@ -1269,7 +1269,7 @@ class DBManagerTeraUserAccess:
         return services_configs
 
     def query_service_access(self, user_group_id: int = None, device_id: int = None, participant_group_id: int = None,
-                             service_id: int = None):
+                             service_id: int = None, user_id: int = None):
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraServiceRole import TeraServiceRole
         accessible_services_ids = self.get_accessible_services_ids()
@@ -1281,6 +1281,11 @@ class DBManagerTeraUserAccess:
             query = query.filter_by(id_device=device_id)
         if participant_group_id:
             query = query.filter_by(id_participant_group=participant_group_id)
+        if user_id:
+            user = TeraUser.get_user_by_id(user_id)
+            user_groups_ids = [ug.id_user_group for ug in user.user_user_groups]
+            query = query.filter(TeraServiceAccess.id_user_group.in_(user_groups_ids))
+
         if service_id:
             query = query.join(TeraServiceAccess.service_access_role).filter_by(id_service=service_id)
         else:
