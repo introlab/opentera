@@ -216,16 +216,16 @@ class TeraService(BaseModel, SoftDeleteMixin):
         super().insert(service)
 
         # Create default admin-user role for each service
-        from opentera.db.models.TeraServiceRole import TeraServiceRole
-        new_role = TeraServiceRole()
-        new_role.id_service = service.id_service
-        new_role.service_role_name = 'admin'
-        TeraServiceRole.insert(new_role)
-
-        new_role = TeraServiceRole()
-        new_role.id_service = service.id_service
-        new_role.service_role_name = 'user'
-        TeraServiceRole.insert(new_role)
+        # from opentera.db.models.TeraServiceRole import TeraServiceRole
+        # new_role = TeraServiceRole()
+        # new_role.id_service = service.id_service
+        # new_role.service_role_name = 'admin'
+        # TeraServiceRole.insert(new_role)
+        #
+        # new_role = TeraServiceRole()
+        # new_role.id_service = service.id_service
+        # new_role.service_role_name = 'user'
+        # TeraServiceRole.insert(new_role)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         for service_site in self.service_sites:

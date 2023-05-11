@@ -79,7 +79,8 @@ class UserQueryServiceAccess(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @api.doc(description='Create/update service - access association.',
+    @api.doc(description='Create/update service - access association. A list can be posted - if an item with a '
+                         'id_service_access doesn\'t have an id_service_role element, it will be deleted.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',

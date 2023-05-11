@@ -235,4 +235,9 @@ class UserQueryServiceAccessTest(BaseUserAPITest):
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('id_service_role'))
         self.assertTrue(json_data.__contains__('service_role_name'))
-        self.assertTrue(json_data.__contains__('service_name'))
+        if not minimal:
+            self.assertTrue(json_data.__contains__('service_name'))
+            self.assertTrue(json_data.__contains__('id_service'))
+        else:
+            self.assertFalse(json_data.__contains__('service_name'))
+            self.assertTrue(json_data.__contains__('id_service'))

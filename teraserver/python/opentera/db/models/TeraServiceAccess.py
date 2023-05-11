@@ -54,6 +54,7 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if not minimal:
             if self.service_access_role:
                 json_val['service_name'] = self.service_access_role.service_role_service.service_name
+                json_val['id_service'] = self.service_access_role.service_role_service.id_service
             # else:
             #     # This happens on transient objects
             #     from opentera.db.models.TeraService import TeraService
