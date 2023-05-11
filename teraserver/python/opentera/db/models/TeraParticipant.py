@@ -131,7 +131,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
                                   'participant_login_enabled', 'participant_token'])
 
         participant_json = super().to_json(ignore_fields=ignore_fields)
-        if self.participant_project:
+        if self.participant_project and not minimal:
             participant_json['participant_project_enabled'] = self.participant_project.project_enabled
         return participant_json
 

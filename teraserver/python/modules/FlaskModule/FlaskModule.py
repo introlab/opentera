@@ -187,6 +187,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryServiceProjects import UserQueryServiceProjects
         from modules.FlaskModule.API.user.UserQueryServiceSites import UserQueryServiceSites
         from modules.FlaskModule.API.user.UserQueryServiceAccess import UserQueryServiceAccess
+        from modules.FlaskModule.API.user.UserQueryServiceRoles import UserQueryServiceRole
         from modules.FlaskModule.API.user.UserSessionManager import UserSessionManager
         from modules.FlaskModule.API.user.UserQueryServiceConfigs import UserQueryServiceConfig
         from modules.FlaskModule.API.user.UserQueryStats import UserQueryUserStats
@@ -204,11 +205,11 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSites,          '/devices/sites', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceProjects,       '/devices/projects', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceParticipants,   '/devices/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
@@ -224,7 +225,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessions,             '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(UserSessionManager,            '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
@@ -233,6 +234,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryServiceSites,         '/services/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceAccess,        '/services/access', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceConfig,        '/services/configs', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryServiceRole,          '/services/roles', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)

@@ -13,7 +13,7 @@ from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAcce
 
 
 class UserQueryDeviceParticipantsTest(BaseUserAPITest):
-    test_endpoint = '/api/user/deviceparticipants'
+    test_endpoint = '/api/user/devices/participants'
 
     def setUp(self):
         super().setUp()

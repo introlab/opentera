@@ -46,12 +46,18 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
         # Remove null values
         if not json_val['id_project']:
             del json_val['id_project']
+        else:
+            if not minimal:
+                json_val['project_name'] = self.service_role_project.project_name
+
         if not json_val['id_site']:
             del json_val['id_site']
         else:
             if not minimal:
                 json_val['site_name'] = self.service_role_site.site_name
 
+        if not minimal:
+            json_val['service_name'] = self.service_role_service.service_name
         return json_val
 
     @staticmethod

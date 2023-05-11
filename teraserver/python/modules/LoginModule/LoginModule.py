@@ -482,6 +482,8 @@ class LoginModule(BaseModule):
             return True
 
         # Second attempt, validate dynamic token
+        if not token_value:
+            return False
 
         # Disabled tokens should never be used
         if LoginModule.is_participant_token_disabled(token_value):
