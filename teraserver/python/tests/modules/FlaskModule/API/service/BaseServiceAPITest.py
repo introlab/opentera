@@ -127,8 +127,8 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
-                                      params: dict = {}, endpoint: str = ''):
+    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,
+                                      params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -137,7 +137,7 @@ class BaseServiceAPITest(unittest.TestCase):
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
-                                        params: dict = {}, endpoint: str = ''):
+                                        params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
         if endpoint is None:
