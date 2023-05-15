@@ -5,11 +5,13 @@ from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
 
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSite import TeraSite
 from sqlalchemy.exc import InvalidRequestError
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_project', type=int, help='ID of the project to query')
+get_parser.add_argument('id_site', type=int, help='ID of the site to query projects for')
 
 
 class ServiceQueryProjects(Resource):
@@ -33,13 +35,18 @@ class ServiceQueryProjects(Resource):
 
         projects = []
         # Can only query project with an id
-        if not args['id_project']:
-            return gettext('Missing project id'), 400
+        if not args['id_project'] and not args['id_site']:
+            return gettext('Missing parameter'), 400
 
         if args['id_project']:
             if args['id_project'] not in service_access.get_accessible_projects_ids():
                 return gettext('Forbidden'), 403
             projects = [TeraProject.get_project_by_id(args['id_project'])]
+
+        if args['id_site']:
+            if args['id_site'] not in service_access.get_accessibles_sites_ids():
+                return gettext('Forbidden'), 403
+            projects = TeraSite.get_site_by_id(args['id_site']).site_projects
 
         try:
             projects_list = []

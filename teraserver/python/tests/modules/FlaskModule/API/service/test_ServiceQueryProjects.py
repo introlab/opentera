@@ -1,6 +1,6 @@
 from BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSite import TeraSite
 
 
 class ServiceQueryProjectsTest(BaseServiceAPITest):
@@ -26,15 +26,15 @@ class ServiceQueryProjectsTest(BaseServiceAPITest):
     def test_get_endpoint_with_token_auth_and_invalid_id_project(self):
         with self._flask_app.app_context():
             params = {'id_project': -1}
-            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token, params=params,
-                                                         endpoint=self.test_endpoint)
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_token_auth_and_valid_id_project(self):
         with self._flask_app.app_context():
             params = {'id_project': 1}
-            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token, params=params,
-                                                         endpoint=self.test_endpoint)
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
             self.assertEqual(1, len(response.json))
             project: TeraProject = TeraProject.get_project_by_id(1)
@@ -49,3 +49,29 @@ class ServiceQueryProjectsTest(BaseServiceAPITest):
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
                 self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_token_auth_and_invalid_id_site(self):
+        with self._flask_app.app_context():
+            params = {'id_site': -1}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_token_auth_and_denied_id_site(self):
+        with self._flask_app.app_context():
+            params = {'id_site': 2}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_token_auth_and_id_site(self):
+        with self._flask_app.app_context():
+            params = {'id_site': 1}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            site: TeraSite = TeraSite.get_site_by_id(1)
+            self.assertEqual(len(site.site_projects), len(response.json))
+            for json_project in response.json:
+                project: TeraProject = TeraProject.get_project_by_id(json_project['id_project'])
+                self.assertEqual(project.to_json(minimal=True), json_project)
