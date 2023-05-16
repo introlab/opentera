@@ -1,8 +1,8 @@
-from flask import jsonify, session
+from flask import jsonify, session, request
 from flask_login import logout_user
 from flask_restx import Resource, reqparse, fields
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
+from modules.LoginModule.LoginModule import participant_multi_auth, current_participant, LoginModule
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 
 # Parser definition(s)
@@ -30,6 +30,12 @@ class ParticipantLogout(Resource):
             logout_user()
             session.clear()
             self.module.send_participant_disconnect_module_message(current_participant.participant_uuid)
+            # Add token to disabled set
+            if 'Authorization' in request.headers:
+                scheme, old_token = request.headers['Authorization'].split(None, 1)
+                if scheme == 'OpenTera':
+                    LoginModule.participant_push_disabled_token(old_token)
+
             return gettext("Participant logged out."), 200
         else:
             return gettext("Participant not logged in"), 403

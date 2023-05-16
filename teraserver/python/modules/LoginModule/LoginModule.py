@@ -51,29 +51,56 @@ participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth
 
 
 class DisabledTokenStorage:
-    def __init__(self):
-        self.disabled_tokens = []
+    """
+    This class is used to store disabled tokens in redis.
+    """
+    def __init__(self, redis_key: str):
+        self.redis_key = redis_key
+        self.redis_client = None
+        self.token_key = None
+
+    def config(self, config: ConfigManager, token_key: str):
+        self.token_key = token_key
+        self.redis_client = redis.Redis(host=config.redis_config['hostname'],
+                                        port=config.redis_config['port'],
+                                        username=config.redis_config['username'],
+                                        password=config.redis_config['password'],
+                                        db=config.redis_config['db'])
+
+        # Remove all expired tokens
+        self.remove_all_expired_tokens(self.token_key)
 
     def push_disabled_token(self, token):
-        if token not in self.disabled_tokens:
-            self.disabled_tokens.append(token)
+        # Add token to set
+        self.redis_client.sadd(self.redis_key, token)
 
     def get_disabled_tokens(self):
-        return self.disabled_tokens
+        # Get all elements from the set
+        return self.redis_client.smembers(self.redis_key)
 
     def is_disabled_token(self, token):
-        return token in self.disabled_tokens
+        # Check if token is in set
+        return self.redis_client.sismember(self.redis_key, token)
 
     def clear_all_disabled_tokens(self):
-        self.disabled_tokens.clear()
+        # Clear set
+        self.redis_client.delete(self.redis_key)
 
     def remove_disabled_token(self, token):
-        if token in self.disabled_tokens:
-            self.disabled_tokens.remove(token)
+        # Remove token from set
+        self.redis_client.srem(self.redis_key, token)
 
     def remove_all_expired_tokens(self, key):
         to_be_removed = []
-        for token in self.disabled_tokens:
+        for token in self.redis_client.smembers(self.redis_key):
+
+            if token is None:
+                continue
+
+            if len(token) == 0:
+                self.redis_client.srem(self.redis_key, token)
+                continue
+
             import jwt
             try:
                 token_dict = jwt.decode(token, key, algorithms='HS256')
@@ -82,15 +109,14 @@ class DisabledTokenStorage:
                 # We should stop looking for expired tokens since they are added chronologically
                 break
             except jwt.exceptions.ExpiredSignatureError as e:
+                # Remove expired token
                 to_be_removed.append(token)
+                self.redis_client.srem(self.redis_key, token)
             except jwt.exceptions.PyJWTError as e:
                 print(e)
                 continue
 
-        # Remove expired tokens
-        for expired_token in to_be_removed:
-            self.disabled_tokens.remove(expired_token)
-
+        # Return removed tokens
         return to_be_removed
 
 
@@ -99,8 +125,8 @@ class LoginModule(BaseModule):
     redis_client = None
 
     # Only user & participant tokens expire (for now)
-    __user_disabled_token_storage = DisabledTokenStorage()
-    __participant_disabled_token_storage = DisabledTokenStorage()
+    __user_disabled_token_storage = DisabledTokenStorage(redis_key='user_disabled_tokens')
+    __participant_disabled_token_storage = DisabledTokenStorage(redis_key='participant_disabled_tokens')
 
     def __init__(self, config: ConfigManager, app=flask_app):
         self.app = app
@@ -110,6 +136,13 @@ class LoginModule(BaseModule):
                                                username=config.redis_config['username'],
                                                password=config.redis_config['password'],
                                                db=config.redis_config['db'])
+
+        # Configure Disabled Token Storage
+        LoginModule.__user_disabled_token_storage.config(config, self.redis_client.get(
+            RedisVars.RedisVar_UserTokenAPIKey))
+
+        LoginModule.__participant_disabled_token_storage.config(config, self.redis_client.get(
+            RedisVars.RedisVar_ParticipantTokenAPIKey))
 
         BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
 
@@ -152,11 +185,11 @@ class LoginModule(BaseModule):
 
         # Cookie based configuration
         self.app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
-                                 'REMEMBER_COOKIE_DURATION': 14,
-                                 'REMEMBER_COOKIE_SECURE': True,
-                                 'USE_PERMANENT_SESSION': True,
-                                 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
-                                 'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+                                'REMEMBER_COOKIE_DURATION': 14,
+                                'REMEMBER_COOKIE_SECURE': True,
+                                'USE_PERMANENT_SESSION': True,
+                                'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
+                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
@@ -818,3 +851,7 @@ class LoginModule(BaseModule):
             return gettext('Unauthorized'), 401
 
         return decorated
+
+
+if __name__ == '__main__':
+    pass
