@@ -1,12 +1,8 @@
-from typing import List
-
 from BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraUser import TeraUser
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
-from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 import uuid
 

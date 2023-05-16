@@ -327,24 +327,26 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
+        from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
 
-        namespace.add_resource(ServiceQueryAccess,          '/access', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryAssets,          '/assets', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryDevices,         '/devices', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryDisconnect,      '/disconnect', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryParticipants,    '/participants', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryProjects,        '/projects', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryRoles,           '/roles', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryServices,        '/services', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessions,        '/sessions', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessionEvents,   '/sessions/events', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceSessionManager,       '/sessions/manager', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessionTypes,    '/sessiontypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySites,           '/sites', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryTests,           '/tests', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryTestTypes,       '/testtypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryUsers,           '/users', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAccess,          '       /access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryParticipants,            '/participants', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryProjects,                '/projects', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryRoles,                   '/roles', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryServiceAccess,           '/serviceaccess', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryServices,                '/services', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessions,                '/sessions', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionEvents,           '/sessions/events', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceSessionManager,               '/sessions/manager', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionTypes,            '/sessiontypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from modules.FlaskModule.Views.About import About
