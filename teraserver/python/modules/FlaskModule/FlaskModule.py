@@ -329,7 +329,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
 
-        namespace.add_resource(ServiceQueryAccess,          '       /access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)

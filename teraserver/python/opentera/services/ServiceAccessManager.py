@@ -11,7 +11,9 @@ from opentera.services.TeraUserClient import TeraUserClient
 from opentera.services.TeraDeviceClient import TeraDeviceClient
 from opentera.services.TeraParticipantClient import TeraParticipantClient
 from opentera.services.TeraServiceClient import TeraServiceClient
+from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 from opentera.utils.UserAgentParser import UserAgentParser
+from opentera.redis.RedisVars import RedisVars
 import opentera.messages.python as messages
 
 # Current client identity, stacked
@@ -19,8 +21,6 @@ current_user_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'curren
 current_device_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device_client', None))
 current_participant_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant_client', None))
 current_service_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_service_client', None))
-
-
 current_login_type = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_login_type', LoginType.UNKNOWN_LOGIN))
 
 
@@ -42,6 +42,51 @@ class ServiceAccessManager:
     api_service_token_key = None
     token_cookie_name = 'OpenTera'
     service = None
+
+    # Only user & participant tokens expire (for now)
+    __user_disabled_token_storage = DisabledTokenStorage(redis_key='user_disabled_tokens')
+    __participant_disabled_token_storage = DisabledTokenStorage(redis_key='participant_disabled_tokens')
+
+    @staticmethod
+    def init_access_manager(service):
+        # Set service
+        ServiceAccessManager.service = service
+
+        # Update Service Access information
+        ServiceAccessManager.api_user_token_key = \
+            service.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+        ServiceAccessManager.api_participant_token_key = \
+            service.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
+        ServiceAccessManager.api_participant_static_token_key = \
+            service.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
+        ServiceAccessManager.api_device_token_key = \
+            service.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
+        ServiceAccessManager.api_device_static_token_key = \
+            service.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+        ServiceAccessManager.api_service_token_key = \
+            service.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+
+        # Update Token Storage information
+        ServiceAccessManager.__user_disabled_token_storage.config(
+            service.config_man, ServiceAccessManager.api_user_token_key)
+        ServiceAccessManager.__participant_disabled_token_storage.config(
+            service.config_man, ServiceAccessManager.api_participant_token_key)
+
+    @staticmethod
+    def user_add_disabled_token(token):
+        return ServiceAccessManager.__user_disabled_token_storage.add_disabled_token(token)
+
+    @staticmethod
+    def is_user_token_disabled(token):
+        return ServiceAccessManager.__user_disabled_token_storage.is_disabled_token(token)
+
+    @staticmethod
+    def participant_add_disabled_token(token):
+        return ServiceAccessManager.__participant_disabled_token_storage.add_disabled_token(token)
+
+    @staticmethod
+    def is_participant_token_disabled(token):
+        return ServiceAccessManager.__participant_disabled_token_storage.is_disabled_token(token)
 
     @staticmethod
     def token_required(allow_dynamic_tokens=True, allow_static_tokens=False):
@@ -94,7 +139,7 @@ class ServiceAccessManager:
                 #########################
                 # Verify token from redis
                 # USER TOKEN MANAGEMENT
-                if allow_dynamic_tokens: # User only use dynamic tokens, don't validate otherwise
+                if allow_dynamic_tokens:  # User only use dynamic tokens, don't validate otherwise
                     if ServiceAccessManager.validate_user_token(token=token):
                         return f(*args, **kwargs)
 
@@ -263,7 +308,11 @@ class ServiceAccessManager:
             # Not a user, or invalid token, will continue...
             pass
         else:
-            # User token
+            # Check if token is disabled
+            if ServiceAccessManager.is_user_token_disabled(token):
+                return False
+
+            # User token is valid and not disabled
             _request_ctx_stack.top.current_user_client = \
                 TeraUserClient(token_dict, token, ServiceAccessManager.service.config_man)
             _request_ctx_stack.top.current_login_type = LoginType.USER_LOGIN
@@ -308,7 +357,11 @@ class ServiceAccessManager:
                 # Not a participant, or invalid token, will continue...
                 pass
             else:
-                # Participant token
+                # Look for disabled tokens, token was decoded successfully
+                if ServiceAccessManager.is_participant_token_disabled(token):
+                    return False
+
+                # Participant token is not disabled, everything is ok
                 _request_ctx_stack.top.current_participant_client = \
                     TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
                 _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
