@@ -782,7 +782,3 @@ class LoginModule(BaseModule):
             return gettext('Unauthorized'), 401
 
         return decorated
-
-
-if __name__ == '__main__':
-    pass
