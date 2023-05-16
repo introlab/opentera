@@ -29,7 +29,7 @@ class UserLogout(Resource):
             if 'Authorization' in request.headers:
                 scheme, old_token = request.headers['Authorization'].split(None, 1)
                 if scheme == 'OpenTera':
-                    LoginModule.user_push_disabled_token(old_token)
+                    LoginModule.user_add_disabled_token(old_token)
 
             return gettext("User logged out."), 200
         else:

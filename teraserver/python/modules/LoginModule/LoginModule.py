@@ -12,6 +12,7 @@ from opentera.db.models.TeraService import TeraService
 import opentera.messages.python as messages
 
 from opentera.config.ConfigManager import ConfigManager
+from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
@@ -48,76 +49,6 @@ user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
 participant_http_auth = HTTPBasicAuth(realm='participant')
 participant_token_auth = HTTPTokenAuth("OpenTera")
 participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
-
-
-class DisabledTokenStorage:
-    """
-    This class is used to store disabled tokens in redis.
-    """
-    def __init__(self, redis_key: str):
-        self.redis_key = redis_key
-        self.redis_client = None
-        self.token_key = None
-
-    def config(self, config: ConfigManager, token_key: str):
-        self.token_key = token_key
-        self.redis_client = redis.Redis(host=config.redis_config['hostname'],
-                                        port=config.redis_config['port'],
-                                        username=config.redis_config['username'],
-                                        password=config.redis_config['password'],
-                                        db=config.redis_config['db'])
-
-        # Remove all expired tokens
-        self.remove_all_expired_tokens(self.token_key)
-
-    def push_disabled_token(self, token):
-        # Add token to set
-        self.redis_client.sadd(self.redis_key, token)
-
-    def get_disabled_tokens(self):
-        # Get all elements from the set
-        return self.redis_client.smembers(self.redis_key)
-
-    def is_disabled_token(self, token):
-        # Check if token is in set
-        return self.redis_client.sismember(self.redis_key, token)
-
-    def clear_all_disabled_tokens(self):
-        # Clear set
-        self.redis_client.delete(self.redis_key)
-
-    def remove_disabled_token(self, token):
-        # Remove token from set
-        self.redis_client.srem(self.redis_key, token)
-
-    def remove_all_expired_tokens(self, key):
-        to_be_removed = []
-        for token in self.redis_client.smembers(self.redis_key):
-
-            if token is None:
-                continue
-
-            if len(token) == 0:
-                self.redis_client.srem(self.redis_key, token)
-                continue
-
-            import jwt
-            try:
-                token_dict = jwt.decode(token, key, algorithms='HS256')
-                # Expired tokens will throw exception.
-                # If we continue here, tokens have a valid expiration time.
-                # We should stop looking for expired tokens since they are added chronologically
-                break
-            except jwt.exceptions.ExpiredSignatureError as e:
-                # Remove expired token
-                to_be_removed.append(token)
-                self.redis_client.srem(self.redis_key, token)
-            except jwt.exceptions.PyJWTError as e:
-                print(e)
-                continue
-
-        # Return removed tokens
-        return to_be_removed
 
 
 class LoginModule(BaseModule):
@@ -314,8 +245,8 @@ class LoginModule(BaseModule):
         return False
 
     @staticmethod
-    def user_push_disabled_token(token):
-        LoginModule.__user_disabled_token_storage.push_disabled_token(token)
+    def user_add_disabled_token(token):
+        LoginModule.__user_disabled_token_storage.add_disabled_token(token)
 
     @staticmethod
     def is_user_token_disabled(token):
@@ -493,8 +424,8 @@ class LoginModule(BaseModule):
         return False
 
     @staticmethod
-    def participant_push_disabled_token(token):
-        LoginModule.__participant_disabled_token_storage.push_disabled_token(token)
+    def participant_add_disabled_token(token):
+        LoginModule.__participant_disabled_token_storage.add_disabled_token(token)
 
     @staticmethod
     def is_participant_token_disabled(token):
