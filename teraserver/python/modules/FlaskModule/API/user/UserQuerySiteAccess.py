@@ -147,6 +147,10 @@ class UserQuerySiteAccess(Resource):
                                 site_access_json['user_groups'] = ug_list
 
                             access_list.append(site_access_json)
+
+            # Sort by site name
+            if access_list and 'site_name' in access_list[0]:
+                access_list.sort(key=lambda a: a['site_name'])
             return access_list
 
         # No access, but still fine

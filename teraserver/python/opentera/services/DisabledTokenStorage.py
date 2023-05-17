@@ -39,6 +39,8 @@ class DisabledTokenStorage:
 
     def is_disabled_token(self, token) -> bool:
         # Check if token is in set
+        if not token:
+            return True
         return self.redis_client.sismember(self.redis_key, token)
 
     def clear_all_disabled_tokens(self) -> Any:

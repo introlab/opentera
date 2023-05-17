@@ -345,11 +345,6 @@ class UserQuerySiteAccessTest(BaseUserAPITest):
                                                         params=params)
             self.assertEqual(200, response.status_code, msg="Delete OK")
 
-            params = {'id': current_id2}
-            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                        params=params)
-            self.assertEqual(200, response.status_code, msg="Delete OK")
-
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
         self.assertTrue(json_data.__contains__('site_access_role'))

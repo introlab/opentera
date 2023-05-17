@@ -533,7 +533,6 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
             self.assertEqual(response.status_code, 200, msg="Post update")
             json_data = response.json[0]
             self._checkJson(json_data)
-            current_id2 = json_data['id_project_access']
             self.assertEqual(json_data['project_access_role'], 'user')
 
             # Delete
@@ -542,11 +541,6 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
                                                         params=params)
             self.assertEqual(403, response.status_code, msg="Delete denied")
 
-            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                        params=params)
-            self.assertEqual(response.status_code, 200, msg="Delete OK")
-
-            params = {'id': current_id2}
             response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                         params=params)
             self.assertEqual(response.status_code, 200, msg="Delete OK")

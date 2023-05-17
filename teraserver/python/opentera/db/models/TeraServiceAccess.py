@@ -91,7 +91,8 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         access = TeraServiceAccess.get_service_access_for_user_group(id_service=id_service,
                                                                      id_user_group=id_user_group,
                                                                      id_site=id_site,
-                                                                     id_project=id_project)
+                                                                     id_project=id_project,
+                                                                     id_service_role=id_service_role)
 
         if not access:
             # No access already present for that user group - create new one
@@ -119,7 +120,7 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if id_site:
             query = query.filter_by(id_site=id_site)
 
-        if id_service_role:
+        if id_service_role and not id_site and not id_project:  # We search with id_service_role only if no project/site
             query = query.filter_by(id_service_role=id_service_role)
 
         return query.all()

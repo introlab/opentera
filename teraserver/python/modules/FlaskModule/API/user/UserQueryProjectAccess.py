@@ -162,6 +162,12 @@ class UserQueryProjectAccess(Resource):
                             if project_access_json:
                                 access_list.append(project_access_json)
 
+            # Sort by project name
+            if access_list and 'project_name' in access_list[0]:
+                if not args['with_sites']:
+                    access_list.sort(key=lambda a: a['project_name'])
+                else:
+                    access_list.sort(key=lambda a: (a['site_name'], a['project_name']))
             return access_list
 
         # No access, but still fine

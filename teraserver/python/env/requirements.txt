@@ -23,7 +23,7 @@ flask-swagger-ui==4.11.1
 Flask-Limiter==3.3.0
 Flask-Mail==0.9.1
 Flask-Principal==0.4.0
-redis==4.5.4
+redis==4.5.5
 txredisapi==1.4.9
 passlib==1.7.4
 bcrypt==4.0.1

@@ -256,6 +256,8 @@ class LoginModule(BaseModule):
         """
         Tokens key is dynamic and stored in a redis variable for users.
         """
+        if not token_value:
+            return False
         # Disabled tokens should never be used
         if LoginModule.is_user_token_disabled(token_value):
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
