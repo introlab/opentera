@@ -325,6 +325,21 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
             for entry in all_entries:
                 LoginEntry.delete(entry.id_login_event)
 
+    def test_get_endpoint_with_disabled_token(self):
+        with self.app_context():
+            login_response = self._get_with_user_http_auth(self.test_client, username='admin',
+                                                           password='admin', endpoint=self.user_login_endpoint)
+            self.assertEqual(200, login_response.status_code)
+            token = login_response.json['user_token']
+
+            logout_response = self._get_with_user_token_auth(self.test_client, token=token,
+                                                             endpoint=self.user_logout_endpoint)
+            self.assertEqual(200, login_response.status_code)
+
+            # Try to call endpoint with disabled token
+            response = self._get_with_service_token_auth(self.test_client, token=token)
+            self.assertEqual(403, response.status_code)
+
     def _create_entry_with_user_uuid_and_date(self, entry_uuid: str, entry_date: datetime):
         self.assertIsNotNone(entry_uuid)
         self.assertIsNotNone(entry_date)
