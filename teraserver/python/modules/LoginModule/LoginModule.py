@@ -457,7 +457,7 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.participant_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
-                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_NO_TOKEN,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
