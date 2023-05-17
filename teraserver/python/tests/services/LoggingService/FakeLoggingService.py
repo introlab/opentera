@@ -19,6 +19,9 @@ class FakeFlaskModule(BaseModule):
     def __init__(self,  config: ConfigManager, flask_app):
         BaseModule.__init__(self, 'FakeFlaskModule', config)
 
+        # Will allow for user api to work
+        self.config.server_config = {'hostname': '127.0.0.1', 'port': 40075}
+
         self.flask_app = flask_app
         self.api = CustomAPI(self.flask_app, version='1.0.0', title='LoggingService API',
                              description='FakeLoggingService API Documentation', doc='/doc', prefix='/api',
@@ -38,8 +41,16 @@ class FakeFlaskModule(BaseModule):
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         self.logging_api_namespace = self.api.namespace('logging', description='LoggingService API')
         self.service_api_namespace = self.api.namespace('service', description='Fake TeraServer service API')
+        self.user_api_namespace = self.api.namespace('user', description='Fake TeraServer user API')
+        self.participant_api_namespace = self.api.namespace('participant',
+                                                            description='Fake TeraServer participant API')
+        self.device_api_namespace = self.api.namespace('device', description='Fake TeraServer device API')
+
         self.setup_fake_logging_api(flask_app)
         self.setup_fake_service_api(flask_app)
+        self.setup_fake_user_api(flask_app)
+        self.setup_fake_participant_api(flask_app)
+        self.setup_fake_device_api(flask_app)
 
     def setup_fake_logging_api(self, flask_app):
         from services.LoggingService.FlaskModule import FlaskModule
@@ -58,6 +69,48 @@ class FakeFlaskModule(BaseModule):
 
             # The trick is to initialize main server api to thew newly created namespace
             FlaskModule.init_service_api(self, self.service_api_namespace, kwargs)
+
+    def setup_fake_user_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake Service API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to thew newly created namespace
+            FlaskModule.init_user_api(self, self.user_api_namespace, kwargs)
+
+    def setup_fake_participant_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to the newly created namespace
+            FlaskModule.init_participant_api(self, self.participant_api_namespace, kwargs)
+
+    def setup_fake_device_api(self, flask_app):
+        from modules.FlaskModule.FlaskModule import FlaskModule
+        with flask_app.app_context():
+            # Setup Fake API
+            kwargs = {'flaskModule': self,
+                      'test': True}
+
+            # The trick is to initialize main server api to the newly created namespace
+            FlaskModule.init_device_api(self, self.device_api_namespace, kwargs)
+
+    def send_user_disconnect_module_message(self, user_uuid: str):
+        print('FakeFlaskModule : send_user_disconnect_module_message')
+        pass
+
+    def send_participant_disconnect_module_message(self, participant_uuid: str):
+        print('FakeFlaskModule : send_participant_disconnect_module_message')
+        pass
+
+    def send_device_disconnect_module_message(self, device_uuid: str):
+        print('FakeFlaskModule : send_device_disconnect_module_message')
+        pass
 
 
 class FakeLoggingService(ServiceOpenTera):
@@ -87,7 +140,7 @@ class FakeLoggingService(ServiceOpenTera):
             # Redis variables & db must be initialized before
             ServiceOpenTera.__init__(self, self.config_man, {'service_key': 'LoggingService'})
 
-            self.login_module = LoginModule(self.config_man)
+            self.login_module = LoginModule(self.config_man, self.flask_app)
 
             from opentera.db.models.TeraService import TeraService
             logging_service: TeraService = TeraService.get_service_by_key('LoggingService')
