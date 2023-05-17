@@ -50,7 +50,7 @@ class DisabledTokenStorage:
         self.redis_client.srem(self.redis_key, token)
 
     def remove_all_expired_tokens(self, key) -> Set[str]:
-        to_be_removed = set()
+        to_be_removed: set = set()
         for token in self.redis_client.smembers(self.redis_key):
 
             if token is None:
@@ -68,8 +68,12 @@ class DisabledTokenStorage:
                 break
             except jwt.exceptions.ExpiredSignatureError as e:
                 # Remove expired token
-                to_be_removed.append(token)
+                to_be_removed.add(token)
                 self.redis_client.srem(self.redis_key, token)
+            except jwt.exceptions.InvalidSignatureError as e:
+                # Token was signed with a different key, remove it
+                self.redis_client.srem(self.redis_key, token)
+                self.logging_client.log_error('DisabledTokenStorage.remove_all_expired_tokens', str(e))
             except jwt.exceptions.PyJWTError as e:
                 self.logging_client.log_error('DisabledTokenStorage.remove_all_expired_tokens', str(e))
                 continue
