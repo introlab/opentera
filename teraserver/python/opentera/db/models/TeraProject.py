@@ -68,9 +68,9 @@ class TeraProject(BaseModel, SoftDeleteMixin):
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraUser import TeraUser
         # Get all users who have a role in the project
-        project_access = TeraServiceAccess.get_service_access_for_project(id_service=Globals.opentera_service_id,
-                                                                          id_project=self.id_project,
-                                                                          with_deleted=with_deleted)
+        project_access = TeraServiceAccess.get_service_access(id_service=Globals.opentera_service_id,
+                                                              id_project=self.id_project,
+                                                              with_deleted=with_deleted)
 
         users = []
         for access in project_access:
@@ -83,9 +83,9 @@ class TeraProject(BaseModel, SoftDeleteMixin):
 
         # Also appends users with site access but no direct access to project
         if include_site_access:
-            site_access = TeraServiceAccess.get_service_access_for_site(id_service=Globals.opentera_service_id,
-                                                                        id_site=self.id_site,
-                                                                        with_deleted=with_deleted)
+            site_access = TeraServiceAccess.get_service_access(id_service=Globals.opentera_service_id,
+                                                               id_site=self.id_site,
+                                                               with_deleted=with_deleted)
             for access in site_access:
                 if access.service_access_role.service_role_name == 'admin':
                     if access.service_access_user_group:

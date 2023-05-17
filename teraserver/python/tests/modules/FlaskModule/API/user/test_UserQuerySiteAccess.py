@@ -331,6 +331,7 @@ class UserQuerySiteAccessTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code, msg="Post update, take 2")
             self.assertGreater(len(response.json), 0)
             json_data = response.json[0]
+            current_id2 = json_data['id_site_access']
             self._checkJson(json_data)
             self.assertEqual(json_data['site_access_role'], 'user')
 

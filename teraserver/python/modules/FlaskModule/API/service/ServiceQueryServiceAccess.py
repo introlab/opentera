@@ -4,7 +4,6 @@ from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
-from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraServiceAccess
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc

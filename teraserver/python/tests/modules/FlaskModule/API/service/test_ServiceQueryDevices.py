@@ -125,7 +125,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                           endpoint=self.test_endpoint)
-            self.assertEqual(400, response.status_code)
+            self.assertEqual(415, response.status_code)
 
     def test_post_endpoint_with_token_auth_create_device(self):
         with self._flask_app.app_context():

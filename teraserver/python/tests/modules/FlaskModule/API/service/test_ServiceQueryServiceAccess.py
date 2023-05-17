@@ -18,9 +18,12 @@ class ServiceQueryAccessTest(BaseServiceAPITest):
             access.id_user_group = 1
             access.id_service_role = self.id_service_role
             TeraServiceAccess.insert(access)
+            self.id_service_access = access.id_service_access
 
     def tearDown(self):
         super().tearDown()
+        with self._flask_app.app_context():
+            TeraServiceAccess.delete(self.id_service_access)
 
     def test_get_endpoint_no_auth(self):
         with self._flask_app.app_context():
