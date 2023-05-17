@@ -1,9 +1,10 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
+import modules.Globals as Globals
 
 
 class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -84,84 +85,82 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             .filter_by(id_service_access=service_access_id).first()
 
     @staticmethod
-    def update_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_service_role: int,
-                                                      id_site: int):
+    def update_service_access_for_user_group(id_service: int, id_user_group: int, id_service_role: int,
+                                             id_site: int | None = None, id_project: int | None = None):
         # Check if access already exists
-        # access = TeraServiceAccess.get_specific_access_for_user_group(id_service=id_service,
-        #                                                               id_user_group=id_user_group,
-        #                                                               id_service_role=id_service_role)
+        access = TeraServiceAccess.get_service_access_for_user_group(id_service=id_service,
+                                                                     id_user_group=id_user_group,
+                                                                     id_site=id_site,
+                                                                     id_project=id_project)
 
-        access = TeraServiceAccess.get_service_access_for_user_group_for_site(id_service=id_service,
-                                                                              id_user_group=id_user_group,
-                                                                              id_site=id_site)
-
-        if access is None:
+        if not access:
             # No access already present for that user group - create new one
             access = TeraServiceAccess()
             access.id_user_group = id_user_group
             access.id_service_role = id_service_role
             TeraServiceAccess.insert(access)
+            return access
         else:
             # Update it
-            access.id_service_role = id_service_role
-
+            access[0].id_service_role = id_service_role
             TeraServiceAccess.db().session.commit()
-        return access
+            return access[0]
 
     @staticmethod
-    def update_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_service_role: int,
-                                                         id_project: int):
-        # Check if access already exists
-        access = TeraServiceAccess.get_service_access_for_user_group_for_project(id_service=id_service,
-                                                                                 id_user_group=id_user_group,
-                                                                                 id_project=id_project)
+    def get_service_access_for_user_group(id_user_group: int, id_service: int, id_project: int | None = None,
+                                          id_site: int | None = None, id_service_role: int | None = None,
+                                          with_deleted: bool = False):
+        query = TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_user_group=id_user_group).join(TeraServiceRole).filter_by(id_service=id_service)
 
-        if access is None:
-            # No access already present for that user - create new one
-            access = TeraServiceAccess()
-            access.id_user_group = id_user_group
-            access.id_service_role = id_service_role
-            TeraServiceAccess.insert(access)
-        else:
-            # Update it
-            access.id_service_role = id_service_role
+        if id_project:
+            query = query.filter_by(id_project=id_project)
 
-            TeraServiceAccess.db().session.commit()
-        return access
+        if id_site:
+            query = query.filter_by(id_site=id_site)
+
+        if id_service_role:
+            query = query.filter_by(id_service_role=id_service_role)
+
+        return query.all()
 
     @staticmethod
-    def get_service_access_for_user_group(id_service: int, id_user_group: int, with_deleted: bool = False):
-        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_user_group=id_user_group).join(TeraServiceRole)\
-            .filter_by(id_service=id_service).all()
+    # Returns all access related to a service
+    def get_service_access(id_service: int, id_project: int | None = None, id_site: int | None = None,
+                           with_deleted: bool = False):
+        query = TeraServiceAccess.query.execution_options(include_deleted=with_deleted) \
+            .join(TeraServiceRole).filter_by(id_service=id_service)\
+
+        if id_site:
+            query = query.filter_by(id_site=id_site)
+        if id_project:
+            query = query.filter_by(id_project=id_project)
+
+        return query.all()
 
     @staticmethod
-    def get_service_access_for_project(id_service: int, id_project: int, with_deleted: bool = False):
-        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraServiceRole).filter_by(id_service=id_service, id_project=id_project).all()
+    def delete_service_access_for_user_group(id_service: int, id_user_group: int, id_site: int | None = None,
+                                             id_project: int | None = None, id_service_role: int | None = None):
 
-    @staticmethod
-    def get_service_access_for_site(id_service: int, id_site: int, with_deleted: bool = False):
-        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraServiceRole).filter_by(id_service=id_service, id_site=id_site).all()
+        for service_access in TeraServiceAccess.get_service_access_for_user_group(id_service=id_service,
+                                                                                  id_user_group=id_user_group,
+                                                                                  id_site=id_site,
+                                                                                  id_project=id_project):
+            if id_service_role and service_access.id_service_role == id_service_role:
+                TeraServiceAccess.delete(service_access.id_service_access)
+                return
 
-    @staticmethod
-    def get_service_access_for_user_group_for_site(id_service: int, id_user_group: int, id_site: int,
-                                                   with_deleted: bool = False):
-        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraServiceRole).filter_by(id_service=id_service, id_site=id_site).filter(
-            TeraServiceAccess.id_user_group == id_user_group).first()
+            if id_site and service_access.service_access_role.id_site == id_site:
+                TeraServiceAccess.delete(service_access.id_service_access)
+                return
 
-    @staticmethod
-    def get_service_access_for_user_group_for_project(id_service: int, id_user_group: int, id_project: int,
-                                                      with_deleted: bool = False):
-        return TeraServiceAccess.query.execution_options(include_deleted=with_deleted)\
-            .join(TeraServiceRole).filter_by(id_service=id_service, id_project=id_project).filter(
-            TeraServiceAccess.id_user_group == id_user_group).first()
+            if id_project and service_access.service_access_role.id_project == id_project:
+                TeraServiceAccess.delete(service_access.id_service_access)
+                return
 
+    # TODO: Delete those methods (replaced by the generic one)
     @staticmethod
     def delete_service_access_for_user_group_for_site(id_site: int, id_user_group: int):
-        import modules.Globals as Globals
         for service_access in TeraServiceAccess.get_service_access_for_user_group(
                 id_service=Globals.opentera_service_id, id_user_group=id_user_group):
             if service_access.service_access_role.id_site == id_site:
@@ -170,7 +169,6 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
     @staticmethod
     def delete_service_access_for_user_group_for_project(id_project: int, id_user_group: int):
-        import modules.Globals as Globals
         for service_access in TeraServiceAccess.get_service_access_for_user_group(
                 id_service=Globals.opentera_service_id, id_user_group=id_user_group):
             if service_access.service_access_role.id_project == id_project:

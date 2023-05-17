@@ -328,8 +328,9 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
+        from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
 
-        namespace.add_resource(ServiceQueryAccess,          '       /access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
@@ -345,6 +346,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
 

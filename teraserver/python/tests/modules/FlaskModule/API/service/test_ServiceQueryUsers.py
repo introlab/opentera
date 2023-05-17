@@ -1,7 +1,6 @@
 from typing import List
 
 from BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraUser import TeraUser
 
 

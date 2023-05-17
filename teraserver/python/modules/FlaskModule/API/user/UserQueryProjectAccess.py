@@ -208,9 +208,9 @@ class UserQueryProjectAccess(Resource):
 
                 # Find id_service_role for that
                 project_service_role = \
-                    TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
-                                                                          project_id=json_project['id_project'],
-                                                                          rolename=json_project['project_access_role'])
+                    TeraServiceRole.get_service_role_by_name(service_id=Globals.opentera_service_id,
+                                                             project_id=json_project['id_project'],
+                                                             rolename=json_project['project_access_role'])
             if 'id_service_role' in json_project:
                 if json_project['id_service_role'] == 0:
                     # No more access to that project for that user group - remove all access!
@@ -227,9 +227,9 @@ class UserQueryProjectAccess(Resource):
                 # access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
                 #                                                  json_project['id_project'],
                 #                                                  json_project['project_access_role'])
-                access = TeraServiceAccess.update_service_access_for_user_group_for_project(
-                    id_service=Globals.opentera_service_id, id_user_group=json_project['id_user_group'],
-                    id_service_role=project_service_role.id_service_role, id_project=json_project['id_project'])
+                access = TeraServiceAccess.update_service_access_for_user_group(
+                    id_service=Globals.opentera_service_id, id_user_group=int(json_project['id_user_group']),
+                    id_service_role=project_service_role.id_service_role, id_project=int(json_project['id_project']))
             except exc.SQLAlchemyError as e:
                 import sys
                 print(sys.exc_info())
