@@ -37,23 +37,11 @@ class ServiceOpenTera(RedisClient):
         self.backend_port = config_man.backend_config['port']
         self.service_uuid = config_man.service_config['ServiceUUID']
 
-        # Update Service Access information
-        ServiceAccessManager.api_user_token_key = \
-            self.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
-        ServiceAccessManager.api_participant_token_key = \
-            self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
-        ServiceAccessManager.api_participant_static_token_key = \
-            self.redisGet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
-        ServiceAccessManager.api_device_token_key = \
-            self.redisGet(RedisVars.RedisVar_DeviceTokenAPIKey)
-        ServiceAccessManager.api_device_static_token_key = \
-            self.redisGet(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
-        ServiceAccessManager.api_service_token_key = \
-            self.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-        ServiceAccessManager.service = self
-
         # Create service token for service api requests
         self.service_token = self.service_generate_token()
+
+        # Init service access manager
+        ServiceAccessManager.init_access_manager(service=self)
 
     def redisConnectionMade(self):
         print('*** ServiceOpenTera.redisConnectionMade for', self.config['name'])

@@ -33,7 +33,7 @@ class ParticipantRefreshToken(Resource):
         # Put old token in disabled tokens
         scheme, old_token = request.headers['Authorization'].split(None, 1)
         if len(old_token) > 0:
-            LoginModule.participant_push_disabled_token(old_token)
+            LoginModule.participant_add_disabled_token(old_token)
 
         # Regenerate token, 30 minutes expiration
         participant_token = current_participant.dynamic_token(token_key, expiration=60 * 30)

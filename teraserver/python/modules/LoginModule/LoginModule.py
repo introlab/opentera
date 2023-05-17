@@ -12,6 +12,7 @@ from opentera.db.models.TeraService import TeraService
 import opentera.messages.python as messages
 
 from opentera.config.ConfigManager import ConfigManager
+from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
@@ -50,57 +51,13 @@ participant_token_auth = HTTPTokenAuth("OpenTera")
 participant_multi_auth = MultiAuth(participant_http_auth, participant_token_auth)
 
 
-class DisabledTokenStorage:
-    def __init__(self):
-        self.disabled_tokens = []
-
-    def push_disabled_token(self, token):
-        if token not in self.disabled_tokens:
-            self.disabled_tokens.append(token)
-
-    def get_disabled_tokens(self):
-        return self.disabled_tokens
-
-    def is_disabled_token(self, token):
-        return token in self.disabled_tokens
-
-    def clear_all_disabled_tokens(self):
-        self.disabled_tokens.clear()
-
-    def remove_disabled_token(self, token):
-        if token in self.disabled_tokens:
-            self.disabled_tokens.remove(token)
-
-    def remove_all_expired_tokens(self, key):
-        to_be_removed = []
-        for token in self.disabled_tokens:
-            import jwt
-            try:
-                token_dict = jwt.decode(token, key, algorithms='HS256')
-                # Expired tokens will throw exception.
-                # If we continue here, tokens have a valid expiration time.
-                # We should stop looking for expired tokens since they are added chronologically
-                break
-            except jwt.exceptions.ExpiredSignatureError as e:
-                to_be_removed.append(token)
-            except jwt.exceptions.PyJWTError as e:
-                print(e)
-                continue
-
-        # Remove expired tokens
-        for expired_token in to_be_removed:
-            self.disabled_tokens.remove(expired_token)
-
-        return to_be_removed
-
-
 class LoginModule(BaseModule):
     # This client is required for static functions
     redis_client = None
 
     # Only user & participant tokens expire (for now)
-    __user_disabled_token_storage = DisabledTokenStorage()
-    __participant_disabled_token_storage = DisabledTokenStorage()
+    __user_disabled_token_storage = DisabledTokenStorage(redis_key='user_disabled_tokens')
+    __participant_disabled_token_storage = DisabledTokenStorage(redis_key='participant_disabled_tokens')
 
     def __init__(self, config: ConfigManager, app=flask_app):
         self.app = app
@@ -110,6 +67,13 @@ class LoginModule(BaseModule):
                                                username=config.redis_config['username'],
                                                password=config.redis_config['password'],
                                                db=config.redis_config['db'])
+
+        # Configure Disabled Token Storage
+        LoginModule.__user_disabled_token_storage.config(config, self.redis_client.get(
+            RedisVars.RedisVar_UserTokenAPIKey))
+
+        LoginModule.__participant_disabled_token_storage.config(config, self.redis_client.get(
+            RedisVars.RedisVar_ParticipantTokenAPIKey))
 
         BaseModule.__init__(self, ModuleNames.LOGIN_MODULE_NAME.value, config)
 
@@ -152,11 +116,11 @@ class LoginModule(BaseModule):
 
         # Cookie based configuration
         self.app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
-                                 'REMEMBER_COOKIE_DURATION': 14,
-                                 'REMEMBER_COOKIE_SECURE': True,
-                                 'USE_PERMANENT_SESSION': True,
-                                 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
-                                 'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+                                'REMEMBER_COOKIE_DURATION': 14,
+                                'REMEMBER_COOKIE_SECURE': True,
+                                'USE_PERMANENT_SESSION': True,
+                                'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
+                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
 
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
@@ -281,8 +245,8 @@ class LoginModule(BaseModule):
         return False
 
     @staticmethod
-    def user_push_disabled_token(token):
-        LoginModule.__user_disabled_token_storage.push_disabled_token(token)
+    def user_add_disabled_token(token):
+        LoginModule.__user_disabled_token_storage.add_disabled_token(token)
 
     @staticmethod
     def is_user_token_disabled(token):
@@ -460,8 +424,8 @@ class LoginModule(BaseModule):
         return False
 
     @staticmethod
-    def participant_push_disabled_token(token):
-        LoginModule.__participant_disabled_token_storage.push_disabled_token(token)
+    def participant_add_disabled_token(token):
+        LoginModule.__participant_disabled_token_storage.add_disabled_token(token)
 
     @staticmethod
     def is_participant_token_disabled(token):
