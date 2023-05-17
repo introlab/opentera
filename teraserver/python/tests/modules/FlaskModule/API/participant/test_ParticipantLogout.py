@@ -67,3 +67,32 @@ class ParticipantLogoutTest(BaseParticipantAPITest):
 
                 self.assertEqual('application/json', logout_response.headers['Content-Type'])
                 self.assertEqual(200, logout_response.status_code)
+
+    def test_logout_twice_should_not_be_authorized_because_of_disabled_token(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if participant.participant_token is None:
+                    continue
+
+                login_response = self._get_with_participant_token_auth(
+                    self.test_client, token=participant.participant_token, endpoint=self.login_endpoint)
+                if not participant.participant_enabled:
+                    self.assertEqual(401, login_response.status_code)
+                    continue
+
+                self.assertEqual(200, login_response.status_code)
+
+                # Generate a dynamic token
+                token = self._generate_participant_dynamic_token(participant)
+
+                # First logout should work
+                logout_response = self._get_with_participant_token_auth(
+                    self.test_client, token=token, endpoint=self.test_endpoint)
+
+                self.assertEqual('application/json', logout_response.headers['Content-Type'])
+                self.assertEqual(200, logout_response.status_code)
+
+                # Second logout should fail because token is disabled
+                logout_response = self._get_with_participant_token_auth(
+                    self.test_client, token=token, endpoint=self.test_endpoint)
+                self.assertEqual(401, logout_response.status_code)

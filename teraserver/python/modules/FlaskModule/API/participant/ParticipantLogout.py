@@ -34,7 +34,9 @@ class ParticipantLogout(Resource):
             if 'Authorization' in request.headers:
                 scheme, old_token = request.headers['Authorization'].split(None, 1)
                 if scheme == 'OpenTera':
-                    LoginModule.participant_add_disabled_token(old_token)
+                    # Only dynamic tokens
+                    if old_token != current_participant.participant_token:
+                        LoginModule.participant_add_disabled_token(old_token)
 
             return gettext("Participant logged out."), 200
         else:
