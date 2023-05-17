@@ -28,6 +28,7 @@ from twisted.internet import task
 
 import modules.Globals as Globals
 from opentera.utils.UserAgentParser import UserAgentParser
+
 # Current participant identity, stacked
 current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
 
@@ -207,7 +208,7 @@ class LoginModule(BaseModule):
 
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
 
-        if logged_user:
+        if logged_user and logged_user.is_active():
             _request_ctx_stack.top.current_user = logged_user
 
             # print('user_verify_password, found user: ', current_user)
@@ -264,13 +265,13 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
-                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
                                          os_name=login_infos['os_name'],
                                          os_version=login_infos['os_version'],
-                                         message=token_value,  # TODO: Don't store the token?
+                                         message='disabled:' + token_value,  # TODO: Don't store the token?
                                          server_endpoint=login_infos['server_endpoint'])
             return False
 
@@ -320,7 +321,7 @@ class LoginModule(BaseModule):
 
             _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
-            if current_user:
+            if current_user and current_user.is_active():
                 # current_user.update_last_online()
                 login_user(current_user, remember=True)
                 return True
@@ -329,7 +330,8 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.user_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
-                                         login_status=messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_UNKNOWN if not current_user
+                                         else messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
@@ -386,7 +388,7 @@ class LoginModule(BaseModule):
 
         logged_participant = TeraParticipant.verify_password(username=username, password=password,
                                                              participant=tentative_participant)
-        if logged_participant:
+        if logged_participant and logged_participant.is_active():
             _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
 
             # print('participant_verify_password, found participant: ', current_participant)
@@ -414,7 +416,9 @@ class LoginModule(BaseModule):
                                      level=messages.LogEvent.LOGLEVEL_ERROR,
                                      login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                      login_status=
-                                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD,
+                                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD if
+                                     not logged_participant else
+                                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
                                      client_name=login_infos['client_name'],
                                      client_version=login_infos['client_version'],
                                      client_ip=login_infos['client_ip'],
@@ -442,13 +446,25 @@ class LoginModule(BaseModule):
         # TeraParticipant verifies if the participant is active and login is enabled
         _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
 
-        if current_participant:
+        if current_participant and current_participant.is_active():
             # current_participant.update_last_online()
             login_user(current_participant, remember=True)
             return True
 
         # Second attempt, validate dynamic token
         if not token_value:
+            login_infos = UserAgentParser.parse_request_for_login_infos(request)
+            self.logger.send_login_event(sender='LoginModule.participant_verify_token',
+                                         level=messages.LogEvent.LOGLEVEL_ERROR,
+                                         login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_NO_TOKEN,
+                                         client_name=login_infos['client_name'],
+                                         client_version=login_infos['client_version'],
+                                         client_ip=login_infos['client_ip'],
+                                         os_name=login_infos['os_name'],
+                                         os_version=login_infos['os_version'],
+                                         message='no token specified',
+                                         server_endpoint=login_infos['server_endpoint'])
             return False
 
         # Disabled tokens should never be used
@@ -457,13 +473,13 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.participant_verify_token',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_TOKEN,
-                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_INVALID_TOKEN,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
                                          os_name=login_infos['os_name'],
                                          os_version=login_infos['os_version'],
-                                         message=token_value,  # TODO: Don't store the token?
+                                         message='disabled:' + token_value,  # TODO: Don't store the token?
                                          server_endpoint=login_infos['server_endpoint'])
             return False
 
@@ -517,7 +533,7 @@ class LoginModule(BaseModule):
             _request_ctx_stack.top.current_participant = \
                 TeraParticipant.get_participant_by_uuid(token_dict['participant_uuid'])
 
-        if current_participant:
+        if current_participant and current_participant.is_active():
             # Flag that participant has full API access
             current_participant.fullAccess = True
             # current_participant.update_last_online()
@@ -717,7 +733,6 @@ class LoginModule(BaseModule):
 
                 # Verify scheme and token
                 if scheme == 'OpenTera':
-
                     try:
                         token_dict = jwt.decode(token,
                                                 LoginModule.redis_client.get(
