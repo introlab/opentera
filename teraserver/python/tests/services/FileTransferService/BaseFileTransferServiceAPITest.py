@@ -12,6 +12,7 @@ from FakeFileTransferService import FakeFileTransferService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.db.models.TeraService import TeraService
 from modules.LoginModule.LoginModule import LoginModule
+from requests.auth import _basic_auth_str
 
 
 def infinite_jti_sequence():
@@ -33,6 +34,8 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
     participant_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
     service_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
     device_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
+    user_login_endpoint = '/api/user/login'
+    user_logout_endpoint = '/api/user/logout'
 
     @classmethod
     def setUpClass(cls):
@@ -122,6 +125,24 @@ class BaseFileTransferServiceAPITest(unittest.TestCase):
         else:
             headers = {}
 
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': 'OpenTera ' + token}
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _get_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                 params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+
+        headers = {'Authorization': _basic_auth_str(username, password)}
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,

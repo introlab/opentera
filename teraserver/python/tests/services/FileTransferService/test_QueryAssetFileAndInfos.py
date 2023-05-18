@@ -772,3 +772,18 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
                                                         endpoint=self.asset_endpoint)
                 self.assertEqual(200, response.status_code, 'Delete OK')
                 self.assertTrue(self.delete_asset(asset['asset_uuid']))
+
+    def test_get_endpoint_with_disabled_token(self):
+        with self.app_context():
+            login_response = self._get_with_user_http_auth(self.test_client, username='admin',
+                                                           password='admin', endpoint=self.user_login_endpoint)
+            self.assertEqual(200, login_response.status_code)
+            token = login_response.json['user_token']
+
+            logout_response = self._get_with_user_token_auth(self.test_client, token=token,
+                                                             endpoint=self.user_logout_endpoint)
+            self.assertEqual(200, logout_response.status_code)
+
+            # Try to call endpoint with disabled token
+            response = self._get_with_token_auth(self.test_client, token=token)
+            self.assertEqual(403, response.status_code)

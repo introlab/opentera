@@ -57,17 +57,12 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
 
                 token_key = ServiceAccessManager.api_user_token_key
                 token = user.get_token(token_key)
-                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token)
 
-                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
-                                            'admin' in service_access['service_access']['LoggingService']):
-                    self.assertEqual(response.status_code, 200)
-                    entries = LoginEntry.get_login_entries_by_user_uuid(user.user_uuid)
-                    self.assertEqual(len(response.json), len(entries))
-                else:
-                    self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 200)
+                entries = LoginEntry.get_login_entries_by_user_uuid(user.user_uuid)
+                self.assertEqual(len(response.json), len(entries))
 
                 # Delete entries
                 for entry in entries:
@@ -111,22 +106,17 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
 
                 token_key = ServiceAccessManager.api_user_token_key
                 token = user.get_token(token_key)
-                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
 
-                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
-                                            'admin' in service_access['service_access']['LoggingService']):
-                    self.assertEqual(response.status_code, 200)
-                    self.assertEqual(len(response.json), 4)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 4)
 
-                    params['start_date'] = str(current_date.isoformat())
-                    params['end_date'] = str(current_date.isoformat())
-                    response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-                    self.assertEqual(response.status_code, 200)
-                    self.assertEqual(len(response.json), 1)
-                else:
-                    self.assertEqual(response.status_code, 403)
+                params['start_date'] = str(current_date.isoformat())
+                params['end_date'] = str(current_date.isoformat())
+                response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 1)
 
                 # Cleanup
                 LoginEntry.delete(current_entry.id_login_event)
@@ -154,16 +144,10 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 }
                 token_key = ServiceAccessManager.api_user_token_key
                 token = user.get_token(token_key)
-                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-
-                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
-                                            'admin' in service_access['service_access']['LoggingService']):
-                    self.assertEqual(response.status_code, 200)
-                    self.assertEqual(len(response.json), 10)
-                else:
-                    self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 10)
 
                 # Cleanup
                 for entry in all_entries:
@@ -189,16 +173,11 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
                 }
                 token_key = ServiceAccessManager.api_user_token_key
                 token = user.get_token(token_key)
-                service_access = user.get_service_access_dict()
 
                 response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
 
-                if user.user_superadmin or ('LoggingService' in service_access['service_access'] and
-                                            'admin' in service_access['service_access']['LoggingService']):
-                    self.assertEqual(response.status_code, 200)
-                    self.assertEqual(len(response.json), 40)
-                else:
-                    self.assertEqual(response.status_code, 403)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json), 40)
 
                 # Cleanup
                 for entry in all_entries:
@@ -334,7 +313,7 @@ class LoggingServiceQueryLoginEntriesTest(BaseLoggingServiceAPITest):
 
             logout_response = self._get_with_user_token_auth(self.test_client, token=token,
                                                              endpoint=self.user_logout_endpoint)
-            self.assertEqual(200, login_response.status_code)
+            self.assertEqual(200, logout_response.status_code)
 
             # Try to call endpoint with disabled token
             response = self._get_with_service_token_auth(self.test_client, token=token)

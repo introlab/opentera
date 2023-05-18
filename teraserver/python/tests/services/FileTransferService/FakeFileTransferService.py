@@ -102,18 +102,6 @@ class FakeFlaskModule(BaseModule):
             # The trick is to initialize main server api to the newly created namespace
             FlaskModule.init_device_api(self, self.device_api_namespace, kwargs)
 
-    def send_user_disconnect_module_message(self, user_uuid: str):
-        print('FakeFlaskModule : send_user_disconnect_module_message')
-        pass
-
-    def send_participant_disconnect_module_message(self, participant_uuid: str):
-        print('FakeFlaskModule : send_participant_disconnect_module_message')
-        pass
-
-    def send_device_disconnect_module_message(self, device_uuid: str):
-        print('FakeFlaskModule : send_device_disconnect_module_message')
-        pass
-
 
 class FakeFileTransferService(ServiceOpenTeraWithAssets):
     """
