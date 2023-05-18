@@ -42,7 +42,6 @@ class QueryLoginEntries(Resource):
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @ServiceAccessManager.token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
-    @ServiceAccessManager.service_user_roles_required(['admin'])
     def get(self):
 
         args = get_parser.parse_args()
