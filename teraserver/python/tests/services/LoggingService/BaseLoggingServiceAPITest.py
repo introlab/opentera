@@ -8,17 +8,7 @@ import random
 from string import digits, ascii_lowercase, ascii_uppercase
 from FakeLoggingService import FakeLoggingService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-
-
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(user_jti_generator) to get next sequence number
-user_jti_generator = infinite_jti_sequence()
+from requests.auth import _basic_auth_str
 
 
 class BaseLoggingServiceAPITest(unittest.TestCase):
@@ -29,6 +19,8 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
     participant_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
     service_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
     device_token_key = ''.join(random.choice(digits + ascii_lowercase + ascii_uppercase) for _ in range(36))
+    user_login_endpoint = '/api/user/login'
+    user_logout_endpoint = '/api/user/logout'
 
     @classmethod
     def setUpClass(cls):
@@ -73,27 +65,15 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
 
     @staticmethod
     def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), superadmin=False, expiration=3600):
-        import time
-        import jwt
-        import random
-        import uuid
-
-        # Creating token with user info
-        now = time.time()
         token_key = ServiceAccessManager.api_user_token_key
-
-        payload = {
-            'iat': int(now),
-            'exp': int(now) + expiration,
-            'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
-            'user_uuid': user_uuid,
-            'id_user': 1,
-            'user_fullname': name,
-            'user_superadmin': superadmin
-        }
-
-        return jwt.encode(payload, token_key, algorithm='HS256')
+        from opentera.db.models.TeraUser import TeraUser
+        user: TeraUser = TeraUser()
+        user.user_uuid = user_uuid
+        user.id_user = 1
+        user.user_firstname = name
+        user.user_lastname = name
+        user.user_superadmin = superadmin
+        return user.get_token(token_key, expiration=expiration)
 
     def _get_with_service_token_auth(self, client: FlaskClient, token=None, params=None, endpoint=None):
         if params is None:
@@ -105,6 +85,24 @@ class BaseLoggingServiceAPITest(unittest.TestCase):
         else:
             headers = {}
 
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        headers = {'Authorization': 'OpenTera ' + token}
+        return client.get(endpoint, headers=headers, query_string=params)
+
+    def _get_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
+                                 params=None, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+
+        headers = {'Authorization': _basic_auth_str(username, password)}
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,

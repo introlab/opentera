@@ -27,44 +27,9 @@ import sys
 import os
 import argparse
 from sqlalchemy.exc import OperationalError
-import opentera.crypto.crypto_utils as crypto
 from opentera.utils.TeraVersions import TeraVersions
 from opentera.config.ConfigManager import ConfigManager
 import modules.Globals as Globals
-
-
-def generate_certificates(config: ConfigManager):
-    """
-        Will generate certificates and keys if they do not exist
-    """
-    site_certificate_path = config.server_config['ssl_path'] + '/' + config.server_config['site_certificate']
-    site_key_path = config.server_config['ssl_path'] + '/' + config.server_config['site_private_key']
-    ca_certificate_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_certificate']
-    ca_key_path = config.server_config['ssl_path'] + '/' + config.server_config['ca_private_key']
-
-    if not os.path.exists(site_certificate_path) or not os.path.exists(site_key_path):
-        print('Generating Site certificate and key')
-        site_info = crypto.generate_local_certificate()
-        # Save files
-        crypto.write_private_key_and_certificate(site_info, keyfile=site_key_path, certfile=site_certificate_path)
-
-    if not os.path.exists(ca_certificate_path) or not os.path.exists(ca_key_path):
-        print('Generating Site certificate and key')
-        ca_info = crypto.generate_ca_certificate(common_name='Local CA')
-        # Save files
-        crypto.write_private_key_and_certificate(ca_info, keyfile=ca_key_path, certfile=ca_certificate_path)
-
-
-def verify_file_upload_directory(config: ConfigManager, create=True):
-    file_upload_path = config.server_config['upload_path']
-
-    if not os.path.exists(file_upload_path):
-        if create:
-            # TODO Change permissions?
-            os.mkdir(file_upload_path, 0o700)
-        else:
-            return None
-    return file_upload_path
 
 
 def init_shared_variables(config):
@@ -114,35 +79,17 @@ def init_shared_variables(config):
     versions.save_to_db()
 
 
-def init_services(config: ConfigManager):
+def init_opentera_service(config: ConfigManager):
     print('Initializing services...')
-
     from opentera.db.models.TeraService import TeraService
-    from opentera.redis.RedisVars import RedisVars
-    import json
-    # Create redis client
-    import redis
-    redis_client = redis.Redis(host=config.redis_config['hostname'],
-                               port=config.redis_config['port'],
-                               db=config.redis_config['db'],
-                               username=config.redis_config['username'],
-                               password=config.redis_config['password'])
 
     # Set python path to current folder so that import work from services
     tera_python_dir = pathlib.Path(__file__).parent.absolute()
     os.environ['PYTHONPATH'] = str(tera_python_dir)
 
-    services = TeraService.query.all()
-    for service in services:
-        # Ignore special service TeraServer
-        if service.service_key == 'OpenTeraServer':
-            Globals.opentera_service_id = service.id_service
-            continue
-        if service.service_enabled:
-            print('Activating service: ' + service.service_key)
-            redis_client.set(RedisVars.RedisVar_ServicePrefixKey + service.service_key, json.dumps(service.to_json()))
-        else:
-            print('Skipping disabled service: ' + service.service_key)
+    # Update service ID
+    service = TeraService.get_service_by_key('OpenTeraServer')
+    Globals.opentera_service_id = service.id_service
 
 
 if __name__ == '__main__':
@@ -175,9 +122,6 @@ if __name__ == '__main__':
 
     # Load configuration file.
     config_man.load_config(config_file)
-
-    # Generate certificate (if required)
-    generate_certificates(config_man)
 
     try:
 
@@ -221,7 +165,7 @@ if __name__ == '__main__':
         init_shared_variables(config=config_man)
 
         # Initialize enabled services
-        init_services(config=config_man)
+        init_opentera_service(config=config_man)
 
         # Main Flask module
         flask_module = FlaskModule(config_man)

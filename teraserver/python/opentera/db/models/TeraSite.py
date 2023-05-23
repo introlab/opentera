@@ -12,7 +12,7 @@ class TeraSite(BaseModel, SoftDeleteMixin):
 
     site_devices = relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
     site_projects = relationship("TeraProject", cascade="delete", passive_deletes=True,
-                                 back_populates='project_site', lazy='joined')
+                                 back_populates='project_site', lazy='selectin')
 
     site_services_roles = relationship("TeraServiceRole", cascade='delete', passive_deletes=True)
 

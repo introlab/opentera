@@ -15,13 +15,13 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
     def test_get_endpoint_with_invalid_token(self):
         with self.app_context():
             response = self._get_with_service_token_auth(self.test_client, token="invalid")
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_valid_token_but_not_admin(self):
         with self.app_context():
             token = self._generate_fake_user_token(name='FakeUser', superadmin=False, expiration=3600)
             response = self._get_with_service_token_auth(self.test_client, token=token)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_valid_token_and_admin(self):
         with self.app_context():
@@ -37,7 +37,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 all_entries.append(entry)
 
             response = self._get_with_service_token_auth(self.test_client, token=token)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertGreaterEqual(len(response.json), 50)
 
             # Cleanup
@@ -72,12 +72,12 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             }
 
             response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 50)
 
             params['end_date'] = str(tomorrow.isoformat())
             response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 100)
 
             # Cleanup
@@ -103,7 +103,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             }
 
             response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertLess(len(response.json), 50)
 
             # Cleanup
@@ -130,7 +130,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             }
 
             response = self._get_with_service_token_auth(self.test_client, token=token, params=params)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 10)
 
             # Cleanup
@@ -142,8 +142,6 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
-            min_timestamp = ''
-            max_timestamp = ''
             for i in range(50):
                 current_time = datetime.now()
                 entry = self._create_log_entry(current_time, 99, 'test', 'test_message')
@@ -154,12 +152,12 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
 
             # Filter with higher log level should give no entry
             response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 1})
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 0)
 
             # Filter with exact log level should give at least amount
             response = self._get_with_service_token_auth(self.test_client, token=token, params={'log_level': 99})
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 50)
 
             # Cleanup
@@ -186,7 +184,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
                 all_entries.append(entry)
 
             response = self._get_with_service_token_auth(self.test_client, token=token, params={'stats': True})
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(200, response.status_code)
             self.assertTrue('count' in response.json)
             self.assertGreaterEqual(response.json['count'], 51)
             self.assertTrue('min_timestamp' in response.json)
@@ -197,6 +195,21 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             # Cleanup
             for entry in all_entries:
                 LogEntry.delete(entry.id_log_entry)
+
+    def test_get_endpoint_with_disabled_token(self):
+        with self.app_context():
+            login_response = self._get_with_user_http_auth(self.test_client, username='admin',
+                                                           password='admin', endpoint=self.user_login_endpoint)
+            self.assertEqual(200, login_response.status_code)
+            token = login_response.json['user_token']
+
+            logout_response = self._get_with_user_token_auth(self.test_client, token=token,
+                                                             endpoint=self.user_logout_endpoint)
+            self.assertEqual(200, logout_response.status_code)
+
+            # Try to call endpoint with disabled token
+            response = self._get_with_service_token_auth(self.test_client, token=token)
+            self.assertEqual(403, response.status_code)
 
     def _create_log_entry(self, timestamp: datetime, log_level: int, sender: str, message: str):
         self.assertIsNotNone(timestamp)

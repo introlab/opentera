@@ -135,17 +135,22 @@ class TeraAssetTest(BaseModelsTest):
         with self._flask_app.app_context():
             users = []
             id_sessions = []
+            assets_infos = []
             for user in TeraUser.query.all():
                 user_info = {'id_user': user.id_user}
                 assets = 0
                 for session in user.user_sessions:
                     assets += len(session.session_assets)
-                    id_sessions.append(session.id_session)
+                    assets_infos.extend(session.session_assets)
+                    if session.id_session not in id_sessions:
+                        id_sessions.append(session.id_session)
                 # Also add assets created but not in session we are part of
                 for asset in user.user_assets:
                     if asset.id_session not in id_sessions:
                         assets += 1
+                        assets_infos.append(asset)
                 user_info['assets_count'] = assets
+                user_info['assets_info'] = assets_infos
                 users.append(user_info)
             self.db.session.expire_all()  # Clear cache
             for user in users:
@@ -161,7 +166,8 @@ class TeraAssetTest(BaseModelsTest):
                 assets = 0
                 for session in device.device_sessions:
                     assets += len(session.session_assets)
-                    id_sessions.append(session.id_session)
+                    if session.id_session not in id_sessions:
+                        id_sessions.append(session.id_session)
                 # Also add assets created but not in session we are part of
                 for asset in device.device_assets:
                     if asset.id_session not in id_sessions:
@@ -182,7 +188,8 @@ class TeraAssetTest(BaseModelsTest):
                 assets = 0
                 for session in part.participant_sessions:
                     assets += len(session.session_assets)
-                    id_sessions.append(session.id_session)
+                    if session.id_session not in id_sessions:
+                        id_sessions.append(session.id_session)
                 # Also add assets created but not in session we are part of
                 for asset in part.participant_assets:
                     if asset.id_session not in id_sessions:

@@ -327,7 +327,18 @@ class UserQueryParticipantsTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(response.status_code, 400, msg="Mismatch between project and group")
 
-            del json_data['participant']['id_project']
+            del json_data['participant']['id_participant_group']
+            proj2: TeraProject = TeraProject.get_project_by_id(2)
+            proj2.project_enabled = False
+            proj2.db().session.commit()
+
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 400, msg="Project disabled")  # All ok now!
+
+            proj2.project_enabled = True
+            proj2.db().session.commit()
+
             response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
                                                       json=json_data)
             self.assertEqual(response.status_code, 200, msg="Post new")  # All ok now!
@@ -339,7 +350,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
             json_data = {
                 'participant': {
                     'id_participant': second_new_id,
-                    'participant_enabled': False,
+                    'participant_enabled': True,
                     'id_participant_group': 5
                 }
             }
@@ -352,12 +363,31 @@ class UserQueryParticipantsTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(response.status_code, 403, msg="Update forbidden")
 
+            proj2.project_enabled = False
+            proj2.db().session.commit()
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 400, msg="No update - project disabled")
+
+            json_data['participant']['participant_enabled'] = False
+            json_data['participant']['participant_name'] = 'TestingNameChange'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(response.status_code, 200, msg="Update other than enabled = OK")
+            part_data = response.json[0]
+            self.assertEqual(part_data['participant_name'], 'TestingNameChange')
+            self.assertEqual(part_data['participant_enabled'], False)
+
+            proj2.project_enabled = True
+            proj2.db().session.commit()
+
+            json_data['participant']['participant_enabled'] = True
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(response.status_code, 200, msg="Update completed")
             part_data = response.json[0]
             self._checkJson(part_data)
-            self.assertEqual(part_data['participant_enabled'], False)
+            self.assertEqual(part_data['participant_enabled'], True)
 
             # Delete newly created participant
             response = self._delete_with_user_http_auth(self.test_client, username='user4', password='user4',
@@ -471,8 +501,10 @@ class UserQueryParticipantsTest(BaseUserAPITest):
             self.assertFalse(json_data.__contains__('participant_token'))
             self.assertFalse(json_data.__contains__('participant_lastonline'))
             self.assertFalse(json_data.__contains__('participant_login_enabled'))
+            self.assertFalse(json_data.__contains__('participant_project_enabled'))
         else:
             self.assertTrue(json_data.__contains__('participant_username'))
             self.assertTrue(json_data.__contains__('participant_token'))
             self.assertTrue(json_data.__contains__('participant_lastonline'))
             self.assertTrue(json_data.__contains__('participant_login_enabled'))
+            self.assertTrue(json_data.__contains__('participant_project_enabled'))

@@ -3,7 +3,7 @@ from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 
 
 class UserQueryDeviceSitesTest(BaseUserAPITest):
-    test_endpoint = '/api/user/devicesites'
+    test_endpoint = '/api/user/devices/sites'
 
     def setUp(self):
         super().setUp()

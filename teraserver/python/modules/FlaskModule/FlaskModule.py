@@ -4,12 +4,10 @@ from flask_restx import Api, Namespace
 from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
 from opentera.modules.BaseModule import BaseModule, ModuleNames
-from opentera.modules.BaseModule import create_module_event_topic_from_name, create_module_message_topic_from_name
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.OpenTeraServerVersion import opentera_server_version_string
 import redis
 from modules.Globals import opentera_doc_url
-import opentera.messages.python as messages
 
 
 # Flask application
@@ -127,27 +125,6 @@ class FlaskModule(BaseModule):
         print('FlaskModule - Received message ', pattern, channel, message)
         pass
 
-    def _send_disconnect_module_message(self, uuid: str):
-        module_message = self.create_module_message(
-            src=create_module_message_topic_from_name(ModuleNames.FLASK_MODULE_NAME),
-            dest=create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, uuid)
-        )
-        server_command = messages.ServerCommand()
-        server_command.type = messages.ServerCommand.CMD_CLIENT_DISCONNECT
-        command_message = messages.Any()
-        command_message.Pack(server_command)
-        module_message.data.extend([command_message])
-        self.send_module_message(module_message)
-
-    def send_user_disconnect_module_message(self, user_uuid: str):
-        self._send_disconnect_module_message(user_uuid)
-
-    def send_participant_disconnect_module_message(self, participant_uuid: str):
-        self._send_disconnect_module_message(participant_uuid)
-
-    def send_device_disconnect_module_message(self, device_uuid: str):
-        self._send_disconnect_module_message(device_uuid)
-
     @staticmethod
     def init_user_api(module: object, namespace: Namespace, additional_args: dict = dict()):
 
@@ -187,6 +164,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryServiceProjects import UserQueryServiceProjects
         from modules.FlaskModule.API.user.UserQueryServiceSites import UserQueryServiceSites
         from modules.FlaskModule.API.user.UserQueryServiceAccess import UserQueryServiceAccess
+        from modules.FlaskModule.API.user.UserQueryServiceRoles import UserQueryServiceRole
         from modules.FlaskModule.API.user.UserSessionManager import UserSessionManager
         from modules.FlaskModule.API.user.UserQueryServiceConfigs import UserQueryServiceConfig
         from modules.FlaskModule.API.user.UserQueryStats import UserQueryUserStats
@@ -204,11 +182,11 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSites,          '/devices/sites', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceProjects,       '/devices/projects', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceParticipants,   '/devices/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
@@ -224,7 +202,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessions,             '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(UserSessionManager,            '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
+        # namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
@@ -233,6 +211,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryServiceSites,         '/services/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceAccess,        '/services/access', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceConfig,        '/services/configs', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryServiceRole,          '/services/roles', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySites,                '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
@@ -248,7 +227,6 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryUserPreferences,      '/users/preferences', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryVersions,             '/versions', resource_class_kwargs=kwargs)
         # namespace.add_resource(UserQueryUndelete,             '/undelete', resource_class_kwargs=kwargs)
-        # api.add_namespace(user_api_ns)
 
     @staticmethod
     def init_device_api(module: object, namespace: Namespace, additional_args: dict = dict()):
@@ -278,9 +256,6 @@ class FlaskModule(BaseModule):
         namespace.add_resource(DeviceQueryParticipants,     '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(DeviceQueryStatus,           '/status', resource_class_kwargs=kwargs)
 
-        # Finally, add namespace
-        # api.add_namespace(device_api_ns)
-
     @staticmethod
     def init_participant_api(module: object, namespace: Namespace, additional_args: dict = dict()):
         # Default arguments
@@ -303,8 +278,6 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ParticipantQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantRefreshToken,        '/refresh_token', resource_class_kwargs=kwargs)
-
-        # api.add_namespace(participant_api_ns)
 
     @staticmethod
     def init_service_api(module: object, namespace: Namespace, additional_args: dict = dict()):
@@ -330,26 +303,29 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
         from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
+        from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
+        from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
+        from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
 
-        namespace.add_resource(ServiceQueryUsers,          '/users', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryDevices,        '/devices', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryAssets,         '/assets', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessionEvents,  '/sessions/events', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySiteProjectAccessRoles, '/users/access', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryServices,       '/services', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryProjects,       '/projects', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySites,          '/sites', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceSessionManager,      '/sessions/manager', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQuerySessionTypes,   '/sessiontypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryTestTypes,      '/testtypes', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryTests,          '/tests', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryAccess,         '/access', resource_class_kwargs=kwargs)
-        namespace.add_resource(ServiceQueryDisconnect,     '/disconnect', resource_class_kwargs=kwargs)
-
-        # Add namespace
-        # api.add_namespace(service_api_ns)
+        namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryParticipants,            '/participants', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryProjects,                '/projects', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryRoles,                   '/roles', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryServiceAccess,           '/serviceaccess', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryServices,                '/services', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessions,                '/sessions', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionEvents,           '/sessions/events', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceSessionManager,               '/sessions/manager', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionTypes,            '/sessiontypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from modules.FlaskModule.Views.About import About

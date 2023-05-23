@@ -8,7 +8,7 @@ file(MAKE_DIRECTORY ${ENV_PATH})
 
 # Define packages to install
 set (conda_packages
-    protobuf # ==3.18.1
+    protobuf==3.20.3
 )
 
 if(WIN32)
@@ -31,7 +31,7 @@ add_custom_target(
 # Create environment, will produce python executable
 add_custom_command(
   OUTPUT ${PYTHON_PATH}
-  COMMAND ${CONDA_PATH} install -m -c conda-forge -y -p ${ENV_PATH} python=${PYTHON_VERSION} ${conda_packages}
+  COMMAND ${CONDA_PATH} install -m -c anaconda -y -p ${ENV_PATH} python=${PYTHON_VERSION} ${conda_packages}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

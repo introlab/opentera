@@ -161,7 +161,7 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                                                      params={'id_site': 1})
             self.assertEqual(200, response.status_code)
             json_data = response.json
-            services_access = (TeraServiceAccess.get_service_access_for_site(
+            services_access = (TeraServiceAccess.get_service_access(
                 id_service=TeraService.get_openteraserver_service().id_service, id_site=1))
             ug_ids = []
             for sa in services_access:
@@ -170,9 +170,10 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                     if id_ug not in ug_ids:
                         ug_ids.append(id_ug)
 
-            projects = TeraProject.query_data({'id_site': 1})
+            # projects = TeraProject.query_data({'id_site': 1})
+            projects = TeraProject.query_with_filters({'id_site': 1})
             for project in projects:
-                services_access = (TeraServiceAccess.get_service_access_for_project(
+                services_access = (TeraServiceAccess.get_service_access(
                     id_service=TeraService.get_openteraserver_service().id_service, id_project=project.id_project))
                 for sa in services_access:
                     if sa.service_access_user_group:
@@ -195,7 +196,7 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                                                      params={'id_site': 1})
             self.assertEqual(200, response.status_code)
             json_data = response.json
-            services_access = (TeraServiceAccess.get_service_access_for_site(
+            services_access = (TeraServiceAccess.get_service_access(
                 id_service=TeraService.get_openteraserver_service().id_service, id_site=1))
             ug_ids = []
             for sa in services_access:
@@ -204,9 +205,10 @@ class UserQueryUserGroupsTest(BaseUserAPITest):
                     if id_ug not in ug_ids:
                         ug_ids.append(id_ug)
 
-            projects = TeraProject.query_data({'id_site': 1})
+            # projects = TeraProject.query_data({'id_site': 1})
+            projects = TeraProject.query_with_filters({'id_site': 1})
             for project in projects:
-                services_access = (TeraServiceAccess.get_service_access_for_project(
+                services_access = (TeraServiceAccess.get_service_access(
                     id_service=TeraService.get_openteraserver_service().id_service, id_project=project.id_project))
                 for sa in services_access:
                     if sa.service_access_user_group:

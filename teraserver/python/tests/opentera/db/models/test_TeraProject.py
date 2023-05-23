@@ -1,6 +1,8 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraDevice import TeraDevice
 
 
 class TeraProjectTest(BaseModelsTest):
@@ -81,11 +83,11 @@ class TeraProjectTest(BaseModelsTest):
             users_ids = new_project.get_users_ids_in_project()
             self.assertIsNotNone(users_ids)
 
-    def test_get_users_ids_in_project(self):
+    def test_get_users_in_project(self):
         with self._flask_app.app_context():
             new_project = TeraProject()
             new_project.id_site = 1
-            new_project.project_name = 'test_get_users_ids_in_project'
+            new_project.project_name = 'test_get_users_in_project'
             self.db.session.add(new_project)
             self.db.session.commit()
             users = new_project.get_users_in_project()
@@ -126,3 +128,48 @@ class TeraProjectTest(BaseModelsTest):
             #     print(e)
             # self.assertRaises(Exception, TeraProject.insert(project=new_project))
             # don't know why the self.assertRaises doesnt work here
+
+    def test_update_set_inactive(self):
+        with self._flask_app.app_context():
+            new_project = TeraProject()
+            new_project.id_site = 1
+            new_project.project_name = 'test_update_set_inactive'
+            self.db.session.add(new_project)
+            self.db.session.commit()
+
+            # Create participants
+            participants = []
+            for i in range(3):
+                part = TeraParticipant()
+                part.id_project = new_project.id_project
+                part.participant_name = 'Participant #' + str(i+1)
+                part.participant_enabled = True
+                TeraParticipant.insert(part)
+                participants.append(part)
+
+            for part in participants:
+                self.assertTrue(part.participant_enabled)
+
+            # Associate devices
+            devices = []
+            for i in range(2):
+                device = TeraDevice()
+                device.device_name = 'Device #' + str(i+1)
+                device.id_device_type = 1
+                TeraDevice.insert(device)
+                devices.append(device)
+            part = participants[0]
+            for device in devices:
+                device.device_participants.append(part)
+            self.db.session.commit()
+
+            # Set project inactive
+            TeraProject.update(new_project.id_project, {'project_enabled': False})
+
+            # Check if participants are inactive
+            for part in participants:
+                self.assertFalse(part.participant_enabled)
+
+            # Check that associated devices are not anymore
+            for device in devices:
+                self.assertEqual([], device.device_participants)

@@ -1,6 +1,7 @@
 import uuid
 from flask import request
 from requests import Response
+from typing import List
 
 
 class TeraUserClient:
@@ -11,16 +12,10 @@ class TeraUserClient:
         self.__user_fullname = token_dict['user_fullname']
         self.__user_token = token
         self.__user_superadmin = token_dict['user_superadmin']
+        self.__service_access = token_dict['service_access']
 
-        # A little trick here to get the right URL for the server if we are using a proxy
         backend_hostname = config_man.backend_config["hostname"]
         backend_port = str(config_man.backend_config["port"])
-
-        # if 'X-Externalhost' in request.headers:
-        #   backend_hostname = request.headers['X-Externalhost']
-
-        #if 'X-Externalport' in request.headers:
-        #    backend_port = request.headers['X-Externalport']
 
         self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
 
@@ -64,6 +59,14 @@ class TeraUserClient:
     def user_superadmin(self, superadmin: bool):
         self.__user_superadmin = superadmin
 
+    @property
+    def service_access(self):
+        return self.__service_access
+
+    @service_access.setter
+    def service_access(self, service_access: dict):
+        self.__service_access = service_access
+
     def do_get_request_to_backend(self, path: str) -> Response:
         from requests import get
         request_headers = {'Authorization': 'OpenTera ' + self.__user_token}
@@ -71,7 +74,15 @@ class TeraUserClient:
         backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
         return backend_response
 
-    def get_role_for_site(self, id_site: int):
+    def get_roles_for_service(self, service_key: str) -> List[str]:
+        # Roles are stored in the token, in the service_access dictionary
+        roles: List[str] = []
+        if 'service_access' in self.__service_access:
+            if service_key in self.__service_access['service_access']:
+                roles = self.__service_access['service_access'][service_key]
+        return roles
+
+    def get_role_for_site(self, id_site: int) -> str:
         response = self.do_get_request_to_backend('/api/user/sites?user_uuid=' + self.__user_uuid)
 
         if response.status_code == 200:
@@ -86,7 +97,7 @@ class TeraUserClient:
 
         return 'Undefined'
 
-    def get_role_for_project(self, id_project: int):
+    def get_role_for_project(self, id_project: int) -> str:
         response = self.do_get_request_to_backend('/api/user/projects?user_uuid=' + self.__user_uuid)
 
         if response.status_code == 200:

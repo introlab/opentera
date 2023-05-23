@@ -267,7 +267,7 @@ class UserQueryFormsTest(BaseUserAPITest):
             self.assertEqual(400, response.status_code, msg='Missing id_session_type')
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'type': 'session_type_config', 'id': 1})
+                                                     params={'type': 'session_type_config', 'id': 2})
             self.assertEqual(200, response.status_code)
             form_data = response.json
             self.assertEqual('session_type_config', form_data['objecttype'])

@@ -210,22 +210,32 @@ class TeraService(BaseModel, SoftDeleteMixin):
         TeraService.db().session.add(new_service)
         TeraService.db().session.commit()
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=False)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=False)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_service': self.id_service, 'service_key': self.service_key}
+
     @classmethod
     def insert(cls, service):
         service.service_uuid = str(uuid.uuid4())
         super().insert(service)
 
         # Create default admin-user role for each service
-        from opentera.db.models.TeraServiceRole import TeraServiceRole
-        new_role = TeraServiceRole()
-        new_role.id_service = service.id_service
-        new_role.service_role_name = 'admin'
-        TeraServiceRole.insert(new_role)
-
-        new_role = TeraServiceRole()
-        new_role.id_service = service.id_service
-        new_role.service_role_name = 'user'
-        TeraServiceRole.insert(new_role)
+        # from opentera.db.models.TeraServiceRole import TeraServiceRole
+        # new_role = TeraServiceRole()
+        # new_role.id_service = service.id_service
+        # new_role.service_role_name = 'admin'
+        # TeraServiceRole.insert(new_role)
+        #
+        # new_role = TeraServiceRole()
+        # new_role.id_service = service.id_service
+        # new_role.service_role_name = 'user'
+        # TeraServiceRole.insert(new_role)
 
     def delete_check_integrity(self) -> IntegrityError | None:
         for service_site in self.service_sites:

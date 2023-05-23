@@ -12,6 +12,7 @@ from flask_babel import gettext
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user_group', type=int, help='Usergroup ID to query service access')
+get_parser.add_argument('id_user', type=int, help='User ID to query service access')
 get_parser.add_argument('id_participant_group', type=int, help='Participant group ID to query service access')
 get_parser.add_argument('id_device', type=int, help='Device ID to query service access')
 get_parser.add_argument('id_service', type=int, help='Service ID to query associated access from')
@@ -63,6 +64,9 @@ class UserQueryServiceAccess(Resource):
         elif args['id_service']:
             if args['id_service'] in user_access.get_accessible_services_ids():
                 service_access = user_access.query_service_access(service_id=args['id_service'])
+        elif args['id_user']:
+            if args['id_user'] in user_access.get_accessible_users_ids():
+                service_access = user_access.query_service_access(user_id=args['id_user'])
 
         # Sort by service
         service_access.sort(key=lambda x: x.service_access_role.id_service)
@@ -79,7 +83,8 @@ class UserQueryServiceAccess(Resource):
                                          'get', 500, 'InvalidRequestError', str(e))
             return gettext('Invalid request'), 500
 
-    @api.doc(description='Create/update service - access association.',
+    @api.doc(description='Create/update service - access association. A list can be posted - if an item with a '
+                         'id_service_access doesn\'t have an id_service_role element, it will be deleted.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',

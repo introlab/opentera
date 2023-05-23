@@ -195,6 +195,9 @@ class BaseParticipantAPITest(unittest.TestCase):
         # Send participant disconnected message
         self._user_manager_module.handle_participant_connected(tera_message.head, participant_connected)
 
+    def _generate_participant_dynamic_token(self, participant: TeraParticipant):
+        return participant.dynamic_token(self.participant_token_key)
+
     def _get_with_participant_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
         if params is None:
             params = {}

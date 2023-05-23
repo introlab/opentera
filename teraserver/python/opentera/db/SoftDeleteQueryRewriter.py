@@ -102,6 +102,10 @@ class SoftDeleteQueryRewriter:
         if isinstance(join_obj.right, Table):
             stmt = self.rewrite_from_table(stmt, join_obj.right)
 
+        # SB - This happened when managing "lazy-joined" relationship
+        # if isinstance(join_obj.right, Alias) and isinstance(join_obj.left, Subquery):  # Lazy joins
+        #     stmt = self.analyze_from(stmt, join_obj.right)
+
         return stmt
 
     def analyze_from(self, stmt: Select, from_obj):
@@ -123,6 +127,11 @@ class SoftDeleteQueryRewriter:
             return stmt
 
         if isinstance(from_obj, Alias):
+            # SB - This happened when managing "lazy-joined" relationship
+            # if isinstance(from_obj.element, Table):
+            #     return self.rewrite_from_table(from_obj.element.select(), from_obj)
+            #     # return self.rewrite_element(from_obj.element)
+
             if isinstance(from_obj.element, Subquery):
                 self.rewrite_element(from_obj.element)
                 return stmt

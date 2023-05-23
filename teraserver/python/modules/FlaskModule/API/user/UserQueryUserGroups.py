@@ -117,7 +117,7 @@ class UserQueryUserGroups(Resource):
         return [], 200
 
     @api.doc(description='Create / update user group. id_user_group must be set to "0" to create a new user group. User'
-                         ' groups can be modified has a site admin role.',
+                         ' groups can be modified if the user has a site admin role.',
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
@@ -212,16 +212,16 @@ class UserQueryUserGroups(Resource):
                     # Check if we must remove access for that site
                     if 'site_access_role' not in site or site['site_access_role'] == '':
                         # No more access to that site for that user group - remove all access!
-                        TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                        TeraServiceAccess.delete_service_access_for_user_group(
                             id_user_group=json_user_group['id_user_group'], id_site=int(site['id_site']))
                         continue
 
                     # Find id_service_role
                     site_service_role = \
-                        TeraServiceRole.get_specific_service_role_for_site(service_id=Globals.opentera_service_id,
-                                                                           site_id=int(site['id_site']),
-                                                                           rolename=site['site_access_role'])
-                    TeraServiceAccess.update_service_access_for_user_group_for_site(
+                        TeraServiceRole.get_service_role_by_name(service_id=Globals.opentera_service_id,
+                                                                 site_id=int(site['id_site']),
+                                                                 rolename=site['site_access_role'])
+                    TeraServiceAccess.update_service_access_for_user_group(
                         id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                         id_service_role=site_service_role.id_service_role, id_site=int(site['id_site']))
                 except exc.SQLAlchemyError as e:
@@ -244,10 +244,10 @@ class UserQueryUserGroups(Resource):
 
                     # Find id_service_role
                     project_service_role = \
-                        TeraServiceRole.get_specific_service_role_for_project(service_id=Globals.opentera_service_id,
-                                                                              project_id=int(project['id_project']),
-                                                                              rolename=project['project_access_role'])
-                    TeraServiceAccess.update_service_access_for_user_group_for_project(
+                        TeraServiceRole.get_service_role_by_name(service_id=Globals.opentera_service_id,
+                                                                 project_id=int(project['id_project']),
+                                                                 rolename=project['project_access_role'])
+                    TeraServiceAccess.update_service_access_for_user_group(
                         id_service=Globals.opentera_service_id, id_user_group=json_user_group['id_user_group'],
                         id_service_role=project_service_role.id_service_role, id_project=int(project['id_project']))
 

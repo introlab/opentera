@@ -1,4 +1,6 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 
 
 class UserQueryServiceAccessTest(BaseUserAPITest):
@@ -96,6 +98,27 @@ class UserQueryServiceAccessTest(BaseUserAPITest):
                 self._checkJson(json_data=data_item)
                 self.assertEqual(data_item['id_user_group'], 2)
                 self.assertTrue(data_item.__contains__('user_group_name'))
+
+    def test_query_for_user(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params={'id_user': 2})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(0, len(response.json))
+
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_user': 4})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            user = TeraUser.get_user_by_id(4)
+            user_group_ids = [ug.id_user_group for ug in user.user_user_groups]
+            target_count = TeraServiceAccess.query.filter(
+                TeraServiceAccess.id_user_group.in_(user_group_ids)).count()
+            self.assertEqual(target_count, len(response.json))
+
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
 
     def test_query_for_device(self):
         with self._flask_app.app_context():
@@ -235,4 +258,13 @@ class UserQueryServiceAccessTest(BaseUserAPITest):
         self.assertTrue(json_data.__contains__('id_service'))
         self.assertTrue(json_data.__contains__('id_service_role'))
         self.assertTrue(json_data.__contains__('service_role_name'))
-        self.assertTrue(json_data.__contains__('service_name'))
+        if not minimal:
+            self.assertTrue(json_data.__contains__('service_name'))
+            self.assertTrue(json_data.__contains__('service_key'))
+            self.assertTrue(json_data.__contains__('id_service'))
+            self.assertTrue(json_data.__contains__('service_access_role_name'))
+        else:
+            self.assertFalse(json_data.__contains__('service_name'))
+            self.assertFalse(json_data.__contains__('service_key'))
+            self.assertFalse(json_data.__contains__('id_service'))
+            self.assertFalse(json_data.__contains__('service_access_role_name'))

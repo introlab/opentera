@@ -1,5 +1,9 @@
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models import TeraUser
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraProject import TeraProject
 
 from sqlalchemy import or_, not_
 
@@ -79,12 +83,6 @@ class DBManagerTeraServiceAccess:
         sessions.extend(other_sessions)
 
         return sessions
-        # from opentera.db.models.TeraSession import TeraSession
-        # from opentera.db.models.TeraParticipant import TeraParticipant
-        #
-        # part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
-        # return TeraSession.query.join(TeraSession.session_participants). \
-        #     filter(TeraParticipant.id_participant.in_(part_ids)).all()
 
     def get_accessible_sessions_ids(self, admin_only=False):
         ses_ids = []
@@ -95,10 +93,6 @@ class DBManagerTeraServiceAccess:
         return ses_ids
 
     def get_accessibles_sites(self):
-        # projects = self.get_accessible_projects()
-        # sites = set([project.project_site for project in projects])
-        # return list(sites)
-
         # Build site list - get sites where that service is associated
         from opentera.db.models.TeraServiceSite import TeraServiceSite
         service_sites = TeraServiceSite.get_sites_for_service(self.service.id_service)
@@ -126,6 +120,14 @@ class DBManagerTeraServiceAccess:
     def get_accessible_participants_uuids(self, admin_only=False):
         return [participant.participant_uuid for participant in self.get_accessible_participants(admin_only=admin_only)]
 
+    def get_accessible_participants_groups(self):
+        project_id_list = self.get_accessible_projects_ids()
+        groups = TeraParticipantGroup.query.join(TeraProject).filter(TeraProject.id_project.in_(project_id_list)).all()
+        return groups
+
+    def get_accessible_participants_groups_ids(self):
+        return [group.id_participant_group for group in self.get_accessible_participants_groups()]
+
     def get_accessible_users(self, admin_only=False):
         projects = self.get_accessible_projects(admin_only=admin_only)
         users = []
@@ -139,6 +141,24 @@ class DBManagerTeraServiceAccess:
 
     def get_accessible_users_ids(self, admin_only=False):
         return [user.id_user for user in self.get_accessible_users(admin_only=admin_only)]
+
+    def get_accessible_usergroups(self):
+        # Usergroup is accessible if it has access to a service site / project or if it has a role in the service
+        access = TeraServiceAccess.query.join(TeraServiceRole).\
+            filter(TeraServiceRole.id_service == self.service.id_service).\
+            filter(TeraServiceAccess.id_user_group is not None).all()
+
+        usergroups = []
+        if access:
+            for service_access in access:
+                ug = service_access.service_access_user_group
+                if ug not in usergroups:
+                    usergroups.append(ug)
+
+        return usergroups
+
+    def get_accessible_usergroups_ids(self):
+        return [ug.id_user_group for ug in self.get_accessible_usergroups()]
 
     def get_accessible_users_uuids(self, admin_only=False):
         return [user.user_uuid for user in self.get_accessible_users(admin_only=admin_only)]

@@ -34,14 +34,14 @@ class DBManagerTeraUserAccess:
                 users_ids.append(user.id_user)
         return users_ids
 
-    def get_accessible_users(self, admin_only=False):
+    def get_accessible_users(self, admin_only=False, include_site_access=False):
         if self.user.user_superadmin:
             users = TeraUser.query.order_by(TeraUser.user_firstname.asc()).all()
         else:
             projects = self.get_accessible_projects(admin_only=admin_only)
             users = []
             for project in projects:
-                project_users = project.get_users_in_project()
+                project_users = project.get_users_in_project(include_site_access=include_site_access)
                 for user in project_users:
                     if user not in users:
                         users.append(user)
@@ -1182,7 +1182,8 @@ class DBManagerTeraUserAccess:
 
     def query_users_for_site(self, site_id: int, enabled_only: bool = False, admin_only: bool = False,
                              include_super_admins: bool = False):
-        accessible_users = self.get_accessible_users()
+        # is_site_admin = self.get_site_role(site_id) == 'admin'
+        accessible_users = self.get_accessible_users(include_site_access=True)
         users = set()
         for user in accessible_users:
             if (enabled_only and not user.user_enabled) or (not include_super_admins and user.user_superadmin):
@@ -1196,7 +1197,12 @@ class DBManagerTeraUserAccess:
 
     def query_users_for_project(self, project_id: int, enabled_only: bool = False, admin_only: bool = False,
                                 include_super_admins: bool = False):
-        accessible_users = self.get_accessible_users()
+
+        # Only returns site admins users if itself is site admin!
+        # project = TeraProject.get_project_by_id(project_id)
+        # is_site_admin = self.get_site_role(project.id_site) == 'admin'
+        accessible_users = self.get_accessible_users(include_site_access=True)
+
         users = set()
         for user in accessible_users:
             if enabled_only and not user.user_enabled or (not include_super_admins and user.user_superadmin):
@@ -1263,7 +1269,7 @@ class DBManagerTeraUserAccess:
         return services_configs
 
     def query_service_access(self, user_group_id: int = None, device_id: int = None, participant_group_id: int = None,
-                             service_id: int = None):
+                             service_id: int = None, user_id: int = None):
         from opentera.db.models.TeraServiceAccess import TeraServiceAccess
         from opentera.db.models.TeraServiceRole import TeraServiceRole
         accessible_services_ids = self.get_accessible_services_ids()
@@ -1275,6 +1281,11 @@ class DBManagerTeraUserAccess:
             query = query.filter_by(id_device=device_id)
         if participant_group_id:
             query = query.filter_by(id_participant_group=participant_group_id)
+        if user_id:
+            user = TeraUser.get_user_by_id(user_id)
+            user_groups_ids = [ug.id_user_group for ug in user.user_user_groups]
+            query = query.filter(TeraServiceAccess.id_user_group.in_(user_groups_ids))
+
         if service_id:
             query = query.join(TeraServiceAccess.service_access_role).filter_by(id_service=service_id)
         else:

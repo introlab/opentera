@@ -147,7 +147,7 @@ class UserQueryForms(Resource):
                     else:
                         return gettext('No reply from service while querying session type config'), 408
 
-                return {}
+                return TeraSessionTypeConfigForm.get_session_type_config_form(session_type=session_type)
 
         if args['type'] == 'session':
             return TeraSessionForm.get_session_form(user_access=user_access, specific_session_id=args['id'],

@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 from flask_babel import gettext
+from sqlalchemy.exc import IntegrityError
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraParticipant import TeraParticipant
@@ -109,10 +110,25 @@ class ServiceQueryParticipants(Resource):
             participant.participant_login_enabled = True
             participant.participant_lastonline = datetime.now()
             # Will generate token, last online
-            TeraParticipant.insert(participant)
+            try:
+                TeraParticipant.insert(participant)
+            except IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, ServiceQueryParticipants.__name__, 'insert',
+                                               400, 'Integrity error', str(e))
+
+                if 't_projects' in str(e.args):
+                    return gettext('Can\'t insert participant: participant\'s project is disabled or invalid.'), 400
         else:
             # Update participant
-            TeraParticipant.update(participant_info['id_participant'], participant_info)
+            try:
+                TeraParticipant.update(participant_info['id_participant'], participant_info)
+            except IntegrityError as e:
+                self.module.logger.log_warning(self.module.module_name, ServiceQueryParticipants.__name__, 'update',
+                                               400, 'Integrity error', str(e))
+
+                if 't_projects' in str(e.args):
+                    return gettext('Can\'t update participant: participant\'s project is disabled.'), 400
+
             # Update info
             participant = TeraParticipant.get_participant_by_id(participant_info['id_participant'])
 

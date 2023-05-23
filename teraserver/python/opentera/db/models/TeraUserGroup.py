@@ -42,11 +42,14 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         # Minimal information, delete can not be filtered
         return {'id_user_group': self.id_user_group}
 
-    def get_projects_roles(self, no_inheritance: bool = False) -> dict:
+    def get_projects_roles(self,  service_id: int | None = None, no_inheritance: bool = False) -> dict:
         projects_roles = {}
 
         # Projects
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_project:
                 projects_roles[service_role.service_role_project] = \
                     {'project_role': service_role.service_role_name, 'inherited': False}
@@ -54,6 +57,9 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
         # Sites - if we are admin in a site, we are automatically admin in all its project
         if not no_inheritance:
             for service_role in self.user_group_services_roles:
+                if service_id and service_role.id_service != service_id:
+                    # Need to limit to a specific service and this is not one for that
+                    continue
                 if service_role.id_site:
                     if service_role.service_role_name == 'admin':
                         for project in service_role.service_role_site.site_projects:
@@ -61,22 +67,36 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
 
         return projects_roles
 
-    def get_sites_roles(self) -> dict:
+    def get_sites_roles(self, service_id: int | None = None) -> dict:
         sites_roles = {}
         # Sites
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_site:
                 sites_roles[service_role.service_role_site] = \
                     {'site_role': service_role.service_role_name, 'inherited': False}
 
         # Projects - each project's site also provides a "user" access for that site
         for service_role in self.user_group_services_roles:
+            if service_id and service_role.id_service != service_id:
+                # Need to limit to a specific service and this is not one for that
+                continue
             if service_role.id_project:
                 project_site = service_role.service_role_project.project_site
                 if project_site not in sites_roles:
                     sites_roles[project_site] = {'site_role': 'user', 'inherited': True}
 
         return sites_roles
+
+    def get_global_roles(self, service_id: int) -> list:
+        global_roles = []
+
+        for service_role in self.user_group_services_roles:
+            if not service_role.id_site and not service_role.id_project and service_role.id_service == service_id:
+                global_roles.append(service_role.service_role_name)
+        return global_roles
 
     @staticmethod
     def get_user_group_by_group_name(name: str, with_deleted: bool = False):
@@ -125,25 +145,24 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
             access = TeraServiceAccess()
             access.id_user_group = id_user_group
             id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-            user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
-                                                                              project_id=id_project, rolename='user')
+            user_role = TeraServiceRole.get_service_role_by_name(service_id=opentera_service_id, project_id=id_project,
+                                                                 rolename='user')
             access.id_service_role = user_role.id_service_role
             TeraUserGroup.db().session.add(access)
 
             access = TeraServiceAccess()
             access.id_user_group = id_user_group
             id_project = TeraProject.get_project_by_projectname('Default Project #2').id_project
-            user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
-                                                                              project_id=id_project, rolename='user')
+            user_role = TeraServiceRole.get_service_role_by_name(service_id=opentera_service_id, project_id=id_project,
+                                                                 rolename='user')
             access.id_service_role = user_role.id_service_role
             TeraUserGroup.db().session.add(access)
 
             admin_access = TeraServiceAccess()
-            admin_role = TeraServiceRole.get_specific_service_role_for_site(service_id=opentera_service_id,
-                                                                            site_id=TeraSite
-                                                                            .get_site_by_sitename('Default Site')
-                                                                            .id_site,
-                                                                            rolename='admin')
+            admin_role = TeraServiceRole.get_service_role_by_name(service_id=opentera_service_id,
+                                                                  site_id=TeraSite.get_site_by_sitename('Default Site')
+                                                                  .id_site,
+                                                                  rolename='admin')
             admin_access.id_service_role = admin_role.id_service_role
             admin_access.id_user_group = \
                 TeraUserGroup.get_user_group_by_group_name('Admins - Default Site').id_user_group
@@ -152,15 +171,15 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
             access = TeraServiceAccess()
             access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Admins - Project 1').id_user_group
             id_project = TeraProject.get_project_by_projectname('Default Project #1').id_project
-            admin_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
-                                                                               project_id=id_project, rolename='admin')
+            admin_role = TeraServiceRole.get_service_role_by_name(service_id=opentera_service_id, project_id=id_project,
+                                                                  rolename='admin')
             access.id_service_role = admin_role.id_service_role
             TeraUserGroup.db().session.add(access)
 
             access = TeraServiceAccess()
             access.id_user_group = TeraUserGroup.get_user_group_by_group_name('Users - Project 1').id_user_group
-            user_role = TeraServiceRole.get_specific_service_role_for_project(service_id=opentera_service_id,
-                                                                              project_id=id_project, rolename='user')
+            user_role = TeraServiceRole.get_service_role_by_name(service_id=opentera_service_id, project_id=id_project,
+                                                                 rolename='user')
             access.id_service_role = user_role.id_service_role
             TeraUserGroup.db().session.add(access)
 

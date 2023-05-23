@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-21 09:06-0400\n"
+"POT-Creation-Date: 2023-05-23 14:24-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -49,7 +49,17 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:68
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:74
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:80
-#: modules/FlaskModule/API/service/ServiceQueryProjects.py:41
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:52
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:57
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:99
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:106
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:158
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:112
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:100
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:104
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:108
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:116
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:194
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:86
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:91
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:66
@@ -58,6 +68,8 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:84
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:90
 #: modules/FlaskModule/API/service/ServiceQuerySites.py:36
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:96
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:197
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:301
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:122
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:257
@@ -76,21 +88,21 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDisconnect.py:84
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:107
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:159
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:350
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:353
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:198
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:269
-#: modules/FlaskModule/API/user/UserQueryProjects.py:145
-#: modules/FlaskModule/API/user/UserQueryProjects.py:150
-#: modules/FlaskModule/API/user/UserQueryProjects.py:258
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:112
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:363
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:366
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:204
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:275
+#: modules/FlaskModule/API/user/UserQueryProjects.py:151
+#: modules/FlaskModule/API/user/UserQueryProjects.py:156
+#: modules/FlaskModule/API/user/UserQueryProjects.py:264
 #: modules/FlaskModule/API/user/UserQueryServiceAccess.py:117
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:121
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:129
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:208
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:212
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:216
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:220
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:122
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:126
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:134
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:213
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:217
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:221
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:225
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:151
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:155
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:159
@@ -99,6 +111,8 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:245
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:249
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:253
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:79
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:136
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:129
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:259
 #: modules/FlaskModule/API/user/UserQueryServices.py:121
@@ -113,8 +127,8 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:55
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:107
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:138
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:183
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:266
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:187
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:270
 #: modules/FlaskModule/API/user/UserQuerySites.py:124
 #: modules/FlaskModule/API/user/UserQuerySites.py:127
 #: modules/FlaskModule/API/user/UserQuerySites.py:176
@@ -138,6 +152,15 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryUsers.py:214
 #: modules/FlaskModule/API/user/UserQueryUsers.py:219
 #: modules/FlaskModule/API/user/UserQueryUsers.py:348
+#: opentera/services/ServiceAccessManager.py:116
+#: opentera/services/ServiceAccessManager.py:166
+#: opentera/services/ServiceAccessManager.py:195
+#: opentera/services/ServiceAccessManager.py:214
+#: opentera/services/ServiceAccessManager.py:242
+#: opentera/services/ServiceAccessManager.py:297
+#: opentera/services/ServiceAccessManager.py:411
+#: opentera/services/ServiceAccessManager.py:417
+#: opentera/services/ServiceAccessManager.py:428
 msgid "Forbidden"
 msgstr ""
 
@@ -148,6 +171,16 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:233
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:247
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:284
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:116
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:138
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:176
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:73
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:94
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:123
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:138
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:150
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:172
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:205
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:104
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:119
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:185
@@ -155,6 +188,9 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryTests.py:234
 #: modules/FlaskModule/API/service/ServiceQueryTests.py:245
 #: modules/FlaskModule/API/service/ServiceQueryTests.py:280
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:141
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:158
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:215
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:180
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:221
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:276
@@ -173,19 +209,22 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:120
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:135
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:178
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:239
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:280
-#: modules/FlaskModule/API/user/UserQueryProjects.py:190
-#: modules/FlaskModule/API/user/UserQueryProjects.py:205
-#: modules/FlaskModule/API/user/UserQueryProjects.py:276
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:151
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:163
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:185
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:231
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:245
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:286
+#: modules/FlaskModule/API/user/UserQueryProjects.py:196
+#: modules/FlaskModule/API/user/UserQueryProjects.py:211
+#: modules/FlaskModule/API/user/UserQueryProjects.py:282
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:156
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:168
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:190
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:236
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:208
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:264
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:287
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:322
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:98
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:119
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:147
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:244
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:286
 #: modules/FlaskModule/API/user/UserQueryServices.py:162
@@ -204,8 +243,8 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessions.py:179
 #: modules/FlaskModule/API/user/UserQuerySessions.py:194
 #: modules/FlaskModule/API/user/UserQuerySessions.py:272
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:237
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:277
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:241
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:281
 #: modules/FlaskModule/API/user/UserQuerySites.py:140
 #: modules/FlaskModule/API/user/UserQuerySites.py:155
 #: modules/FlaskModule/API/user/UserQuerySites.py:194
@@ -233,15 +272,17 @@ msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQueryParticipants.py:41
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:82
-#: modules/FlaskModule/API/service/ServiceQueryProjects.py:56
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:72
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:67
 #: modules/FlaskModule/API/service/ServiceQueryServices.py:76
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:62
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:122
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:109
 #: modules/FlaskModule/API/user/UserQueryDisconnect.py:86
-#: modules/FlaskModule/API/user/UserQueryProjects.py:110
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:80
+#: modules/FlaskModule/API/user/UserQueryProjects.py:116
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:84
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:123
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:67
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:112
 #: modules/FlaskModule/API/user/UserQueryServices.py:104
 #: modules/FlaskModule/API/user/UserQuerySessionEvents.py:62
@@ -272,8 +313,9 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:270
 #: modules/FlaskModule/API/service/ServiceQueryDevices.py:73
 #: modules/FlaskModule/API/service/ServiceQueryDevices.py:87
-#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:68
-#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:83
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:69
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:84
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:49
 #: modules/FlaskModule/API/service/ServiceQuerySessionEvents.py:46
 #: modules/FlaskModule/API/service/ServiceQuerySiteProjectAccessRoles.py:43
 #: modules/FlaskModule/API/service/ServiceQueryTests.py:266
@@ -282,10 +324,10 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:65
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:61
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:157
-#: modules/FlaskModule/API/user/UserQueryForms.py:82
+#: modules/FlaskModule/API/user/UserQueryForms.py:85
 #: modules/FlaskModule/API/user/UserQueryParticipants.py:76
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:81
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:52
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:53
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:63
 #: modules/FlaskModule/API/user/UserQueryServiceSites.py:60
 #: modules/FlaskModule/API/user/UserQuerySessionEvents.py:46
@@ -301,11 +343,11 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:61
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:114
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:137
-#: modules/LoginModule/LoginModule.py:595
-#: modules/LoginModule/LoginModule.py:695
-#: modules/LoginModule/LoginModule.py:762
-#: modules/LoginModule/LoginModule.py:789
-#: modules/LoginModule/LoginModule.py:808
+#: modules/LoginModule/LoginModule.py:587
+#: modules/LoginModule/LoginModule.py:687
+#: modules/LoginModule/LoginModule.py:753
+#: modules/LoginModule/LoginModule.py:780
+#: modules/LoginModule/LoginModule.py:799
 msgid "Unauthorized"
 msgstr ""
 
@@ -345,11 +387,11 @@ msgstr ""
 msgid "Missing current_participant"
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogout.py:33
+#: modules/FlaskModule/API/participant/ParticipantLogout.py:41
 msgid "Participant logged out."
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogout.py:35
+#: modules/FlaskModule/API/participant/ParticipantLogout.py:43
 msgid "Participant not logged in"
 msgstr ""
 
@@ -485,20 +527,109 @@ msgstr ""
 msgid "Success"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:89
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:90
 msgid "Unknown project"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:92
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:93
 msgid "Invalid participant name"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:95
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:96
 msgid "Invalid participant email"
 msgstr ""
 
-#: modules/FlaskModule/API/service/ServiceQueryProjects.py:37
-msgid "Missing project id"
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:120
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:312
+msgid "Can't insert participant: participant's project is disabled or invalid."
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryParticipants.py:130
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:285
+msgid "Can't update participant: participant's project is disabled."
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:48
+msgid "Missing parameter"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:87
+#: modules/FlaskModule/API/user/UserQueryProjects.py:132
+msgid "Missing project"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:93
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:180
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:198
+#: modules/FlaskModule/API/user/UserQueryProjects.py:138
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:179
+msgid "Missing id_project"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:96
+#: modules/FlaskModule/API/user/UserQueryProjects.py:140
+msgid "Missing id_site arguments"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryProjects.py:169
+#: modules/FlaskModule/API/user/UserQueryProjects.py:275
+msgid ""
+"Can't delete project: please delete all participants with sessions before"
+" deleting."
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:52
+msgid "Missing service_role field"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:58
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:154
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:172
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:85
+msgid "Missing id_service_role"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryRoles.py:81
+#: modules/FlaskModule/API/user/UserQueryServiceRoles.py:106
+msgid "Missing fields"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:87
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:104
+msgid "Missing service_access"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:91
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:108
+msgid "Missing id_service_access"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:95
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:112
+msgid "Can't combine id_user_group, id_participant_group and id_device in request"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:114
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:132
+msgid "Bad id_service_role"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:158
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:176
+#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:192
+msgid "Missing at least one id field"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryServiceAccess.py:191
+#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
+#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:296
+#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:209
+#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:63
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:308
+#: modules/FlaskModule/API/user/UserQueryServiceSites.py:266
+#: modules/FlaskModule/API/user/UserQuerySessionTypeProjects.py:270
+#: modules/FlaskModule/API/user/UserQueryTestTypeProjects.py:271
+msgid "Not found"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryServices.py:38
@@ -572,6 +703,50 @@ msgstr ""
 msgid "Service can't delete tests for that session"
 msgstr ""
 
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:71
+#: modules/FlaskModule/API/user/UserQueryUserGroups.py:132
+msgid "Missing user_group"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:78
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:196
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:179
+#: modules/FlaskModule/API/user/UserQueryUserGroups.py:139
+#: modules/FlaskModule/API/user/UserQueryUserUserGroups.py:102
+msgid "Missing id_user_group"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:90
+msgid "Missing service role name or id_service_role"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:103
+msgid "Can't set access to service other than self"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:109
+msgid "No access for at a least one project in the list"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:115
+msgid "No access for at a least one site in the list"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:127
+msgid "Bad role name for service"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:145
+msgid "A new usergroup must have at least one service access"
+msgstr ""
+
+#: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:207
+#: modules/FlaskModule/API/user/UserQueryUserGroups.py:300
+msgid ""
+"Can't delete user group: please delete all users part of that user group "
+"before deleting."
+msgstr ""
+
 #: modules/FlaskModule/API/service/ServiceSessionManager.py:116
 #: modules/FlaskModule/API/user/UserSessionManager.py:107
 msgid "Missing action"
@@ -632,11 +807,11 @@ msgstr ""
 msgid "Invalid client version handler"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogout.py:27
+#: modules/FlaskModule/API/user/UserLogout.py:34
 msgid "User logged out."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogout.py:29
+#: modules/FlaskModule/API/user/UserLogout.py:36
 msgid "User not logged in"
 msgstr ""
 
@@ -668,17 +843,6 @@ msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:149
 msgid "Device not assigned to project or participant"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:203
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:296
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:204
-#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:63
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:308
-#: modules/FlaskModule/API/user/UserQueryServiceSites.py:266
-#: modules/FlaskModule/API/user/UserQuerySessionTypeProjects.py:270
-#: modules/FlaskModule/API/user/UserQueryTestTypeProjects.py:271
-msgid "Not found"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:141
@@ -720,13 +884,6 @@ msgid ""
 "Can't delete device from project. Please remove all participants "
 "associated with the device or all sessions in the project referring to "
 "the device before deleting."
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:180
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:192
-#: modules/FlaskModule/API/user/UserQueryProjects.py:132
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:179
-msgid "Missing id_project"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:182
@@ -833,7 +990,7 @@ msgid "Unexisting ID/Forbidden access"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:79
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:387
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:400
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:182
 msgid "Database Error"
 msgstr ""
@@ -937,19 +1094,23 @@ msgstr ""
 msgid "Use Logout instead to disconnect current user"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:79
+#: modules/FlaskModule/API/user/UserQueryForms.py:82
 msgid "Missing type"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:134
+#: modules/FlaskModule/API/user/UserQueryForms.py:137
 msgid "Missing session type id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:167
+#: modules/FlaskModule/API/user/UserQueryForms.py:148
+msgid "No reply from service while querying session type config"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryForms.py:182
 msgid "Invalid service specified"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryForms.py:180
+#: modules/FlaskModule/API/user/UserQueryForms.py:195
 msgid "Unknown form type: "
 msgstr ""
 
@@ -1001,95 +1162,61 @@ msgstr ""
 msgid "Mismatch between id_project and group's project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:370
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:383
 msgid "Can't delete participant: please remove all related sessions beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:372
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:385
 msgid ""
 "Can't delete participant: please remove all sessions created by this "
 "participant beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:375
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:388
 msgid "Can't delete participant: please remove all related assets beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:377
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:390
 msgid "Can't delete participant: please remove all related tests beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:379
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:392
 msgid ""
 "Can't delete participant: please remove all related sessions, assets and "
 "tests before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:190
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:175
-#: modules/FlaskModule/API/user/UserQueryUserGroups.py:139
-#: modules/FlaskModule/API/user/UserQueryUserUserGroups.py:102
-msgid "Missing id_user_group"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:194
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:179
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:200
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:183
 msgid "Missing role name or id"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:223
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:229
 msgid "Invalid role name or id for that project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:265
+#: modules/FlaskModule/API/user/UserQueryProjectAccess.py:271
 msgid "No project access to delete."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:126
-msgid "Missing project"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryProjects.py:134
-msgid "Missing id_site arguments"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryProjects.py:163
+#: modules/FlaskModule/API/user/UserQueryProjects.py:169
 msgid "No access to a session type for at least one of it"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:175
+#: modules/FlaskModule/API/user/UserQueryProjects.py:181
 msgid "At least one session type is not associated to the project site"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryProjects.py:269
-msgid ""
-"Can't delete project: please delete all participants with sessions before"
-" deleting."
+#: modules/FlaskModule/API/user/UserQueryServiceAccessToken.py:35
+#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:189
+#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:142
+#: modules/FlaskModule/API/user/UserQueryServiceSites.py:134
+#: modules/FlaskModule/API/user/UserQueryServices.py:128
+msgid "Missing id_service"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:99
-msgid "Missing service_access"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:103
-msgid "Missing id_service_access"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:107
-msgid "Can't combine id_user_group, id_participant_group and id_device in request"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:127
-msgid "Bad id_service_role"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:167
-msgid "Missing id_service_role"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceAccess.py:171
-#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:192
-msgid "Missing at least one id field"
+#: modules/FlaskModule/API/user/UserQueryServiceAccessToken.py:38
+msgid "No access to specified service"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:72
@@ -1104,13 +1231,6 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:175
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:198
 msgid "Invalid config format provided"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:189
-#: modules/FlaskModule/API/user/UserQueryServiceProjects.py:142
-#: modules/FlaskModule/API/user/UserQueryServiceSites.py:134
-#: modules/FlaskModule/API/user/UserQueryServices.py:128
-msgid "Missing id_service"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryServiceProjects.py:170
@@ -1299,15 +1419,15 @@ msgstr ""
 msgid "Session is in progress: can't delete that session."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:177
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:181
 msgid "Missing id_site"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:221
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:225
 msgid "Invalid role name or id for that site"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:262
+#: modules/FlaskModule/API/user/UserQuerySiteAccess.py:266
 msgid "No site access to delete"
 msgstr ""
 
@@ -1412,18 +1532,8 @@ msgstr ""
 msgid "Item isn't deleted"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryUserGroups.py:132
-msgid "Missing user_group"
-msgstr ""
-
 #: modules/FlaskModule/API/user/UserQueryUserGroups.py:142
 msgid "Missing user group name"
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserQueryUserGroups.py:300
-msgid ""
-"Can't delete user group: please delete all users part of that user group "
-"before deleting."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:89
@@ -1554,16 +1664,16 @@ msgstr ""
 msgid "Invalid reply code"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:630
-#: modules/LoginModule/LoginModule.py:663
+#: modules/LoginModule/LoginModule.py:622
+#: modules/LoginModule/LoginModule.py:655
 msgid "Disabled device"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:640
+#: modules/LoginModule/LoginModule.py:632
 msgid "Invalid token"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:740
+#: modules/LoginModule/LoginModule.py:732
 msgid "Invalid Token"
 msgstr ""
 
@@ -1760,15 +1870,24 @@ msgid "Project ID"
 msgstr ""
 
 #: opentera/forms/TeraProjectForm.py:24
+msgid "Enabled"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:26
 msgid "Site"
 msgstr ""
 
-#: opentera/forms/TeraProjectForm.py:25
+#: opentera/forms/TeraProjectForm.py:27
 msgid "Role"
 msgstr ""
 
-#: opentera/forms/TeraProjectForm.py:26 opentera/forms/TeraSiteForm.py:17
+#: opentera/forms/TeraProjectForm.py:28 opentera/forms/TeraSiteForm.py:17
 msgid "Site Name"
+msgstr ""
+
+#: opentera/forms/TeraProjectForm.py:30 opentera/forms/TeraProjectForm.py:32
+#: opentera/forms/TeraTestTypeForm.py:32
+msgid "Description"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:25
@@ -1972,14 +2091,6 @@ msgstr ""
 msgid "Session Has Device Data"
 msgstr ""
 
-#: opentera/forms/TeraSessionTypeConfigForm.py:19
-msgid "General configuration"
-msgstr ""
-
-#: opentera/forms/TeraSessionTypeConfigForm.py:22
-msgid "Allow session recording"
-msgstr ""
-
 #: opentera/forms/TeraSessionTypeForm.py:29
 msgid "Session Type ID"
 msgstr ""
@@ -2042,10 +2153,6 @@ msgstr ""
 
 #: opentera/forms/TeraTestTypeForm.py:31
 msgid "Expose Web editor"
-msgstr ""
-
-#: opentera/forms/TeraTestTypeForm.py:32
-msgid "Description"
 msgstr ""
 
 #: opentera/forms/TeraUserForm.py:18
@@ -2141,79 +2248,79 @@ msgstr ""
 msgid "Join me!"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:382
+#: opentera/services/BaseWebRTCService.py:383
 msgid "Cannot create session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:422
+#: opentera/services/BaseWebRTCService.py:423
 msgid "Cannot create process"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:436
+#: opentera/services/BaseWebRTCService.py:437
 msgid "Cannot create session"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:459
+#: opentera/services/BaseWebRTCService.py:460
 msgid "Cannot create STOP session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:516
+#: opentera/services/BaseWebRTCService.py:517
 msgid "Error stopping session - check server logs"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:518
+#: opentera/services/BaseWebRTCService.py:519
 msgid "No matching session to stop"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:542
-#: opentera/services/BaseWebRTCService.py:619
-#: opentera/services/BaseWebRTCService.py:706
+#: opentera/services/BaseWebRTCService.py:543
+#: opentera/services/BaseWebRTCService.py:620
+#: opentera/services/BaseWebRTCService.py:707
 msgid "User"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:544
+#: opentera/services/BaseWebRTCService.py:545
 msgid "Error creating user invited session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:556
-#: opentera/services/BaseWebRTCService.py:634
-#: opentera/services/BaseWebRTCService.py:721
+#: opentera/services/BaseWebRTCService.py:557
+#: opentera/services/BaseWebRTCService.py:635
+#: opentera/services/BaseWebRTCService.py:722
 msgid "Participant"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:558
+#: opentera/services/BaseWebRTCService.py:559
 msgid "Error creating participant invited session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:571
-#: opentera/services/BaseWebRTCService.py:650
-#: opentera/services/BaseWebRTCService.py:736
+#: opentera/services/BaseWebRTCService.py:572
+#: opentera/services/BaseWebRTCService.py:651
+#: opentera/services/BaseWebRTCService.py:737
 msgid "Device"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:573
+#: opentera/services/BaseWebRTCService.py:574
 msgid "Error creating device invited session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:589
+#: opentera/services/BaseWebRTCService.py:590
 msgid "Error updating session"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:621
+#: opentera/services/BaseWebRTCService.py:622
 msgid "Error creating user left session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:636
+#: opentera/services/BaseWebRTCService.py:637
 msgid "Error creating participant left session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:652
+#: opentera/services/BaseWebRTCService.py:653
 msgid "Error creating device left session event"
 msgstr ""
 
-#: opentera/services/BaseWebRTCService.py:709
-#: opentera/services/BaseWebRTCService.py:724
-#: opentera/services/BaseWebRTCService.py:739
+#: opentera/services/BaseWebRTCService.py:710
+#: opentera/services/BaseWebRTCService.py:725
+#: opentera/services/BaseWebRTCService.py:740
 msgid "Cannot create refused session event"
 msgstr ""
 
@@ -2251,5 +2358,14 @@ msgstr ""
 #~ "Can't delete service from site: please"
 #~ " delete all sessions using that "
 #~ "service in the site before deleting."
+#~ msgstr ""
+
+#~ msgid "Missing project id"
+#~ msgstr ""
+
+#~ msgid "General configuration"
+#~ msgstr ""
+
+#~ msgid "Allow session recording"
 #~ msgstr ""
 

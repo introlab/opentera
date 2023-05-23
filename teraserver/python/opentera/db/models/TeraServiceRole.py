@@ -19,7 +19,7 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
     service_role_site = relationship('TeraSite', viewonly=True)
 
     service_role_user_groups = relationship("TeraUserGroup", secondary="t_services_access",
-                                            back_populates="user_group_services_roles",  lazy='joined')
+                                            back_populates="user_group_services_roles",  lazy='selectin')
 
     def __init__(self):
         pass
@@ -46,18 +46,28 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
         # Remove null values
         if not json_val['id_project']:
             del json_val['id_project']
+        else:
+            if not minimal:
+                json_val['project_name'] = self.service_role_project.project_name
+
         if not json_val['id_site']:
             del json_val['id_site']
         else:
             if not minimal:
                 json_val['site_name'] = self.service_role_site.site_name
 
+        if not minimal:
+            json_val['service_name'] = self.service_role_service.service_name
         return json_val
 
     @staticmethod
-    def get_service_roles(service_id: int, with_deleted: bool = False):
-        return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_service=service_id).all()
+    def get_service_roles(service_id: int, globals_only: bool = False, with_deleted: bool = False):
+        query = TeraServiceRole.query.execution_options(include_deleted=with_deleted).filter_by(id_service=service_id)
+
+        if globals_only:
+            query = query.filter_by(id_site=None).filter_by(id_project=None)
+
+        return query.all()
 
     @staticmethod
     def get_service_roles_for_site(service_id: int, site_id: int, with_deleted: bool = False):
@@ -65,25 +75,29 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
             .filter_by(id_service=service_id, id_site=site_id).all()
 
     @staticmethod
-    def get_specific_service_role_for_site(service_id: int, site_id: int, rolename: str, with_deleted: bool = False):
-        return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_service=service_id, id_site=site_id, service_role_name=rolename).first()
-
-    @staticmethod
     def get_service_roles_for_project(service_id: int, project_id: int, with_deleted: bool = False):
         return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_service=service_id, id_project=project_id).all()
 
     @staticmethod
-    def get_specific_service_role_for_project(service_id: int, project_id: int, rolename: str,
-                                              with_deleted: bool = False):
-        return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
-            .filter_by(id_service=service_id, id_project=project_id, service_role_name=rolename).first()
-
-    @staticmethod
     def get_service_role_by_id(role_id: int, with_deleted: bool = False):
         return TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_service_role=role_id).first()
+
+    @staticmethod
+    def get_service_role_by_name(service_id: int, rolename: str, site_id: int | None = None,
+                                 project_id: int | None = None, with_deleted: bool = False):
+
+        query = TeraServiceRole.query.execution_options(include_deleted=with_deleted)\
+            .filter_by(id_service=service_id, service_role_name=rolename)
+
+        if site_id:
+            query = query.filter_by(id_site=site_id)
+
+        if project_id:
+            query = query.filter_by(id_project=project_id)
+
+        return query.first()
 
     @staticmethod
     def create_defaults(test=False):

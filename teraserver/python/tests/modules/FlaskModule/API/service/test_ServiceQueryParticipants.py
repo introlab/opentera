@@ -1,8 +1,8 @@
 from typing import List
 
 from BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraProject import TeraProject
 
 
 class ServiceQueryParticipantsTest(BaseServiceAPITest):
@@ -79,14 +79,24 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
 
     def test_post_endpoint_with_token_auth_update_participant(self):
         with self._flask_app.app_context():
+            proj2: TeraProject = TeraProject.get_project_by_id(2)
+            proj2.project_enabled = False
+            proj2.db().session.commit()
+
             participant_schema = {
                 'participant': {
                     'id_participant': 0,
-                    'id_project': 1,
+                    'id_project': 2,
                     'participant_name': 'test_participant',
                     'participant_email': 'test_participant_email'
                 }
             }
+
+            response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                          json=participant_schema, endpoint=self.test_endpoint)
+            self.assertEqual(400, response.status_code, msg='Insert on a disabled project')
+            proj2.project_enabled = True
+            proj2.db().session.commit()
 
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                           json=participant_schema, endpoint=self.test_endpoint)
@@ -98,11 +108,22 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
             # Store new id_participant
             participant_schema['participant']['id_participant'] = id_participant
 
-            # Update name
+            # Disable project and try to enable the participant
+            proj2.project_enabled = False
+            proj2.db().session.commit()
+            participant_schema['participant']['participant_enabled'] = True
+            response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                          json=participant_schema, endpoint=self.test_endpoint)
+            self.assertEqual(400, response.status_code, msg='Cant enable on disabled project')
+            del participant_schema['participant']['participant_enabled']
+
+            # Update name, even if disabled, should be OK!
             participant_schema['participant']['participant_name'] = 'updated test_participant'
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                           json=participant_schema, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
+            proj2.project_enabled = True
+            proj2.db().session.commit()
             participant = TeraParticipant.get_participant_by_id(id_participant)
             self.assertEqual(response.json['id_participant'], participant.id_participant)
             self.assertEqual(participant_schema['participant']['participant_name'], response.json['participant_name'])
