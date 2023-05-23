@@ -1,10 +1,15 @@
-from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
 from opentera.config.ConfigManager import ConfigManager
 from opentera.db.models.TeraService import TeraService
-
+import opentera.messages.python as messages
+from twisted.internet import defer
 import os
 import subprocess
 import sys
+import json
+from google.protobuf.json_format import ParseError
+from google.protobuf.message import DecodeError
+from opentera.redis.RedisVars import RedisVars
 
 
 class ServiceLauncherModule(BaseModule):
@@ -14,23 +19,87 @@ class ServiceLauncherModule(BaseModule):
         self.processList = []
         self.launch_system_service_only = system_only
         self.enable_tests = enable_tests
+        self.update_redis_all_service_info()
 
     def __del__(self):
         self.terminate_processes()
 
+    def update_specific_service_info(self, service_key: str, service_info: dict):
+        self.redisSet(RedisVars.RedisVar_ServicePrefixKey + service_key, json.dumps(service_info))
+
+    def delete_specific_service_info(self, service_key: str):
+        self.redisDelete(RedisVars.RedisVar_ServicePrefixKey + service_key)
+
+    def update_redis_all_service_info(self):
+        services = TeraService.query.all()
+        for service in services:
+            # Ignore special service TeraServer
+            if service.service_key == 'OpenTeraServer':
+                continue
+            if service.service_enabled:
+                self.update_specific_service_info(service.service_key, service.to_json())
+
+    @defer.inlineCallbacks
     def setup_module_pubsub(self):
         # Additional subscribe here
+        print('ServiceLauncherModule - Registering to events...')
+        # Always register to user events
+        yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ModuleNames.DATABASE_MODULE_NAME, 'service'), self.database_event_received_for_service)
 
         # Launch all internal services
         services = TeraService.query.all()
         for service in services:
             if service.service_system:
                 # print(service)
-                if service.service_key != 'OpenTeraServer': # and service.service_key != 'LoggingService':
+                if service.service_key != 'OpenTeraServer':  # and service.service_key != 'LoggingService':
                     self.launch_service(service)
             elif service.service_enabled and not self.launch_system_service_only:
                 # or service.service_key == 'FileTransferService'):
                 self.launch_service(service)
+
+        # Need to register to events (base class)
+        super().setup_module_pubsub()
+
+    def database_event_received_for_service(self, pattern, channel, message):
+        # Process database event
+        try:
+            tera_event = messages.TeraEvent()
+            if isinstance(message, str):
+                ret = tera_event.ParseFromString(message.encode('utf-8'))
+            elif isinstance(message, bytes):
+                ret = tera_event.ParseFromString(message)
+
+            database_event = messages.DatabaseEvent()
+
+            # Look for DatabaseEvent
+            for any_msg in tera_event.events:
+                if any_msg.Unpack(database_event):
+                    # Process event
+                    try:
+                        service_dict = json.loads(database_event.object_value)
+
+                        if database_event.type == database_event.DB_CREATE or \
+                                database_event.type == database_event.DB_UPDATE:
+                            # Update redis values
+                            if 'id_service' in service_dict:
+                                if service_dict['service_enabled'] and 'deleted_at' not in service_dict:
+                                    self.update_specific_service_info(service_dict['service_key'], service_dict)
+                                else:
+                                    self.delete_specific_service_info(service_dict['service_key'])
+                        elif database_event.type == database_event.DB_DELETE:
+                            if 'service_key' in service_dict:
+                                self.delete_specific_service_info(service_dict['service_key'])
+
+                    except json.JSONDecodeError as json_decode_error:
+                        print('ServiceLauncherModule:database_event_received_for_service - JSONDecodeError ',
+                              str(database_event.object_value), str(json_decode_error))
+        except DecodeError as decode_error:
+            print('ServiceLauncherModule:database_event_received_for_service - DecodeError ', pattern, channel, message,
+                  decode_error)
+        except ParseError as parse_error:
+            print('ServiceLauncherModule:database_event_received_for_service - Failure in database_event_received',
+                  parse_error)
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -43,7 +112,7 @@ class ServiceLauncherModule(BaseModule):
         pass
 
     def launch_service(self, service: TeraService):
-        print('Launching service: ', service.service_key)
+        print('ServiceLauncherModule:launch_service : ', service.service_key)
         self.logger.log_info(self.module_name, 'Launching service', service.service_key)
         # First argument will be python executable
         executable_args = [sys.executable]

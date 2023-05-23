@@ -210,6 +210,16 @@ class TeraService(BaseModel, SoftDeleteMixin):
         TeraService.db().session.add(new_service)
         TeraService.db().session.commit()
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=False)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=False)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_service': self.id_service, 'service_key': self.service_key}
+
     @classmethod
     def insert(cls, service):
         service.service_uuid = str(uuid.uuid4())
