@@ -34,6 +34,9 @@
           <a href="../../../index.html" class="icon icon-home">
             OpenTera
           </a>
+              <div class="version">
+                1.2.2
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -131,6 +134,24 @@
 </div>
 <section id="user">
 <h2>user<a class="headerlink" href="#user" title="Permalink to this heading"></a></h2>
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-assets">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#delete--user-assets" title="Permalink to this definition"></a></dt>
+<dd><p>Delete asset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to delete asset information from here</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-assets">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#get--user-assets" title="Permalink to this definition"></a></dt>
@@ -184,18 +205,22 @@
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-assets">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#delete--user-assets" title="Permalink to this definition"></a></dt>
-<dd><p>Delete asset.</p>
+<dt class="sig sig-object http" id="delete--user-devices">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices</span></span><a class="headerlink" href="#delete--user-devices" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Device ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to delete asset information from here</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Wrong ID/ No ID</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device (can delete if superadmin)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -275,28 +300,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devices">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices</span></span><a class="headerlink" href="#delete--user-devices" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Device ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Wrong ID/ No ID</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device (can delete if superadmin)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device not found or database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-devices-online">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/online</span></span><a class="headerlink" href="#get--user-devices-online" title="Permalink to this definition"></a></dt>
@@ -310,6 +313,27 @@
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-devices-participants">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/participants</span></span><a class="headerlink" href="#delete--user-devices-participants" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device-participant association.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Specific device-participant association ID to delete. Be careful: this is not the device or the participant ID, but the ID of the association itself!</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-participant association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -369,21 +393,21 @@
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devices-participants">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/participants</span></span><a class="headerlink" href="#delete--user-devices-participants" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device-participant association.</p>
+<dt class="sig sig-object http" id="delete--user-devices-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/projects</span></span><a class="headerlink" href="#delete--user-devices-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device-project association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific device-participant association ID to delete. Be careful: this is not the device or the participant ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific device-project association ID to delete. Be careful: this is not the device or the project ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-participant association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to project or one of the device’s site)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-project association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -444,21 +468,21 @@
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devices-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/projects</span></span><a class="headerlink" href="#delete--user-devices-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device-project association.</p>
+<dt class="sig sig-object http" id="delete--user-devices-sites">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/sites</span></span><a class="headerlink" href="#delete--user-devices-sites" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device-site association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific device-project association ID to delete. Be careful: this is not the device or the project ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific device-site association ID to delete. Be careful: this is not the device or the site ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to project or one of the device’s site)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-project association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to site)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-site association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -518,21 +542,21 @@
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devices-sites">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/sites</span></span><a class="headerlink" href="#delete--user-devices-sites" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device-site association.</p>
+<dt class="sig sig-object http" id="delete--user-devicesubtypes">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicesubtypes</span></span><a class="headerlink" href="#delete--user-devicesubtypes" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device subtype</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific device-site association ID to delete. Be careful: this is not the device or the site ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Device subtype ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to site)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-site association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device subtype (can delete if site admin)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device subtype not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -591,21 +615,23 @@
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devicesubtypes">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicesubtypes</span></span><a class="headerlink" href="#delete--user-devicesubtypes" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device subtype</p>
+<dt class="sig sig-object http" id="delete--user-devicetypes">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicetypes</span></span><a class="headerlink" href="#delete--user-devicetypes" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific device type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Device subtype ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Device type ID to delete</p></li>
+<li><p><strong>device_type_key</strong> (<em>string</em>) – Unique device key to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device subtype (can delete if site admin)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device subtype not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device type (can delete if site admin)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device type not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Tried to delete with 2 parameters</p></li>
 </ul>
 </dd>
 </dl>
@@ -658,29 +684,6 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified device type</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occured when saving device type</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-devicetypes">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicetypes</span></span><a class="headerlink" href="#delete--user-devicetypes" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific device type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Device type ID to delete</p></li>
-<li><p><strong>device_type_key</strong> (<em>string</em>) – Unique device key to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device type (can delete if site admin)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device type not found or database error.</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Tried to delete with 2 parameters</p></li>
 </ul>
 </dd>
 </dl>
@@ -757,6 +760,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-groups">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#delete--user-groups" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific participant group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Participant Group ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete participant group (only project admin can delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-groups">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#get--user-groups" title="Permalink to this definition"></a></dt>
@@ -808,27 +832,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-groups">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#delete--user-groups" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific participant group</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Participant Group ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete participant group (only project admin can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-login">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/login</span></span><a class="headerlink" href="#get--user-login" title="Permalink to this definition"></a></dt>
@@ -860,6 +863,27 @@ versions</p>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-participants">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/participants</span></span><a class="headerlink" href="#delete--user-participants" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific participant</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Participant ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete participant (only project admin can delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -940,27 +964,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-participants">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/participants</span></span><a class="headerlink" href="#delete--user-participants" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific participant</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Participant ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete participant (only project admin can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-participants-online">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/participants/online</span></span><a class="headerlink" href="#get--user-participants-online" title="Permalink to this definition"></a></dt>
@@ -974,6 +977,27 @@ versions</p>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-projectaccess">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/projectaccess</span></span><a class="headerlink" href="#delete--user-projectaccess" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific project access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Project Access ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete project access(only user who is admin in that project can remove it)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1033,20 +1057,20 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-projectaccess">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/projectaccess</span></span><a class="headerlink" href="#delete--user-projectaccess" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific project access</p>
+<dt class="sig sig-object http" id="delete--user-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/projects</span></span><a class="headerlink" href="#delete--user-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific project</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Project Access ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Project ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete project access(only user who is admin in that project can remove it)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete project (only site admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -1110,27 +1134,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/projects</span></span><a class="headerlink" href="#delete--user-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific project</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Project ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete project (only site admin can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-refresh_token">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/refresh_token</span></span><a class="headerlink" href="#get--user-refresh_token" title="Permalink to this definition"></a></dt>
@@ -1146,6 +1149,28 @@ versions</p>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Server error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-services">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services</span></span><a class="headerlink" href="#delete--user-services" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Service ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Service doesn’t exists</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete service (only super admins can delete) or service is a system service</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1221,22 +1246,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services</span></span><a class="headerlink" href="#delete--user-services" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service</p>
+<dt class="sig sig-object http" id="delete--user-services-access">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/access</span></span><a class="headerlink" href="#delete--user-services-access" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service access.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Service ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific service access ID to delete. Be careful: this is not the service or service role ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Service doesn’t exists</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete service (only super admins can delete) or service is a system service</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not admin of the associated elements)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1298,21 +1322,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services-access">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/access</span></span><a class="headerlink" href="#delete--user-services-access" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service access.</p>
+<dt class="sig sig-object http" id="delete--user-services-configs">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/configs</span></span><a class="headerlink" href="#delete--user-services-configs" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific service access ID to delete. Be careful: this is not the service or service role ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Service config ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not admin of the associated elements)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete config (must have admin access to the related object - user,device or participant, or be its own config)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1378,21 +1402,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services-configs">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/configs</span></span><a class="headerlink" href="#delete--user-services-configs" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session</p>
+<dt class="sig sig-object http" id="delete--user-services-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/projects</span></span><a class="headerlink" href="#delete--user-services-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service - project association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Service config ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific service - project association ID to delete. Be careful: this is not the service or project ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete config (must have admin access to the related object - user,device or participant, or be its own config)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not site admin of the associated project)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1456,21 +1480,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/projects</span></span><a class="headerlink" href="#delete--user-services-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service - project association.</p>
+<dt class="sig sig-object http" id="delete--user-services-roles">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/roles</span></span><a class="headerlink" href="#delete--user-services-roles" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service role.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific service - project association ID to delete. Be careful: this is not the service or project ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific service role ID to delete.</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not site admin of the associated project)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete role (not super admin)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1529,21 +1553,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services-roles">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/roles</span></span><a class="headerlink" href="#delete--user-services-roles" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service role.</p>
+<dt class="sig sig-object http" id="delete--user-services-sites">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/sites</span></span><a class="headerlink" href="#delete--user-services-sites" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service - site association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific service role ID to delete.</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific service - site association ID to delete. Be careful: this is not the service or site ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete role (not super admin)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (only super admins can)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1604,21 +1628,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-services-sites">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/sites</span></span><a class="headerlink" href="#delete--user-services-sites" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service - site association.</p>
+<dt class="sig sig-object http" id="delete--user-sessions">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions</span></span><a class="headerlink" href="#delete--user-sessions" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific service - site association ID to delete. Be careful: this is not the service or site ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Session ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (only super admins can)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete session (must have access to all participants and users in the session to delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1695,20 +1719,20 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sessions">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions</span></span><a class="headerlink" href="#delete--user-sessions" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session</p>
+<dt class="sig sig-object http" id="delete--user-sessions-events">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/events</span></span><a class="headerlink" href="#delete--user-sessions-events" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session event</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Session ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Session event ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete session (must have access to all participants and users in the session to delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete event (no access to that session)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -1767,27 +1791,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sessions-events">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/events</span></span><a class="headerlink" href="#delete--user-sessions-events" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session event</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Session event ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete event (no access to that session)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-sessions-manager">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/manager</span></span><a class="headerlink" href="#post--user-sessions-manager" title="Permalink to this definition"></a></dt>
@@ -1822,6 +1825,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user doesn’t have enough permission</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal server error</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-sessiontypes">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes</span></span><a class="headerlink" href="#delete--user-sessiontypes" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Session type ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete session type (no admin access to project related to that type or sessions of that type exists in the system somewhere)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1883,21 +1907,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sessiontypes">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes</span></span><a class="headerlink" href="#delete--user-sessiontypes" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session type</p>
+<dt class="sig sig-object http" id="delete--user-sessiontypes-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/projects</span></span><a class="headerlink" href="#delete--user-sessiontypes-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session-type - project association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Session type ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific device-type - project association ID to delete. Be careful: this is not the session-type or project ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete session type (no admin access to project related to that type or sessions of that type exists in the system somewhere)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to session-type or project)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1958,21 +1982,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sessiontypes-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/projects</span></span><a class="headerlink" href="#delete--user-sessiontypes-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session-type - project association.</p>
+<dt class="sig sig-object http" id="delete--user-sessiontypes-sites">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/sites</span></span><a class="headerlink" href="#delete--user-sessiontypes-sites" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific session type-site association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific device-type - project association ID to delete. Be careful: this is not the session-type or project ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific session type-site association ID to delete. Be careful: this is not the session type or the site ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to session-type or project)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2032,21 +2056,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sessiontypes-sites">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/sites</span></span><a class="headerlink" href="#delete--user-sessiontypes-sites" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific session type-site association.</p>
+<dt class="sig sig-object http" id="delete--user-siteaccess">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/siteaccess</span></span><a class="headerlink" href="#delete--user-siteaccess" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific site access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific session type-site association ID to delete. Be careful: this is not the session type or the site ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Site Access ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site access(only user who is admin in that site can remove it)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2106,20 +2130,20 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-siteaccess">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/siteaccess</span></span><a class="headerlink" href="#delete--user-siteaccess" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific site access</p>
+<dt class="sig sig-object http" id="delete--user-sites">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sites</span></span><a class="headerlink" href="#delete--user-sites" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific site</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Site Access ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Site ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site access(only user who is admin in that site can remove it)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site (only super admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -2177,27 +2201,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-sites">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sites</span></span><a class="headerlink" href="#delete--user-sites" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific site</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Site ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site (only super admin can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-stats">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/stats</span></span><a class="headerlink" href="#get--user-stats" title="Permalink to this definition"></a></dt>
@@ -2223,6 +2226,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Missing parameter - one id must be specified.</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-tests">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/tests</span></span><a class="headerlink" href="#delete--user-tests" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific test</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Test type ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete test</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2276,9 +2300,9 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-tests">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/tests</span></span><a class="headerlink" href="#delete--user-tests" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific test</p>
+<dt class="sig sig-object http" id="delete--user-testtypes">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes</span></span><a class="headerlink" href="#delete--user-testtypes" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific test type</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2289,7 +2313,7 @@ versions</p>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete test</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete test type (no admin access to project related to that type or tests of that type exists in the system somewhere)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -2357,21 +2381,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-testtypes">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes</span></span><a class="headerlink" href="#delete--user-testtypes" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific test type</p>
+<dt class="sig sig-object http" id="delete--user-testtypes-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/projects</span></span><a class="headerlink" href="#delete--user-testtypes-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific test-type - project association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Test type ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific test type - project association ID to delete. Be careful: this is not the test-type or project ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete test type (no admin access to project related to that type or tests of that type exists in the system somewhere)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to test-type or project)</p></li>
 </ul>
 </dd>
 </dl>
@@ -2432,21 +2456,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-testtypes-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/projects</span></span><a class="headerlink" href="#delete--user-testtypes-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific test-type - project association.</p>
+<dt class="sig sig-object http" id="delete--user-testtypes-sites">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/sites</span></span><a class="headerlink" href="#delete--user-testtypes-sites" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific test type-site association.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific test type - project association ID to delete. Be careful: this is not the test-type or project ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific test type-site association ID to delete. Be careful: this is not the test type or the site ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to test-type or project)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2506,21 +2530,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-testtypes-sites">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/sites</span></span><a class="headerlink" href="#delete--user-testtypes-sites" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific test type-site association.</p>
+<dt class="sig sig-object http" id="delete--user-usergroups">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/usergroups</span></span><a class="headerlink" href="#delete--user-usergroups" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific user group</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific test type-site association ID to delete. Be careful: this is not the test type or the site ID, but the ID of the association itself!</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – User group ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user group (only a site admin that includes that user group in their site can delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2577,20 +2601,20 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-usergroups">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/usergroups</span></span><a class="headerlink" href="#delete--user-usergroups" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific user group</p>
+<dt class="sig sig-object http" id="delete--user-users">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/users</span></span><a class="headerlink" href="#delete--user-users" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific user</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – User group ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – User ID to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user group (only a site admin that includes that user group in their site can delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user (only super admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -2666,27 +2690,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-users">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/users</span></span><a class="headerlink" href="#delete--user-users" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific user</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – User ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user (only super admin can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-users-online">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users/online</span></span><a class="headerlink" href="#get--user-users-online" title="Permalink to this definition"></a></dt>
@@ -2757,6 +2760,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--user-users-usergroups">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#delete--user-users-usergroups" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific user - user group relationship</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – User - User group relationship ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user group (only a site admin that includes that user group in their site can delete)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-users-usergroups">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#get--user-users-usergroups" title="Permalink to this definition"></a></dt>
@@ -2803,27 +2827,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing field(id_user_group) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified user group</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving user group</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--user-users-usergroups">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#delete--user-users-usergroups" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific user - user group relationship</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – User - User group relationship ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user group (only a site admin that includes that user group in their site can delete)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3024,6 +3027,18 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--device-sessions">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#delete--device-sessions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--device-sessions">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#get--device-sessions" title="Permalink to this definition"></a></dt>
@@ -3077,8 +3092,8 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--device-sessions">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#delete--device-sessions" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object http" id="delete--device-sessions-events">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/device/sessions/events</span></span><a class="headerlink" href="#delete--device-sessions-events" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -3124,18 +3139,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged device doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal server error</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--device-sessions-events">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/device/sessions/events</span></span><a class="headerlink" href="#delete--device-sessions-events" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 </ul>
 </dd>
 </dl>
@@ -3407,6 +3410,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--service-assets">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#delete--service-assets" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific asset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uuid</strong> (<em>string</em>) – Asset UUID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete asset</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-assets">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#get--service-assets" title="Permalink to this definition"></a></dt>
@@ -3456,27 +3480,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad request - wrong or missing parameters in query</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to post that asset</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-assets">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#delete--service-assets" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific asset</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>uuid</strong> (<em>string</em>) – Asset UUID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete asset</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3623,6 +3626,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--service-projects">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#delete--service-projects" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Project ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete project (service not associated to)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-projects">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#get--service-projects" title="Permalink to this definition"></a></dt>
@@ -3677,20 +3701,20 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-projects">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#delete--service-projects" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific project</p>
+<dt class="sig sig-object http" id="delete--service-roles">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/roles</span></span><a class="headerlink" href="#delete--service-roles" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service role.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Project ID to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Service role to delete</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete project (service not associated to)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete role (not related to that service)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
@@ -3746,21 +3770,21 @@ versions</p>
 </dd></dl>
 
 <dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-roles">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/roles</span></span><a class="headerlink" href="#delete--service-roles" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service role.</p>
+<dt class="sig sig-object http" id="delete--service-serviceaccess">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/serviceaccess</span></span><a class="headerlink" href="#delete--service-serviceaccess" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific service access.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Service role to delete</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Specific service access ID to delete. Be careful: this is not the service or service role ID, but the ID of the association itself!</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete role (not related to that service)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not related to this service)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3812,27 +3836,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t modify association (only self access can be modified)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occurred when saving association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-serviceaccess">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/serviceaccess</span></span><a class="headerlink" href="#delete--service-serviceaccess" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific service access.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – Specific service access ID to delete. Be careful: this is not the service or service role ID, but the ID of the association itself!</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not related to this service)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -4074,6 +4077,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--service-tests">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#delete--service-tests" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific test</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uuid</strong> (<em>string</em>) – Test UUID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete test</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-tests">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#get--service-tests" title="Permalink to this definition"></a></dt>
@@ -4124,27 +4148,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-tests">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#delete--service-tests" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific test</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>uuid</strong> (<em>string</em>) – Test UUID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete test</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-testtypes">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes</span></span><a class="headerlink" href="#get--service-testtypes" title="Permalink to this definition"></a></dt>
@@ -4166,6 +4169,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--service-usergroups">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/usergroups</span></span><a class="headerlink" href="#delete--service-usergroups" title="Permalink to this definition"></a></dt>
+<dd><p>Delete a specific user group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – User group ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete user group (no access to it)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
@@ -4213,27 +4237,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing field(id_user_group) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t create/update the specified user group</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving user group</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http delete">
-<dt class="sig sig-object http" id="delete--service-usergroups">
-<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/usergroups</span></span><a class="headerlink" href="#delete--service-usergroups" title="Permalink to this definition"></a></dt>
-<dd><p>Delete a specific user group</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – User group ID to delete</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete user group (no access to it)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
 </ul>
 </dd>
 </dl>
