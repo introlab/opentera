@@ -12,6 +12,8 @@ author = 'Simon Brière, Dominic Létourneau'
 release = '1.2.2'
 version = release
 
+html_logo = 'images/LogoOpenTera200px.png'
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
