@@ -19,7 +19,7 @@ class TeraServiceRole(BaseModel, SoftDeleteMixin):
     service_role_site = relationship('TeraSite', viewonly=True)
 
     service_role_user_groups = relationship("TeraUserGroup", secondary="t_services_access",
-                                            back_populates="user_group_services_roles",  lazy='joined')
+                                            back_populates="user_group_services_roles",  lazy='selectin')
 
     def __init__(self):
         pass

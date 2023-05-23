@@ -13,6 +13,8 @@ from sqlalchemy.sql.type_api import TypeEngine
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm import ORMExecuteState, Session
+from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.sql import Select
 
 from functools import cache
 
@@ -23,18 +25,31 @@ from opentera.db.SoftDeleteQueryRewriter import SoftDeleteQueryRewriter
 def activate_soft_delete_hook(deleted_field_name: str, disable_soft_delete_option_name: str):
     """Activate an event hook to rewrite the queries."""
     # Enable Soft Delete on all Relationship Loads which implement SoftDeleteMixin
-    @listens_for(Session, "do_orm_execute")
-    def soft_delete_execute(state: ORMExecuteState):
-        if not state.is_select:
-            return
-        if 'include_deleted' in state.session.info and len(state.session.info['include_deleted']) > 0:
+    # @listens_for(Session, "do_orm_execute")
+    # def soft_delete_execute(state: ORMExecuteState):
+    #     if not state.is_select:
+    #         return
+    #     if 'include_deleted' in state.session.info and len(state.session.info['include_deleted']) > 0:
+    #         print('test_include_deleted')
+    #         return
+    #
+    #     adapted = SoftDeleteQueryRewriter(deleted_field_name, disable_soft_delete_option_name).rewrite_statement(
+    #         state.statement
+    #     )
+    #     state.statement = adapted
+    @listens_for(Engine, "before_execute", retval=True)
+    def soft_delete_execute(conn: Connection, clauseelement, multiparams, params, execution_options):
+        if not isinstance(clauseelement, Select):
+            return clauseelement, multiparams, params
+
+        if disable_soft_delete_option_name in execution_options and execution_options[disable_soft_delete_option_name]:
             print('test_include_deleted')
-            return
+            return clauseelement, multiparams, params
 
         adapted = SoftDeleteQueryRewriter(deleted_field_name, disable_soft_delete_option_name).rewrite_statement(
-            state.statement
+            clauseelement
         )
-        state.statement = adapted
+        return adapted, multiparams, params
 
 
 def generate_soft_delete_mixin_class(

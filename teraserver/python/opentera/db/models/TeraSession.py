@@ -37,21 +37,21 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     session_parameters = Column(String, nullable=True)
 
     session_participants = relationship("TeraParticipant", secondary="t_sessions_participants",
-                                        back_populates="participant_sessions", lazy="joined")
+                                        back_populates="participant_sessions", lazy="selectin")
     session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
-                                 lazy="joined")
+                                 lazy="selectin")
     session_devices = relationship("TeraDevice", secondary="t_sessions_devices",
-                                   back_populates="device_sessions", lazy="joined")
+                                   back_populates="device_sessions", lazy="selectin")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
     session_creator_participant = relationship('TeraParticipant')
     session_creator_service = relationship('TeraService')
 
-    session_session_type = relationship('TeraSessionType', back_populates='session_type_sessions', lazy='joined')
+    session_session_type = relationship('TeraSessionType', back_populates='session_type_sessions', lazy='selectin')
     session_events = relationship('TeraSessionEvent', cascade="delete", back_populates='session_event_session')
-    session_assets = relationship('TeraAsset', cascade='delete', back_populates='asset_session', lazy='joined')
-    session_tests = relationship('TeraTest', cascade='delete', back_populates='test_session', lazy='joined')
+    session_assets = relationship('TeraAsset', cascade='delete', back_populates='asset_session', lazy='selectin')
+    session_tests = relationship('TeraTest', cascade='delete', back_populates='test_session', lazy='selectin')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:

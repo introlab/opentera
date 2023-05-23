@@ -56,7 +56,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
     participant_participant_group = relationship("TeraParticipantGroup",
                                                  back_populates='participant_group_participants')
 
-    participant_project = relationship("TeraProject", back_populates='project_participants', lazy='joined')
+    participant_project = relationship("TeraProject", back_populates='project_participants', lazy='selectin')
 
     participant_created_sessions = relationship("TeraSession", cascade='delete',
                                                 back_populates='session_creator_participant', passive_deletes=True)

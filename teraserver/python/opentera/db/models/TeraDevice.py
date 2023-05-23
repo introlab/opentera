@@ -37,7 +37,7 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
     device_sites = relationship("TeraSite", secondary='t_devices_sites', back_populates='site_devices')
     # device_projects = relationship('TeraDeviceProject', cascade='delete')
     device_projects = relationship("TeraProject", secondary="t_devices_projects",
-                                   back_populates="project_devices", lazy='joined')
+                                   back_populates="project_devices", lazy='selectin')
     # device_session_types = relationship("TeraSessionTypeDeviceType")
     device_participants = relationship("TeraParticipant",  secondary="t_devices_participants",
                                        back_populates="participant_devices", passive_deletes=True)
