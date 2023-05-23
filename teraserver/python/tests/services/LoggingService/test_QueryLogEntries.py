@@ -142,8 +142,6 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
-            min_timestamp = ''
-            max_timestamp = ''
             for i in range(50):
                 current_time = datetime.now()
                 entry = self._create_log_entry(current_time, 99, 'test', 'test_message')
@@ -207,7 +205,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
 
             logout_response = self._get_with_user_token_auth(self.test_client, token=token,
                                                              endpoint=self.user_logout_endpoint)
-            self.assertEqual(200, login_response.status_code)
+            self.assertEqual(200, logout_response.status_code)
 
             # Try to call endpoint with disabled token
             response = self._get_with_service_token_auth(self.test_client, token=token)
@@ -225,4 +223,3 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
         entry.sender = sender
         entry.message = message
         return entry
-
