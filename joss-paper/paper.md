@@ -22,7 +22,6 @@ authors:
     affiliation : 1
 
   - name: Cédric Godin
-    orcid : 0000-0000-0000-0000
     affiliation : 1
 
   - name : Philippe Warren
@@ -30,23 +29,20 @@ authors:
     affiliation : 1
 
   - name : Gabriel Lauzier
-    orcid: 0000-0000-0000-0000
     affiliation: 1
 
   - name: Ian-Mathieu Joly
-    orcid: 0000-0000-0000-0000
     affiliation: 1
 
   - name: Jérémie Bourque
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0008-5868-9724
     affiliation : 1
 
   - name: Philippe Arsenault
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0003-0772-1177
     affiliation: 1
 
   - name: Cynthia Vilanova
-    orcid : 0000-0000-0000-0000
     affiliation : 2
 
   - name: Michel Tousignant
