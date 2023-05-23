@@ -75,6 +75,11 @@ jobs:
       run: |
         $OPENTERA_PYTHON TeraServer.py --enable_tests=1 &
         sleep 10
+        
+    - name: Update API json documentation
+      working-directory: docs/services/teraserver/api
+      run: |
+        curl -O --insecure https://localhost:40075/api/swagger.json    
 
     - name: Generate base documentation
       working-directory: docs
@@ -82,12 +87,7 @@ jobs:
         pip install -r requirements.txt
         make html
         touch _build/html/.nojekyll
-
-    - name: Update API json documentation
-      working-directory: docs/services/teraserver/api
-      run: |
-        curl -O --insecure https://localhost:40075/api/swagger.json
-
+        
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
