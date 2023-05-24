@@ -10,6 +10,7 @@ project = 'OpenTera'
 copyright = '2023, Simon Brière, Dominic Létourneau'
 author = 'Simon Brière, Dominic Létourneau'
 release = '1.2.3'
+version = release
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -26,7 +27,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'venv']
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
-    'navigation_depth': -1
+    'navigation_depth': -1,
+    'display_version': True
 }
 
 source_suffix = {
