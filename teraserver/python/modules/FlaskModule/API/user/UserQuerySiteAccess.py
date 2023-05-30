@@ -191,8 +191,11 @@ class UserQuerySiteAccess(Resource):
                 # Check if we must remove access for that site
                 if json_site['site_access_role'] == '':
                     # No more access to that site for that user group - remove all access!
-                    TeraServiceAccess.delete_service_access_for_user_group_for_site(
-                        id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                    TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                           id_user_group=json_site['id_user_group'],
+                                                                           id_site=json_site['id_site'])
+                    # TeraServiceAccess.delete_service_access_for_user_group_for_site(
+                    #     id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
                     continue
 
                 # If we are setting a "user" role for a site, check if there's already such an inherited role from
@@ -204,8 +207,9 @@ class UserQuerySiteAccess(Resource):
                                       .items() if project.id_site == json_site['id_site']]
                     if projects_roles:
                         # Delete that site access without adding new access
-                        TeraServiceAccess.delete_service_access_for_user_group_for_site(
-                            id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                        TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                               id_user_group=json_site['id_user_group'],
+                                                                               id_site=json_site['id_site'])
                         continue
 
                 # Find id_service_role for that
@@ -216,8 +220,9 @@ class UserQuerySiteAccess(Resource):
             if 'id_service_role' in json_site:
                 if json_site['id_service_role'] == 0:
                     # No more access to that site for that user group - remove all access!
-                    TeraServiceAccess.delete_service_access_for_user_group_for_site(
-                        id_user_group=json_site['id_user_group'], id_site=json_site['id_site'])
+                    TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                           id_user_group=json_site['id_user_group'],
+                                                                           id_site=json_site['id_site'])
                     continue
                 site_service_role = TeraServiceRole.get_service_role_by_id(json_site['id_service_role'])
 

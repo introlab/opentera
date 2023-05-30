@@ -238,8 +238,10 @@ class UserQueryUserGroups(Resource):
                     # Check if we must remove access for that project
                     if 'project_access_role' not in project or project['project_access_role'] == '':
                         # No more access to that project for that user group - remove all access!
-                        TeraServiceAccess.delete_service_access_for_user_group_for_project(
-                            id_user_group=json_user_group['id_user_group'], id_project=int(project['id_project']))
+                        TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                               id_user_group=json_user_group[
+                                                                                   'id_user_group'],
+                                                                               id_project=int(project['id_project']))
                         continue
 
                     # Find id_service_role
