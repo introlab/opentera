@@ -300,6 +300,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
         from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
+        from modules.FlaskModule.API.service.ServiceQueryTestTypeProjects import ServiceQueryTestTypeProjects
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
         from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
@@ -323,6 +324,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTestTypeProjects,        '/testtypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
