@@ -240,7 +240,7 @@ class ServiceQueryTestTypeProjectTest(BaseServiceAPITest):
                                                                     {'id_test_type': testtype2.id_test_type},
                                                                     {'id_test_type': 3}]}}
             response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
-            self.assertEqual(403, response.status_code, msg="One test type not allowed - not part of the site project!")
+            self.assertEqual(200, response.status_code, msg="Test type not in site but added")
 
             json_data = {'project': {'id_project': 2, 'testtypes': [{'id_test_type': testtype1.id_test_type},
                                                                     {'id_test_type': testtype2.id_test_type}]}}

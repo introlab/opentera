@@ -43,7 +43,7 @@ def activate_soft_delete_hook(deleted_field_name: str, disable_soft_delete_optio
             return clauseelement, multiparams, params
 
         if disable_soft_delete_option_name in execution_options and execution_options[disable_soft_delete_option_name]:
-            print('test_include_deleted')
+            # print('test_include_deleted')
             return clauseelement, multiparams, params
 
         adapted = SoftDeleteQueryRewriter(deleted_field_name, disable_soft_delete_option_name).rewrite_statement(
