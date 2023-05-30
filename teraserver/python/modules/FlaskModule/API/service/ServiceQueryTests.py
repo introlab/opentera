@@ -25,10 +25,7 @@ get_parser.add_argument('service_uuid', type=str, help='Query all tests associat
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include tests infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
-
-
 post_parser = api.parser()
-
 
 delete_parser = api.parser()
 delete_parser.add_argument('uuid', type=str, help='Test UUID to delete', required=True)
