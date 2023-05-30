@@ -285,9 +285,9 @@ class ServiceQueryTestTypeProjectTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
             self.assertEqual(403, response.status_code, msg="No access to project")
 
-            json_data = {'test_type_project': {'id_project': 1, 'id_test_type': 3}}
-            response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
-            self.assertEqual(403, response.status_code, msg="Add new association not OK - type not part of the site")
+            # json_data = {'test_type_project': {'id_project': 1, 'id_test_type': 3}}
+            # response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
+            # self.assertEqual(403, response.status_code, msg="Add new association not OK - type not part of the site")
 
             json_data = {'test_type_project': {'id_project': 2, 'id_test_type': 2}}
             response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)

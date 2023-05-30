@@ -198,7 +198,13 @@ class ServiceQueryTestTypeProjects(Resource):
                                                                                      json_tt['id_test_type']
                                                                                      )
             if not site_access:
-                return gettext('At least one test type is not associated to the site of its project'), 403
+                # return gettext('At least one test type is not associated to the site of its project'), 403
+                # At service level, if we have access to the project, we automatically associate the test type to its
+                # site, since we know we are allowed to (prevent a call to another API)
+                ttts = TeraTestTypeSite()
+                ttts.id_test_type = json_tt['id_test_type']
+                ttts.id_site = proj.id_site
+                TeraTestTypeSite.insert(ttts)
 
         for json_tt in json_ttp:
             if 'id_test_type_project' not in json_tt:
