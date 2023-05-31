@@ -170,16 +170,17 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_service.service_system = True
         TeraService.db().session.add(new_service)
 
-        new_service = TeraService()
-        new_service.service_uuid = str(uuid.uuid4())
-        new_service.service_key = 'BureauActif'
-        new_service.service_name = 'Bureau Actif'
-        new_service.service_hostname = '127.0.0.1'
-        new_service.service_port = 4050
-        new_service.service_endpoint = '/'
-        new_service.service_clientendpoint = '/bureau'
-        new_service.service_enabled = True
-        TeraService.db().session.add(new_service)
+        if test:
+            new_service = TeraService()
+            new_service.service_uuid = str(uuid.uuid4())
+            new_service.service_key = 'BureauActif'
+            new_service.service_name = 'Bureau Actif'
+            new_service.service_hostname = '127.0.0.1'
+            new_service.service_port = 4050
+            new_service.service_endpoint = '/'
+            new_service.service_clientendpoint = '/bureau'
+            new_service.service_enabled = True
+            TeraService.db().session.add(new_service)
 
         new_service = TeraService()
         new_service.service_uuid = str(uuid.uuid4())
@@ -198,17 +199,18 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_service.service_system = True
         TeraService.db().session.add(new_service)
 
-        new_service = TeraService()
-        new_service.service_uuid = str(uuid.uuid4())
-        new_service.service_key = 'RobotTeleOperationService'
-        new_service.service_name = 'Robot Teleoperation Service'
-        new_service.service_hostname = '127.0.0.1'
-        new_service.service_port = 4080
-        new_service.service_endpoint = '/'
-        new_service.service_clientendpoint = '/robot'
-        new_service.service_enabled = True
-        TeraService.db().session.add(new_service)
-        TeraService.db().session.commit()
+        if test:
+            new_service = TeraService()
+            new_service.service_uuid = str(uuid.uuid4())
+            new_service.service_key = 'RobotTeleOperationService'
+            new_service.service_name = 'Robot Teleoperation Service'
+            new_service.service_hostname = '127.0.0.1'
+            new_service.service_port = 4080
+            new_service.service_endpoint = '/'
+            new_service.service_clientendpoint = '/robot'
+            new_service.service_enabled = True
+            TeraService.db().session.add(new_service)
+            TeraService.db().session.commit()
 
     def to_json_create_event(self):
         return self.to_json(minimal=False)

@@ -301,10 +301,11 @@ class BaseMixin(object):
         for name in dir(cls):
             value = getattr(cls, name)
             if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
-                    (name.startswith(model_name) or name.startswith('id')):
+                    (name.startswith(model_name) or name.startswith('id')) and not name.endswith('uuid'):
                 # Ok so far, check if column is required or not
                 if 'ColumnProperty' in str(type(value.prop)):
-                    if not value.prop.columns[0].nullable and name not in json_data and name not in ignore_fields:
+                    if not value.prop.columns[0].nullable and name not in json_data and name not in ignore_fields and \
+                            not value.prop.columns[0].default:
                         missing_fields.append(name)
 
         return missing_fields

@@ -208,8 +208,9 @@ class UserQueryProjectAccess(Resource):
                 # Check if we must remove access for that site
                 if json_project['project_access_role'] == '':
                     # No more access to that project for that user group - remove all access!
-                    TeraServiceAccess.delete_service_access_for_user_group_for_project(
-                        id_user_group=json_project['id_user_group'], id_project=json_project['id_project'])
+                    TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                           id_user_group=json_project['id_user_group'],
+                                                                           id_project=json_project['id_project'])
                     continue
 
                 # Find id_service_role for that
@@ -220,8 +221,9 @@ class UserQueryProjectAccess(Resource):
             if 'id_service_role' in json_project:
                 if json_project['id_service_role'] == 0:
                     # No more access to that project for that user group - remove all access!
-                    TeraServiceAccess.delete_service_access_for_user_group_for_project(
-                        id_user_group=json_project['id_user_group'], id_project=json_project['id_project'])
+                    TeraServiceAccess.delete_service_access_for_user_group(id_service=Globals.opentera_service_id,
+                                                                           id_user_group=json_project['id_user_group'],
+                                                                           id_project=json_project['id_project'])
                     continue
                 project_service_role = TeraServiceRole.get_service_role_by_id(json_project['id_service_role'])
 
@@ -230,9 +232,6 @@ class UserQueryProjectAccess(Resource):
 
             # Do the update!
             try:
-                # access = TeraProjectAccess.update_project_access(json_project['id_user_group'],
-                #                                                  json_project['id_project'],
-                #                                                  json_project['project_access_role'])
                 access = TeraServiceAccess.update_service_access_for_user_group(
                     id_service=Globals.opentera_service_id, id_user_group=int(json_project['id_user_group']),
                     id_service_role=project_service_role.id_service_role, id_project=int(json_project['id_project']))

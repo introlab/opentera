@@ -1,5 +1,6 @@
 from opentera.db.Base import BaseModel
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, Sequence
@@ -27,6 +28,23 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         rval = super().to_json(ignore_fields=ignore_fields)
 
         return rval
+
+    def to_json_create_event(self):
+        json_data = self.to_json(minimal=True)
+        # Query session type information
+        session_type = TeraSessionType.get_session_type_by_id(self.id_session_type)
+        if session_type:
+            json_data['session_type_id_service'] = session_type.id_service
+        return json_data
+
+    def to_json_update_event(self):
+        json_data = self.to_json(minimal=True)
+        json_data['session_type_id_service'] = self.session_type_site_session_type.id_service
+        return json_data
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_session_type_site': self.id_session_type_site}
 
     @staticmethod
     def create_defaults(test=False):

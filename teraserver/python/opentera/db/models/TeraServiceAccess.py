@@ -4,7 +4,6 @@ from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, Sequence
 from sqlalchemy.orm import relationship
 from opentera.db.models.TeraServiceRole import TeraServiceRole
-import modules.Globals as Globals
 
 
 class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
@@ -158,23 +157,6 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             if id_project and service_access.service_access_role.id_project == id_project:
                 TeraServiceAccess.delete(service_access.id_service_access)
                 return
-
-    # TODO: Delete those methods (replaced by the generic one)
-    @staticmethod
-    def delete_service_access_for_user_group_for_site(id_site: int, id_user_group: int):
-        for service_access in TeraServiceAccess.get_service_access_for_user_group(
-                id_service=Globals.opentera_service_id, id_user_group=id_user_group):
-            if service_access.service_access_role.id_site == id_site:
-                TeraServiceAccess.delete(service_access.id_service_access)
-                break
-
-    @staticmethod
-    def delete_service_access_for_user_group_for_project(id_project: int, id_user_group: int):
-        for service_access in TeraServiceAccess.get_service_access_for_user_group(
-                id_service=Globals.opentera_service_id, id_user_group=id_user_group):
-            if service_access.service_access_role.id_project == id_project:
-                TeraServiceAccess.delete(service_access.id_service_access)
-                break
 
     @staticmethod
     def create_defaults(test=False):

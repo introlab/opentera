@@ -52,7 +52,9 @@ EventNameClassMap = {
     TeraUserGroup.get_model_name(): TeraUserGroup,
     TeraTestType.get_model_name(): TeraTestType,
     TeraTest.get_model_name(): TeraTest,
-    TeraService.get_model_name(): TeraService
+    TeraService.get_model_name(): TeraService,
+    TeraSessionTypeSite.get_model_name(): TeraSessionTypeSite,
+    TeraSessionTypeProject.get_model_name(): TeraSessionTypeProject
 }
 
 # All exported symbols
