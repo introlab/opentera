@@ -44,7 +44,8 @@ class MyHTTPChannel(HTTPChannel):
         if req.requestHeaders.hasHeader('X-Participant-UUID'):
             req.requestHeaders.removeHeader('X-Participant-UUID')
             # TODO raise error ?
-        #
+
+        # TODO remove this ?
         # if cert is not None:
         #     # Certificate found, add information in header
         #     subject = cert.get_subject()
@@ -139,7 +140,7 @@ class TwistedModule(BaseModule):
         # Establish root resource
         root_resource = WSGIRootResource(wsgi_resource, {b'assets': static_resource, b'wss': wss_root})
 
-        # Create a Twisted Web Site
+        # Create a Twisted Website
         site = MySite(root_resource)
 
         # List of available CA clients certificates
@@ -147,26 +148,27 @@ class TwistedModule(BaseModule):
         # caCerts=[cert.original]
         caCerts = []
 
-        # Use verify = True to verify certificates
-        self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
-                                                  requireCertificate=False,
-                                                  enableSessions=False)
-
-        ctx = self.ssl_factory.getContext()
-        ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/'
-                                + self.config.server_config['site_private_key'])
-
-        ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/'
-                                 + self.config.server_config['site_certificate'])
-
-        # Certificate verification callback
-        ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
-
-        # With self-signed certs we have to explicitely tell the server to trust certificates
-        ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
-                                  + self.config.server_config['ca_certificate'])
-
+        # SSL is normally handled by nginx
         if self.config.server_config['use_ssl']:
+            # Use verify = True to verify certificates
+            self.ssl_factory = ssl.CertificateOptions(verify=False, caCerts=caCerts,
+                                                      requireCertificate=False,
+                                                      enableSessions=False)
+
+            ctx = self.ssl_factory.getContext()
+            ctx.use_privatekey_file(self.config.server_config['ssl_path'] + '/'
+                                    + self.config.server_config['site_private_key'])
+
+            ctx.use_certificate_file(self.config.server_config['ssl_path'] + '/'
+                                     + self.config.server_config['site_certificate'])
+
+            # Certificate verification callback
+            ctx.set_verify(SSL.VERIFY_NONE, self.verifyCallback)
+
+            # With self-signed certs we have to explicitly tell the server to trust certificates
+            ctx.load_verify_locations(self.config.server_config['ssl_path'] + '/'
+                                      + self.config.server_config['ca_certificate'])
+
             reactor.listenSSL(self.config.server_config['port'], site, self.ssl_factory)
         else:
             reactor.listenTCP(self.config.server_config['port'], site)
@@ -200,6 +202,3 @@ class TwistedModule(BaseModule):
     def run(self):
         log.startLogging(sys.stdout)
         reactor.run()
-
-
-
