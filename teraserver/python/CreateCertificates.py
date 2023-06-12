@@ -46,12 +46,16 @@ def generate_certificates(config: ConfigManager):
         site_info = crypto.generate_local_certificate()
         # Save files
         crypto.write_private_key_and_certificate(site_info, keyfile=site_key_path, certfile=site_certificate_path)
+    else:
+        print('Site certificate and key already exists, skipping...')
 
     if not os.path.exists(ca_certificate_path) or not os.path.exists(ca_key_path):
-        print('Generating Site certificate and key')
+        print('Generating CA certificate and key')
         ca_info = crypto.generate_ca_certificate(common_name='Local CA')
         # Save files
         crypto.write_private_key_and_certificate(ca_info, keyfile=ca_key_path, certfile=ca_certificate_path)
+    else:
+        print('CA certificate and key already exists, skipping...')
 
 
 if __name__ == '__main__':
