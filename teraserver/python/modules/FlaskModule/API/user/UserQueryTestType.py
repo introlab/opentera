@@ -135,12 +135,16 @@ class UserQueryTestTypes(Resource):
 
         # Check if current user can modify the posted type
         if json_test_type['id_test_type'] > 0:
-            projects_ids = [proj.id_project for proj in
-                            TeraTestTypeProject.get_projects_for_test_type(json_test_type['id_test_type'])]
-            admin_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
-
-            if len(set(projects_ids).difference(admin_projects_ids)) == len(projects_ids):
-                return gettext('Not project admin in at least one project'), 403
+            # Test types can be modified if the user has admin access to service (e.g. has admin access to a site
+            # related to that service or is super admin) -> This will be checked below.
+            pass
+            # projects_ids = [proj.id_project for proj in
+            #                 TeraTestTypeProject.get_projects_for_test_type(json_test_type['id_test_type'])]
+            # admin_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
+            #
+            # accessible_projects = [proj_id for proj_id in projects_ids if proj_id in admin_projects_ids]
+            # if len(accessible_projects) and not current_user.user_superadmin:
+            #     return gettext('Not project admin in at least one project'), 403
         else:
             # Test types can be created without a project if super admin, but require a project otherwise
             if 'test_type_projects' not in json_test_type and not current_user.user_superadmin:
@@ -160,7 +164,8 @@ class UserQueryTestTypes(Resource):
             test_type: TeraTestType = TeraTestType.get_test_type_by_id(json_test_type['id_test_type'])
             if test_type:
                 current_service_id = test_type.id_service
-        if current_service_id not in user_access.get_accessible_services_ids():
+
+        if current_service_id not in user_access.get_accessible_services_ids(admin_only=True):
             return gettext('Forbidden'), 403
 
         tt_sites_ids = []
@@ -172,6 +177,7 @@ class UserQueryTestTypes(Resource):
                 test_type_sites = [test_type_sites]
             tt_sites_ids = [site['id_site'] for site in test_type_sites]
             admin_sites_ids = user_access.get_accessible_sites_ids(admin_only=True)
+
             if set(tt_sites_ids).difference(admin_sites_ids):
                 # We have some sites where we are not admin
                 return gettext('No site admin access for at least one site in the list'), 403

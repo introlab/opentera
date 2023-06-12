@@ -70,6 +70,8 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def create_defaults(test=False):
+        if not test:
+            return
         # from opentera.db.models.TeraProject import TeraProject
         # from opentera.db.models.TeraDeviceType import TeraDeviceType
         from opentera.db.models.TeraService import TeraService
