@@ -372,9 +372,9 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraServiceSite import TeraServiceSite
 
         if self.user.user_superadmin:
-            if self.user.user_superadmin:
-                return TeraService.query.all()
+            return TeraService.query.all()
 
+        # TODO: Check if SQL query is OK
         # Accessible services are those from projects and sites where the user is admin
         accessible_projects_ids = self.get_accessible_projects_ids()
         admin_sites_ids = self.get_accessible_sites_ids(admin_only=True)

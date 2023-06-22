@@ -323,15 +323,9 @@ class UserQueryTestTypes(Resource):
         # Check if current user can delete
         test_type = TeraTestType.get_test_type_by_id(id_todel)
 
-        # Check if we are admin of all projects of that test type
-        if len(test_type.test_type_projects) > 0:
-            for proj in test_type.test_type_projects:
-                if user_access.get_project_role(proj.id_project) != "admin":
-                    return gettext('Cannot delete because you are not admin in all projects.'), 403
-        else:
-            # No project right now for that test type - must at least project admin somewhere to delete
-            if len(user_access.get_accessible_projects(admin_only=True)) == 0:
-                return gettext('Unable to delete - not admin in at least one project'), 403
+        # Check if we have admin access to the related test type service
+        if test_type.id_service not in user_access.get_accessible_services_ids(admin_only=True):
+            return gettext('Unable to delete - not admin in the related test type service'), 403
 
         # If we are here, we are allowed to delete. Do so.
         try:
