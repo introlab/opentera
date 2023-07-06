@@ -57,7 +57,7 @@ class QueryAssetFile(Resource):
              responses={200: 'Success - Return informations about file assets',
                         400: 'Required parameter is missing',
                         403: 'Access denied to the requested asset'})
-    @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
+    @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=True)
     def post(self):
         if not request.content_type.__contains__('multipart/form-data'):
             return gettext('Wrong content type'), 400

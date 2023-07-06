@@ -63,7 +63,7 @@ class QueryAssetFileInfos(Resource):
              responses={200: 'Success - Return informations about file assets',
                         400: 'Required parameter is missing',
                         403: 'Access denied to the requested asset'})
-    @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
+    @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=True)
     def post(self):
         if 'assets' not in request.json and 'file_asset' not in request.json:
             return gettext('Badly formatted request'), 400
