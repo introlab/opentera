@@ -175,8 +175,12 @@ class BaseMixin(object):
 
         # with Session(cls.db().engine) as session:
         update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
-        update_obj.from_json(update_values)
-        cls.db().session.commit()
+
+        if update_obj:
+            update_obj.from_json(update_values)
+            cls.db().session.commit()
+        else:
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(update_id) + ' cannot update.')
 
     @classmethod
     def commit(cls):
@@ -201,16 +205,20 @@ class BaseMixin(object):
     @classmethod
     def delete(cls, id_todel, autocommit: bool = True):
         delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        cannot_be_deleted_exception = delete_obj.delete_check_integrity()
-        if cannot_be_deleted_exception:
-            raise cannot_be_deleted_exception
+
         if delete_obj:
+            cannot_be_deleted_exception = delete_obj.delete_check_integrity()
+            if cannot_be_deleted_exception:
+                raise cannot_be_deleted_exception
+
             if getattr(delete_obj, 'soft_delete', None):
                 delete_obj.soft_delete()
             else:
                 cls.db().session.delete(delete_obj)
             if autocommit:
                 cls.commit()
+        else:
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) + ' cannot delete.')
 
     @classmethod
     def undelete(cls, id_to_undelete):
@@ -222,6 +230,8 @@ class BaseMixin(object):
             cls.commit()
         else:
             print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
+            
 
     # @classmethod
     # def handle_include_deleted_flag(cls, include_deleted=False):
