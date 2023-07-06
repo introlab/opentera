@@ -231,7 +231,7 @@ class BaseMixin(object):
         else:
             print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
             raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
-            
+
 
     # @classmethod
     # def handle_include_deleted_flag(cls, include_deleted=False):
