@@ -4,7 +4,7 @@ import datetime
 import time
 import typing as t
 import sqlalchemy.sql.sqltypes
-from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
+from flask_sqlalchemy import SQLAlchemy, query, model
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
 from sqlalchemy.inspection import inspect as sqlinspector
@@ -14,7 +14,7 @@ from functools import wraps
 
 
 class _QueryProperty:
-    def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
+    def __get__(self, obj: model.Model | None, cls: t.Type[model.Model]) -> query.Query:
         return cls.db().session.query(cls)
 
 
@@ -322,4 +322,4 @@ class BaseMixin(object):
 
 
 # Declarative base, inherit from Base for all models
-BaseModel = declarative_base(cls=BaseMixin)
+BaseModel = sqlalchemy.orm.declarative_base(cls=BaseMixin)

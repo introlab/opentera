@@ -17,7 +17,7 @@ from twisted.internet import reactor, ssl
 from twisted.web.http import HTTPChannel
 from twisted.web.server import Site
 from twisted.web.static import File
-from twisted.web import resource
+from twisted.web import resource, pages
 from twisted.web.wsgi import WSGIResource
 from twisted.python import log
 from OpenSSL import SSL
@@ -131,7 +131,7 @@ class TwistedModule(BaseModule):
         # root_resource = WSGIRootResource(wsgi_resource, {b'wss': wss_resource})
 
         # Avoid using the wss resource at root level
-        wss_root = resource.ForbiddenResource()
+        wss_root = pages.forbidden()
 
         wss_root.putChild(b'user', wss_user_resource)
         wss_root.putChild(b'participant', wss_participant_resource)

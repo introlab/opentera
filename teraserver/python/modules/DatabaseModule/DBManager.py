@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import event
+from sqlalchemy import event, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
@@ -297,7 +297,7 @@ class DBManager (BaseModule):
 
         # Init tables
         with self.app.app_context():
-            inspector = Inspector.from_engine(self.db.engine)
+            inspector = inspect(self.db.engine)
             tables = inspector.get_table_names()
             # tables = db.engine.table_names()
             if not tables:
