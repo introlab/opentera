@@ -3,7 +3,7 @@
     "name": "LoggingService",
     "hostname": "127.0.0.1",
     "port": 4041,
-    "debug_mode": false
+    "debug_mode": true
   },
   "Backend": {
     "hostname": "127.0.0.1",
