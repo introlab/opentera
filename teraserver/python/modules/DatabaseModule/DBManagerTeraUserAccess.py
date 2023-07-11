@@ -26,8 +26,8 @@ class DBManagerTeraUserAccess:
     def __init__(self, user: TeraUser):
         self.user = user
 
-    def get_accessible_users_ids(self, admin_only=False):
-        users = self.get_accessible_users(admin_only=admin_only)
+    def get_accessible_users_ids(self, admin_only=False, include_site_access=False):
+        users = self.get_accessible_users(admin_only=admin_only, include_site_access=include_site_access)
         users_ids = []
         for user in users:
             if user.id_user not in users_ids:

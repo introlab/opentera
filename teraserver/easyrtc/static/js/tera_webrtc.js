@@ -1155,9 +1155,12 @@ async function shareScreen(local, start){
         // Start screen sharing
         let screenStream = undefined;
         try {
+            // TODO: Check if video can put to false or set "enabled=false"
             screenStream = await navigator.mediaDevices.getDisplayMedia({video: true,
                 audio: currentConfig.screenAudio});
             easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
+            // TODO: Use easyrtc.setSdpFilters to improve audio quality
+            // easyrtc.setSdpFilters()
 
             console.log("Starting screen sharing - with audio: " + currentConfig.screenAudio);
 

@@ -109,10 +109,10 @@ There is a few config files to edit. You should edit each of them and put the co
 1. Create nginx configuration file: `sudo nano /etc/nginx/sites-available/opentera`
 2. Copy the `server` section (only) from the `teraserver/python/config/nginx.conf` file. 
 3. Edit the `ssl_certificate`, `ssl_certificate_key`, `ssl_client_certificate` to point to your correct SSL setup.
-4. Edit the `include opentera.conf` line with the full path to the `opentera.conf` file, for example: `/home/baseuser/opentera/teraserver/python/config/opentera.conf;`
+4. Edit the `include opentera.conf` and the `include external_services.conf` lines with the full path to the `*.conf` files, for example: `/home/baseuser/opentera/teraserver/python/config/opentera.conf;`
 5. Enable the site by creating a symbolic link into the sites-enabled folder: `sudo ln -s /etc/nginx/sites-available/opentera /etc/nginx/sites-enabled/`
-
-6. Restart the nginx server: `sudo systemctl restart nginx`
+6. Remove the default nginx config (if needed) that listens to port 80 (`sudo rm /etc/nginx/sites-enabled/default`)
+7. Restart the nginx server: `sudo systemctl restart nginx`
 
 #### Service configuration
 TO ensure that OpenTera will run automatically and after a reboot, a systemd service can be created. 
@@ -127,7 +127,7 @@ After=network-online.target
 User=**PUT THE EXECUTING USER HERE**
 Group=**PUT THE EXECUTING GROUP HERE**
 Environment=PYTHONPATH=**(path to opentera)**/opentera/teraserver/python
-ExecStart=**(path to opentera)**/opentera/teraserver/python/env/python-3.8/bin/python3 **(path to opentera)**/opentera/teraserver/python/TeraServer.py
+ExecStart=**(path to opentera)**/opentera/teraserver/python/env/python-3.10/bin/python3 **(path to opentera)**/opentera/teraserver/python/TeraServer.py
 WorkingDirectory=**(path to opentera)**/opentera/teraserver/python
 StandardOutput=syslog+console
 StandardError=syslog+console
@@ -190,5 +190,5 @@ key=(path to private key file)
 
 1. Install certbot agent: `sudo apt-get install certbot`
 2. Install nginx plugin: `sudo apt-get install python3-certbot-nginx`
-3. Run certbot: `sudo certbot --nginx -d (your_host_name)`
+3. Run certbot: `sudo certbot run -a standalone -i nginx -d (your_host_name)`
 
