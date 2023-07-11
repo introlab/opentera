@@ -1,16 +1,13 @@
 import inspect
 import datetime
-# import uuid
 import time
 import typing as t
 import sqlalchemy.sql.sqltypes
 from flask_sqlalchemy import SQLAlchemy, query, model
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
+from sqlalchemy import Column, BigInteger
 from sqlalchemy.inspection import inspect as sqlinspector
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from functools import wraps
 
 
 class _QueryProperty:

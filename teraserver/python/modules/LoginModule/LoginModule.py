@@ -16,7 +16,7 @@ from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
-from flask import request, _request_ctx_stack
+from flask import request, g
 from flask_babel import gettext
 from werkzeug.local import LocalProxy
 from flask_restx import reqparse
@@ -30,16 +30,16 @@ import modules.Globals as Globals
 from opentera.utils.UserAgentParser import UserAgentParser
 
 # Current participant identity, stacked
-current_participant = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant', None))
+current_participant = LocalProxy(lambda: g.setdefault('current_participant', None))
 
 # Current device identity, stacked
-current_device = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device', None))
+current_device = LocalProxy(lambda: g.setdefault('current_device', None))
 
 # Current user identity, stacked
-current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user', None))
+current_user = LocalProxy(lambda: g.setdefault('current_user', None))
 
 # Current service identity, stacked
-current_service = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_service', None))
+current_service = LocalProxy(lambda: g.setdefault('current_service', None))
 
 # Authentication schemes for users
 user_http_auth = HTTPBasicAuth(realm='user')
@@ -102,7 +102,7 @@ class LoginModule(BaseModule):
 
         # We wait until we are connected to redis
         # Every 30 minutes?
-        loopDeferred = self.cleanup_disabled_tokens_loop_task.start(60.0 * 30)
+        self.cleanup_disabled_tokens_loop_task.start(60.0 * 30)
 
     def notify_module_messages(self, pattern, channel, message):
         """
@@ -171,8 +171,7 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.user_verify_password',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                         login_status=
-                                         messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_USERNAME,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_USERNAME,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
@@ -195,8 +194,7 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.user_verify_password',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                         login_status=
-                                         messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
@@ -209,7 +207,7 @@ class LoginModule(BaseModule):
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
 
         if logged_user and logged_user.is_active():
-            _request_ctx_stack.top.current_user = logged_user
+            g.current_user = logged_user
 
             # print('user_verify_password, found user: ', current_user)
             # current_user.update_last_online()
@@ -319,7 +317,7 @@ class LoginModule(BaseModule):
                                              server_endpoint=login_infos['server_endpoint'])
                 return False
 
-            _request_ctx_stack.top.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
+            g.current_user = TeraUser.get_user_by_uuid(token_dict['user_uuid'])
             # TODO: Validate if user is also online?
             if current_user and current_user.is_active():
                 # current_user.update_last_online()
@@ -375,8 +373,7 @@ class LoginModule(BaseModule):
             self.logger.send_login_event(sender='LoginModule.participant_verify_password',
                                          level=messages.LogEvent.LOGLEVEL_ERROR,
                                          login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                         login_status=
-                                         messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
+                                         login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED,
                                          client_name=login_infos['client_name'],
                                          client_version=login_infos['client_version'],
                                          client_ip=login_infos['client_ip'],
@@ -389,7 +386,7 @@ class LoginModule(BaseModule):
         logged_participant = TeraParticipant.verify_password(username=username, password=password,
                                                              participant=tentative_participant)
         if logged_participant and logged_participant.is_active():
-            _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_username(username)
+            g.current_participant = TeraParticipant.get_participant_by_username(username)
 
             # print('participant_verify_password, found participant: ', current_participant)
             # current_participant.update_last_online()
@@ -397,7 +394,7 @@ class LoginModule(BaseModule):
             login_user(current_participant, remember=True)
 
             # Flag that participant has full API access
-            current_participant.fullAccess = True
+            g.current_participant.fullAccess = True
 
             # Clear attempts counter
             self.redisDelete(attempts_key)
@@ -415,8 +412,7 @@ class LoginModule(BaseModule):
         self.logger.send_login_event(sender='LoginModule.participant_verify_password',
                                      level=messages.LogEvent.LOGLEVEL_ERROR,
                                      login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                     login_status=
-                                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD if
+                                     login_status=messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_WRONG_PASSWORD if
                                      not logged_participant else
                                      messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_DISABLED_ACCOUNT,
                                      client_name=login_infos['client_name'],
@@ -444,10 +440,11 @@ class LoginModule(BaseModule):
         # print('LoginModule - participant_verify_token for ', token_value, self)
 
         # TeraParticipant verifies if the participant is active and login is enabled
-        _request_ctx_stack.top.current_participant = TeraParticipant.get_participant_by_token(token_value)
+        g.current_participant = TeraParticipant.get_participant_by_token(token_value)
 
         if current_participant and current_participant.is_active():
             # current_participant.update_last_online()
+            g.current_participant.fullAccess = False
             login_user(current_participant, remember=True)
             return True
 
@@ -530,12 +527,12 @@ class LoginModule(BaseModule):
                                              server_endpoint=login_infos['server_endpoint'])
                 return False
 
-            _request_ctx_stack.top.current_participant = \
+            g.current_participant = \
                 TeraParticipant.get_participant_by_uuid(token_dict['participant_uuid'])
 
         if current_participant and current_participant.is_active():
             # Flag that participant has full API access
-            current_participant.fullAccess = True
+            g.current_participant.fullAccess = True
             # current_participant.update_last_online()
             login_user(current_participant, remember=True)
             return True
@@ -601,7 +598,7 @@ class LoginModule(BaseModule):
             # We are interested in the content of two fields : X-Device-Uuid, X-Participant-Uuid
             if request.headers.__contains__('X-Device-Uuid'):
                 # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_uuid(
+                g.current_device = TeraDevice.get_device_by_uuid(
                     request.headers['X-Device-Uuid'])
 
                 # Device must be found and enabled
@@ -634,7 +631,7 @@ class LoginModule(BaseModule):
                 # Verify scheme and token
                 if scheme == 'OpenTera':
                     # Load device from DB
-                    _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token)
+                    g.current_device = TeraDevice.get_device_by_token(token)
 
                     # Device must be found and enabled
                     if current_device:
@@ -662,7 +659,7 @@ class LoginModule(BaseModule):
             # Verify token in params
             if 'token' in token_args:
                 # Load device from DB
-                _request_ctx_stack.top.current_device = TeraDevice.get_device_by_token(token_args['token'])
+                g.current_device = TeraDevice.get_device_by_token(token_args['token'])
 
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
@@ -783,7 +780,7 @@ class LoginModule(BaseModule):
                 # Check if service is allowed to connect
                 service = TeraService.get_service_by_uuid(service_uuid)
                 if service and service.service_enabled:
-                    _request_ctx_stack.top.current_service = service
+                    g.current_service = service
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.

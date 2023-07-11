@@ -74,7 +74,8 @@ class DBManager (BaseModule):
 
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
-        self.db = SQLAlchemy()
+        # Future parameters = use only SQLALchemy 2.x features
+        self.db = SQLAlchemy(engine_options={'future': True}, session_options={'future': True})
         self.db_uri = None
         self.app = app
 
