@@ -179,12 +179,12 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraSessionTypeSite.check_integrity(inserted_obj)
         return inserted_obj
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         for project in self.session_type_site_site.site_projects:
             ses_type_project = TeraSessionTypeProject.get_session_type_project_for_session_type_project(
-                project.id_project, self.id_session_type)
+                project.id_project, self.id_session_type, with_deleted=with_deleted)
             if ses_type_project:
-                cannot_be_deleted_exception = ses_type_project.delete_check_integrity()
+                cannot_be_deleted_exception = ses_type_project.delete_check_integrity(with_deleted=with_deleted)
                 if cannot_be_deleted_exception:
                     return IntegrityError('Still have sessions of that type in the site', self.id_session_type,
                                           't_sessions')

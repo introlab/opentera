@@ -7,6 +7,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
+from sqlalchemy.exc import SQLAlchemyError
 
 
 class TeraAssetTest(BaseModelsTest):
@@ -270,6 +271,41 @@ class TeraAssetTest(BaseModelsTest):
             # Make sure it is deleted
             # Warning, it was deleted, object is not valid anymore
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
+            # Check session is still present
+            self.db.session.expire_all()
+            session = TeraSession.get_session_by_id(2)
+            self.assertIsNotNone(session)
+
+    def test_hard_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            asset = TeraAsset()
+            asset.asset_name = 'Test asset'
+            asset.id_session = TeraSession.get_session_by_id(2).id_session
+            asset.asset_service_uuid = TeraService.get_service_by_id(1).service_uuid
+            asset.asset_type = 'application/test'
+            TeraAsset.insert(asset)
+            self.assertIsNotNone(asset.id_asset)
+            id_asset = asset.id_asset
+
+            # Try to hard delete while not soft deleted
+            # with self.assertRaises(SQLAlchemyError):
+            #     TeraAsset.delete(id_asset, hard_delete=True)
+            #
+            # # Soft delete
+            # TeraAsset.delete(id_asset)
+            #
+            # # Assert soft deleted
+            # asset = TeraAsset.query.filter_by(id_asset=id_asset).execution_options(include_deleted=True).first()
+            # self.assertIsNotNone(asset)
+            # self.assertIsNotNone(asset.deleted_at)
+
+            # Hard delete
+            TeraAsset.delete(id_asset, hard_delete=True)
+
+            # Make sure it is deleted
+            # Warning, it was deleted, object is not valid anymore
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, with_deleted=True))
             # Check session is still present
             self.db.session.expire_all()
             session = TeraSession.get_session_by_id(2)

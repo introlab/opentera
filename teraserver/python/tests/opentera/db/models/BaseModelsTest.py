@@ -12,6 +12,7 @@ class BaseModelsTest(unittest.TestCase):
         cls._flask_app = Flask('BaseModelsTest')
         cls._flask_app.debug = False
         cls._flask_app.testing = True
+        cls._flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
         cls._db_man = DBManager(cls._config, app=cls._flask_app)
         # Setup DB in RAM
         cls._db_man.open_local({}, echo=False, ram=True)

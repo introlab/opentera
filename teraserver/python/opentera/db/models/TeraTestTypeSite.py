@@ -133,12 +133,13 @@ class TeraTestTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraTestTypeSite.check_integrity(inserted_obj)
         return inserted_obj
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         for project in self.test_type_site_site.site_projects:
             test_type_project = TeraTestTypeProject.get_test_type_project_for_test_type_project(project.id_project,
-                                                                                                self.id_test_type)
+                                                                                                self.id_test_type,
+                                                                                                with_deleted)
             if test_type_project:
-                cannot_be_deleted_exception = test_type_project.delete_check_integrity()
+                cannot_be_deleted_exception = test_type_project.delete_check_integrity(with_deleted=with_deleted)
                 if cannot_be_deleted_exception:
                     return IntegrityError('Still have test of that type in the site', self.id_test_type, 't_tests')
         return None

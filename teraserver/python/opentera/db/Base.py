@@ -196,22 +196,35 @@ class BaseMixin(object):
             cls.commit()
             return db_object
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         return None  # Can delete by default
 
     @classmethod
-    def delete(cls, id_todel, autocommit: bool = True):
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+    def delete(cls, id_todel, autocommit: bool = True, hard_delete: bool = False):
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel)\
+            .execution_options(include_deleted=hard_delete).first()
 
         if delete_obj:
             cannot_be_deleted_exception = delete_obj.delete_check_integrity()
             if cannot_be_deleted_exception:
                 raise cannot_be_deleted_exception
 
-            if getattr(delete_obj, 'soft_delete', None):
+            has_soft_delete = getattr(delete_obj, 'soft_delete', None) is not None
+            has_hard_delete = getattr(delete_obj, 'hard_delete', None) is not None
+            if has_soft_delete and not hard_delete:
                 delete_obj.soft_delete()
             else:
-                cls.db().session.delete(delete_obj)
+                # if has_soft_delete:
+                #     # Check that object was soft deleted before doing a hard delete
+                #     if not delete_obj.deleted_at:
+                #         # Object must be soft deleted first before being hard deleted!
+                #         raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) +
+                #                               ' cannot be hard deleted: not soft deleted beforehand!')
+                if has_hard_delete and hard_delete:
+                    delete_obj.hard_delete()
+                    return
+                else:
+                    cls.db().session.delete(delete_obj)
             if autocommit:
                 cls.commit()
         else:
@@ -231,21 +244,16 @@ class BaseMixin(object):
 
 
     # @classmethod
-    # def handle_include_deleted_flag(cls, include_deleted=False):
-    #     if 'include_deleted' not in cls.db().session.info:
-    #         cls.db().session.info['include_deleted'] = list()
-    #
-    #     if include_deleted:
-    #         cls.db().session.info['include_deleted'].push(cls.__name__)
-    #     else:
-    #         cls.db().session.info['include_deleted'].pop(-1)
-
-    @classmethod
-    def hard_delete(cls, id_todel):
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        if delete_obj:
-            cls.db().session.delete(delete_obj)
-            cls.commit()
+    # def hard_delete(cls, id_todel):
+    #     delete_obj = cls.db().session.query(cls).execution_options(include_deleted=True)\
+    #         .filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
+    #     if delete_obj:
+    #         if not delete_obj.deleted_at:
+    #             # Object must be soft deleted first before being hard deleted!
+    #             raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) +
+    #                                   ' cannot be hard deleted: not soft deleted beforehand!')
+    #         cls.db().session.delete(delete_obj)
+    #         cls.commit()
 
     @classmethod
     def query_with_filters(cls, filters=None, with_deleted: bool = False):

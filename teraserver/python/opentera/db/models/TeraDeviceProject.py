@@ -81,19 +81,19 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             TeraDeviceProject.delete(delete_obj.id_device_project, autocommit=autocommit)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
         from opentera.db.models.TeraParticipant import TeraParticipant
         from opentera.db.models.TeraSession import TeraSession
 
-        if TeraDeviceParticipant.query.join(TeraParticipant).\
+        if TeraDeviceParticipant.query.execution_options(include_deleted=with_deleted).join(TeraParticipant).\
             filter(TeraParticipant.id_project == self.id_project).\
                 filter(TeraDeviceParticipant.id_device == self.id_device).count():
             return IntegrityError('Project still has participant associated to the device',
                                   self.id_device_project, 't_participants')
 
         # Find sessions with matching device and project
-        device_sessions = TeraSession.get_sessions_for_device(self.id_device)
+        device_sessions = TeraSession.get_sessions_for_device(self.id_device, with_deleted=with_deleted)
         device_project_sessions = [ses.id_session for ses in device_sessions
                                    if ses.get_associated_project_id() == self.id_project]
 

@@ -139,8 +139,8 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
 
         return urls
 
-    def delete_check_integrity(self) -> IntegrityError | None:
-        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}) > 0:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
+        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}, with_deleted=with_deleted) > 0:
             return IntegrityError('Test Type still has associated tests', self.id_test_type, 't_tests')
         return None
 
