@@ -58,7 +58,7 @@ class TeraUserUserGroupTest(BaseModelsTest):
             self.assertIsNotNone(uug_result)
             self.assertEqual(uug, uug_result)
             # Cleanup
-            TeraUserUserGroup.hard_delete(uug_result.id_user_user_group)
+            TeraUserUserGroup.delete(uug_result.id_user_user_group, hard_delete=True)
             self.assertEqual(initial_count, TeraUserUserGroup.query.count())
             self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(
                 uug_result.id_user_user_group, with_deleted=True))
@@ -128,7 +128,7 @@ class TeraUserUserGroupTest(BaseModelsTest):
             uug_result = TeraUserUserGroup.insert(uug)
             self.assertIsNotNone(uug_result)
             id_user_user_group = uug.id_user_user_group
-            TeraUserUserGroup.hard_delete(id_user_user_group)
+            TeraUserUserGroup.delete(id_user_user_group, hard_delete=True)
             self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, with_deleted=True))
 
     def test_soft_delete(self):

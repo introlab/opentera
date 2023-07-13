@@ -331,17 +331,17 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         super().insert(user)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
-        if TeraSessionUsers.get_session_count_for_user(self.id_user) > 0:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
+        if TeraSessionUsers.get_session_count_for_user(self.id_user, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has sessions', self.id_user, 't_sessions_users')
 
-        if TeraSession.get_count(filters={'id_creator_user': self.id_user}) > 0:
+        if TeraSession.get_count(filters={'id_creator_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created sessions', self.id_user, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_user': self.id_user}) > 0:
+        if TeraAsset.get_count(filters={'id_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created assets', self.id_user, 't_assets')
 
-        if TeraTest.get_count(filters={'id_user': self.id_user}) > 0:
+        if TeraTest.get_count(filters={'id_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created tests', self.id_user, 't_tests')
 
         return None

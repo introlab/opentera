@@ -1,6 +1,6 @@
 from werkzeug.local import LocalProxy
 from functools import wraps
-from flask import _request_ctx_stack, request
+from flask import g, request
 from flask_restx import reqparse
 from typing import List
 from enum import Enum
@@ -17,11 +17,11 @@ from opentera.redis.RedisVars import RedisVars
 import opentera.messages.python as messages
 
 # Current client identity, stacked
-current_user_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_user_client', None))
-current_device_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_device_client', None))
-current_participant_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_participant_client', None))
-current_service_client = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_service_client', None))
-current_login_type = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'current_login_type', LoginType.UNKNOWN_LOGIN))
+current_user_client = LocalProxy(lambda: g.setdefault('current_user_client', None))
+current_device_client = LocalProxy(lambda: g.setdefault('current_device_client', None))
+current_participant_client = LocalProxy(lambda: g.setdefault('current_participant_client', None))
+current_service_client = LocalProxy(lambda: g.setdefault('current_service_client', None))
+current_login_type = LocalProxy(lambda: g.setdefault('current_login_type', LoginType.UNKNOWN_LOGIN))
 
 
 class LoginType(Enum):
@@ -313,9 +313,8 @@ class ServiceAccessManager:
                 return False
 
             # User token is valid and not disabled
-            _request_ctx_stack.top.current_user_client = \
-                TeraUserClient(token_dict, token, ServiceAccessManager.service.config_man)
-            _request_ctx_stack.top.current_login_type = LoginType.USER_LOGIN
+            g.current_user_client = TeraUserClient(token_dict, token, ServiceAccessManager.service.config_man)
+            g.current_login_type = LoginType.USER_LOGIN
             return True
 
     @staticmethod
@@ -328,9 +327,8 @@ class ServiceAccessManager:
                 pass
             else:
                 # Device token
-                _request_ctx_stack.top.current_device_client = \
-                    TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
-                _request_ctx_stack.top.current_login_type = LoginType.DEVICE_LOGIN
+                g.current_device_client = TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
+                g.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
         if allow_static_tokens:  # Check for static device token
@@ -341,9 +339,8 @@ class ServiceAccessManager:
                 pass
             else:
                 # Device token
-                _request_ctx_stack.top.current_device_client = \
-                    TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
-                _request_ctx_stack.top.current_login_type = LoginType.DEVICE_LOGIN
+                g.current_device_client = TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
+                g.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
         return False
@@ -362,9 +359,9 @@ class ServiceAccessManager:
                     return False
 
                 # Participant token is not disabled, everything is ok
-                _request_ctx_stack.top.current_participant_client = \
+                g.current_participant_client = \
                     TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
-                _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
+                g.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
         if allow_static_tokens:  # Check for static participant token
@@ -376,9 +373,9 @@ class ServiceAccessManager:
                 pass
             else:
                 # Participant token
-                _request_ctx_stack.top.current_participant_client = \
+                g.current_participant_client = \
                     TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
-                _request_ctx_stack.top.current_login_type = LoginType.PARTICIPANT_LOGIN
+                g.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
         return False
@@ -392,9 +389,8 @@ class ServiceAccessManager:
             pass
         else:
             # Service token
-            _request_ctx_stack.top.current_service_client = \
-                TeraServiceClient(token_dict, token, ServiceAccessManager.service.config_man)
-            _request_ctx_stack.top.current_login_type = LoginType.SERVICE_LOGIN
+            g.current_service_client = TeraServiceClient(token_dict, token, ServiceAccessManager.service.config_man)
+            g.current_login_type = LoginType.SERVICE_LOGIN
             return True
 
         return False

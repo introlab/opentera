@@ -125,10 +125,11 @@ class TeraTestTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         TeraTestTypeProject.check_integrity(inserted_obj)
         return inserted_obj
 
-    def delete_check_integrity(self) -> IntegrityError | None:
-        session_ids = [session.id_session for session in TeraSession.get_sessions_for_project(self.id_project)]
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
+        session_ids = [session.id_session for session in TeraSession.get_sessions_for_project(self.id_project,
+                                                                                              with_deleted=with_deleted)]
         test_count = TeraTest.query.filter(TeraTest.id_session.in_(session_ids))\
-            .filter(TeraTest.id_test_type == self.id_test_type).count()
+            .filter(TeraTest.id_test_type == self.id_test_type).execution_options(include_deleted=with_deleted).count()
 
         if test_count > 0:
             return IntegrityError('Test type has tests in this project', self.id_test_type, 't_tests')

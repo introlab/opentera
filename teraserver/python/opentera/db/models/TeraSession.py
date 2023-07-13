@@ -438,6 +438,12 @@ class TeraSession(BaseModel, SoftDeleteMixin):
     def insert(cls, session):
         session.session_uuid = str(uuid.uuid4())
 
+        if not session.session_start_datetime:
+            session.session_start_datetime = datetime.now()
+
+        if not session.session_status:
+            session.session_status = TeraSessionStatus.STATUS_INPROGRESS.value
+
         if type(session.session_parameters) is dict:
             # Dumps dictionary into json
             session.session_parameters = json.dumps(session.session_parameters)

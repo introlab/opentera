@@ -197,7 +197,7 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertTrue(new_group.id_user_group > 0)
             self.assertIsNotNone(TeraUserGroup.get_user_group_by_id(id_user_group))
             # Cleanup
-            TeraUserGroup.hard_delete(new_group.id_user_group)
+            TeraUserGroup.delete(new_group.id_user_group, hard_delete=True)
             self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
 
     def test_update_with_modified_id_user_group(self):

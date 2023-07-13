@@ -185,7 +185,7 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
 
             TeraUserGroup.db().session.commit()
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         if len(self.user_group_users) > 0:
             return IntegrityError('User group still has associated users', self.id_user_group, 't_users')
         return None
