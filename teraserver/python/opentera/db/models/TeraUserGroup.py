@@ -182,7 +182,6 @@ class TeraUserGroup(BaseModel, SoftDeleteMixin):
                                                                  rolename='user')
             access.id_service_role = user_role.id_service_role
             TeraUserGroup.db().session.add(access)
-
             TeraUserGroup.db().session.commit()
 
     def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:

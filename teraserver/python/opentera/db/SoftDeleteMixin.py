@@ -121,7 +121,7 @@ def generate_soft_delete_mixin_class(
                     # Relationship has a cascade delete or a secondary table
                     if relation[1].cascade.delete:
                         for item in getattr(_self, relation[0]):
-                            # print("Cascade deleting " + str(item))
+                            print("Cascade deleting " + str(item))
                             hard_item_deleter = getattr(item, hard_delete_method_name)
                             hard_item_deleter()
 
@@ -176,17 +176,6 @@ def generate_soft_delete_mixin_class(
         class_attributes[undelete_method_name] = undelete_method
 
     activate_soft_delete_hook(deleted_field_name, disable_soft_delete_filtering_option_name)
-
-    def handle_include_deleted_flag(_self, include_deleted=False):
-        if 'include_deleted' not in _self.db().session.info:
-            _self.db().session.info['include_deleted'] = list()
-
-        if include_deleted:
-            _self.db().session.info['include_deleted'].append(_self.get_model_name())
-        else:
-            _self.db().session.info['include_deleted'].pop(-1)
-
-    class_attributes['handle_include_deleted_flag'] = handle_include_deleted_flag
 
     generated_class = type(class_name, tuple(), class_attributes)
 

@@ -1,6 +1,13 @@
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraSessionDevices import TeraSessionDevices
+from opentera.db.models.TeraSessionUsers import TeraSessionUsers
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraService import TeraService
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
@@ -49,3 +56,106 @@ class TeraSessionTest(BaseModelsTest):
             #                        'session_name': 'TEST',
             #                        'session_status': 0,
             #                        'session_start_datetime': str(datetime.now())}}
+
+    def test_soft_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            ses = TeraSession()
+            ses.id_creator_service = 1
+            ses.id_session_type = 1
+            ses.session_name = "Test session"
+            ses.session_participants = [TeraParticipant.get_participant_by_id(1)]
+            ses.session_devices = [TeraDevice.get_device_by_id(1)]
+            ses.session_users = [TeraUser.get_user_by_id(2)]
+            TeraSession.insert(ses)
+            id_session = ses.id_session
+
+            # Attach asset
+            asset = TeraAsset()
+            asset.asset_name = "Asset test"
+            asset.id_device = 1
+            asset.id_session = id_session
+            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
+            asset.asset_type = 'Test'
+            TeraAsset.insert(asset)
+            id_asset = asset.id_asset
+
+            # ... and test
+            test = TeraTest()
+            test.id_device = 1
+            test.id_session = id_session
+            test.id_test_type = 1
+            test.test_name = "Test test!"
+            TeraTest.insert(test)
+            id_test = test.id_test
+
+            # Soft delete
+            TeraSession.delete(id_session)
+
+            # Make sure it is deleted
+            self.assertIsNone(TeraSession.get_session_by_id(id_session))
+
+            # Query, with soft delete flag
+            ses = TeraSession.query.filter_by(id_session=id_session).execution_options(include_deleted=True).first()
+            self.assertIsNotNone(ses)
+            self.assertIsNotNone(ses.deleted_at)
+            self.assertIsNone(TeraSessionParticipants.query.filter_by(id_session=id_session).first())
+            self.assertIsNone(TeraSessionUsers.query.filter_by(id_session=id_session).first())
+            self.assertIsNone(TeraSessionDevices.query.filter_by(id_session=id_session).first())
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
+            self.assertIsNone(TeraTest.get_test_by_id(id_test))
+            self.assertIsNotNone(TeraSessionParticipants.query.filter_by(id_session=id_session)
+                                 .execution_options(include_deleted=True).first())
+            self.assertIsNotNone(TeraSessionUsers.query.filter_by(id_session=id_session)
+                                 .execution_options(include_deleted=True).first())
+            self.assertIsNotNone(TeraSessionDevices.query.filter_by(id_session=id_session)
+                                 .execution_options(include_deleted=True).first())
+            self.assertIsNotNone(TeraAsset.get_asset_by_id(id_asset, True))
+            self.assertIsNotNone(TeraTest.get_test_by_id(id_test, True))
+
+    def test_hard_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            ses = TeraSession()
+            ses.id_creator_service = 1
+            ses.id_session_type = 1
+            ses.session_name = "Test session"
+            ses.session_participants = [TeraParticipant.get_participant_by_id(1)]
+            ses.session_devices = [TeraDevice.get_device_by_id(1)]
+            ses.session_users = [TeraUser.get_user_by_id(2)]
+            TeraSession.insert(ses)
+            id_session = ses.id_session
+
+            # Attach asset
+            asset = TeraAsset()
+            asset.asset_name = "Asset test"
+            asset.id_device = 1
+            asset.id_session = id_session
+            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
+            asset.asset_type = 'Test'
+            TeraAsset.insert(asset)
+            id_asset = asset.id_asset
+
+            # ... and test
+            test = TeraTest()
+            test.id_device = 1
+            test.id_session = id_session
+            test.id_test_type = 1
+            test.test_name = "Test test!"
+            TeraTest.insert(test)
+            id_test = test.id_test
+
+            # Hard delete
+            TeraSession.delete(id_session, hard_delete=True)
+
+            # Make sure eveything is deleted
+            self.assertIsNone(TeraSession.get_session_by_id(id_session, True))
+            self.assertIsNone(TeraSessionParticipants.query.filter_by(id_session=id_session)
+                              .execution_options(include_deleted=True).first())
+            self.assertIsNone(TeraSessionUsers.query.filter_by(id_session=id_session)
+                              .execution_options(include_deleted=True).first())
+            self.assertIsNone(TeraSessionDevices.query.filter_by(id_session=id_session)
+                              .execution_options(include_deleted=True).first())
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, with_deleted=True))
+            self.assertIsNone(TeraTest.get_test_by_id(id_test, with_deleted=True))
+

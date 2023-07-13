@@ -3,6 +3,7 @@ from sqlalchemy import exc
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 
 
 class TeraProjectTest(BaseModelsTest):
@@ -173,3 +174,114 @@ class TeraProjectTest(BaseModelsTest):
             # Check that associated devices are not anymore
             for device in devices:
                 self.assertEqual([], device.device_participants)
+
+    def test_soft_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            project = TeraProject()
+            project.project_name = "Test project"
+            project.id_site = 1
+            TeraProject.insert(project)
+            self.assertIsNotNone(project.id_project)
+            id_project = project.id_project
+
+            # Soft delete
+            TeraProject.delete(id_project)
+
+            # Make sure it is deleted
+            self.assertIsNone(TeraProject.get_project_by_id(id_project))
+
+            # Query, with soft delete flag
+            project = TeraProject.query.filter_by(id_project=id_project) \
+                .execution_options(include_deleted=True).first()
+            self.assertIsNotNone(project)
+            self.assertIsNotNone(project.deleted_at)
+
+    def test_hard_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            project = TeraProject()
+            project.project_name = "Test project"
+            project.id_site = 1
+            TeraProject.insert(project)
+            self.assertIsNotNone(project.id_project)
+            id_project = project.id_project
+
+            # Create a new participant in that project
+            participant = TeraParticipant()
+            participant.participant_name = "Test participant"
+            participant.id_project = id_project
+            TeraParticipant.insert(participant)
+            self.assertIsNotNone(participant.id_participant)
+            id_participant = participant.id_participant
+
+            # Soft delete to prevent relationship integrity errors as we want to test hard-delete cascade here
+            TeraParticipant.delete(id_participant)
+            TeraProject.delete(id_project)
+
+            # Check that relationships are still there
+            self.assertIsNone(TeraParticipant.get_participant_by_id(id_participant))
+            self.assertIsNotNone(TeraParticipant.get_participant_by_id(id_participant, True))
+            self.assertIsNone(TeraProject.get_project_by_id(id_project))
+            self.assertIsNotNone(TeraProject.get_project_by_id(id_project, True))
+
+            # Hard delete
+            TeraProject.delete(id_project, hard_delete=True)
+
+            # Make sure eveything is deleted
+            self.assertIsNone(TeraParticipant.get_participant_by_id(id_participant, True))
+            self.assertIsNone(TeraProject.get_project_by_id(id_project, True))
+
+    def test_project_relationships_deletion_and_access(self):
+        with self._flask_app.app_context():
+            # Create new
+            project = TeraProject()
+            project.project_name = "Test project"
+            project.id_site = 1
+            TeraProject.insert(project)
+            self.assertIsNotNone(project.id_project)
+            id_project = project.id_project
+
+            # Create participant groups
+            group = TeraParticipantGroup()
+            group.participant_group_name = "Test participant group 1"
+            group.id_project = id_project
+            TeraParticipantGroup.insert(group)
+            self.assertIsNotNone(group.id_participant_group)
+            id_participant_group1 = group.id_participant_group
+
+            participant = TeraParticipant()
+            participant.participant_name = "Test participant"
+            participant.id_project = 1
+            participant.id_participant_group = id_participant_group1
+            TeraParticipant.insert(participant)
+            self.assertIsNotNone(participant.id_participant)
+            id_participant = participant.id_participant
+
+            group = TeraParticipantGroup()
+            group.participant_group_name = "Test participant group 2"
+            group.id_project = id_project
+            TeraParticipantGroup.insert(group)
+            self.assertIsNotNone(group.id_participant_group)
+            id_participant_group2 = group.id_participant_group
+
+            self.assertEqual(2, len(project.project_participants_groups))
+
+            # Soft delete one group
+            TeraParticipantGroup.delete(id_participant_group2)
+
+            self.db.session.expire_all()
+            project = TeraProject.get_project_by_id(id_project)
+            self.assertEqual(1, len(project.project_participants_groups))
+
+            self.db.session.expire_all()
+            project = TeraProject.get_project_by_id(id_project, with_deleted=True)
+            self.assertEqual(1, len(project.project_participants_groups))  # Don't get deleted groups even with flag
+
+            self.assertEqual(1, len(project.project_participants_groups[0].participant_group_participants))
+            TeraParticipant.delete(id_participant)
+            self.db.session.expire_all()
+            project = TeraProject.get_project_by_id(id_project)
+            self.assertEqual(0, len(project.project_participants_groups[0].participant_group_participants))
+
+

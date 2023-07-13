@@ -2,6 +2,10 @@ from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraService import TeraService
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
@@ -64,3 +68,105 @@ class TeraUserTest(BaseModelsTest):
             # Verify that multi can access 2 projects
             projects = DBManager.userAccess(multi).get_accessible_projects()
             self.assertEqual(len(projects), 2)
+
+    def test_soft_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Test"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("test")
+            user.user_superadmin = False
+            user.user_username = "test"
+            TeraUser.insert(user)
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
+
+            # Soft delete
+            TeraUser.delete(id_user)
+            # Make sure participant is deleted
+            self.assertIsNone(TeraUser.get_user_by_id(id_user))
+
+            # Query, with soft delete flag
+            user = TeraUser.query.filter_by(id_user=id_user).execution_options(include_deleted=True).first()
+            self.assertIsNotNone(user)
+            self.assertIsNotNone(user.deleted_at)
+
+    def test_hard_delete(self):
+        with self._flask_app.app_context():
+            # Create new user
+            user = TeraUser()
+            user.user_enabled = True
+            user.user_firstname = "Test"
+            user.user_lastname = "User"
+            user.user_profile = ""
+            user.user_password = TeraUser.encrypt_password("test")
+            user.user_superadmin = False
+            user.user_username = "test"
+            TeraUser.insert(user)
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
+
+            # Assign user to sessions
+            user_session = TeraSession()
+            user_session.id_creator_user = id_user
+            user_session.id_session_type = 1
+            user_session.session_name = 'Creator user session'
+            TeraSession.insert(user_session)
+            id_session = user_session.id_session
+
+            user_session = TeraSession()
+            user_session.id_creator_service = 1
+            user_session.id_session_type = 1
+            user_session.session_name = "User invitee session"
+            user_session.session_users = [user]
+            TeraSession.insert(user_session)
+            id_session_invitee = user_session.id_session
+
+            # Attach asset
+            asset = TeraAsset()
+            asset.asset_name = "User asset test"
+            asset.id_user = id_user
+            asset.id_session = id_session
+            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
+            asset.asset_type = 'Test'
+            TeraAsset.insert(asset)
+            id_asset = asset.id_asset
+
+            # ... and test
+            test = TeraTest()
+            test.id_user = id_user
+            test.id_session = id_session
+            test.id_test_type = 1
+            test.test_name = "User test test!"
+            TeraTest.insert(test)
+            id_test = test.id_test
+
+            # Soft delete device to prevent relationship integrity errors as we want to test hard-delete cascade here
+            TeraSession.delete(id_session)
+            TeraSession.delete(id_session_invitee)
+            TeraUser.delete(id_user)
+
+            # Check that relationships are still there
+            self.assertIsNone(TeraUser.get_user_by_id(id_user))
+            self.assertIsNotNone(TeraUser.get_user_by_id(id_user, True))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session))
+            self.assertIsNotNone(TeraSession.get_session_by_id(id_session, True))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session_invitee))
+            self.assertIsNotNone(TeraSession.get_session_by_id(id_session_invitee, True))
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
+            self.assertIsNotNone(TeraAsset.get_asset_by_id(id_asset, True))
+            self.assertIsNone(TeraTest.get_test_by_id(id_test))
+            self.assertIsNotNone(TeraTest.get_test_by_id(id_test, True))
+
+            # Hard delete participant
+            TeraUser.delete(user.id_user, hard_delete=True)
+
+            # Make sure device and associations are deleted
+            self.assertIsNone(TeraUser.get_user_by_id(id_user, True))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session, True))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session_invitee, True))
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, True))
+            self.assertIsNone(TeraTest.get_test_by_id(id_test, True))

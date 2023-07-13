@@ -110,7 +110,7 @@ class TeraParticipantTest(BaseModelsTest):
             TeraSession.delete(id_session_invitee)
             TeraParticipant.delete(id_participant)
 
-            # Check that device and relationships are still there
+            # Check that relationships are still there
             self.assertIsNone(TeraParticipant.get_participant_by_id(id_participant))
             self.assertIsNotNone(TeraParticipant.get_participant_by_id(id_participant, True))
             self.assertIsNone(TeraSession.get_session_by_id(id_session))

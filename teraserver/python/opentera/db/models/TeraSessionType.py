@@ -180,3 +180,8 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
             st.id_service = None
 
         super().insert(st)
+
+    def hard_delete_before(self):
+        # Delete sessions related to that session type
+        for ses in self.session_type_sessions:
+            ses.hard_delete()

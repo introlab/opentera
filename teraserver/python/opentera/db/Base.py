@@ -15,19 +15,6 @@ class _QueryProperty:
         return cls.db().session.query(cls)
 
 
-class HandleIncludeDeletedFlag:
-    def __init__(self, cls):
-        self.cls = cls
-
-    def __call__(self, f, *args, **kwargs):
-        if 'include_deleted' not in self.cls.db().session.info:
-            self.cls.db().session.info['include_deleted'] = list()
-        self.cls.db().session.info['include_deleted'].push(self.cls.__name__)
-        retval = f(args, kwargs)
-        self.cls.db().session.info['include_deleted'].pop(-1)
-        return retval
-
-
 class BaseMixin(object):
     version_id = Column(BigInteger, nullable=False, default=int(time.time()*1000))
 
@@ -201,16 +188,21 @@ class BaseMixin(object):
 
     @classmethod
     def delete(cls, id_todel, autocommit: bool = True, hard_delete: bool = False):
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel)\
-            .execution_options(include_deleted=hard_delete).first()
+        if hard_delete:
+            cls.handle_include_deleted_flag(True)
+            autocommit = False
+        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
 
         if delete_obj:
-            cannot_be_deleted_exception = delete_obj.delete_check_integrity()
-            if cannot_be_deleted_exception:
-                raise cannot_be_deleted_exception
-
             has_soft_delete = getattr(delete_obj, 'soft_delete', None) is not None
             has_hard_delete = getattr(delete_obj, 'hard_delete', None) is not None
+
+            if (has_soft_delete and not delete_obj.deleted_at) or not has_soft_delete:
+                # Don't check integrity for already soft-deleted objects
+                cannot_be_deleted_exception = delete_obj.delete_check_integrity()
+                if cannot_be_deleted_exception:
+                    raise cannot_be_deleted_exception
+
             if has_soft_delete and not hard_delete:
                 delete_obj.soft_delete()
             else:
@@ -222,13 +214,14 @@ class BaseMixin(object):
                 #                               ' cannot be hard deleted: not soft deleted beforehand!')
                 if has_hard_delete and hard_delete:
                     delete_obj.hard_delete()
-                    return
                 else:
                     cls.db().session.delete(delete_obj)
             if autocommit:
                 cls.commit()
         else:
             raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) + ' cannot delete.')
+        if hard_delete:
+            cls.handle_include_deleted_flag(False)
 
     @classmethod
     def undelete(cls, id_to_undelete):
@@ -242,18 +235,15 @@ class BaseMixin(object):
             print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
             raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
 
+    @classmethod
+    def handle_include_deleted_flag(cls, include_deleted=False):
+        if 'include_deleted' not in cls.db().session.info:
+            cls.db().session.info['include_deleted'] = list()
 
-    # @classmethod
-    # def hard_delete(cls, id_todel):
-    #     delete_obj = cls.db().session.query(cls).execution_options(include_deleted=True)\
-    #         .filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-    #     if delete_obj:
-    #         if not delete_obj.deleted_at:
-    #             # Object must be soft deleted first before being hard deleted!
-    #             raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) +
-    #                                   ' cannot be hard deleted: not soft deleted beforehand!')
-    #         cls.db().session.delete(delete_obj)
-    #         cls.commit()
+        if include_deleted:
+            cls.db().session.info['include_deleted'].append(cls.get_model_name())
+        else:
+            cls.db().session.info['include_deleted'].pop(-1)
 
     @classmethod
     def query_with_filters(cls, filters=None, with_deleted: bool = False):

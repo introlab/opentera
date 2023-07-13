@@ -255,7 +255,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertEqual('New asset name', asset.asset_name)
             self.assertEqual('Unknown', asset.asset_type)
 
-    def test_delete(self):
+    def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
             asset = TeraAsset()

@@ -1,6 +1,7 @@
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 
 
 class TeraServiceTest(BaseModelsTest):
@@ -330,23 +331,23 @@ class TeraServiceTest(BaseModelsTest):
         #
         """
         return
-        with self._flask_app.app_context():
-            new_service = TeraService()
-            new_service.service_uuid = 'Definitely longer than a 36 characters string'
-            new_service.service_name = 'Name'
-            new_service.service_key = 'key'
-            new_service.service_hostname = 'Hostname'
-            new_service.service_port = 2
-            new_service.service_endpoint = "Endpoint"
-            new_service.service_clientendpoint = 'Clientendpoint'
-            new_service.service_enabled = True
-            new_service.service_system = True
-            new_service.service_editable_config = True
-            self.db.session.add(new_service)
-            self.db.session.commit()
-            self.assertRaises(exc.IntegrityError, self.db.session.commit)
+        # with self._flask_app.app_context():
+        #     new_service = TeraService()
+        #     new_service.service_uuid = 'Definitely longer than a 36 characters string'
+        #     new_service.service_name = 'Name'
+        #     new_service.service_key = 'key'
+        #     new_service.service_hostname = 'Hostname'
+        #     new_service.service_port = 2
+        #     new_service.service_endpoint = "Endpoint"
+        #     new_service.service_clientendpoint = 'Clientendpoint'
+        #     new_service.service_enabled = True
+        #     new_service.service_system = True
+        #     new_service.service_editable_config = True
+        #     self.db.session.add(new_service)
+        #     self.db.session.commit()
+        #     self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
-    def test_service_port_integer(self):
+    def test_service_port_integer_value(self):
         """
         #
         # SQLite uses what it calls a dynamic typing system, which ultimately means that you can store text
@@ -354,20 +355,84 @@ class TeraServiceTest(BaseModelsTest):
         # attempts to do this will fail - not with SQLite.
         """
         return
+        # with self._flask_app.app_context():
+        #     new_service = TeraService()
+        #
+        #     new_service.service_uuid = 'uuid'
+        #     new_service.service_name = 'Name'
+        #     new_service.service_key = 'key'
+        #     new_service.service_hostname = 'Hostname'
+        #
+        #     new_service.service_port = 'not an integer'
+        #
+        #     new_service.service_endpoint = "Endpoint"
+        #     new_service.service_clientendpoint = 'Clientendpoint'
+        #     new_service.service_enabled = True
+        #     new_service.service_system = True
+        #     new_service.service_editable_config = True
+        #     self.db.session.add(new_service)
+        #     self.db.session.commit()
+
+    def test_soft_delete(self):
         with self._flask_app.app_context():
-            new_service = TeraService()
+            # Create new
+            service = TeraService()
+            service.service_name = 'Test Service'
+            service.service_key = 'TestService'
+            service.service_hostname = 'localhost'
+            service.service_port = 12345
+            service.service_endpoint = 'test'
+            service.service_clientendpoint = '/'
+            TeraService.insert(service)
+            self.assertIsNotNone(service.id_service)
+            id_service = service.id_service
 
-            new_service.service_uuid = 'uuid'
-            new_service.service_name = 'Name'
-            new_service.service_key = 'key'
-            new_service.service_hostname = 'Hostname'
+            # Soft delete
+            TeraService.delete(id_service)
 
-            new_service.service_port = 'not an integer'
+            # Make sure it is deleted
+            self.assertIsNone(TeraService.get_service_by_id(id_service))
 
-            new_service.service_endpoint = "Endpoint"
-            new_service.service_clientendpoint = 'Clientendpoint'
-            new_service.service_enabled = True
-            new_service.service_system = True
-            new_service.service_editable_config = True
-            self.db.session.add(new_service)
-            self.db.session.commit()
+            # Query, with soft delete flag
+            service = TeraService.query.filter_by(id_service=id_service).execution_options(include_deleted=True).first()
+            self.assertIsNotNone(service)
+            self.assertIsNotNone(service.deleted_at)
+
+    def test_hard_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            service = TeraService()
+            service.service_name = 'Test Service'
+            service.service_key = 'TestService'
+            service.service_hostname = 'localhost'
+            service.service_port = 12345
+            service.service_endpoint = 'test'
+            service.service_clientendpoint = '/'
+            TeraService.insert(service)
+            self.assertIsNotNone(service.id_service)
+            id_service = service.id_service
+
+            # Create a new site association for that service
+            site_service = TeraServiceSite()
+            site_service.id_service = id_service
+            site_service.id_site = 1
+            TeraServiceSite.insert(site_service)
+            self.assertIsNotNone(site_service.id_service_site)
+            id_site_service = site_service.id_service_site
+
+            # Soft delete to prevent relationship integrity errors as we want to test hard-delete cascade here
+            TeraServiceSite.delete(id_site_service)
+            TeraService.delete(id_service)
+
+            # Check that relationships are still there
+            self.assertIsNone(TeraService.get_service_by_id(id_service))
+            self.assertIsNotNone(TeraService.get_service_by_id(id_service, True))
+            self.assertIsNone(TeraServiceSite.get_service_site_by_id(id_site_service))
+            self.assertIsNotNone(TeraServiceSite.get_service_site_by_id(id_site_service, True))
+
+            # Hard delete
+            TeraService.delete(id_service, hard_delete=True)
+
+            # Make sure eveything is deleted
+            self.assertIsNone(TeraService.get_service_by_id(id_service, True))
+            self.assertIsNone(TeraServiceSite.get_service_site_by_id(id_site_service, True))

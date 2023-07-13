@@ -28,12 +28,13 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
     test_type_service = relationship("TeraService")
     test_type_projects = relationship("TeraProject", secondary="t_tests_types_projects")
     test_type_sites = relationship("TeraSite", secondary="t_tests_types_sites")
+    test_type_tests = relationship("TeraTest", cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['test_type_service', 'test_type_sites', 'test_type_projects',
-                              'test_type_test_type_projects', 'test_type_test_type_sites'])
+                              'test_type_test_type_projects', 'test_type_test_type_sites', 'test_type_tests'])
 
         if minimal:
             ignore_fields.extend(['test_type_description'])
