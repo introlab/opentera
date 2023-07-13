@@ -407,3 +407,8 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             return IntegrityError('Participant still has created tests', self.id_participant, 't_tests')
 
         return None
+
+    def hard_delete_before(self):
+        # Delete sessions that we are part of since they will not be deleted otherwise
+        for ses in self.participant_sessions:
+            ses.hard_delete()
