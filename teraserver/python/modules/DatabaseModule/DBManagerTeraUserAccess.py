@@ -558,9 +558,13 @@ class DBManagerTeraUserAccess:
 
     def query_session_type_by_id(self, session_type_id: int):
         proj_ids = self.get_accessible_projects_ids()
-        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
-                                                                                               in_(proj_ids)).first()
-        return session_type
+        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id)\
+
+        if not self.user.user_superadmin:
+            # Super admin = get all session types even if not associated to a project
+            session_type = session_type.filter(TeraProject.id_project.in_(proj_ids))
+
+        return session_type.first()
 
     def query_test_type(self, test_type_id: int):
         # site_ids = self.get_accessible_sites_ids()
