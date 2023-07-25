@@ -14,38 +14,35 @@ class TeraParticipantTest(BaseModelsTest):
     def test_token(self):
         with self._flask_app.app_context():
             return
-            participantGroup = TeraParticipantGroup()
-            participantGroup.participant_group_name = 'participants'
-            participantGroup.id_project = 1
-
-            participant = TeraParticipant()
-            participant.participant_name = 'Test Participant'
-            participant.participant_uuid = str(uuid.uuid4())
-            participant.participant_participant_group = participantGroup
-
-            token = participant.create_token()
-
-            self.assertNotEqual(token, "")
-            self.db.session.add(participantGroup)
-            self.db.session.add(participant)
-
-            self.db.session.commit()
-
-            # Load participant from invalid token
-            loadedParticipant = TeraParticipant.get_participant_by_token('rien')
-            self.assertEqual(loadedParticipant, None)
-
-            # Load participant from valid token
-            loadedParticipant = TeraParticipant.get_participant_by_token(token)
-            self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
+            # participantGroup = TeraParticipantGroup()
+            # participantGroup.participant_group_name = 'participants'
+            # participantGroup.id_project = 1
+            #
+            # participant = TeraParticipant()
+            # participant.participant_name = 'Test Participant'
+            # participant.participant_uuid = str(uuid.uuid4())
+            # participant.participant_participant_group = participantGroup
+            #
+            # token = participant.create_token()
+            #
+            # self.assertNotEqual(token, "")
+            # self.db.session.add(participantGroup)
+            # self.db.session.add(participant)
+            #
+            # self.db.session.commit()
+            #
+            # # Load participant from invalid token
+            # loadedParticipant = TeraParticipant.get_participant_by_token('rien')
+            # self.assertEqual(loadedParticipant, None)
+            #
+            # # Load participant from valid token
+            # loadedParticipant = TeraParticipant.get_participant_by_token(token)
+            # self.assertEqual(loadedParticipant.participant_uuid, participant.participant_uuid)
 
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create a new participant
-            participant = TeraParticipant()
-            participant.participant_name = "Test participant"
-            participant.id_project = 1
-            TeraParticipant.insert(participant)
+            participant = TeraParticipantTest.new_test_participant(id_project=1)
             self.assertIsNotNone(participant.id_participant)
             id_participant = participant.id_participant
 
@@ -63,10 +60,7 @@ class TeraParticipantTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create a new participant
-            participant = TeraParticipant()
-            participant.participant_name = "Test participant"
-            participant.id_project = 1
-            TeraParticipant.insert(participant)
+            participant = TeraParticipantTest.new_test_participant(id_project=1)
             self.assertIsNotNone(participant.id_participant)
             id_participant = participant.id_participant
 
@@ -132,3 +126,11 @@ class TeraParticipantTest(BaseModelsTest):
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, True))
             self.assertIsNone(TeraTest.get_test_by_id(id_test, True))
 
+    @staticmethod
+    def new_test_participant(id_project: int) -> TeraParticipant:
+        participant = TeraParticipant()
+        participant.participant_name = "Test participant"
+        participant.id_project = id_project
+        TeraParticipant.insert(participant)
+
+        return participant

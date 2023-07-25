@@ -72,15 +72,7 @@ class TeraUserTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            user = TeraUser()
-            user.user_enabled = True
-            user.user_firstname = "Test"
-            user.user_lastname = "User"
-            user.user_profile = ""
-            user.user_password = TeraUser.encrypt_password("test")
-            user.user_superadmin = False
-            user.user_username = "test"
-            TeraUser.insert(user)
+            user = TeraUserTest.new_test_user()
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -97,15 +89,7 @@ class TeraUserTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new user
-            user = TeraUser()
-            user.user_enabled = True
-            user.user_firstname = "Test"
-            user.user_lastname = "User"
-            user.user_profile = ""
-            user.user_password = TeraUser.encrypt_password("test")
-            user.user_superadmin = False
-            user.user_username = "test"
-            TeraUser.insert(user)
+            user = TeraUserTest.new_test_user()
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -170,3 +154,16 @@ class TeraUserTest(BaseModelsTest):
             self.assertIsNone(TeraSession.get_session_by_id(id_session_invitee, True))
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, True))
             self.assertIsNone(TeraTest.get_test_by_id(id_test, True))
+
+    @staticmethod
+    def new_test_user() -> TeraUser:
+        user = TeraUser()
+        user.user_enabled = True
+        user.user_firstname = "Test"
+        user.user_lastname = "User"
+        user.user_profile = ""
+        user.user_password = TeraUser.encrypt_password("test")
+        user.user_superadmin = False
+        user.user_username = "test"
+        TeraUser.insert(user)
+        return user

@@ -51,10 +51,7 @@ class TeraDeviceTest(BaseModelsTest):
     def test_insert_with_minimal_config(self):
         with self._flask_app.app_context():
             # Create a new device
-            device = TeraDevice()
-            device.device_name = 'Test device'
-            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
-            TeraDevice.insert(device)
+            device = TeraDeviceTest.new_test_device()
             self.assertIsNotNone(device.id_device)
             self.assertIsNotNone(device.device_token)
             self.assertIsNotNone(device.device_uuid)
@@ -83,10 +80,7 @@ class TeraDeviceTest(BaseModelsTest):
     def test_delete(self):
         with self._flask_app.app_context():
             # Create a new device
-            device = TeraDevice()
-            device.device_name = 'Test device'
-            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
-            TeraDevice.insert(device)
+            device = TeraDeviceTest.new_test_device()
             self.assertIsNotNone(device.id_device)
             id_device = device.id_device
             # Delete device
@@ -98,10 +92,7 @@ class TeraDeviceTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create a new device
-            device = TeraDevice()
-            device.device_name = 'Test device'
-            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
-            TeraDevice.insert(device)
+            device = TeraDeviceTest.new_test_device()
             self.assertIsNotNone(device.id_device)
             id_device = device.id_device
             # Delete device
@@ -118,10 +109,7 @@ class TeraDeviceTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create a new device
-            device = TeraDevice()
-            device.device_name = 'Test device'
-            device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
-            TeraDevice.insert(device)
+            device = TeraDeviceTest.new_test_device()
             self.assertIsNotNone(device.id_device)
             id_device = device.id_device
 
@@ -163,13 +151,10 @@ class TeraDeviceTest(BaseModelsTest):
             id_session_invitee = device_session.id_session
 
             # Attach asset
-            asset = TeraAsset()
-            asset.asset_name = "Device asset test"
-            asset.id_device = id_device
-            asset.id_session = id_session
-            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
-            asset.asset_type = 'Test'
-            TeraAsset.insert(asset)
+            from test_TeraAsset import TeraAssetTest
+            asset = TeraAssetTest.new_test_asset(id_session=id_session,
+                                                 service_uuid=TeraService.get_openteraserver_service().service_uuid,
+                                                 id_device=id_device)
             id_asset = asset.id_asset
 
             # ... and test
@@ -227,3 +212,12 @@ class TeraDeviceTest(BaseModelsTest):
             self.assertIsNone(TeraTest.get_test_by_id(id_test, True))
             self.assertIsNone(TeraServiceConfig.get_service_config_by_id(id_service_config, True))
             self.assertIsNone(TeraDeviceSite.get_device_site_by_id(id_device_site, True))
+
+    @staticmethod
+    def new_test_device() -> TeraDevice:
+        device = TeraDevice()
+        device.device_name = 'Test device'
+        device.id_device_type = TeraDeviceType.get_device_type_by_key('capteur').id_device_type
+        TeraDevice.insert(device)
+
+        return device

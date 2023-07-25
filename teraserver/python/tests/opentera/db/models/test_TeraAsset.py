@@ -258,14 +258,11 @@ class TeraAssetTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            asset = TeraAsset()
-            asset.asset_name = 'Test asset'
-            asset.id_session = TeraSession.get_session_by_id(2).id_session
-            asset.asset_service_uuid = TeraService.get_service_by_id(1).service_uuid
-            asset.asset_type = 'application/test'
-            TeraAsset.insert(asset)
+            asset = TeraAssetTest.new_test_asset(id_session=2,
+                                                 service_uuid=TeraService.get_service_by_id(1).service_uuid)
             self.assertIsNotNone(asset.id_asset)
             id_asset = asset.id_asset
+
             # Delete
             TeraAsset.delete(id_asset)
             # Make sure it is deleted
@@ -279,26 +276,10 @@ class TeraAssetTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new
-            asset = TeraAsset()
-            asset.asset_name = 'Test asset'
-            asset.id_session = TeraSession.get_session_by_id(2).id_session
-            asset.asset_service_uuid = TeraService.get_service_by_id(1).service_uuid
-            asset.asset_type = 'application/test'
-            TeraAsset.insert(asset)
+            asset = TeraAssetTest.new_test_asset(id_session=2,
+                                                 service_uuid=TeraService.get_service_by_id(1).service_uuid)
             self.assertIsNotNone(asset.id_asset)
             id_asset = asset.id_asset
-
-            # Try to hard delete while not soft deleted
-            # with self.assertRaises(SQLAlchemyError):
-            #     TeraAsset.delete(id_asset, hard_delete=True)
-            #
-            # # Soft delete
-            # TeraAsset.delete(id_asset)
-            #
-            # # Assert soft deleted
-            # asset = TeraAsset.query.filter_by(id_asset=id_asset).execution_options(include_deleted=True).first()
-            # self.assertIsNotNone(asset)
-            # self.assertIsNotNone(asset.deleted_at)
 
             # Hard delete
             TeraAsset.delete(id_asset, hard_delete=True)
@@ -310,3 +291,81 @@ class TeraAssetTest(BaseModelsTest):
             self.db.session.expire_all()
             session = TeraSession.get_session_by_id(2)
             self.assertIsNotNone(session)
+
+    def test_undelete(self):
+        with self._flask_app.app_context():
+            # Create new participant
+            from test_TeraParticipant import TeraParticipantTest
+            participant = TeraParticipantTest.new_test_participant(id_project=1)
+            id_participant = participant.id_participant
+
+            # Create new device
+            from test_TeraDevice import TeraDeviceTest
+            device = TeraDeviceTest.new_test_device()
+            id_device = device.id_device
+
+            # Create new user
+            from test_TeraUser import TeraUserTest
+            user = TeraUserTest.new_test_user()
+            id_user = user.id_user
+
+            # Create new session
+            from test_TeraSession import TeraSessionTest
+            ses = TeraSessionTest.new_test_session(participants=[participant], users=[user], devices=[device])
+            id_session = ses.id_session
+
+            # Create new asset
+            asset = TeraAssetTest.new_test_asset(id_session=ses.id_session,
+                                                 service_uuid=TeraService.get_service_by_id(1).service_uuid)
+            self.assertIsNotNone(asset.id_asset)
+            id_asset = asset.id_asset
+
+            # Delete
+            # Asset will be deleted with the session
+            TeraSession.delete(id_session)
+            TeraParticipant.delete(id_participant)
+            TeraDevice.delete(id_device)
+            TeraUser.delete(id_user)
+            # TeraAsset.delete(id_asset)
+            # Make sure it is deleted
+            # Warning, it was deleted, object is not valid anymore
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
+
+            # Undelete
+            TeraAsset.undelete(id_asset)
+
+            # Make sure it is back!
+            self.db.session.expire_all()
+            asset = TeraAsset.get_asset_by_id(id_asset)
+            self.assertIsNotNone(asset)
+            self.assertIsNone(asset.deleted_at)
+
+            ses = TeraSession.get_session_by_id(id_session)
+            self.assertIsNotNone(ses)
+            user = TeraUser.get_user_by_id(id_user)
+            self.assertIsNotNone(user)
+            device = TeraDevice.get_device_by_id(id_device)
+            self.assertIsNotNone(device)
+            participant = TeraParticipant.get_participant_by_id(id_participant)
+            self.assertIsNotNone(participant)
+
+    @staticmethod
+    def new_test_asset(id_session: int, service_uuid: str, id_device: int | None = None,
+                       id_participant: int | None = None, id_user: int | None = None,
+                       id_service: int | None = None) -> TeraAsset:
+        asset = TeraAsset()
+        asset.asset_name = 'Test asset'
+        asset.id_session = id_session
+        if id_device:
+            asset.id_device = id_device
+        if id_participant:
+            asset.id_participant = id_participant
+        if id_user:
+            asset.id_user = id_user,
+        if id_service:
+            asset.id_service = id_service,
+        asset.asset_service_uuid = service_uuid
+        asset.asset_type = 'application/test'
+        TeraAsset.insert(asset)
+        return asset
+

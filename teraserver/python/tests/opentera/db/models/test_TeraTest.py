@@ -47,3 +47,22 @@ class TeraTestTest(BaseModelsTest):
 
             # Make sure eveything is deleted
             self.assertIsNone(TeraTest.get_test_by_id(id_test, True))
+
+    def test_undelete(self):
+        with self._flask_app.app_context():
+            # Create new
+            test = TeraTest()
+            test.id_participant = 1
+            test.id_session = 1
+            test.id_test_type = 1
+            test.test_name = "Test test!"
+            TeraTest.insert(test)
+            self.assertIsNotNone(test.id_test)
+            id_test = test.id_test
+
+            # Soft delete
+            TeraTest.delete(id_test)
+
+            # Make sure it is deleted
+            self.assertIsNone(TeraTest.get_test_by_id(id_test))
+

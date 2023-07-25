@@ -60,24 +60,16 @@ class TeraSessionTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            ses = TeraSession()
-            ses.id_creator_service = 1
-            ses.id_session_type = 1
-            ses.session_name = "Test session"
-            ses.session_participants = [TeraParticipant.get_participant_by_id(1)]
-            ses.session_devices = [TeraDevice.get_device_by_id(1)]
-            ses.session_users = [TeraUser.get_user_by_id(2)]
-            TeraSession.insert(ses)
+            ses = TeraSessionTest.new_test_session(participants=[TeraParticipant.get_participant_by_id(1)],
+                                                   devices=[TeraDevice.get_device_by_id(1)],
+                                                   users=[TeraUser.get_user_by_id(2)])
             id_session = ses.id_session
 
             # Attach asset
-            asset = TeraAsset()
-            asset.asset_name = "Asset test"
-            asset.id_device = 1
-            asset.id_session = id_session
-            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
-            asset.asset_type = 'Test'
-            TeraAsset.insert(asset)
+            from test_TeraAsset import TeraAssetTest
+            asset = TeraAssetTest.new_test_asset(id_session=id_session,
+                                                 service_uuid=TeraService.get_openteraserver_service().service_uuid,
+                                                 id_device=1)
             id_asset = asset.id_asset
 
             # ... and test
@@ -116,24 +108,16 @@ class TeraSessionTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new
-            ses = TeraSession()
-            ses.id_creator_service = 1
-            ses.id_session_type = 1
-            ses.session_name = "Test session"
-            ses.session_participants = [TeraParticipant.get_participant_by_id(1)]
-            ses.session_devices = [TeraDevice.get_device_by_id(1)]
-            ses.session_users = [TeraUser.get_user_by_id(2)]
-            TeraSession.insert(ses)
+            ses = ses = TeraSessionTest.new_test_session(participants=[TeraParticipant.get_participant_by_id(1)],
+                                                         devices=[TeraDevice.get_device_by_id(1)],
+                                                         users=[TeraUser.get_user_by_id(2)])
             id_session = ses.id_session
 
             # Attach asset
-            asset = TeraAsset()
-            asset.asset_name = "Asset test"
-            asset.id_device = 1
-            asset.id_session = id_session
-            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
-            asset.asset_type = 'Test'
-            TeraAsset.insert(asset)
+            from test_TeraAsset import TeraAssetTest
+            asset = TeraAssetTest.new_test_asset(id_session=id_session,
+                                                 service_uuid=TeraService.get_openteraserver_service().service_uuid,
+                                                 id_device=1)
             id_asset = asset.id_asset
 
             # ... and test
@@ -159,3 +143,17 @@ class TeraSessionTest(BaseModelsTest):
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, with_deleted=True))
             self.assertIsNone(TeraTest.get_test_by_id(id_test, with_deleted=True))
 
+    @staticmethod
+    def new_test_session(id_creator_service: int = 1, id_session_type: int = 1, participants: list | None = None,
+                         devices: list | None = None, users: list | None = None) -> TeraSession:
+        if participants is None:
+            participants = []
+        ses = TeraSession()
+        ses.id_creator_service = id_creator_service
+        ses.id_session_type = id_session_type
+        ses.session_name = "Test session"
+        ses.session_participants = participants
+        ses.session_devices = devices
+        ses.session_users = users
+        TeraSession.insert(ses)
+        return ses

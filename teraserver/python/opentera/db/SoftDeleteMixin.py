@@ -121,7 +121,7 @@ def generate_soft_delete_mixin_class(
                     # Relationship has a cascade delete or a secondary table
                     if relation[1].cascade.delete:
                         for item in getattr(_self, relation[0]):
-                            print("Cascade deleting " + str(item))
+                            # print("Cascade deleting " + str(item))
                             hard_item_deleter = getattr(item, hard_delete_method_name)
                             hard_item_deleter()
 
@@ -147,19 +147,18 @@ def generate_soft_delete_mixin_class(
 
     if generate_undelete_method:
         def undelete_method(_self):
+            if not getattr(_self, deleted_field_name):
+                print("Object " + str(_self.__class__) + " not deleted - returning.")
+                return
+            _self.handle_include_deleted_flag(True)
+            setattr(_self, deleted_field_name, None)
+            print("Undeleting " + str(_self.__class__))
             if handle_cascade_delete:
                 primary_key_name = inspect(_self.__class__).primary_key[0].name
                 for relation in inspect(_self.__class__).relationships.items():
-                    if relation[1].cascade.delete:  # Relationship has a cascade delete
-                        # Item has a delete_at field (thus supports soft-delete)
-                        if deleted_field_name in relation[1].entity.columns.keys():
-                            # Cascade undelete - must manually query to get deleted rows
-                            related_items = relation[1].entity.class_.query.execution_options(include_deleted=True).\
-                                filter(text(primary_key_name + '=' + str(getattr(_self, primary_key_name)))).all()
-                            for item in related_items:
-                                item_undeleter = getattr(item, undelete_method_name)
-                                item_undeleter()
+                    print(str(_self.__class__) + " - relation " + str(relation))
                     if relation[1].secondary is not None:
+                        print("-> Undeleting secondary table relationship " + relation[1].secondary.name)
                         # Item has a delete_at field (thus supports soft-delete)
                         if deleted_field_name in relation[1].entity.columns.keys():
                             model_class = _self.get_class_from_tablename(relation[1].secondary.name)
@@ -171,7 +170,39 @@ def generate_soft_delete_mixin_class(
                                     item_undeleter = getattr(item, undelete_method_name)
                                     item_undeleter()
 
-            setattr(_self, deleted_field_name, None)
+                                    # Undelete "left-side" item of the relationship
+                                    remote_primary_key = relation[1].target.primary_key.columns[0].name
+                                    remote_model = _self.get_class_from_tablename(relation[1].target.name)
+                                    remote_item = remote_model.query.filter(text(remote_primary_key + '=' +
+                                                                                 str(getattr(item, remote_primary_key)))
+                                                                            ).execution_options(include_deleted=True)\
+                                        .first()
+                                    if remote_item:
+                                        print("--> Undeleting left side of secondary table " + relation[1].target.name)
+                                        item_undeleter = getattr(remote_item, undelete_method_name)
+                                        item_undeleter()
+
+                                continue
+                    # Check for parents or related items
+                    if relation[1].back_populates:
+                        print("--> Undeleting back_populates relationship " + str(relation[1]))
+                        # if relation[1].cascade.delete:  # Relationship has a cascade delete
+                        # Item has a delete_at field (thus supports soft-delete)
+                        if deleted_field_name in relation[1].entity.columns.keys():
+                            # Cascade undelete - must manually query to get deleted rows
+                            remote_primary_key = list(relation[1].remote_side)[0].name
+                            local_primary_key = list(relation[1].local_columns)[0].name
+                            self_key_value = getattr(_self, local_primary_key)
+                            if not self_key_value:
+                                continue
+                            related_items = relation[1].entity.class_.query.execution_options(include_deleted=True).\
+                                filter(text(remote_primary_key + '=' + str(self_key_value))).all()
+                            for item in related_items:
+                                item_undeleter = getattr(item, undelete_method_name)
+                                item_undeleter()
+                            continue
+                    print("Skipped undelete")
+                _self.handle_include_deleted_flag(False)
 
         class_attributes[undelete_method_name] = undelete_method
 
