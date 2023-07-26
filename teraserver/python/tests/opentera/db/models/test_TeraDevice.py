@@ -273,6 +273,8 @@ class TeraDeviceTest(BaseModelsTest):
             self.assertIsNone(asset)  # Asset stays deleted
             test = TeraTest.get_test_by_id(id_test)
             self.assertIsNone(test)  # Test stays deleted
+            config = TeraServiceConfig.get_service_config_by_id(id_service_config)
+            self.assertIsNotNone(config)
 
     @staticmethod
     def new_test_device() -> TeraDevice:

@@ -412,3 +412,6 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         # Delete sessions that we are part of since they will not be deleted otherwise
         for ses in self.participant_sessions:
             ses.hard_delete()
+
+    def get_undelete_cascade_relations(self):
+        return ['participant_service_config']

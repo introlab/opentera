@@ -269,3 +269,6 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
         # Delete sessions that we are part of since they will not be deleted otherwise
         for ses in self.device_sessions:
             ses.hard_delete()
+
+    def get_undelete_cascade_relations(self):
+        return ['device_service_config']
