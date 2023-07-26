@@ -7,7 +7,7 @@ from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 
 
 class TeraAssetTest(BaseModelsTest):
@@ -316,17 +316,13 @@ class TeraAssetTest(BaseModelsTest):
 
             # Create new asset
             asset = TeraAssetTest.new_test_asset(id_session=ses.id_session,
-                                                 service_uuid=TeraService.get_service_by_id(1).service_uuid)
+                                                 service_uuid=TeraService.get_service_by_id(1).service_uuid,
+                                                 id_user=id_user, id_participant=id_participant, id_device=id_device)
             self.assertIsNotNone(asset.id_asset)
             id_asset = asset.id_asset
 
             # Delete
-            # Asset will be deleted with the session
-            TeraSession.delete(id_session)
-            TeraParticipant.delete(id_participant)
-            TeraDevice.delete(id_device)
-            TeraUser.delete(id_user)
-            # TeraAsset.delete(id_asset)
+            TeraAsset.delete(id_asset)
             # Make sure it is deleted
             # Warning, it was deleted, object is not valid anymore
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
@@ -340,14 +336,55 @@ class TeraAssetTest(BaseModelsTest):
             self.assertIsNotNone(asset)
             self.assertIsNone(asset.deleted_at)
 
-            ses = TeraSession.get_session_by_id(id_session)
-            self.assertIsNotNone(ses)
-            user = TeraUser.get_user_by_id(id_user)
-            self.assertIsNotNone(user)
-            device = TeraDevice.get_device_by_id(id_device)
-            self.assertIsNotNone(device)
+            # Now, delete again but with its dependencies...
+            # Asset will be deleted with the session
+            TeraSession.delete(id_session)
+            TeraParticipant.delete(id_participant)
+            TeraDevice.delete(id_device)
+            TeraUser.delete(id_user)
+
+            # Exception should be thrown when trying to undelete
+            with self.assertRaises(IntegrityError) as cm:
+                TeraAsset.undelete(id_asset)
+
+            # Restore participant
+            TeraParticipant.undelete(id_participant)
             participant = TeraParticipant.get_participant_by_id(id_participant)
             self.assertIsNotNone(participant)
+
+            # Restore asset - still has dependencies issues...
+            with self.assertRaises(IntegrityError) as cm:
+                TeraAsset.undelete(id_asset)
+
+            # Restore user
+            TeraUser.undelete(id_user)
+            user = TeraUser.get_user_by_id(id_user)
+            self.assertIsNotNone(user)
+
+            # Restore asset - still has dependencies issues...
+            with self.assertRaises(IntegrityError) as cm:
+                TeraAsset.undelete(id_asset)
+
+            # Restore device
+            TeraDevice.undelete(id_device)
+            device = TeraDevice.get_device_by_id(id_device)
+            self.assertIsNotNone(device)
+
+            # Restore asset - still has dependencies issues...
+            with self.assertRaises(IntegrityError) as cm:
+                TeraAsset.undelete(id_asset)
+
+            # Restore session
+            TeraSession.undelete(id_session)
+
+            ses = TeraSession.get_session_by_id(id_session)
+            self.assertIsNotNone(ses)
+
+            # Asset was restored with the session...
+            self.db.session.expire_all()
+            asset = TeraAsset.get_asset_by_id(id_asset)
+            self.assertIsNotNone(asset)
+            self.assertIsNone(asset.deleted_at)
 
     @staticmethod
     def new_test_asset(id_session: int, service_uuid: str, id_device: int | None = None,
@@ -361,9 +398,9 @@ class TeraAssetTest(BaseModelsTest):
         if id_participant:
             asset.id_participant = id_participant
         if id_user:
-            asset.id_user = id_user,
+            asset.id_user = id_user
         if id_service:
-            asset.id_service = id_service,
+            asset.id_service = id_service
         asset.asset_service_uuid = service_uuid
         asset.asset_type = 'application/test'
         TeraAsset.insert(asset)

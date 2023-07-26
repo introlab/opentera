@@ -15,11 +15,11 @@ class BaseModelsTest(unittest.TestCase):
         cls._flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
         cls._db_man = DBManager(cls._config, app=cls._flask_app)
         # Setup DB in RAM
-        # filename = 'D:\\temp\\opentera.db'
-        # import os
-        # os.remove(filename)
-        # cls._db_man.open_local({'filename': filename}, echo=False, ram=False)
-        cls._db_man.open_local({}, echo=False, ram=True)
+        filename = 'D:\\temp\\opentera.db'
+        import os
+        os.remove(filename)
+        cls._db_man.open_local({'filename': filename}, echo=False, ram=False)
+        # cls._db_man.open_local({}, echo=False, ram=True)
 
         # Creating default users / tests. Time-consuming, only once per test file.
         with cls._flask_app.app_context():

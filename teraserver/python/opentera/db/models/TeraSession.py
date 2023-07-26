@@ -40,8 +40,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                         back_populates="participant_sessions", lazy="selectin")
     session_users = relationship("TeraUser", secondary="t_sessions_users", back_populates="user_sessions",
                                  lazy="selectin")
-    session_devices = relationship("TeraDevice", secondary="t_sessions_devices",
-                                   back_populates="device_sessions", lazy="selectin")
+    session_devices = relationship("TeraDevice", secondary="t_sessions_devices", back_populates="device_sessions",
+                                   lazy="selectin")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
@@ -457,3 +457,6 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                 # Dumps dictionnary into json
                 values['session_parameters'] = json.dumps(values['session_parameters'])
         super().update(update_id=update_id, values=values)
+
+    def get_undelete_cascade_relations(self):
+        return ['session_events', 'session_assets', 'session_tests']

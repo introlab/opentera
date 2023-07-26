@@ -27,10 +27,7 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_to_json(self):
         with self._flask_app.app_context():
-            new_site = TeraSite()
-            new_site.site_name = 'Site Name'
-            self.db.session.add(new_site)
-            self.db.session.commit()
+            new_site = TeraSiteTest.new_test_site()
             new_site_json = new_site.to_json()
             new_site_json_minimal = new_site.to_json(minimal=True)
             self.assertEqual(new_site_json['site_name'], 'Site Name')
@@ -52,21 +49,14 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_to_json_update_event(self):
         with self._flask_app.app_context():
-            new_site = TeraSite()
-            new_site.site_name = 'test_to_json_update_event'
-            self.db.session.add(new_site)
-            self.db.session.commit()
-            self.db.session.rollback()
+            new_site = TeraSiteTest.new_test_site()
             new_site_json = new_site.to_json_update_event()
             self.assertEqual(new_site_json['site_name'], new_site.site_name)
             self.assertGreaterEqual(new_site_json['id_site'], 1)
 
     def test_to_json_delete_event(self):
         with self._flask_app.app_context():
-            new_site = TeraSite()
-            new_site.site_name = 'test_to_json_delete_event'
-            self.db.session.add(new_site)
-            self.db.session.commit()
+            new_site = TeraSiteTest.new_test_site()
             new_site_json_delete = new_site.to_json_delete_event()
             self.assertGreaterEqual(new_site_json_delete['id_site'], 1)
 
@@ -90,9 +80,7 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_insert_and_delete(self):
         with self._flask_app.app_context():
-            new_site = TeraSite()
-            new_site.site_name = 'test_insert_and_delete'
-            TeraSite.insert(site=new_site)
+            new_site = TeraSiteTest.new_test_site()
             self.assertGreaterEqual(new_site.id_site, 1)
             id_to_del = TeraSite.get_site_by_id(new_site.id_site).id_site
             TeraSite.delete(id_todel=id_to_del)
@@ -104,9 +92,7 @@ class TeraSiteTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            site = TeraSite()
-            site.site_name = "Test Site"
-            TeraSite.insert(site)
+            site = TeraSiteTest.new_test_site()
             id_site = site.id_site
 
             # Soft delete
@@ -123,9 +109,7 @@ class TeraSiteTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new
-            site = TeraSite()
-            site.site_name = "Test Site"
-            TeraSite.insert(site)
+            site = TeraSiteTest.new_test_site()
             id_site = site.id_site
 
             project = TeraProject()
@@ -174,5 +158,12 @@ class TeraSiteTest(BaseModelsTest):
             self.assertIsNone(TeraProject.get_project_by_id(id_project, True))
             self.assertIsNone(TeraParticipant.get_participant_by_id(id_participant, True))
             self.assertIsNone(TeraSession.get_session_by_id(id_session, True))
+
+    @staticmethod
+    def new_test_site() -> TeraSite:
+        site = TeraSite()
+        site.site_name = "Test Site"
+        TeraSite.insert(site)
+        return site
 
 

@@ -144,16 +144,28 @@ class TeraSessionTest(BaseModelsTest):
             self.assertIsNone(TeraTest.get_test_by_id(id_test, with_deleted=True))
 
     @staticmethod
-    def new_test_session(id_creator_service: int = 1, id_session_type: int = 1, participants: list | None = None,
+    def new_test_session(id_session_type: int = 1, id_creator_service: int | None = None,
+                         id_creator_device: int | None = None, id_creator_participant: int | None = None,
+                         id_creator_user: int | None = None, participants: list | None = None,
                          devices: list | None = None, users: list | None = None) -> TeraSession:
         if participants is None:
             participants = []
         ses = TeraSession()
-        ses.id_creator_service = id_creator_service
+        if id_creator_service:
+            ses.id_creator_service = id_creator_service
+        if id_creator_device:
+            ses.id_creator_device = id_creator_device
+        if id_creator_participant:
+            ses.id_creator_participant = id_creator_participant
+        if id_creator_user:
+            ses.id_creator_user = id_creator_user
         ses.id_session_type = id_session_type
         ses.session_name = "Test session"
-        ses.session_participants = participants
-        ses.session_devices = devices
-        ses.session_users = users
+        if participants:
+            ses.session_participants = participants
+        if devices:
+            ses.session_devices = devices
+        if users:
+            ses.session_users = users
         TeraSession.insert(ses)
         return ses
