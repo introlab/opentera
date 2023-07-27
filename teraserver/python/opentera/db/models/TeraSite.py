@@ -87,3 +87,6 @@ class TeraSite(BaseModel, SoftDeleteMixin):
         access_role.id_site = site.id_site
         access_role.service_role_name = 'user'
         TeraServiceRole.insert(access_role)
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['site_services_roles']

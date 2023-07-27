@@ -253,3 +253,6 @@ class TeraService(BaseModel, SoftDeleteMixin):
             del values['service_uuid']
 
         super().update(update_id, values)
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['service_sites', 'service_projects', 'service_roles']

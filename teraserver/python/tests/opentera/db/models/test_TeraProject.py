@@ -3,7 +3,7 @@ from sqlalchemy import exc
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraParticipant import TeraParticipant
-from opentera.db.models.TeraDevice import TeraDevice
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from sqlalchemy.exc import IntegrityError
 
@@ -213,7 +213,10 @@ class TeraProjectTest(BaseModelsTest):
             self.assertIsNotNone(TeraProject.get_project_by_id(id_project))
 
             # Delete project again...
+            project_service_roles_ids = [role.id_service_role for role in project.project_services_roles]
             TeraProject.delete(id_project)
+            for id_role in project_service_roles_ids:
+                self.assertIsNone(TeraServiceRole.get_service_role_by_id(id_role))
 
             # ... then site.
             TeraSite.delete(id_site)
@@ -226,6 +229,11 @@ class TeraProjectTest(BaseModelsTest):
             # Undelete everything - should work
             TeraSite.undelete(id_site)
             TeraProject.undelete(id_project)
+
+            # Check that project service roles are also undeleted
+            self.db.session.expire_all()
+            project = TeraProject.get_project_by_id(id_project)
+            self.assertEqual(len(project.project_services_roles), 2)
 
     def test_project_relationships_deletion_and_access(self):
         with self._flask_app.app_context():

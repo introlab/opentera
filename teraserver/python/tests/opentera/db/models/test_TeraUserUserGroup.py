@@ -143,3 +143,11 @@ class TeraUserUserGroupTest(BaseModelsTest):
             id_user_user_group = uug.id_user_user_group
             TeraUserUserGroup.delete(id_user_user_group)
             self.assertIsNotNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, with_deleted=True))
+
+    @staticmethod
+    def new_test_user_usergroup(id_user: int, id_user_group: int) -> TeraUserUserGroup:
+        uug = TeraUserUserGroup()
+        uug.id_user = id_user
+        uug.id_user_group = id_user_group
+        TeraUserUserGroup.insert(uug)
+        return uug

@@ -230,9 +230,7 @@ class TeraUserGroupTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            ug = TeraUserGroup()
-            ug.user_group_name = "Test User Group"
-            TeraUserGroup.insert(ug)
+            ug = TeraUserGroupTest.new_test_usergroup()
             self.assertIsNotNone(ug.id_user_group)
             id_user_group = ug.id_user_group
 
@@ -250,22 +248,12 @@ class TeraUserGroupTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new
-            ug = TeraUserGroup()
-            ug.user_group_name = "Test User Group"
-            TeraUserGroup.insert(ug)
+            ug = TeraUserGroupTest.new_test_usergroup()
             self.assertIsNotNone(ug.id_user_group)
             id_user_group = ug.id_user_group
 
-            user = TeraUser()
-            user.user_enabled = True
-            user.user_firstname = "Test"
-            user.user_lastname = "User"
-            user.user_profile = ""
-            user.user_password = TeraUser.encrypt_password("test")
-            user.user_superadmin = False
-            user.user_username = "test"
-            user.user_user_groups = [ug]
-            TeraUser.insert(user)
+            from test_TeraUser import TeraUserTest
+            user = TeraUserTest.new_test_user(user_groups=[ug])
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -290,4 +278,12 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group, True))
             self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, True))
 
+    def test_undelete(self):
+        pass
 
+    @staticmethod
+    def new_test_usergroup() -> TeraUserGroup:
+        ug = TeraUserGroup()
+        ug.user_group_name = "Test User Group"
+        TeraUserGroup.insert(ug)
+        return ug

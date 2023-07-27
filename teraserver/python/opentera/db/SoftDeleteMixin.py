@@ -175,7 +175,7 @@ def generate_soft_delete_mixin_class(
                         raise IntegrityError('Cannot undelete: unsatisfied foreign key - ' + col.name, col_value,
                                              remote_table_name)
             # Undelete!
-            print("Undeleting " + str(_self.__class__))
+            # print("Undeleting " + str(_self.__class__))
             setattr(_self, deleted_field_name, None)
 
             # Check relationships that are cascade deleted to restore them
@@ -194,7 +194,7 @@ def generate_soft_delete_mixin_class(
                             related_items = relation[1].entity.class_.query.execution_options(include_deleted=True).\
                                 filter(text(remote_primary_key + '=' + str(self_key_value))).all()
                             for item in related_items:
-                                print("--> Undeleting relationship " + relation[1].key)
+                                # print("--> Undeleting relationship " + relation[1].key)
                                 item_undeleter = getattr(item, undelete_method_name)
                                 item_undeleter()
                             continue
@@ -212,7 +212,7 @@ def generate_soft_delete_mixin_class(
                                 remote_item = remote_model.query.filter(
                                     text(remote_primary_key + '=' + str(getattr(item, remote_primary_key)))).first()
                                 if remote_item:
-                                    print("--> Undeleting relationship with " + relation[1].target.name)
+                                    #  print("--> Undeleting relationship with " + relation[1].target.name)
                                     item_undeleter = getattr(item, undelete_method_name)
                                     item_undeleter()
 

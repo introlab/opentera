@@ -186,3 +186,6 @@ class TeraProject(BaseModel, SoftDeleteMixin):
         TeraProject.db().session.add(access_role)
 
         TeraProject.db().session.commit()
+
+    def get_undelete_cascade_relations(self):
+        return ['project_services_roles']

@@ -353,7 +353,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertIsNotNone(participant)
 
             # Restore asset - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraAsset.undelete(id_asset)
 
             # Restore user
@@ -362,7 +362,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertIsNotNone(user)
 
             # Restore asset - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraAsset.undelete(id_asset)
 
             # Restore device
@@ -371,7 +371,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertIsNotNone(device)
 
             # Restore asset - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraAsset.undelete(id_asset)
 
             # Restore session

@@ -2,6 +2,8 @@ from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 class TeraServiceTest(BaseModelsTest):
@@ -63,7 +65,6 @@ class TeraServiceTest(BaseModelsTest):
             new_service.service_clientendpoint = 'Clientendpoint'
             new_service.service_system = True
             new_service.service_editable_config = True
-
             new_service.service_enabled = None
             self.db.session.add(new_service)
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
@@ -376,14 +377,7 @@ class TeraServiceTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            service = TeraService()
-            service.service_name = 'Test Service'
-            service.service_key = 'TestService'
-            service.service_hostname = 'localhost'
-            service.service_port = 12345
-            service.service_endpoint = 'test'
-            service.service_clientendpoint = '/'
-            TeraService.insert(service)
+            service = TeraServiceTest.new_test_service('TestService')
             self.assertIsNotNone(service.id_service)
             id_service = service.id_service
 
@@ -401,22 +395,13 @@ class TeraServiceTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new
-            service = TeraService()
-            service.service_name = 'Test Service'
-            service.service_key = 'TestService'
-            service.service_hostname = 'localhost'
-            service.service_port = 12345
-            service.service_endpoint = 'test'
-            service.service_clientendpoint = '/'
-            TeraService.insert(service)
+            service = TeraServiceTest.new_test_service('TestService')
             self.assertIsNotNone(service.id_service)
             id_service = service.id_service
 
             # Create a new site association for that service
-            site_service = TeraServiceSite()
-            site_service.id_service = id_service
-            site_service.id_site = 1
-            TeraServiceSite.insert(site_service)
+            from test_TeraServiceSite import TeraServiceSiteTest
+            site_service = TeraServiceSiteTest.new_test_service_site(id_site=1, id_service=id_service)
             self.assertIsNotNone(site_service.id_service_site)
             id_site_service = site_service.id_service_site
 
@@ -436,3 +421,56 @@ class TeraServiceTest(BaseModelsTest):
             # Make sure eveything is deleted
             self.assertIsNone(TeraService.get_service_by_id(id_service, True))
             self.assertIsNone(TeraServiceSite.get_service_site_by_id(id_site_service, True))
+
+    def test_undelete(self):
+        with self._flask_app.app_context():
+            # Create new
+            service = TeraServiceTest.new_test_service('TestService')
+            self.assertIsNotNone(service.id_service)
+            id_service = service.id_service
+
+            # Create service roles
+            from test_TeraServiceRole import TeraServiceRoleTest
+            role = TeraServiceRoleTest.new_test_service_role(id_service=id_service, role_name='admin')
+            id_role_admin = role.id_service_role
+
+            role = TeraServiceRoleTest.new_test_service_role(id_service=id_service, role_name='user')
+            id_role_user = role.id_service_role
+
+            # Create service sites association
+            from test_TeraServiceSite import TeraServiceSiteTest
+            service_site = TeraServiceSiteTest.new_test_service_site(id_site=1, id_service=id_service)
+            id_service_site = service_site.id_service_site
+
+            # Create service projects association
+            from test_TeraServiceProject import TeraServiceProjectTest
+            service_project = TeraServiceProjectTest.new_test_service_project(id_service=id_service, id_project=1)
+            id_service_project = service_project.id_service_project
+
+            # Soft delete to prevent relationship integrity errors as we want to test hard-delete cascade here
+            TeraServiceSite.delete(id_service_site)
+            TeraServiceProject.delete(id_service_project)
+            TeraService.delete(id_service)
+            self.assertIsNone(TeraService.get_service_by_id(id_service))
+            self.assertIsNone(TeraServiceRole.get_service_role_by_id(id_role_user))
+            self.assertIsNone(TeraServiceRole.get_service_role_by_id(id_role_admin))
+
+            # Undelete service
+            TeraService.undelete(id_service)
+            self.assertIsNotNone(TeraService.get_service_by_id(id_service))
+            self.assertIsNotNone(TeraServiceProject.get_service_project_by_id(id_service_project))
+            self.assertIsNotNone(TeraServiceSite.get_service_site_by_id(id_service_site))
+            self.assertIsNotNone(TeraServiceRole.get_service_role_by_id(id_role_user))
+            self.assertIsNotNone(TeraServiceRole.get_service_role_by_id(id_role_admin))
+
+    @staticmethod
+    def new_test_service(service_key: str):
+        service = TeraService()
+        service.service_name = 'Test Service'
+        service.service_key = service_key
+        service.service_hostname = 'localhost'
+        service.service_port = 12345
+        service.service_endpoint = 'test'
+        service.service_clientendpoint = '/'
+        TeraService.insert(service)
+        return service

@@ -6,6 +6,7 @@ from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
@@ -94,38 +95,23 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign user to sessions
-            user_session = TeraSession()
-            user_session.id_creator_user = id_user
-            user_session.id_session_type = 1
-            user_session.session_name = 'Creator user session'
-            TeraSession.insert(user_session)
+            from test_TeraSession import TeraSessionTest
+            user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
-            user_session = TeraSession()
-            user_session.id_creator_service = 1
-            user_session.id_session_type = 1
-            user_session.session_name = "User invitee session"
-            user_session.session_users = [user]
-            TeraSession.insert(user_session)
+            user_session = TeraSessionTest.new_test_session(id_creator_service=1, users=[user])
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            asset = TeraAsset()
-            asset.asset_name = "User asset test"
-            asset.id_user = id_user
-            asset.id_session = id_session
-            asset.asset_service_uuid = TeraService.get_openteraserver_service().service_uuid
-            asset.asset_type = 'Test'
-            TeraAsset.insert(asset)
+            from test_TeraAsset import TeraAssetTest
+            asset = TeraAssetTest.new_test_asset(id_session=id_session,
+                                                 service_uuid=TeraService.get_openteraserver_service().service_uuid,
+                                                 id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            test = TeraTest()
-            test.id_user = id_user
-            test.id_session = id_session
-            test.id_test_type = 1
-            test.test_name = "User test test!"
-            TeraTest.insert(test)
+            from test_TeraTest import TeraTestTest
+            test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
             # Soft delete device to prevent relationship integrity errors as we want to test hard-delete cascade here
@@ -155,8 +141,57 @@ class TeraUserTest(BaseModelsTest):
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset, True))
             self.assertIsNone(TeraTest.get_test_by_id(id_test, True))
 
+    def test_undelete(self):
+        with self._flask_app.app_context():
+            # Create new user
+            user = TeraUserTest.new_test_user()
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
+
+            # Assign to user group
+            from test_TeraUserUserGroup import TeraUserUserGroupTest
+            uug = TeraUserUserGroupTest.new_test_user_usergroup(id_user=id_user, id_user_group=1)
+            id_user_user_group = uug.id_user_user_group
+
+            # Assign user to sessions
+            from test_TeraSession import TeraSessionTest
+            user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
+            id_session = user_session.id_session
+
+            user_session = TeraSessionTest.new_test_session(id_creator_service=1, users=[user])
+            id_session_invitee = user_session.id_session
+
+            # Attach asset
+            from test_TeraAsset import TeraAssetTest
+            asset = TeraAssetTest.new_test_asset(id_session=id_session,
+                                                 service_uuid=TeraService.get_openteraserver_service().service_uuid,
+                                                 id_user=id_user)
+            id_asset = asset.id_asset
+
+            # ... and test
+            from test_TeraTest import TeraTestTest
+            test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
+            id_test = test.id_test
+
+            # Soft delete device to prevent relationship integrity errors as we want to test hard-delete cascade here
+            TeraSession.delete(id_session)
+            TeraSession.delete(id_session_invitee)
+            TeraUser.delete(id_user)
+            self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+
+            # Undelete
+            TeraUser.undelete(id_user)
+
+            # Validate
+            self.assertIsNotNone(TeraUser.get_user_by_id(id_user))
+            self.assertIsNotNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session))
+            self.assertIsNone(TeraSession.get_session_by_id(id_session_invitee))
+            self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
+            self.assertIsNone(TeraTest.get_test_by_id(id_test))
+
     @staticmethod
-    def new_test_user() -> TeraUser:
+    def new_test_user(user_groups: list | None = None) -> TeraUser:
         user = TeraUser()
         user.user_enabled = True
         user.user_firstname = "Test"
@@ -165,5 +200,7 @@ class TeraUserTest(BaseModelsTest):
         user.user_password = TeraUser.encrypt_password("test")
         user.user_superadmin = False
         user.user_username = "test"
+        if user_groups:
+            user.user_user_groups = user_groups
         TeraUser.insert(user)
         return user
