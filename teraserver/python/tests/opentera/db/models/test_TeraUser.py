@@ -6,6 +6,7 @@ from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
@@ -73,7 +74,7 @@ class TeraUserTest(BaseModelsTest):
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
-            user = TeraUserTest.new_test_user()
+            user = TeraUserTest.new_test_user(user_name="user_soft_delete")
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -90,7 +91,7 @@ class TeraUserTest(BaseModelsTest):
     def test_hard_delete(self):
         with self._flask_app.app_context():
             # Create new user
-            user = TeraUserTest.new_test_user()
+            user = TeraUserTest.new_test_user(user_name="user_hard_delete")
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -144,7 +145,7 @@ class TeraUserTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create new user
-            user = TeraUserTest.new_test_user()
+            user = TeraUserTest.new_test_user(user_name="user_undelete")
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -173,6 +174,11 @@ class TeraUserTest(BaseModelsTest):
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
+            # ... and service config
+            from test_TeraServiceConfig import TeraServiceConfigTest
+            service_conf = TeraServiceConfigTest.new_test_service_config(id_service=1, id_user=id_user)
+            id_service_conf = service_conf.id_service_config
+
             # Soft delete device to prevent relationship integrity errors as we want to test hard-delete cascade here
             TeraSession.delete(id_session)
             TeraSession.delete(id_session_invitee)
@@ -189,9 +195,10 @@ class TeraUserTest(BaseModelsTest):
             self.assertIsNone(TeraSession.get_session_by_id(id_session_invitee))
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
             self.assertIsNone(TeraTest.get_test_by_id(id_test))
+            self.assertIsNotNone(TeraServiceConfig.get_service_config_by_id(id_service_conf))
 
     @staticmethod
-    def new_test_user(user_groups: list | None = None) -> TeraUser:
+    def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:
         user = TeraUser()
         user.user_enabled = True
         user.user_firstname = "Test"
@@ -199,7 +206,7 @@ class TeraUserTest(BaseModelsTest):
         user.user_profile = ""
         user.user_password = TeraUser.encrypt_password("test")
         user.user_superadmin = False
-        user.user_username = "test"
+        user.user_username = user_name
         if user_groups:
             user.user_user_groups = user_groups
         TeraUser.insert(user)

@@ -425,7 +425,7 @@ class TeraServiceTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create new
-            service = TeraServiceTest.new_test_service('TestService')
+            service = TeraServiceTest.new_test_service('TestServiceUndelete')
             self.assertIsNotNone(service.id_service)
             id_service = service.id_service
 

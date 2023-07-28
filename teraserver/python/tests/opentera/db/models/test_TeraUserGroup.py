@@ -3,6 +3,7 @@ from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from sqlalchemy.exc import SQLAlchemyError
@@ -253,7 +254,7 @@ class TeraUserGroupTest(BaseModelsTest):
             id_user_group = ug.id_user_group
 
             from test_TeraUser import TeraUserTest
-            user = TeraUserTest.new_test_user(user_groups=[ug])
+            user = TeraUserTest.new_test_user(user_name="user_ug_harddelete", user_groups=[ug])
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
@@ -279,7 +280,38 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, True))
 
     def test_undelete(self):
-        pass
+        with self._flask_app.app_context():
+            # Create new
+            ug = TeraUserGroupTest.new_test_usergroup()
+            self.assertIsNotNone(ug.id_user_group)
+            id_user_group = ug.id_user_group
+
+            from test_TeraUser import TeraUserTest
+            user = TeraUserTest.new_test_user(user_name="user_ug_undelete", user_groups=[ug])
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
+
+            # Add service access
+            from test_TeraServiceAccess import TeraServiceAccessTest
+            access = TeraServiceAccessTest.new_test_service_access(id_service_role=1, id_user_group=id_user_group)
+            id_access = access.id_service_access
+
+            # Delete
+            id_user_user_group = TeraUserUserGroup.query_user_user_group_for_user_user_group(id_user, id_user_group) \
+                .id_user_user_group
+            TeraUserUserGroup.delete(id_user_user_group)
+            TeraUserGroup.delete(id_user_group)
+
+            self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+            self.assertIsNone(TeraServiceAccess.get_service_access_by_id(id_access))
+            self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+
+            # Undelete
+            TeraUserGroup.undelete(id_user_group)
+
+            self.assertIsNotNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+            self.assertIsNotNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+            self.assertIsNotNone(TeraServiceAccess.get_service_access_by_id(id_access))
 
     @staticmethod
     def new_test_usergroup() -> TeraUserGroup:

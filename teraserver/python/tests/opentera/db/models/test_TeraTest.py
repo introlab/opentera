@@ -57,7 +57,7 @@ class TeraTestTest(BaseModelsTest):
 
             # Create new user
             from test_TeraUser import TeraUserTest
-            user = TeraUserTest.new_test_user()
+            user = TeraUserTest.new_test_user(user_name='test_testuser')
             id_user = user.id_user
 
             # Create new session
@@ -88,7 +88,7 @@ class TeraTestTest(BaseModelsTest):
             TeraUser.delete(id_user)
 
             # Exception should be thrown when trying to undelete
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraTest.undelete(id_test)
 
             # Restore participant
@@ -97,7 +97,7 @@ class TeraTestTest(BaseModelsTest):
             self.assertIsNotNone(participant)
 
             # Restore test - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraTest.undelete(id_test)
 
             # Restore user
@@ -106,7 +106,7 @@ class TeraTestTest(BaseModelsTest):
             self.assertIsNotNone(user)
 
             # Restore test - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraTest.undelete(id_test)
 
             # Restore device
@@ -115,7 +115,7 @@ class TeraTestTest(BaseModelsTest):
             self.assertIsNotNone(device)
 
             # Restore test - still has dependencies issues...
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraTest.undelete(id_test)
 
             # Restore session

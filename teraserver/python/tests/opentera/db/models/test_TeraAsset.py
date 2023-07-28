@@ -306,7 +306,7 @@ class TeraAssetTest(BaseModelsTest):
 
             # Create new user
             from test_TeraUser import TeraUserTest
-            user = TeraUserTest.new_test_user()
+            user = TeraUserTest.new_test_user(user_name="asset_user")
             id_user = user.id_user
 
             # Create new session
@@ -344,7 +344,7 @@ class TeraAssetTest(BaseModelsTest):
             TeraUser.delete(id_user)
 
             # Exception should be thrown when trying to undelete
-            with self.assertRaises(IntegrityError) as cm:
+            with self.assertRaises(IntegrityError):
                 TeraAsset.undelete(id_asset)
 
             # Restore participant

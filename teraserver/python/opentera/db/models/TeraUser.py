@@ -427,3 +427,6 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             TeraUser.db().session.add(user)
 
         TeraUser.db().session.commit()
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['user_service_config']
