@@ -101,7 +101,7 @@ OpenTera contains the base server (TeraServer) offering a REST API [@fielding_re
 
 OpenTera also includes base services: Video Rehabilitation, Logging and File Transfer. They are used to conduct audio/video WebRTC sessions from the web along with appropriate logging and file transfer capabilities. Structured sessions enable organized information such as survey data, sensor data, metadata and analytics, and facilitate the retrieval of information and key statistics. Development of new microservices allows developers to add new features to the system such as serious or exergames, exercises coach / videos and participant calendar / portal.
 
-# Related projects
+# Related Projects
 
 \autoref{tab:opentera-related-projects} shows OpenTera-related open-source projects that are currently under active development, implementing new OpenTera services or underlying libraries. OpenTera has been deployed for robot teleoperation during COVID [@panchea_opentera_2022] and is currently used for multiple rehabilitation projects.
 
