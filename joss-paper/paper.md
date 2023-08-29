@@ -105,7 +105,6 @@ OpenTera also includes base services: Video Rehabilitation, Logging and File Tra
 
 \autoref{tab:opentera-related-projects} shows OpenTera-related open-source projects that are currently under active development, implementing new OpenTera services or underlying libraries. Preliminary implementation have been deployed for robot teleoperation during COVID[@panchea_opentera_2022]. The current paper presents the implementation and design choices for a more generic OpenTera framework with a focus on open source implementation. Code quality, documentation, examples and usability have been greatly improved between these versions.
 
-
 Table: OpenTera Related Projects \label{tab:opentera-related-projects}
 
 | GitHub Project Name             | Description                                                                                         |
