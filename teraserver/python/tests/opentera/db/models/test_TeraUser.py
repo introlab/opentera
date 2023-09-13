@@ -282,16 +282,6 @@ class TeraUserTest(BaseModelsTest):
             # TeraServiceAccess.delete(service_access.id_service_access)
             # TeraServiceRole.delete(role.id_service_role)
 
-
-
-
-
-
-
-
-
-
-
     @staticmethod
     def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:
         user = TeraUser()
