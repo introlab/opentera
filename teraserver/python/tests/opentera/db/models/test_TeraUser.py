@@ -9,6 +9,8 @@ from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
+import uuid
+import jwt
 
 
 class TeraUserTest(BaseModelsTest):
@@ -196,6 +198,99 @@ class TeraUserTest(BaseModelsTest):
             self.assertIsNone(TeraAsset.get_asset_by_id(id_asset))
             self.assertIsNone(TeraTest.get_test_by_id(id_test))
             self.assertIsNotNone(TeraServiceConfig.get_service_config_by_id(id_service_conf))
+
+    def test_token_for_admin_should_have_empty_service_access(self):
+        with self._flask_app.app_context():
+            user = TeraUser()
+            user.user_username = 'Test'
+            user.user_uuid = str(uuid.uuid4())
+            user.user_email = 'test@test.com'
+            user.user_firstname = 'Test'
+            user.user_lastname = 'Test'
+            user.user_password = TeraUser.encrypt_password('test')
+            user.user_enabled = True
+            user.user_profile = ''
+            user.user_notes = ''
+            user.user_superadmin = True
+
+            token_key = 'test'
+
+            # Generate token
+            token = user.get_token(token_key)
+            self.assertIsNotNone(token)
+
+            # Verify token
+            token_dict = jwt.decode(token, token_key, algorithms='HS256')
+            self.assertIsNotNone(token_dict)
+
+            self.assertTrue('service_access' in token_dict)
+            self.assertEqual(token_dict['service_access'], {})  # Should be empty
+
+    def test_token_for_siteadmin_should_have_valid_service_access(self):
+        from opentera.db.models.TeraService import TeraService
+        from opentera.db.models.TeraServiceRole import TeraServiceRole
+        from opentera.db.models.TeraUserGroup import TeraUserGroup
+        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+        from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+
+        with self._flask_app.app_context():
+            user = TeraUser.get_user_by_username('siteadmin')
+            self.assertIsNotNone(user)
+
+            # Create a user group and add user and role to it
+            user_group = TeraUserGroup()
+            user_group.user_group_name = 'test'
+            TeraUserGroup.insert(user_group)
+
+            # Add user to the group
+            user_user_group = TeraUserUserGroup()
+            user_user_group.id_user = user.id_user
+            user_user_group.id_user_group = user_group.id_user_group
+            TeraUserUserGroup.insert(user_user_group)
+
+            # Create a role for service
+            service = TeraService.get_service_by_key('FileTransferService')
+            role = TeraServiceRole()
+            role.id_service = service.id_service
+            role.service_role_name = 'test'
+            TeraServiceRole.insert(role)
+
+            # Create service access
+            service_access = TeraServiceAccess()
+            service_access.id_service_role = role.id_service_role
+            service_access.id_user_group = user_group.id_user_group
+            TeraServiceAccess.insert(service_access)
+
+            # Add user to user group
+            token_key = 'test'
+
+            # Generate token
+            token = user.get_token(token_key)
+            self.assertIsNotNone(token)
+
+            # Verify token
+            token_dict = jwt.decode(token, token_key, algorithms='HS256')
+            self.assertIsNotNone(token_dict)
+
+            # Verify service access
+            self.assertTrue('service_access' in token_dict)
+            self.assertEqual(token_dict['service_access'], {service.service_key: [role.service_role_name]})
+
+            # TODO delete everything ?
+            TeraUserUserGroup.delete(user_user_group.id_user_user_group)
+            TeraUserGroup.delete(user_group.id_user_group)
+            # TeraServiceAccess.delete(service_access.id_service_access)
+            # TeraServiceRole.delete(role.id_service_role)
+
+
+
+
+
+
+
+
+
+
 
     @staticmethod
     def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:

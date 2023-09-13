@@ -77,9 +77,9 @@ class TeraUserClient:
     def get_roles_for_service(self, service_key: str) -> List[str]:
         # Roles are stored in the token, in the service_access dictionary
         roles: List[str] = []
-        if 'service_access' in self.__service_access:
-            if service_key in self.__service_access['service_access']:
-                roles = self.__service_access['service_access'][service_key]
+
+        if service_key in self.__service_access:
+            roles = self.__service_access[service_key]
         return roles
 
     def get_role_for_site(self, id_site: int) -> str:

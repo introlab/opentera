@@ -122,7 +122,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     def get_service_access_dict(self):
-        service_access = {'service_access': {}}
+        service_access = {}
 
         # Service access are defined in user groups, not needed for superadmin
         if not self.user_superadmin:
@@ -135,10 +135,10 @@ class TeraUser(BaseModel, SoftDeleteMixin):
                     if service_role.id_site is None and service_role.id_project is None:
                         # Global access
                         # Create entry if not exists
-                        if service_key not in service_access['service_access']:
-                            service_access['service_access'][service_key] = []
+                        if service_key not in service_access:
+                            service_access[service_key] = []
                         # Add role to service
-                        service_access['service_access'][service_key].append(role_name)
+                        service_access[service_key].append(role_name)
 
         return service_access
 

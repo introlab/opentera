@@ -396,7 +396,7 @@ class ServiceAccessManager:
         return False
 
     @staticmethod
-    def service_user_roles_required(roles: List[str]):
+    def service_user_roles_all_required(roles: List[str]):
         def wrap(f):
             @wraps(f)
             def decorated(*args, **kwargs):
@@ -427,3 +427,46 @@ class ServiceAccessManager:
                 return f(*args, **kwargs)
             return decorated
         return wrap
+
+
+@staticmethod
+def service_user_roles_any_required(roles: List[str]):
+    def wrap(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+
+            # Check if service is initialized
+            if ServiceAccessManager.service is None or 'service_key' \
+                    not in ServiceAccessManager.service.service_info:
+                return gettext('Forbidden'), 403
+
+            service_key = ServiceAccessManager.service.service_info['service_key']
+
+            # Check if user is logged in, watch out not None object but LocalProxy cannot use is None...
+            if not current_user_client:
+                return gettext('Forbidden'), 403
+
+            # Super admin pass through
+            if current_user_client.user_superadmin:
+                return f(*args, **kwargs)
+
+            # Check if user has the required role (global roles are stored in token)
+            user_roles_from_token = current_user_client.get_roles_for_service(service_key)
+
+            # Check if user has the required roles
+            if not any(role in user_roles_from_token for role in roles):
+                return gettext('Forbidden'), 403
+
+            # Everything ok, continue
+            return f(*args, **kwargs)
+
+        return decorated
+
+    return wrap
+
+
+@staticmethod
+def service_user_roles_required(roles: List[str]):
+    # For compatibility with old code
+    return ServiceAccessManager.service_user_roles_all_required(roles)
+
