@@ -552,10 +552,12 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
-        if (streamname.endsWith("ScreenShareAudio")){
+        if (streamname.endsWith("ScreenShareAudio") || stream.getVideoTracks()[0].muted){
             // Only sharing audio, video track is always enabled - disable!
+            console.log("Audio only");
             stream.getVideoTracks()[0].enabled = false;
         }
+
     }else{
         showStatusControls(false, slot, true);
         playSound("audioConnected");
@@ -569,8 +571,7 @@ function newStreamStarted(callerid, stream, streamname) {
         //}
     }
 
-    if (stream.getVideoTracks()[0].enabled)
-        easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
+    easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
 
     // Update display
     updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
@@ -1156,15 +1157,21 @@ function signalingLoginFailure(errorCode, message) {
 
 async function shareScreen(local, start, sound_only = false){
     let streamName = localContact.peerid + '_' +'ScreenShare';
-    if (sound_only){
-        streamName += "Audio";
-    }
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;
         try {
-            screenStream = await navigator.mediaDevices.getDisplayMedia({video: true,
-                audio: sound_only || currentConfig.screenAudio});
+            let constraints = {video: true}
+            if (sound_only){
+                constraints.audio = {sampleRate: 48000,
+                                     noiseSuppression: false,
+                                     echoCancellation: false,
+                                     channelCount: 2,
+                                     autoGainControl: false};
+            }else{
+                constraints.audio = currentConfig.screenAudio;
+            }
+            screenStream = await navigator.mediaDevices.getDisplayMedia(constraints);
             if (sound_only){
                 // Video track must be stopped if we want sound only, since it is required to get Display Media to share
                 screenStream.getVideoTracks()[0].enabled = false;
