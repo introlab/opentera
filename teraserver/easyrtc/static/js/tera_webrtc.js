@@ -1170,7 +1170,7 @@ async function shareScreen(local, start, sound_only = false){
                                      echoCancellation: true,
                                      channelCount: 2,
                                      autoGainControl: false,
-                                     voiceActivityDetection: true};
+                                     voiceActivityDetection: false};
             }else{
                 constraints.audio = currentConfig.screenAudio;
             }
