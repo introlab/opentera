@@ -353,11 +353,12 @@ function btnShareScreenClicked(sound_only = false){
 
     // Do the screen sharing
     shareScreen(true, localContact.status.sharingScreen, sound_only).then(function (){
+        let btn = getButtonIcon(true, 1, "ShareScreen");
+        btn.data().soundOnly = sound_only;
 
         updateButtonIconState(localContact.status.sharingScreen, true, 1, "ShareScreen");
 
         // Show / Hide share screen button
-        let btn = getButtonIcon(true, 1, "ShareScreen");
         if (localContact.status.sharingScreen)
             btn.show();
 

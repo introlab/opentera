@@ -552,9 +552,8 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
-        if (streamname.endsWith("ScreenShareAudio") || stream.getVideoTracks()[0].muted){
+        if (streamname.endsWith("ScreenShareAudio")){
             // Only sharing audio, video track is always enabled - disable!
-            console.log("Audio only");
             stream.getVideoTracks()[0].enabled = false;
         }
 
@@ -1157,6 +1156,9 @@ function signalingLoginFailure(errorCode, message) {
 
 async function shareScreen(local, start, sound_only = false){
     let streamName = localContact.peerid + '_' +'ScreenShare';
+    if (sound_only){
+        streamName += "Audio";
+    }
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;
@@ -1165,9 +1167,10 @@ async function shareScreen(local, start, sound_only = false){
             if (sound_only){
                 constraints.audio = {sampleRate: 48000,
                                      noiseSuppression: false,
-                                     echoCancellation: false,
+                                     echoCancellation: true,
                                      channelCount: 2,
-                                     autoGainControl: false};
+                                     autoGainControl: false,
+                                     voiceActivityDetection: true};
             }else{
                 constraints.audio = currentConfig.screenAudio;
             }
