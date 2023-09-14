@@ -39,7 +39,7 @@ class TeraTest(BaseModel, SoftDeleteMixin):
     test_user = relationship("TeraUser", back_populates='user_tests')
     test_participant = relationship("TeraParticipant", back_populates='participant_tests')
     test_service = relationship("TeraService", back_populates='service_tests')
-    test_test_type = relationship('TeraTestType')
+    test_test_type = relationship('TeraTestType', back_populates='test_type_tests')
 
     def from_json(self, json_data, ignore_fields=None):
         if ignore_fields is None:

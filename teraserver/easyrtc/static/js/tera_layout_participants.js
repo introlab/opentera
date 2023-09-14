@@ -159,8 +159,8 @@ function setLargeView(view_id, updateui=true){
     }
 
     if (updateui){
-        updateUserRemoteViewsLayout(remoteStreams.length);
-        updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+        updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
+        updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
     }
 }
 
@@ -209,6 +209,6 @@ function testLayout(local_num, remote_num){
         localStreams.pop();
     }
 
-    updateUserRemoteViewsLayout(remote_num);
-    updateUserLocalViewLayout(local_num, remote_num);
+    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
 }

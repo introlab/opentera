@@ -374,7 +374,7 @@ function localVideoStreamSuccess(stream){
                 for (let i=0; i<remoteStreams.length; i++){
                     easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
                         //console.log("Added stream to " + caller + " - " + streamName);
-                        updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+                        updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
                     });
                 }
             }
@@ -552,6 +552,10 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
+        if (streamname.endsWith("ScreenShareAudio")){
+            // Only sharing audio, video track is always enabled - disable!
+            stream.getVideoTracks()[0].enabled = false;
+        }
     }else{
         showStatusControls(false, slot, true);
         playSound("audioConnected");
@@ -565,11 +569,12 @@ function newStreamStarted(callerid, stream, streamname) {
         //}
     }
 
-    easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
+    if (stream.getVideoTracks()[0].enabled)
+        easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
 
     // Update display
-    updateUserRemoteViewsLayout(remoteStreams.length);
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
     refreshRemoteStatusIcons(callerid);
 
     if (streamname === "default"){
@@ -722,8 +727,8 @@ function streamDisconnected(callerid, mediaStream, streamName){
         }
     }
 
-    updateUserRemoteViewsLayout(remoteStreams.length);
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
 }
 
 function disconnectedFromSignalingServer(){
@@ -1149,20 +1154,26 @@ function signalingLoginFailure(errorCode, message) {
     clearStatusMsg();
 }
 
-async function shareScreen(local, start){
+async function shareScreen(local, start, sound_only = false){
     let streamName = localContact.peerid + '_' +'ScreenShare';
+    if (sound_only){
+        streamName += "Audio";
+    }
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;
         try {
-            // TODO: Check if video can put to false or set "enabled=false"
             screenStream = await navigator.mediaDevices.getDisplayMedia({video: true,
-                audio: currentConfig.screenAudio});
+                audio: sound_only || currentConfig.screenAudio});
+            if (sound_only){
+                // Video track must be stopped if we want sound only, since it is required to get Display Media to share
+                screenStream.getVideoTracks()[0].enabled = false;
+            }
             easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
             // TODO: Use easyrtc.setSdpFilters to improve audio quality
-            // easyrtc.setSdpFilters()
+            //easyrtc.setSdpFilters()
 
-            console.log("Starting screen sharing - with audio: " + currentConfig.screenAudio);
+            console.log("Starting screen sharing - with audio: " + (sound_only || currentConfig.screenAudio));
 
             // Then to add to existing connections
             for (let i=0; i<remoteContacts.length; i++){
@@ -1172,10 +1183,13 @@ async function shareScreen(local, start){
                     easyrtc.renegotiate(remoteContacts[i].peerid);
                 });
             }
-            easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
+            if (!sound_only){
+                easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
+                sendPrimaryView(local_peerid, streamName);
+                setPrimaryViewIcon(local_peerid, streamName);
+            }
+
             localStreams.push({"peerid": local_peerid, "streamname": streamName, "stream":screenStream});
-            sendPrimaryView(local_peerid, streamName);
-            setPrimaryViewIcon(local_peerid, streamName);
 
         } catch(err) {
             showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
@@ -1201,7 +1215,7 @@ async function shareScreen(local, start){
         localStreams.pop();
     }
 
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
 }
 
 function share2ndStream(local, start){
@@ -1267,7 +1281,7 @@ function share2ndStream(local, start){
         }
     }
 
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
 
     // Send status update
     sendStatus({"targetRoom": "default"});
@@ -1379,4 +1393,22 @@ function sendShareScreen(peerid_target, status){
             }
         });
     }
+}
+
+function getVideoStreamsCount(streamsList){
+    let count = streamsList.length;
+    for (let stream_index = 0; stream_index<streamsList.length; stream_index++){
+        let videos = streamsList[stream_index].stream.getVideoTracks();
+        let enabled_count = 0;
+        for (let video_index=0; video_index<videos.length; video_index++){
+            if (videos[video_index].enabled){
+                enabled_count++;
+                break; // No need to continue - we have at least one video!
+            }
+        }
+        if (enabled_count === 0){
+            count--;
+        }
+    }
+    return count;
 }

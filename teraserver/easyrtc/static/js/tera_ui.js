@@ -333,12 +333,12 @@ function enlargeView(local, index){
     }
 
     // Update layouts
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
-    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
 
 }
 
-function btnShareScreenClicked(){
+function btnShareScreenClicked(sound_only = false){
     if (localContact.status.sharing2ndSource === true){
         console.warn("Trying to share screen while already having a second video source");
         return;
@@ -352,7 +352,7 @@ function btnShareScreenClicked(){
     localContact.status.sharingScreen = !localContact.status.sharingScreen;
 
     // Do the screen sharing
-    shareScreen(true, localContact.status.sharingScreen).then(function (){
+    shareScreen(true, localContact.status.sharingScreen, sound_only).then(function (){
 
         updateButtonIconState(localContact.status.sharingScreen, true, 1, "ShareScreen");
 
