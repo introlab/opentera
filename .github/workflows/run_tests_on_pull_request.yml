@@ -100,7 +100,12 @@ jobs:
       working-directory: teraserver/python/tests/opentera/db/models
       run: |
         $OPENTERA_PYTHON -m unittest discover . "test_*.py"
-        
+
+    - name: Run Service Tests
+      working-directory: teraserver/python/tests/opentera/services
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+
     - name: Run FileTransferService Tests
       working-directory: teraserver/python/tests/services/FileTransferService
       run: |

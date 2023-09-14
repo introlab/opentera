@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye
+FROM python:3.11.5-bullseye
 
 # Install requirements (not changing often)
 ADD ./teraserver/python/env/requirements.txt /requirements.txt
