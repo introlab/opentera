@@ -1219,6 +1219,8 @@ async function shareScreen(local, start, sound_only = false){
         // Stop local stream
         localStreams[1].stream.getVideoTracks()[0].stop();   // Screen sharing is always index 1 of localStreams,
                                                              // video track index = 0, since we always have just one.
+        if (localStreams[1].stream.getAudioTracks().length > 0)
+            localStreams[1].stream.getAudioTracks()[0].stop();
         easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
 
         // Remove stream

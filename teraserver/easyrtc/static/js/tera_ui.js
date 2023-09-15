@@ -290,9 +290,11 @@ function updateButtonIconState(status, local, index, prefix){
     if (icon !== undefined){
         if (icon.attr('src')){
             let iconImgPath = icon.attr('src').split('/')
+            let iconName = iconImgPath[iconImgPath.length-1].toLowerCase();
+            iconName = iconName.split("_")[0].split(".")[0];
 
             if (status === true){
-                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_on.png";
+                iconImgPath[iconImgPath.length-1] = iconName + "_on.png";
                 let must_show = false;
                 if (local){
                     if (localTimerHandles[index-1] !== 0) must_show = true;
@@ -301,7 +303,7 @@ function updateButtonIconState(status, local, index, prefix){
                 }
                 (!must_show) ? icon.hide() : icon.show();
             }else{
-                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
+                iconImgPath[iconImgPath.length-1] = iconName + ".png";
                 //icon.show();
             }
             icon.attr('src', pathJoin(iconImgPath))
@@ -356,11 +358,22 @@ function btnShareScreenClicked(sound_only = false){
         let btn = getButtonIcon(true, 1, "ShareScreen");
         btn.data().soundOnly = sound_only;
 
+        // Update icon source according to state
+        if (sound_only && localContact.status.sharingScreen){
+            console.log("Music mode!");
+            btn.attr('src', 'images/music_on.png');
+        }else{
+            btn.attr('src', 'images/sharescreen.png');
+        }
         updateButtonIconState(localContact.status.sharingScreen, true, 1, "ShareScreen");
 
         // Show / Hide share screen button
-        if (localContact.status.sharingScreen)
+        if(localContact.status.sharingScreen){
             btn.show();
+        }else{
+            btn.data().soundOnly = false;
+            //btn.hide();
+        }
 
         // Show / Hide second source button
         btn = getButtonIcon(true, 1, "Show2ndVideo");
