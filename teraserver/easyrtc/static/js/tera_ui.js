@@ -360,7 +360,6 @@ function btnShareScreenClicked(sound_only = false){
 
         // Update icon source according to state
         if (sound_only && localContact.status.sharingScreen){
-            console.log("Music mode!");
             btn.attr('src', 'images/music_on.png');
         }else{
             btn.attr('src', 'images/sharescreen.png');
@@ -371,8 +370,7 @@ function btnShareScreenClicked(sound_only = false){
         if(localContact.status.sharingScreen){
             btn.show();
         }else{
-            btn.data().soundOnly = false;
-            //btn.hide();
+            btn.data().soundOnly = false; // Reset button state
         }
 
         // Show / Hide second source button

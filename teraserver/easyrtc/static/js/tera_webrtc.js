@@ -1178,6 +1178,7 @@ async function shareScreen(local, start, sound_only = false){
             if (sound_only){
                 // Video track must be stopped if we want sound only, since it is required to get Display Media to share
                 screenStream.getVideoTracks()[0].enabled = false;
+                easyrtc.setSdpFilters(undefined, highQualityAudioSdp);
             }
             easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
             // TODO: Use easyrtc.setSdpFilters to improve audio quality
@@ -1423,4 +1424,11 @@ function getVideoStreamsCount(streamsList){
         }
     }
     return count;
+}
+
+function highQualityAudioSdp(sdp){
+    let modified_sdp = sdp.replaceAll('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=510000');
+
+    //console.log(modified_sdp);
+    return modified_sdp;
 }
