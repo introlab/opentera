@@ -1427,8 +1427,11 @@ function getVideoStreamsCount(streamsList){
 }
 
 function highQualityAudioSdp(sdp){
-    let modified_sdp = sdp.replaceAll('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=510000');
+    let modified_sdp = sdp;
 
-    //console.log(modified_sdp);
+    if (sdp.search('useinbandfec=1; stereo=1; maxaveragebitrate') === -1){
+        modified_sdp = sdp.replaceAll('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=64000');
+    }
+    
     return modified_sdp;
 }

@@ -370,11 +370,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="dropup">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
+                    <div class="dropup" id="toolDropup">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
                             Outils
                         </button>
-                        <div class="dropdown-menu bg-primary" aria-labelledby="toolsDropdown" style="transform: translate3d(0px, 2px, 0px);">
+                        <div class="dropdown-menu bg-primary" id="toolsDropdownMenu" aria-labelledby="toolsDropdown" style="transform: translate3d(0px, 2px, 0px);">
                             <div class="dropdown-item" onclick="showChronosDialog();">
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
                                 <label data-i18n="ui.chronos">Chronos</label>
