@@ -149,7 +149,7 @@ function muteSpeaker(local, index, new_state){
         let request = {"peerid": local_peerid, speaker: new_state};
 
         // Mute all remote streams
-        for (let i=1; i<=4; i++){
+        for (let i=1; i<=remoteStreams.length; i++){
             let video_widget = getVideoWidget(false, i);
             video_widget.prop('muted', !new_state);
         }
@@ -1171,7 +1171,7 @@ async function shareScreen(local, start, sound_only = false){
                                      channelCount: 2,
                                      autoGainControl: false,
                                      voiceActivityDetection: false};
-                constraints.video = {frameRate: 0};
+                constraints.video = {frameRate: 1, height: 120, width: 160};
             }else{
                 constraints.video = true;
                 constraints.audio = currentConfig.screenAudio;
