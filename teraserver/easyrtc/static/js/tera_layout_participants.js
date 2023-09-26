@@ -56,7 +56,7 @@ function updateUserRemoteViewsLayout(remote_num){
     }
 
     let col_count = 1;
-    if (remote_num > 4){
+    if (remote_num > 5){
         col_count = 2;
     }
     let base_width = 12 / col_count;

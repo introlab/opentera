@@ -1163,7 +1163,7 @@ async function shareScreen(local, start, sound_only = false){
         // Start screen sharing
         let screenStream = undefined;
         try {
-            let constraints = {video: true}
+            let constraints = {}
             if (sound_only){
                 constraints.audio = {sampleRate: 48000,
                                      noiseSuppression: false,
@@ -1171,7 +1171,9 @@ async function shareScreen(local, start, sound_only = false){
                                      channelCount: 2,
                                      autoGainControl: false,
                                      voiceActivityDetection: false};
+                constraints.video = {frameRate: 0};
             }else{
+                constraints.video = true;
                 constraints.audio = currentConfig.screenAudio;
             }
             screenStream = await navigator.mediaDevices.getDisplayMedia(constraints);
