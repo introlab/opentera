@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-11 08:07-0400\n"
+"POT-Creation-Date: 2023-10-03 13:40-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -164,9 +164,12 @@ msgstr ""
 #: opentera/services/ServiceAccessManager.py:214
 #: opentera/services/ServiceAccessManager.py:242
 #: opentera/services/ServiceAccessManager.py:297
-#: opentera/services/ServiceAccessManager.py:411
-#: opentera/services/ServiceAccessManager.py:417
-#: opentera/services/ServiceAccessManager.py:428
+#: opentera/services/ServiceAccessManager.py:407
+#: opentera/services/ServiceAccessManager.py:413
+#: opentera/services/ServiceAccessManager.py:424
+#: opentera/services/ServiceAccessManager.py:440
+#: opentera/services/ServiceAccessManager.py:446
+#: opentera/services/ServiceAccessManager.py:457
 msgid "Forbidden"
 msgstr ""
 
@@ -356,11 +359,11 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:61
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:114
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:137
-#: modules/LoginModule/LoginModule.py:587
-#: modules/LoginModule/LoginModule.py:687
-#: modules/LoginModule/LoginModule.py:753
-#: modules/LoginModule/LoginModule.py:780
-#: modules/LoginModule/LoginModule.py:799
+#: modules/LoginModule/LoginModule.py:584
+#: modules/LoginModule/LoginModule.py:684
+#: modules/LoginModule/LoginModule.py:750
+#: modules/LoginModule/LoginModule.py:777
+#: modules/LoginModule/LoginModule.py:796
 msgid "Unauthorized"
 msgstr ""
 
@@ -1693,16 +1696,16 @@ msgstr ""
 msgid "Invalid reply code"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:622
-#: modules/LoginModule/LoginModule.py:655
+#: modules/LoginModule/LoginModule.py:619
+#: modules/LoginModule/LoginModule.py:652
 msgid "Disabled device"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:632
+#: modules/LoginModule/LoginModule.py:629
 msgid "Invalid token"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:732
+#: modules/LoginModule/LoginModule.py:729
 msgid "Invalid Token"
 msgstr ""
 
