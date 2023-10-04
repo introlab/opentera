@@ -143,7 +143,6 @@ function muteSpeaker(local, index, new_state){
 
     updateStatusIconState(new_state, local, index, "Speaker");
 
-
     if (local === true){
         // Send display update request
         let request = {"peerid": local_peerid, speaker: new_state};
@@ -552,10 +551,10 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
-        if (streamname.endsWith("ScreenShareAudio")){
+        /*if (streamname.endsWith("ScreenShareAudio")){
             // Only sharing audio, video track is always enabled - disable!
             stream.getVideoTracks()[0].enabled = false;
-        }
+        }*/
 
     }else{
         showStatusControls(false, slot, true);
@@ -1413,6 +1412,8 @@ function sendShareScreen(peerid_target, status){
 function getVideoStreamsIndexes(streamsList){
     let indexes = [];
     for (let stream_index = 0; stream_index<streamsList.length; stream_index++){
+        if (streamsList[stream_index].streamname.endsWith("ScreenShareAudio"))
+            continue;
         let videos = streamsList[stream_index].stream.getVideoTracks();
         for (let video_index=0; video_index<videos.length; video_index++){
             if (videos[video_index].enabled){

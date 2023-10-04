@@ -93,7 +93,7 @@ function updateUserLocalViewLayout(){
     let remote_num = usedRemoteVideosIndexes.length;
     let usedLocalVideosIndexes = getVideoStreamsIndexes(localStreams);
     let local_num = usedLocalVideosIndexes.length;
-    console.log(usedLocalVideosIndexes);
+    //console.log(usedLocalVideosIndexes);
 
     if (currentLargeViewId.startsWith('local') && local_num === 1){
         setColWidth(largeView, 10);
