@@ -26,10 +26,13 @@ function initialUserLayout(){
     updateUserLocalViewLayout(1, 0);
 }
 
-function updateUserRemoteViewsLayout(remote_num){
+function updateUserRemoteViewsLayout(){
     let remoteViews = $("#remoteViews");
     let largeView = $("#largeView");
     let localViews = $("#localViews");
+
+    let usedRemoteVideosIndexes = getVideoStreamsIndexes(remoteStreams);
+    let remote_num = usedRemoteVideosIndexes.length;
 
     if (remote_num === 0){
         remoteViews.hide();
@@ -50,8 +53,9 @@ function updateUserRemoteViewsLayout(remote_num){
     }
 
     // Hide unused views
-    for (let i=remote_num+1; i<=maxRemoteSourceNum; i++){
-        $("#remoteView" + i).hide();
+    for (let i=1; i<=maxRemoteSourceNum; i++){
+        if (!usedRemoteVideosIndexes.includes(i))
+            $("#remoteView" + i).hide();
     }
 
     // Set base col-width depending on number of remote views (2x2 grid if less than 4, 2x3 and then 2x4)
@@ -75,18 +79,20 @@ function updateUserRemoteViewsLayout(remote_num){
     let base_width = 12 / col_count;
 
     // Show used views
-    for (let i=1; i<=remote_num; i++){
-        let current_view = $("#remoteView" + i);
-        current_view.show();
-        if (currentLayoutId === layouts.GRID) {
-            if (!current_view[0].classList.contains('col')) {
-                setColWidth(current_view, base_width);
+    for (let i=1; i<=maxRemoteSourceNum; i++){
+        if (usedRemoteVideosIndexes.includes(i)) {
+            let current_view = $("#remoteView" + i);
+            current_view.show();
+            if (currentLayoutId === layouts.GRID) {
+                if (!current_view[0].classList.contains('col')) {
+                    setColWidth(current_view, base_width);
+                }
             }
-        }
-        if (currentLayoutId === layouts.LARGEVIEW){
-            if (currentLargeViewId !== 'remoteView' + i){
-                // Other views
-                setColWidth(current_view, base_width);
+            if (currentLayoutId === layouts.LARGEVIEW) {
+                if (currentLargeViewId !== 'remoteView' + i) {
+                    // Other views
+                    setColWidth(current_view, base_width);
+                }
             }
         }
     }
@@ -116,10 +122,15 @@ function updateUserRemoteViewsLayout(remote_num){
     }
 }
 
-function updateUserLocalViewLayout(local_num, remote_num){
+function updateUserLocalViewLayout(){
     // let selfViewRow1 = $("#localView1Row");
     let selfViewRow2 = $("#localView2Row");
     let toolsView = $("#toolsViewRow");
+
+    let usedRemoteVideosIndexes = getVideoStreamsIndexes(remoteStreams);
+    let remote_num = usedRemoteVideosIndexes.length;
+    let usedLocalVideosIndexes = getVideoStreamsIndexes(localStreams);
+    let local_num = usedLocalVideosIndexes.length;
 
     // Tool bar display
     if (remote_num>0){

@@ -16,16 +16,18 @@ function initVideoAreas(){
 }
 
 function initialUserLayout(){
-    updateUserRemoteViewsLayout(0);
-    updateUserLocalViewLayout(1, 0);
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
     setLargeView('remoteView1');
 }
 
-function updateUserRemoteViewsLayout(remote_num){
+function updateUserRemoteViewsLayout(){
     let remoteViews = $("#remoteViews");
     let largeView = $("#largeView");
     let localViews = $("#localViews");
 
+    let usedRemoteVideosIndexes = getVideoStreamsIndexes(remoteStreams);
+    let remote_num = usedRemoteVideosIndexes.length;
 
     if (remote_num === 0){
         remoteViews.hide();
@@ -62,43 +64,36 @@ function updateUserRemoteViewsLayout(remote_num){
     let base_width = 12 / col_count;
 
     // Hide unused views
-    for (let i=remote_num+1; i<=maxRemoteSourceNum; i++){
-        $("#remoteView" + i).hide();
+    for (let i=1; i<=maxRemoteSourceNum; i++){
+        if (!usedRemoteVideosIndexes.includes(i))
+            $("#remoteView" + i).hide();
     }
 
     // Show used views
-    for (let i=1; i<=remote_num; i++){
-        let current_view = $("#remoteView" + i);
-        current_view.show();
-        if (currentLargeViewId !== 'remoteView' + i) {
-            //setColWidth(current_view, base_width);
-            removeClassByPrefix(current_view[0], 'col');
-            current_view.addClass('col-xl-' + base_width + ' col-sm-12')
+    for (let i=1; i<=maxRemoteSourceNum; i++){
+        if (usedRemoteVideosIndexes.includes(i)){
+            let current_view = $("#remoteView" + i);
+            current_view.show();
+            if (currentLargeViewId !== 'remoteView' + i) {
+                //setColWidth(current_view, base_width);
+                removeClassByPrefix(current_view[0], 'col');
+                current_view.addClass('col-xl-' + base_width + ' col-sm-12')
+            }
         }
     }
-
-    // If odd numbered views, stretch the last one
-    // if (remote_num % 2 === 0){
-    //     let last_view = $("#remoteView" + remote_num);
-    //     if (currentLargeViewId === 'remoteView' + remote_num){
-    //         if (remote_num-1 > 0) {
-    //             last_view = $("#remoteView" + (remote_num - 1));
-    //         }else{
-    //             last_view = $("#remoteView" + (remote_num + 1));
-    //         }
-    //     }
-    //     if (!last_view[0].classList.contains('col')){
-    //         setColWidth(last_view, Math.ceil(12 / (col_count - 1)));
-    //     }
-    // }
-
 }
 
-function updateUserLocalViewLayout(local_num, remote_num){
+function updateUserLocalViewLayout(){
     let selfViewRow1 = $("#localView1Row");
     let selfViewRow2 = $("#localView2Row");
     let largeView = $("#largeView");
     let localViews = $("#localViews");
+
+    let usedRemoteVideosIndexes = getVideoStreamsIndexes(remoteStreams);
+    let remote_num = usedRemoteVideosIndexes.length;
+    let usedLocalVideosIndexes = getVideoStreamsIndexes(localStreams);
+    let local_num = usedLocalVideosIndexes.length;
+    console.log(usedLocalVideosIndexes);
 
     if (currentLargeViewId.startsWith('local') && local_num === 1){
         setColWidth(largeView, 10);
@@ -159,8 +154,8 @@ function setLargeView(view_id, updateui=true){
     }
 
     if (updateui){
-        updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
-        updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+        updateUserRemoteViewsLayout();
+        updateUserLocalViewLayout();
     }
 }
 
@@ -195,20 +190,22 @@ function removeClassByPrefix(el, prefix) {
 function testLayout(local_num, remote_num){
     remoteStreams=[]
     for (let i=1; i<=remote_num; i++) {
-        $('#remoteVideo' + i)[0].srcObject = $('#localVideo1')[0].srcObject;
-        $('#remoteVideo' + i)[0].muted = true;
-        $('#remoteVideo' + i)[0].play();
-        remoteStreams.push($('#remoteVideo' + i)[0].srcObject)
+        let remoteVideo = $('#remoteVideo' + i)[0];
+        remoteVideo.srcObject = $('#localVideo1')[0].srcObject;
+        remoteVideo.muted = true;
+        remoteVideo.play();
+        remoteStreams.push(remoteVideo.srcObject)
     }
     if (localStreams.length < local_num){
-        $('#localVideo2')[0].srcObject = $('#localVideo1')[0].srcObject;
-        $('#localVideo2')[0].muted = true;
-        $('#localVideo2')[0].play();
-        localStreams.push($('#localVideo2')[0].srcObject)
+        let localVideo2 = $('#localVideo2')[0];
+        localVideo2.srcObject = $('#localVideo1')[0].srcObject;
+        localVideo2.muted = true;
+        localVideo2.play();
+        localStreams.push(localVideo2.srcObject)
     }else{
         localStreams.pop();
     }
 
-    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
 }

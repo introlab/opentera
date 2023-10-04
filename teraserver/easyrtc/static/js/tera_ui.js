@@ -335,8 +335,8 @@ function enlargeView(local, index){
     }
 
     // Update layouts
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
-    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout();
+    updateUserRemoteViewsLayout();
 
 }
 

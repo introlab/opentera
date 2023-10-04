@@ -149,7 +149,7 @@ function muteSpeaker(local, index, new_state){
         let request = {"peerid": local_peerid, speaker: new_state};
 
         // Mute all remote streams
-        for (let i=1; i<=remoteStreams.length; i++){
+        for (let i=1; i<=maxRemoteSourceNum; i++){
             let video_widget = getVideoWidget(false, i);
             video_widget.prop('muted', !new_state);
         }
@@ -374,7 +374,7 @@ function localVideoStreamSuccess(stream){
                 for (let i=0; i<remoteStreams.length; i++){
                     easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
                         //console.log("Added stream to " + caller + " - " + streamName);
-                        updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+                        updateUserLocalViewLayout();
                     });
                 }
             }
@@ -573,8 +573,8 @@ function newStreamStarted(callerid, stream, streamname) {
     easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
 
     // Update display
-    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
     refreshRemoteStatusIcons(callerid);
 
     if (streamname === "default"){
@@ -727,8 +727,8 @@ function streamDisconnected(callerid, mediaStream, streamName){
         }
     }
 
-    updateUserRemoteViewsLayout(getVideoStreamsCount(remoteStreams));
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
 }
 
 function disconnectedFromSignalingServer(){
@@ -1230,7 +1230,7 @@ async function shareScreen(local, start, sound_only = false){
         localStreams.pop();
     }
 
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout();
 }
 
 function share2ndStream(local, start){
@@ -1296,7 +1296,7 @@ function share2ndStream(local, start){
         }
     }
 
-    updateUserLocalViewLayout(getVideoStreamsCount(localStreams), getVideoStreamsCount(remoteStreams));
+    updateUserLocalViewLayout();
 
     // Send status update
     sendStatus({"targetRoom": "default"});
@@ -1410,22 +1410,18 @@ function sendShareScreen(peerid_target, status){
     }
 }
 
-function getVideoStreamsCount(streamsList){
-    let count = streamsList.length;
+function getVideoStreamsIndexes(streamsList){
+    let indexes = [];
     for (let stream_index = 0; stream_index<streamsList.length; stream_index++){
         let videos = streamsList[stream_index].stream.getVideoTracks();
-        let enabled_count = 0;
         for (let video_index=0; video_index<videos.length; video_index++){
             if (videos[video_index].enabled){
-                enabled_count++;
+                indexes.push(stream_index+1);
                 break; // No need to continue - we have at least one video!
             }
         }
-        if (enabled_count === 0){
-            count--;
-        }
     }
-    return count;
+    return indexes;
 }
 
 function highQualityAudioSdp(sdp){
