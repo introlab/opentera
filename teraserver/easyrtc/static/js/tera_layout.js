@@ -238,6 +238,30 @@ function setLargeView(view_id){
 
 }
 
+function setRemoteStatusVideo(stream_index, set){
+    let video = getVideoWidget(false, stream_index+1);
+    let parent_stream_index = getStreamIndexForPeerId(remoteStreams[stream_index].peerid)+1;
+    let parent_video = $("#remoteStatusVideo" + parent_stream_index);
+    if (set){
+        console.log("Setting status video for " + remoteStreams[stream_index].peerid);
+        // Ensure that this video stream is within the correct picture-in-picture
+        if (parent_video[0] && video[0].parentElement.parentElement.id !== parent_video[0].parentElement.id){
+            // Move the video to the correct place
+            parent_video.append(video);
+            showElement(parent_video[0].parentElement.id);
+        }
+    }else{
+        if (parent_video[0]){
+            if (video[0].parentElement.parentElement.id === parent_video[0].parentElement.id){
+                console.log("Removing status video for " + remoteStreams[stream_index].peerid);
+                let prev_el = $('#remoteView' + (stream_index+1));
+                prev_el.append(video);
+                hideElement(parent_video[0].parentElement.id);
+            }
+        }
+    }
+}
+
 function setColWidth(col, width){
     removeClassByPrefix(col[0], 'col');
     if (width>0) {

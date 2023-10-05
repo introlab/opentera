@@ -551,10 +551,11 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
-        /*if (streamname.endsWith("ScreenShareAudio")){
+        if (streamname.endsWith("ScreenShareAudio")){
             // Only sharing audio, video track is always enabled - disable!
-            stream.getVideoTracks()[0].enabled = false;
-        }*/
+            // stream.getVideoTracks()[0].enabled = false;
+            setRemoteStatusVideo(slot-1, true); // Display status video for that stream
+        }
 
     }else{
         showStatusControls(false, slot, true);
@@ -686,6 +687,9 @@ function streamDisconnected(callerid, mediaStream, streamName){
             //setLargeView(new_large_view, false);
         }
     }
+
+    // If that stream used in a status video?
+    setRemoteStatusVideo(slot, false);
 
     // Remove stream
     for (let i=0; i<remoteStreams.length; i++){

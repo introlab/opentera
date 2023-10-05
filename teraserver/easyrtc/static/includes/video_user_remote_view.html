@@ -79,6 +79,12 @@
         </div>
     </div>
 
+    <!-- Picture in picture -->
+    <div id="remoteStatus{##view_id##}" class="overlay-bottom-right status-zone" style="display: none;" onclick="">
+        <img id="remoteMusic{##view_id##}" type="image" alt="image" class="image-status" src="images/music_on.png" style="z-index: 5;"/>
+        <div id="remoteStatusVideo{##view_id##}" class="h-100 w-100 video-pip"></div>
+    </div>
+
     <!-- Video ! -->
     <video id="remoteVideo{##view_id##}" playsinline
            oncontextmenu="return false;"
