@@ -153,6 +153,12 @@ function muteSpeaker(local, index, new_state){
             video_widget.prop('muted', !new_state);
         }
 
+        for (let i=1; i<=remoteStreams.length; i++){
+            let video_widget = getVideoWidget(false, i);
+            if(new_state)
+                video_widget[0].play(); // Make sure all videos are currently playing, useful when sharing music only
+        }
+
         localContact.status.speakerMuted = !new_state;
 
         if (easyrtc.webSocketConnected) {
