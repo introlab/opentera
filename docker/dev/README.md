@@ -16,7 +16,7 @@
 
 #### Visual Studio Code Extensions
 
-* Install the following extensions:
+* Install the following extensions for Visual Studio Code:
   * [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
   * [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
   * [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
@@ -31,14 +31,14 @@ You must select the root directory of the opentera git project.
 
 A sample [docker-compose.yml](./docker-compose.yml) file is provided that generates a full environment with the following components running in individual containers :
 - Redis server
-- PostgresSQL server 
-- NGINX reverse proxy server 
+- PostgresSQL server
+- NGINX reverse proxy server
 - A certificate generator for https self-signed certificates
 - TeraServer and base services
 
 >1. Right-click on the [docker-compose.yml](./docker-compose.yml) and select "Compose Up". This can take several minutes the first time to download all the images and start the containers.
 
->2. Docker compose will create **volumes** (shared disks) to store your databases, configurations, files as specified in the "volume:" section. Those directories are automatically mounted when the containers are started. 
+>2. Docker compose will create **volumes** (shared disks) to store your databases, configurations, files as specified in the "volume:" section. Those directories are automatically mounted when the containers are started.
 
 >3. When running for the first time, databases with default values are generated.
 

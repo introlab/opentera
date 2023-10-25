@@ -48,6 +48,8 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/--no-check-certificate
+docs/swagger.json
 
 build-teraplus-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 *.user
