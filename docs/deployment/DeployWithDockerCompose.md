@@ -94,7 +94,7 @@ You can connect to the PostgreSQL database running in your container by using po
 
 ### Connect to Redis
 
-Redis connexion is available on port **6380**. You can you your favorite tool to inspect the cache.
+Redis connexion is available on port **6380**. You can use your favorite tool to inspect the cache.
 
 ### Debugging with VS Code
 
