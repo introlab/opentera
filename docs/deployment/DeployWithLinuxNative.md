@@ -127,7 +127,7 @@ After=network-online.target
 User=**PUT THE EXECUTING USER HERE**
 Group=**PUT THE EXECUTING GROUP HERE**
 Environment=PYTHONPATH=**(path to opentera)**/opentera/teraserver/python
-ExecStart=**(path to opentera)**/opentera/teraserver/python/env/python-3.10/bin/python3 **(path to opentera)**/opentera/teraserver/python/TeraServer.py
+ExecStart=**(path to opentera)**/opentera/teraserver/python/env/python-3.11/bin/python3 **(path to opentera)**/opentera/teraserver/python/TeraServer.py
 WorkingDirectory=**(path to opentera)**/opentera/teraserver/python
 StandardOutput=syslog+console
 StandardError=syslog+console
