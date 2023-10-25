@@ -55,7 +55,7 @@ Procedure:
 
 **At this stage you have a running OpenTeraServer on your local machine on port 40075. Congratulations!**
 
-API Documentation can be viewed by browsing to [https://localhost:40075/doc](https://localhost:40075/doc). Accept the security risks if your browser is giving you a warning, this is caused because by our local server using a self generated certificate.
+API Documentation can be viewed by browsing to [https://localhost:40075/doc](https://localhost:40075/doc). Accept the security risks if your browser is giving you a warning, this is caused because by your local server using a self generated certificate.
 
 ### Connecting to the Local Server with OpenTeraPlus
 
