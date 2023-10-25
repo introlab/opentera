@@ -25,6 +25,7 @@
    services/services
 
 .. toctree::
+   :maxdepth: 5
    :hidden:
    :caption: Developers
 

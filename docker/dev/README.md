@@ -1,4 +1,4 @@
-# Deploying with Docker Compose on Windows/Mac/Linux
+# Setup a dev Environment with Docker-Compose on Mac/Linux/Windows
 
 [Docker Compose](https://docs.docker.com/compose/) is a tool that simplifies the management of multi-container [Docker](https://docs.docker.com/) applications. It allows you to define and run complex applications using a simple YAML file, specifying the services, networks, and volumes needed, making it easier to orchestrate and manage multiple Docker containers as a single application. An example Docker Compose configuration is provided with OpenTeraServer on GitHub in the [docker/dev](https://github.com/introlab/opentera/tree/main/docker/dev) directory.
 
