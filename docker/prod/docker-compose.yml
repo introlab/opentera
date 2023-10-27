@@ -1,0 +1,88 @@
+version: '3.8'
+#name: might not work depending on docker version, comment it to use the directory name instead (legacy)
+name: opentera-docker-prod
+services:
+  db:
+    # TODO: Use postgres latest image
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      # TODO: Change PostGresSQL default username/password
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+      # This script will initialize the DB (once) at first startup.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+    # Name the network as you wish, use the same network name for all containers.
+      - opentera-docker-prod-net
+
+  cache:
+    # TODO Use redis latest image
+    image: redis:6.2-alpine
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis-cache:/data
+    networks:
+      - opentera-docker-prod-net
+
+  proxy:
+    # TODO Use nginx latest image
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx/opentera.conf:/etc/nginx/opentera.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      # All your SSL certificates will need to be in the certificates volume.
+      - ./certificates/site_cert.pem:/etc/certificates/site_cert.pem
+      - ./certificates/site_key.pem:/etc/certificates/site_key.pem
+      - ./certificates/ca_cert.pem:/etc/certificates/ca_cert.pem
+      - certificates:/etc/certificates
+      - nginx-logs:/etc/nginx/logs
+    ports:
+      # This is the port that is mapped to the outside of the container. Every traffic is routed through the reverse proxy on this port.
+      - '40075:40075'
+    networks:
+      - opentera-docker-prod-net
+
+  opentera-server:
+    build:
+      # Opentera server will be built from source inside the container with a specific Dockerfile
+      dockerfile: teraserver/Dockerfile
+    image: opentera-server
+    restart: always
+    volumes:
+      - ./teraserver/TeraServerConfig.ini:/root/opentera/teraserver/python/config/TeraServerConfig.ini
+      - ./teraserver/FileTransferService.json:/root/opentera/teraserver/python/services/FileTransferService/FileTransferService.json
+      - ./teraserver/LoggingService.json:/root/opentera/teraserver/python/services/LoggingService/LoggingService.json
+      - ./teraserver/VideoRehabService.json:/root/opentera/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - ./teraserver/ice_servers.json:/root/opentera/teraserver/easyrtc/ice_servers.json
+      - opentera-files:/root/opentera/teraserver/python/services/FileTransferService/files
+      - certificates:/root/opentera/teraserver/python/config/certificates
+    networks:
+      - opentera-docker-prod-net
+    depends_on:
+      - proxy
+      - cache
+      - db
+
+volumes:
+  db:
+    driver: local
+
+  redis-cache:
+    driver: local
+
+  certificates:
+    driver: local
+
+  nginx-logs:
+    driver: local
+
+  opentera-files:
+    driver: local
+
+networks:
+  opentera-docker-prod-net:

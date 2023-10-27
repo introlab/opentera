@@ -57,6 +57,8 @@ build-teraserver-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 .idea
 python-3.6
 
+# Docker
+docker/prod/certificates/*.pem
 
 # Node modules
 node_modules/
