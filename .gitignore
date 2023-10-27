@@ -48,6 +48,8 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/--no-check-certificate
+docs/swagger.json
 
 build-teraplus-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 *.user
@@ -55,6 +57,8 @@ build-teraserver-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 .idea
 python-3.6
 
+# Docker
+docker/prod/certificates/*.pem
 
 # Node modules
 node_modules/
@@ -92,3 +96,4 @@ joss-paper/paper.jats
 joss-paper/paper.pdf
 /.vscode
 _python-3.10
+python-3.11

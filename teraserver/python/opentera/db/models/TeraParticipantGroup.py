@@ -71,15 +71,15 @@ class TeraParticipantGroup(BaseModel, SoftDeleteMixin):
     def update(cls, update_id: int, values: dict):
         # If group project changed, also changed project from all participants in that group
         if 'id_project' in values:
-            updated_group:TeraParticipantGroup = TeraParticipantGroup.get_participant_group_by_id(update_id)
+            updated_group: TeraParticipantGroup = TeraParticipantGroup.get_participant_group_by_id(update_id)
             if updated_group:
                 for participant in updated_group.participant_group_participants:
                     participant.id_project = values['id_project']
         super().update(update_id=update_id, values=values)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         for participant in self.participant_group_participants:
-            cannot_be_deleted_exception = participant.delete_check_integrity()
+            cannot_be_deleted_exception = participant.delete_check_integrity(with_deleted=with_deleted)
             if cannot_be_deleted_exception:
                 return IntegrityError('Participant group still has participant(s)', self.id_participant_group,
                                       't_participants')

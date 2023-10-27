@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10.7]
+        python-version: [3.11.4]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
         
@@ -56,7 +56,7 @@ jobs:
       run: |
         cmake .
         make python-all
-        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.10/bin/python)" >> $GITHUB_ENV
+        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.11/bin/python)" >> $GITHUB_ENV
         echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
     
     - name: Generate Self Signed TLS Certificates
@@ -100,7 +100,12 @@ jobs:
       working-directory: teraserver/python/tests/opentera/db/models
       run: |
         $OPENTERA_PYTHON -m unittest discover . "test_*.py"
-        
+
+    - name: Run Service Tests
+      working-directory: teraserver/python/tests/opentera/services
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+
     - name: Run FileTransferService Tests
       working-directory: teraserver/python/tests/services/FileTransferService
       run: |

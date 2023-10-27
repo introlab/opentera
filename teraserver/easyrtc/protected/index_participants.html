@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css" />
 
     <!-- Javascripts -->
-    <script src="js/jquery/jquery-3.5.1.min.js"></script>
+    <script src="js/jquery/jquery-3.7.1.min.js"></script>
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
@@ -195,7 +195,7 @@
                     <div id="localSourcesControls1" class="mb-5 mb-md-0 overlay-bottom-right">
                         <div style="background-color:rgba(0,0,0,0);">
                             <input id="localBtnShow2ndVideo1" type="image" alt="image" src="images/show2ndvideo.png" class="image-icon" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
-                            <input id="localBtnShareScreen1" type="image" alt="image" src="images/sharescreen.png" class="image-icon" onclick="btnShareScreenClicked();event.stopPropagation();" style="display: none;"/>
+                            <input id="localBtnShareScreen1" type="image" alt="image" data-sound-only="false" src="images/sharescreen.png" class="image-icon" onclick="btnShareScreenClicked($('#localBtnShareScreen1').data().soundOnly);event.stopPropagation();" style="display: none;"/>
                         </div>
                     </div>
                     <!-- Video ! -->

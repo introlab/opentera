@@ -564,7 +564,7 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
                                                            files=files,
                                                            endpoint=self.asset_endpoint)
 
-                self.assertEqual(403, response.status_code, 'Forbidden access to API')
+                self.assertEqual(200, response.status_code)
 
     def test_full_as_service(self):
         with self.app_context():

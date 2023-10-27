@@ -239,9 +239,9 @@ class TeraService(BaseModel, SoftDeleteMixin):
         # new_role.service_role_name = 'user'
         # TeraServiceRole.insert(new_role)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         for service_site in self.service_sites:
-            if service_site.delete_check_integrity():
+            if service_site.delete_check_integrity(with_deleted=with_deleted):
                 return IntegrityError('Have sessions, assets or tests using that service', self.id_service,
                                       't_sessions')
         return None
@@ -253,3 +253,6 @@ class TeraService(BaseModel, SoftDeleteMixin):
             del values['service_uuid']
 
         super().update(update_id, values)
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['service_sites', 'service_projects', 'service_roles']

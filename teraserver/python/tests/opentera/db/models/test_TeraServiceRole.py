@@ -139,3 +139,13 @@ class TeraServiceRoleTest(BaseModelsTest):
             self.db.session.commit()
             same_service_role = TeraServiceRole.get_service_role_by_id(role_id=new_service_role.id_service_role)
             self.assertEqual(same_service_role, new_service_role)
+
+    @staticmethod
+    def new_test_service_role(id_service: int, role_name: str, id_site: int | None = None) -> TeraServiceRole:
+        service_role = TeraServiceRole()
+        service_role.id_service = id_service
+        service_role.service_role_name = role_name
+        if id_site:
+            service_role.id_site = id_site
+        TeraServiceRole.insert(service_role)
+        return service_role

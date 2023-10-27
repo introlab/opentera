@@ -124,12 +124,12 @@ class TeraServiceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             # Ok, delete it
             super().delete(id_todel, autocommit=autocommit)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         from opentera.db.models.TeraServiceProject import TeraServiceProject
-        projects = TeraServiceProject.get_projects_for_service(self.id_service)
+        projects = TeraServiceProject.get_projects_for_service(self.id_service, with_deleted=with_deleted)
         for service_project in projects:
             if service_project.service_project_project.id_site == self.id_site:
-                if service_project.delete_check_integrity():
+                if service_project.delete_check_integrity(with_deleted=with_deleted):
                     return IntegrityError('Still have sessions with that service', self.id_service,
                                           't_sessions')
         return None

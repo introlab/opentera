@@ -3,8 +3,10 @@ from sqlalchemy.orm import relationship
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from enum import Enum
+
 import uuid
 import json
+from datetime import datetime
 
 
 class TeraTestStatus(Enum):
@@ -37,7 +39,7 @@ class TeraTest(BaseModel, SoftDeleteMixin):
     test_user = relationship("TeraUser", back_populates='user_tests')
     test_participant = relationship("TeraParticipant", back_populates='participant_tests')
     test_service = relationship("TeraService", back_populates='service_tests')
-    test_test_type = relationship('TeraTestType')
+    test_test_type = relationship('TeraTestType', back_populates='test_type_tests')
 
     def from_json(self, json_data, ignore_fields=None):
         if ignore_fields is None:
@@ -196,6 +198,9 @@ class TeraTest(BaseModel, SoftDeleteMixin):
         # Check if summary is in json
         if isinstance(test.test_summary, dict):
             test.test_summary = json.dumps(test.test_summary)
+
+        if not test.test_datetime:
+            test.test_datetime = datetime.now()
 
         super().insert(test)
 

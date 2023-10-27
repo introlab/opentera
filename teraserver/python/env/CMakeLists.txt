@@ -1,8 +1,6 @@
 # Will try to install env if not present.
 # Conda needs to be installed first
 
-
-
 set (ENV_PATH ${CMAKE_CURRENT_SOURCE_DIR}/python-${PYTHON_VERSION})
 file(MAKE_DIRECTORY ${ENV_PATH})
 
@@ -21,7 +19,6 @@ else(WIN32)
 endif(WIN32)
 
 
-
 # Use the requirements file instead of listing all packages in CMake.
 add_custom_target(
     python-requirements
@@ -35,9 +32,7 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
 # TODO - INSTALL WITH CONDA ?
-
 
 # Will always be considered out of date...
 # Always proceed...

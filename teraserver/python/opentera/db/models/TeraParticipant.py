@@ -390,18 +390,28 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             raise IntegrityError('Participant project disabled - no insert allowed', -1, 't_projects')
         TeraParticipant.db().session.commit()
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         # Safety check - can't delete participants with sessions
-        if TeraSessionParticipants.get_session_count_for_participant(self.id_participant) > 0:
+        if TeraSessionParticipants.get_session_count_for_participant(self.id_participant,
+                                                                     with_deleted=with_deleted) > 0:
             return IntegrityError('Participant still has sessions', self.id_participant, 't_sessions_participants')
 
-        if TeraSession.get_count(filters={'id_creator_participant': self.id_participant}) > 0:
+        if TeraSession.get_count(filters={'id_creator_participant': self.id_participant},
+                                 with_deleted=with_deleted) > 0:
             return IntegrityError('Participant still has created sessions', self.id_participant, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_participant': self.id_participant}) > 0:
+        if TeraAsset.get_count(filters={'id_participant': self.id_participant}, with_deleted=with_deleted) > 0:
             return IntegrityError('Participant still has created assets', self.id_participant, 't_assets')
 
-        if TeraTest.get_count(filters={'id_participant': self.id_participant}) > 0:
+        if TeraTest.get_count(filters={'id_participant': self.id_participant}, with_deleted=with_deleted) > 0:
             return IntegrityError('Participant still has created tests', self.id_participant, 't_tests')
 
         return None
+
+    def hard_delete_before(self):
+        # Delete sessions that we are part of since they will not be deleted otherwise
+        for ses in self.participant_sessions:
+            ses.hard_delete()
+
+    def get_undelete_cascade_relations(self):
+        return ['participant_service_config']

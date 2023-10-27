@@ -246,21 +246,29 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
 
         super().update(update_id=update_id, values=values)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         # Safety check - can't delete participants with sessions
-        if TeraDeviceParticipant.get_count(filters={'id_device': self.id_device}) > 0:
+        if TeraDeviceParticipant.get_count(filters={'id_device': self.id_device}, with_deleted=with_deleted) > 0:
             return IntegrityError('Device still associated to participant(s)', self.id_device, 't_devices_participants')
 
-        if TeraSessionDevices.get_count(filters={'id_device': self.id_device}) > 0:
+        if TeraSessionDevices.get_count(filters={'id_device': self.id_device}, with_deleted=with_deleted) > 0:
             return IntegrityError('Device still has sessions', self.id_device, 't_sessions_devices')
 
-        if TeraSession.get_count(filters={'id_creator_device': self.id_device}) > 0:
+        if TeraSession.get_count(filters={'id_creator_device': self.id_device}, with_deleted=with_deleted) > 0:
             return IntegrityError('Device still has created sessions', self.id_device, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_device': self.id_device}) > 0:
+        if TeraAsset.get_count(filters={'id_device': self.id_device}, with_deleted=with_deleted) > 0:
             return IntegrityError('Device still has created assets', self.id_device, 't_assets')
 
-        if TeraTest.get_count(filters={'id_device': self.id_device}) > 0:
+        if TeraTest.get_count(filters={'id_device': self.id_device}, with_deleted=with_deleted) > 0:
             return IntegrityError('Device still has created tests', self.id_device, 't_tests')
 
         return None
+
+    def hard_delete_before(self):
+        # Delete sessions that we are part of since they will not be deleted otherwise
+        for ses in self.device_sessions:
+            ses.hard_delete()
+
+    def get_undelete_cascade_relations(self):
+        return ['device_service_config']

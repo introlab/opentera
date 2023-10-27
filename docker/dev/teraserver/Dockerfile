@@ -1,4 +1,4 @@
-FROM python:3.10.10-bullseye
+FROM python:3.11.5-bullseye
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
@@ -38,7 +38,7 @@ ADD ./teraserver/python/env/requirements.txt /requirements.txt
 RUN ["/bin/bash", "-c", "python3 -m pip install -r /requirements.txt"]
 
 # Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_16.x -o /nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_18.x -o /nodesource_setup.sh
 RUN bash /nodesource_setup.sh
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 
@@ -46,7 +46,7 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 ADD ./teraserver /teraserver
 
 # Remove local environment that was copied in the ADD command if it exists
-RUN if [ -d "/teraserver/python/env/python-3.10" ]; then rm -rf /teraserver/python/env/python-3.10; fi
+RUN if [ -d "/teraserver/python/env/python-3.11" ]; then rm -rf /teraserver/python/env/python-3.11; fi
 
 # Cleanup directory of cmake cache (we possibly are using it outside of docker)
 RUN if [ -f "/teraserver/CMakeCache.txt" ]; then rm -f /teraserver/CMakeCache.txt; fi

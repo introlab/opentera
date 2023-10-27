@@ -26,8 +26,8 @@ class DBManagerTeraUserAccess:
     def __init__(self, user: TeraUser):
         self.user = user
 
-    def get_accessible_users_ids(self, admin_only=False):
-        users = self.get_accessible_users(admin_only=admin_only)
+    def get_accessible_users_ids(self, admin_only=False, include_site_access=False):
+        users = self.get_accessible_users(admin_only=admin_only, include_site_access=include_site_access)
         users_ids = []
         for user in users:
             if user.id_user not in users_ids:
@@ -372,9 +372,9 @@ class DBManagerTeraUserAccess:
         from opentera.db.models.TeraServiceSite import TeraServiceSite
 
         if self.user.user_superadmin:
-            if self.user.user_superadmin:
-                return TeraService.query.all()
+            return TeraService.query.all()
 
+        # TODO: Check if SQL query is OK
         # Accessible services are those from projects and sites where the user is admin
         accessible_projects_ids = self.get_accessible_projects_ids()
         admin_sites_ids = self.get_accessible_sites_ids(admin_only=True)
@@ -558,16 +558,22 @@ class DBManagerTeraUserAccess:
 
     def query_session_type_by_id(self, session_type_id: int):
         proj_ids = self.get_accessible_projects_ids()
-        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id).filter(TeraProject.id_project.
-                                                                                               in_(proj_ids)).first()
-        return session_type
+        session_type = TeraSessionType.query.filter_by(id_session_type=session_type_id)\
+
+        if not self.user.user_superadmin:
+            # Super admin = get all session types even if not associated to a project
+            session_type = session_type.filter(TeraProject.id_project.in_(proj_ids))
+
+        return session_type.first()
 
     def query_test_type(self, test_type_id: int):
-        site_ids = self.get_accessible_sites_ids()
-        proj_ids = self.get_accessible_projects_ids()
+        # site_ids = self.get_accessible_sites_ids()
+        # proj_ids = self.get_accessible_projects_ids()
         service_ids = self.get_accessible_services_ids()
-        test_type = TeraTestType.query.filter_by(id_test_type=test_type_id).filter(TeraSite.id_site.in_(site_ids))\
-            .filter(TeraTestType.id_service.in_(service_ids)).filter(TeraProject.id_project.in_(proj_ids)).first()
+        test_type = TeraTestType.query.filter_by(id_test_type=test_type_id)\
+            .filter(TeraTestType.id_service.in_(service_ids)).first()
+        # .filter(TeraSite.id_site.in_(site_ids))\
+        # .filter(TeraTestType.id_service.in_(service_ids)).filter(TeraProject.id_project.in_(proj_ids)).first()
         return test_type
 
     def query_projects_for_site(self, site_id: int):

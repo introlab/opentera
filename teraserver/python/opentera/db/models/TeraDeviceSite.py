@@ -116,17 +116,18 @@ class TeraDeviceSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             for device_project in specific_device_projects:
                 TeraDeviceProject.delete(device_project.id_device_project, autocommit=autocommit)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         from opentera.db.models.TeraDeviceProject import TeraDeviceProject
         from opentera.db.models.TeraProject import TeraProject
 
         # Will check if device is part of a project in the site
         specific_device_projects = TeraDeviceProject.query.join(TeraProject).\
-            filter(TeraDeviceProject.id_device == self.id_device).filter(TeraProject.id_site == self.id_site).all()
+            filter(TeraDeviceProject.id_device == self.id_device).filter(TeraProject.id_site == self.id_site).\
+            execution_options(include_deleted=with_deleted).all()
 
         # Check integrity of device_projects
         for device_project in specific_device_projects:
-            integrity_check = device_project.delete_check_integrity()
+            integrity_check = device_project.delete_check_integrity(with_deleted)
             if integrity_check is not None:
                 return integrity_check
 

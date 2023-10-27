@@ -1,34 +1,18 @@
 import inspect
 import datetime
-# import uuid
 import time
 import typing as t
 import sqlalchemy.sql.sqltypes
-from flask_sqlalchemy import SQLAlchemy, BaseQuery, Model
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, text
+from flask_sqlalchemy import SQLAlchemy, query, model
+from sqlalchemy import Column, BigInteger
 from sqlalchemy.inspection import inspect as sqlinspector
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from functools import wraps
 
 
 class _QueryProperty:
-    def __get__(self, obj: Model | None, cls: t.Type[Model]) -> BaseQuery:
+    def __get__(self, obj: model.Model | None, cls: t.Type[model.Model]) -> query.Query:
         return cls.db().session.query(cls)
-
-
-class HandleIncludeDeletedFlag:
-    def __init__(self, cls):
-        self.cls = cls
-
-    def __call__(self, f, *args, **kwargs):
-        if 'include_deleted' not in self.cls.db().session.info:
-            self.cls.db().session.info['include_deleted'] = list()
-        self.cls.db().session.info['include_deleted'].push(self.cls.__name__)
-        retval = f(args, kwargs)
-        self.cls.db().session.info['include_deleted'].pop(-1)
-        return retval
 
 
 class BaseMixin(object):
@@ -175,8 +159,12 @@ class BaseMixin(object):
 
         # with Session(cls.db().engine) as session:
         update_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == update_id).first()
-        update_obj.from_json(update_values)
-        cls.db().session.commit()
+
+        if update_obj:
+            update_obj.from_json(update_values)
+            cls.db().session.commit()
+        else:
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(update_id) + ' cannot update.')
 
     @classmethod
     def commit(cls):
@@ -195,22 +183,45 @@ class BaseMixin(object):
             cls.commit()
             return db_object
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         return None  # Can delete by default
 
     @classmethod
-    def delete(cls, id_todel, autocommit: bool = True):
+    def delete(cls, id_todel, autocommit: bool = True, hard_delete: bool = False):
+        if hard_delete:
+            cls.handle_include_deleted_flag(True)
+            autocommit = False
         delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        cannot_be_deleted_exception = delete_obj.delete_check_integrity()
-        if cannot_be_deleted_exception:
-            raise cannot_be_deleted_exception
+
         if delete_obj:
-            if getattr(delete_obj, 'soft_delete', None):
+            has_soft_delete = getattr(delete_obj, 'soft_delete', None) is not None
+            has_hard_delete = getattr(delete_obj, 'hard_delete', None) is not None
+
+            if (has_soft_delete and not delete_obj.deleted_at) or not has_soft_delete:
+                # Don't check integrity for already soft-deleted objects
+                cannot_be_deleted_exception = delete_obj.delete_check_integrity()
+                if cannot_be_deleted_exception:
+                    raise cannot_be_deleted_exception
+
+            if has_soft_delete and not hard_delete:
                 delete_obj.soft_delete()
             else:
-                cls.db().session.delete(delete_obj)
+                # if has_soft_delete:
+                #     # Check that object was soft deleted before doing a hard delete
+                #     if not delete_obj.deleted_at:
+                #         # Object must be soft deleted first before being hard deleted!
+                #         raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) +
+                #                               ' cannot be hard deleted: not soft deleted beforehand!')
+                if has_hard_delete and hard_delete:
+                    delete_obj.hard_delete()
+                else:
+                    cls.db().session.delete(delete_obj)
             if autocommit:
                 cls.commit()
+        else:
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_todel) + ' cannot delete.')
+        if hard_delete:
+            cls.handle_include_deleted_flag(False)
 
     @classmethod
     def undelete(cls, id_to_undelete):
@@ -222,23 +233,17 @@ class BaseMixin(object):
             cls.commit()
         else:
             print(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
-
-    # @classmethod
-    # def handle_include_deleted_flag(cls, include_deleted=False):
-    #     if 'include_deleted' not in cls.db().session.info:
-    #         cls.db().session.info['include_deleted'] = list()
-    #
-    #     if include_deleted:
-    #         cls.db().session.info['include_deleted'].push(cls.__name__)
-    #     else:
-    #         cls.db().session.info['include_deleted'].pop(-1)
+            raise SQLAlchemyError(cls.__name__ + ' with id ' + str(id_to_undelete) + ' cannot undelete.')
 
     @classmethod
-    def hard_delete(cls, id_todel):
-        delete_obj = cls.db().session.query(cls).filter(getattr(cls, cls.get_primary_key_name()) == id_todel).first()
-        if delete_obj:
-            cls.db().session.delete(delete_obj)
-            cls.commit()
+    def handle_include_deleted_flag(cls, include_deleted=False):
+        if 'include_deleted' not in cls.db().session.info:
+            cls.db().session.info['include_deleted'] = list()
+
+        if include_deleted:
+            cls.db().session.info['include_deleted'].append(cls.get_model_name())
+        else:
+            cls.db().session.info['include_deleted'].pop(-1)
 
     @classmethod
     def query_with_filters(cls, filters=None, with_deleted: bool = False):
@@ -312,4 +317,4 @@ class BaseMixin(object):
 
 
 # Declarative base, inherit from Base for all models
-BaseModel = declarative_base(cls=BaseMixin)
+BaseModel = sqlalchemy.orm.declarative_base(cls=BaseMixin)

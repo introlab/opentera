@@ -143,15 +143,20 @@ function muteSpeaker(local, index, new_state){
 
     updateStatusIconState(new_state, local, index, "Speaker");
 
-
     if (local === true){
         // Send display update request
         let request = {"peerid": local_peerid, speaker: new_state};
 
         // Mute all remote streams
-        for (let i=1; i<=4; i++){
+        for (let i=1; i<=maxRemoteSourceNum; i++){
             let video_widget = getVideoWidget(false, i);
             video_widget.prop('muted', !new_state);
+        }
+
+        for (let i=1; i<=remoteStreams.length; i++){
+            let video_widget = getVideoWidget(false, i);
+            if(new_state)
+                video_widget[0].play(); // Make sure all videos are currently playing, useful when sharing music only
         }
 
         localContact.status.speakerMuted = !new_state;
@@ -374,7 +379,7 @@ function localVideoStreamSuccess(stream){
                 for (let i=0; i<remoteStreams.length; i++){
                     easyrtc.addStreamToCall(remoteStreams[i].peerid, stream.streamName, function (/*caller, streamName*/) {
                         //console.log("Added stream to " + caller + " - " + streamName);
-                        updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+                        updateUserLocalViewLayout();
                     });
                 }
             }
@@ -552,6 +557,12 @@ function newStreamStarted(callerid, stream, streamname) {
             // Screen sharing = no controls
             showStatusControls(false, slot, false);
         }
+        if (streamname.endsWith("ScreenShareAudio")){
+            // Only sharing audio, video track is always enabled - disable!
+            // stream.getVideoTracks()[0].enabled = false;
+            setRemoteStatusVideo(slot-1, true); // Display status video for that stream
+        }
+
     }else{
         showStatusControls(false, slot, true);
         playSound("audioConnected");
@@ -568,8 +579,8 @@ function newStreamStarted(callerid, stream, streamname) {
     easyrtc.setVideoObjectSrc(getVideoWidget(false, slot)[0], stream);
 
     // Update display
-    updateUserRemoteViewsLayout(remoteStreams.length);
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
     refreshRemoteStatusIcons(callerid);
 
     if (streamname === "default"){
@@ -683,6 +694,9 @@ function streamDisconnected(callerid, mediaStream, streamName){
         }
     }
 
+    // If that stream used in a status video?
+    setRemoteStatusVideo(slot, false);
+
     // Remove stream
     for (let i=0; i<remoteStreams.length; i++){
         //console.log(remoteStreams[i].peerid + " = " + callerid + " && " + remoteStreams[i].streamname + " = " + streamName + "?");
@@ -722,8 +736,8 @@ function streamDisconnected(callerid, mediaStream, streamName){
         }
     }
 
-    updateUserRemoteViewsLayout(remoteStreams.length);
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserRemoteViewsLayout();
+    updateUserLocalViewLayout();
 }
 
 function disconnectedFromSignalingServer(){
@@ -1149,17 +1163,39 @@ function signalingLoginFailure(errorCode, message) {
     clearStatusMsg();
 }
 
-async function shareScreen(local, start){
+async function shareScreen(local, start, sound_only = false){
     let streamName = localContact.peerid + '_' +'ScreenShare';
+    if (sound_only){
+        streamName += "Audio";
+    }
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;
         try {
-            screenStream = await navigator.mediaDevices.getDisplayMedia({video: true,
-                audio: currentConfig.screenAudio});
+            let constraints = {}
+            if (sound_only){
+                constraints.audio = {sampleRate: 48000,
+                                     noiseSuppression: false,
+                                     echoCancellation: true,
+                                     channelCount: 2,
+                                     autoGainControl: false,
+                                     voiceActivityDetection: false};
+                constraints.video = {frameRate: 1, height: 120, width: 160};
+            }else{
+                constraints.video = true;
+                constraints.audio = currentConfig.screenAudio;
+            }
+            screenStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+            if (sound_only){
+                // Video track must be stopped if we want sound only, since it is required to get Display Media to share
+                screenStream.getVideoTracks()[0].enabled = false;
+                easyrtc.setSdpFilters(undefined, highQualityAudioSdp);
+            }
             easyrtc.register3rdPartyLocalMediaStream(screenStream, streamName);
+            // TODO: Use easyrtc.setSdpFilters to improve audio quality
+            //easyrtc.setSdpFilters()
 
-            console.log("Starting screen sharing - with audio: " + currentConfig.screenAudio);
+            console.log("Starting screen sharing - with audio: " + (sound_only || currentConfig.screenAudio));
 
             // Then to add to existing connections
             for (let i=0; i<remoteContacts.length; i++){
@@ -1169,10 +1205,13 @@ async function shareScreen(local, start){
                     easyrtc.renegotiate(remoteContacts[i].peerid);
                 });
             }
-            easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
+            if (!sound_only){
+                easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], screenStream);
+                sendPrimaryView(local_peerid, streamName);
+                setPrimaryViewIcon(local_peerid, streamName);
+            }
+
             localStreams.push({"peerid": local_peerid, "streamname": streamName, "stream":screenStream});
-            sendPrimaryView(local_peerid, streamName);
-            setPrimaryViewIcon(local_peerid, streamName);
 
         } catch(err) {
             showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
@@ -1192,13 +1231,15 @@ async function shareScreen(local, start){
         // Stop local stream
         localStreams[1].stream.getVideoTracks()[0].stop();   // Screen sharing is always index 1 of localStreams,
                                                              // video track index = 0, since we always have just one.
+        if (localStreams[1].stream.getAudioTracks().length > 0)
+            localStreams[1].stream.getAudioTracks()[0].stop();
         easyrtc.setVideoObjectSrc(getVideoWidget(true,2)[0], null);
 
         // Remove stream
         localStreams.pop();
     }
 
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserLocalViewLayout();
 }
 
 function share2ndStream(local, start){
@@ -1264,7 +1305,7 @@ function share2ndStream(local, start){
         }
     }
 
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
+    updateUserLocalViewLayout();
 
     // Send status update
     sendStatus({"targetRoom": "default"});
@@ -1376,4 +1417,30 @@ function sendShareScreen(peerid_target, status){
             }
         });
     }
+}
+
+function getVideoStreamsIndexes(streamsList){
+    let indexes = [];
+    for (let stream_index = 0; stream_index<streamsList.length; stream_index++){
+        if (streamsList[stream_index].streamname.endsWith("ScreenShareAudio"))
+            continue;
+        let videos = streamsList[stream_index].stream.getVideoTracks();
+        for (let video_index=0; video_index<videos.length; video_index++){
+            if (videos[video_index].enabled){
+                indexes.push(stream_index+1);
+                break; // No need to continue - we have at least one video!
+            }
+        }
+    }
+    return indexes;
+}
+
+function highQualityAudioSdp(sdp){
+    let modified_sdp = sdp;
+
+    if (sdp.search('useinbandfec=1; stereo=1; maxaveragebitrate') === -1){
+        modified_sdp = sdp.replaceAll('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=64000');
+    }
+    
+    return modified_sdp;
 }

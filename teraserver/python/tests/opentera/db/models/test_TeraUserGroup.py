@@ -3,6 +3,7 @@ from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from sqlalchemy.exc import SQLAlchemyError
@@ -197,7 +198,7 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertTrue(new_group.id_user_group > 0)
             self.assertIsNotNone(TeraUserGroup.get_user_group_by_id(id_user_group))
             # Cleanup
-            TeraUserGroup.hard_delete(new_group.id_user_group)
+            TeraUserGroup.delete(new_group.id_user_group, hard_delete=True)
             self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
 
     def test_update_with_modified_id_user_group(self):
@@ -227,11 +228,94 @@ class TeraUserGroupTest(BaseModelsTest):
                     self.assertRaises(SQLAlchemyError, TeraUserGroup.update, group.id_user_group, invalid_fields)
                     TeraUserGroup.db().session.rollback()
 
+    def test_soft_delete(self):
+        with self._flask_app.app_context():
+            # Create new
+            ug = TeraUserGroupTest.new_test_usergroup()
+            self.assertIsNotNone(ug.id_user_group)
+            id_user_group = ug.id_user_group
+
+            # Soft delete
+            TeraUserGroup.delete(id_user_group)
+            # Make sure participant is deleted
+            self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+
+            # Query, with soft delete flag
+            ug = TeraUserGroup.query.filter_by(id_user_group=id_user_group).\
+                execution_options(include_deleted=True).first()
+            self.assertIsNotNone(ug)
+            self.assertIsNotNone(ug.deleted_at)
+
     def test_hard_delete(self):
         with self._flask_app.app_context():
-            pass
+            # Create new
+            ug = TeraUserGroupTest.new_test_usergroup()
+            self.assertIsNotNone(ug.id_user_group)
+            id_user_group = ug.id_user_group
 
-    # def test_soft_delete(self):
-    #    pass
+            from test_TeraUser import TeraUserTest
+            user = TeraUserTest.new_test_user(user_name="user_ug_harddelete", user_groups=[ug])
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
 
+            # Soft delete to prevent relationship integrity errors as we want to test hard-delete cascade here
+            id_user_user_group = TeraUserUserGroup.query_user_user_group_for_user_user_group(id_user, id_user_group)\
+                .id_user_user_group
+            TeraUserUserGroup.delete(id_user_user_group)
+            TeraUserGroup.delete(id_user_group)
 
+            # Check that relationships are still there
+            self.assertIsNotNone(TeraUser.get_user_by_id(id_user))
+            self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+            self.assertIsNotNone(TeraUserGroup.get_user_group_by_id(id_user_group, True))
+            self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+            self.assertIsNotNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, True))
+
+            # Hard delete
+            TeraUserGroup.delete(id_user_group, hard_delete=True)
+
+            # Make sure eveything is deleted
+            self.assertIsNotNone(TeraUser.get_user_by_id(id_user, True))
+            self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group, True))
+            self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group, True))
+
+    def test_undelete(self):
+        with self._flask_app.app_context():
+            # Create new
+            ug = TeraUserGroupTest.new_test_usergroup()
+            self.assertIsNotNone(ug.id_user_group)
+            id_user_group = ug.id_user_group
+
+            from test_TeraUser import TeraUserTest
+            user = TeraUserTest.new_test_user(user_name="user_ug_undelete", user_groups=[ug])
+            self.assertIsNotNone(user.id_user)
+            id_user = user.id_user
+
+            # Add service access
+            from test_TeraServiceAccess import TeraServiceAccessTest
+            access = TeraServiceAccessTest.new_test_service_access(id_service_role=1, id_user_group=id_user_group)
+            id_access = access.id_service_access
+
+            # Delete
+            id_user_user_group = TeraUserUserGroup.query_user_user_group_for_user_user_group(id_user, id_user_group) \
+                .id_user_user_group
+            TeraUserUserGroup.delete(id_user_user_group)
+            TeraUserGroup.delete(id_user_group)
+
+            self.assertIsNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+            self.assertIsNone(TeraServiceAccess.get_service_access_by_id(id_access))
+            self.assertIsNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+
+            # Undelete
+            TeraUserGroup.undelete(id_user_group)
+
+            self.assertIsNotNone(TeraUserGroup.get_user_group_by_id(id_user_group))
+            self.assertIsNotNone(TeraUserUserGroup.get_user_user_group_by_id(id_user_user_group))
+            self.assertIsNotNone(TeraServiceAccess.get_service_access_by_id(id_access))
+
+    @staticmethod
+    def new_test_usergroup() -> TeraUserGroup:
+        ug = TeraUserGroup()
+        ug.user_group_name = "Test User Group"
+        TeraUserGroup.insert(ug)
+        return ug

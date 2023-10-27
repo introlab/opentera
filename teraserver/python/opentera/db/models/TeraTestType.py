@@ -28,12 +28,13 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
     test_type_service = relationship("TeraService")
     test_type_projects = relationship("TeraProject", secondary="t_tests_types_projects")
     test_type_sites = relationship("TeraSite", secondary="t_tests_types_sites")
+    test_type_tests = relationship("TeraTest", cascade='delete')
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['test_type_service', 'test_type_sites', 'test_type_projects',
-                              'test_type_test_type_projects', 'test_type_test_type_sites'])
+                              'test_type_test_type_projects', 'test_type_test_type_sites', 'test_type_tests'])
 
         if minimal:
             ignore_fields.extend(['test_type_description'])
@@ -139,8 +140,8 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
 
         return urls
 
-    def delete_check_integrity(self) -> IntegrityError | None:
-        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}) > 0:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
+        if TeraTest.get_count(filters={'id_test_type': self.id_test_type}, with_deleted=with_deleted) > 0:
             return IntegrityError('Test Type still has associated tests', self.id_test_type, 't_tests')
         return None
 

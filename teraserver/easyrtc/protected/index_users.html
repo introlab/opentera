@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css" />
 
     <!-- Javascripts -->
-    <script src="js/jquery/jquery-3.5.1.min.js"></script>
+    <script src="js/jquery/jquery-3.7.1.min.js"></script>
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="js/socket.io.js"></script>
     <script src="easyrtc/easyrtc.js"></script>
@@ -313,7 +313,7 @@
                     <div id="localSourcesControls1" class="overlay-bottom-right">
                         <div style="background-color:rgba(0,0,0,0);">
                             <input id="localBtnShow2ndVideo1" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
-                            <input id="localBtnShareScreen1" class="image-icon" type="image" alt="image" src="images/sharescreen.png" onclick="btnShareScreenClicked();event.stopPropagation();" style="display: none;"/>
+                            <input id="localBtnShareScreen1" class="image-icon" type="image" alt="image" data-sound-only="false" src="images/sharescreen.png" onclick="btnShareScreenClicked($('#localBtnShareScreen1').data().soundOnly);event.stopPropagation();" style="display: none;"/>
                         </div>
                     </div>
                     <!-- Video ! -->
@@ -370,11 +370,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="dropup">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
+                    <div class="dropup" id="toolDropup">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="toolsDropdown" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" data-i18n="ui.tools">
                             Outils
                         </button>
-                        <div class="dropdown-menu bg-primary" aria-labelledby="toolsDropdown" style="transform: translate3d(0px, 2px, 0px);">
+                        <div class="dropdown-menu bg-primary" id="toolsDropdownMenu" aria-labelledby="toolsDropdown" style="transform: translate3d(0px, 2px, 0px);">
                             <div class="dropdown-item" onclick="showChronosDialog();">
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
                                 <label data-i18n="ui.chronos">Chronos</label>
@@ -382,6 +383,10 @@
                             <div class="dropdown-item" onclick="showMeasuresDialog();">
                                 <input class="tool-icon" id="btnAngles" type="image" alt="image" src="images/angles.png"/>
                                 <label data-i18n="ui.measures">Mesures</label>
+                            </div>
+                            <div class="dropdown-item" onclick="btnShareScreenClicked(true);">
+                                <input class="tool-icon" id="btnMusic" type="image" alt="image" src="images/music.png"/>
+                                <label data-i18n="ui.music">Partage son</label>
                             </div>
                         </div>
                     </div>

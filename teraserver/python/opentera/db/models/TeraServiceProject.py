@@ -113,24 +113,26 @@ class TeraServiceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if delete_obj:
             TeraServiceProject.delete(delete_obj.id_service_project, autocommit=autocommit)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         # This check will be quite long to process with lot of sessions and data...
         session_types_ids = \
-            [st.id_session_type for st in TeraSessionType.get_session_types_for_service(self.id_service)]
+            [st.id_session_type for st in TeraSessionType.get_session_types_for_service(self.id_service,
+                                                                                        with_deleted=with_deleted)]
 
-        sessions = TeraSession.get_sessions_for_project(self.id_project)
+        sessions = TeraSession.get_sessions_for_project(self.id_project, with_deleted=with_deleted)
         for session in sessions:
             if session.id_session_type in session_types_ids:
                 return IntegrityError('Service has sessions of related session type in this project', self.id_service,
                                       't_sessions')
             if TeraTest.query.join(TeraTestType).filter(TeraTest.id_session == session.id_session).\
                     filter(or_(TeraTest.id_service == self.id_service, TeraTestType.id_service == self.id_service))\
-                    .count() > 0:
+                    .execution_options(include_deleted=with_deleted).count() > 0:
                 return IntegrityError('Service has tests of related test type in this project', self.id_service,
                                       't_tests')
             if TeraAsset.query.filter_by(id_session=session.id_session).\
                 filter(or_(TeraAsset.asset_service_uuid == self.service_project_service.service_uuid,
-                           TeraAsset.id_service == self.id_service)).count() > 0:
+                           TeraAsset.id_service == self.id_service)).execution_options(include_deleted=with_deleted)\
+                    .count() > 0:
                 return IntegrityError('Service has related assets in this project', self.id_service, 't_assets')
         return None
 

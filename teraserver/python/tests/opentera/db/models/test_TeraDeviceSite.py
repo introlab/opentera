@@ -264,3 +264,10 @@ class TeraDeviceSiteTest(BaseModelsTest):
         self.assertFalse('device_site_site' in json_data)
         self.assertFalse('device_site_device' in json_data)
 
+    @staticmethod
+    def new_test_device_site(id_device: int, id_site: int) -> TeraDeviceSite:
+        device_site = TeraDeviceSite()
+        device_site.id_site = id_site
+        device_site.id_device = id_device
+        TeraDeviceSite.insert(device_site)
+        return device_site

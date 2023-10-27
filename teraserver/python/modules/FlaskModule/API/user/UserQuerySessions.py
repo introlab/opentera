@@ -246,7 +246,7 @@ class UserQuerySessions(Resource):
             # At least one participant is not accessible to the user
             return gettext('User doesn\'t have access to at least one participant of that session.'), 403
 
-        accessibles_user_ids = user_access.get_accessible_users_ids()
+        accessibles_user_ids = user_access.get_accessible_users_ids(include_site_access=True)
         if set(session_users_ids).difference(accessibles_user_ids):
             # At least one session user is not accessible to the user
             return gettext('User doesn\'t have access to at least one user of that session.'), 403

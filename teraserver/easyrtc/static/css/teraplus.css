@@ -46,6 +46,16 @@ video {
 	background-color: black;
 }
 
+.video-pip>video{
+	position: relative;
+}
+
+.status-zone{
+	 background-color: transparent;
+	 height: 48px;
+	 width: 48px;
+ }
+
 .badge{
 	z-index: 2;
 	position: relative;
@@ -280,7 +290,7 @@ video {
 	margin-top: 0px;
 }
 
-.dropup:hover .dropdown-menu, .dropdown:hover .dropdown-menu {display: inline-block;}
+/*.dropup:hover .dropdown-menu, .dropdown:hover .dropdown-menu {display: inline-block;}*/
 
 .dropdown .dropdown-menu{
 	margin-top: -1px;
@@ -322,6 +332,11 @@ input[type=checkbox] {
 	width: 3vw;
 	max-width: 32px;
 	/*min-width: 16px;*/
+}
+
+.image-status{
+	width: 100%;
+	height: 100%;
 }
 
 .dropdown .image-icon{

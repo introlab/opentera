@@ -52,7 +52,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     user_user_groups = relationship("TeraUserGroup", secondary="t_users_users_groups",
                                     back_populates="user_group_users", passive_deletes=True)
     user_sessions = relationship("TeraSession", secondary="t_sessions_users", back_populates="session_users",
-                                 passive_deletes=True)
+                                 passive_deletes=True, cascade='delete')
 
     user_created_sessions = relationship("TeraSession", cascade='delete', back_populates='session_creator_user',
                                          passive_deletes=True)
@@ -122,7 +122,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         return jwt.encode(payload, token_key, algorithm='HS256')
 
     def get_service_access_dict(self):
-        service_access = {'service_access': {}}
+        service_access = {}
 
         # Service access are defined in user groups, not needed for superadmin
         if not self.user_superadmin:
@@ -135,10 +135,10 @@ class TeraUser(BaseModel, SoftDeleteMixin):
                     if service_role.id_site is None and service_role.id_project is None:
                         # Global access
                         # Create entry if not exists
-                        if service_key not in service_access['service_access']:
-                            service_access['service_access'][service_key] = []
+                        if service_key not in service_access:
+                            service_access[service_key] = []
                         # Add role to service
-                        service_access['service_access'][service_key].append(role_name)
+                        service_access[service_key].append(role_name)
 
         return service_access
 
@@ -331,17 +331,17 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
         super().insert(user)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
-        if TeraSessionUsers.get_session_count_for_user(self.id_user) > 0:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
+        if TeraSessionUsers.get_session_count_for_user(self.id_user, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has sessions', self.id_user, 't_sessions_users')
 
-        if TeraSession.get_count(filters={'id_creator_user': self.id_user}) > 0:
+        if TeraSession.get_count(filters={'id_creator_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created sessions', self.id_user, 't_sessions')
 
-        if TeraAsset.get_count(filters={'id_user': self.id_user}) > 0:
+        if TeraAsset.get_count(filters={'id_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created assets', self.id_user, 't_assets')
 
-        if TeraTest.get_count(filters={'id_user': self.id_user}) > 0:
+        if TeraTest.get_count(filters={'id_user': self.id_user}, with_deleted=with_deleted) > 0:
             return IntegrityError('User still has created tests', self.id_user, 't_tests')
 
         return None
@@ -427,3 +427,6 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             TeraUser.db().session.add(user)
 
         TeraUser.db().session.commit()
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['user_service_config']

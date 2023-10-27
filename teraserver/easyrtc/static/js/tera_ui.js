@@ -290,9 +290,11 @@ function updateButtonIconState(status, local, index, prefix){
     if (icon !== undefined){
         if (icon.attr('src')){
             let iconImgPath = icon.attr('src').split('/')
+            let iconName = iconImgPath[iconImgPath.length-1].toLowerCase();
+            iconName = iconName.split("_")[0].split(".")[0];
 
             if (status === true){
-                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + "_on.png";
+                iconImgPath[iconImgPath.length-1] = iconName + "_on.png";
                 let must_show = false;
                 if (local){
                     if (localTimerHandles[index-1] !== 0) must_show = true;
@@ -301,7 +303,7 @@ function updateButtonIconState(status, local, index, prefix){
                 }
                 (!must_show) ? icon.hide() : icon.show();
             }else{
-                iconImgPath[iconImgPath.length-1] = prefix.toLowerCase() + ".png";
+                iconImgPath[iconImgPath.length-1] = iconName + ".png";
                 //icon.show();
             }
             icon.attr('src', pathJoin(iconImgPath))
@@ -333,12 +335,12 @@ function enlargeView(local, index){
     }
 
     // Update layouts
-    updateUserLocalViewLayout(localStreams.length, remoteStreams.length);
-    updateUserRemoteViewsLayout(remoteStreams.length);
+    updateUserLocalViewLayout();
+    updateUserRemoteViewsLayout();
 
 }
 
-function btnShareScreenClicked(){
+function btnShareScreenClicked(sound_only = false){
     if (localContact.status.sharing2ndSource === true){
         console.warn("Trying to share screen while already having a second video source");
         return;
@@ -352,14 +354,24 @@ function btnShareScreenClicked(){
     localContact.status.sharingScreen = !localContact.status.sharingScreen;
 
     // Do the screen sharing
-    shareScreen(true, localContact.status.sharingScreen).then(function (){
+    shareScreen(true, localContact.status.sharingScreen, sound_only).then(function (){
+        let btn = getButtonIcon(true, 1, "ShareScreen");
+        btn.data().soundOnly = sound_only;
 
+        // Update icon source according to state
+        if (sound_only && localContact.status.sharingScreen){
+            btn.attr('src', 'images/music_on.png');
+        }else{
+            btn.attr('src', 'images/sharescreen.png');
+        }
         updateButtonIconState(localContact.status.sharingScreen, true, 1, "ShareScreen");
 
         // Show / Hide share screen button
-        let btn = getButtonIcon(true, 1, "ShareScreen");
-        if (localContact.status.sharingScreen)
+        if(localContact.status.sharingScreen){
             btn.show();
+        }else{
+            btn.data().soundOnly = false; // Reset button state
+        }
 
         // Show / Hide second source button
         btn = getButtonIcon(true, 1, "Show2ndVideo");

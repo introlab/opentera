@@ -7,17 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-23 14:24-0400\n"
+"POT-Creation-Date: 2023-10-03 13:40-0400\n"
 "PO-Revision-Date: 2023-05-23 14:29-0400\n"
 "Last-Translator: \n"
-"Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.12.1\n"
-"X-Generator: Poedit 3.3.1\n"
 
 #: VideoRehabService.py:44
 msgid "General configuration"
@@ -74,11 +73,12 @@ msgstr "Navigateur non-supporté détecté"
 
 #: templates/participant_dashboard.html:28 templates/user_dashboard.html:28
 msgid ""
-"Your browser is not supported. Session might or might not work, but it is "
-"recommended to user another browser."
+"Your browser is not supported. Session might or might not work, but it is"
+" recommended to user another browser."
 msgstr ""
 "Votre navigateur Internet n'est pas supporté. La séance peut quand même "
-"fonctionner correctement, mais il est recommandé d'utiliser un autre navigateur."
+"fonctionner correctement, mais il est recommandé d'utiliser un autre "
+"navigateur."
 
 #: templates/participant_dashboard.html:29 templates/user_dashboard.html:29
 msgid "Your browser"
@@ -94,17 +94,17 @@ msgstr "Impossible de se connecter"
 
 #: templates/participant_dashboard.html:32 templates/user_dashboard.html:32
 msgid ""
-"Your access might have been disabled or you might be already logged in on "
-"another device"
+"Your access might have been disabled or you might be already logged in on"
+" another device"
 msgstr ""
-"Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté sur "
-"un autre appareil"
+"Votre accès peut avoir été désactivé ou vous êtes peut-être déjà connecté"
+" sur un autre appareil"
 
 #: templates/participant_dashboard.html:33 templates/user_dashboard.html:33
 msgid "Your session is now over. You may now logout or close this page."
 msgstr ""
-"La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer cette "
-"page."
+"La séance est maintenant terminée. Vous pouvez vous déconnecter ou fermer"
+" cette page."
 
 #: templates/participant_dashboard.html:59 templates/user_dashboard.html:59
 msgid "Error"
@@ -159,11 +159,13 @@ msgstr "Impossible d'accéder à la caméra et/ou au microphone"
 msgid "Error message"
 msgstr "Message d'erreur"
 
-#: templates/participant_localview.html:116 templates/user_session_lobby.html:126
+#: templates/participant_localview.html:116
+#: templates/user_session_lobby.html:126
 msgid "Session starting..."
 msgstr "Démarrage de la séance en cours..."
 
-#: templates/participant_localview.html:119 templates/user_session_lobby.html:129
+#: templates/participant_localview.html:119
+#: templates/user_session_lobby.html:129
 msgid "The session is about to start... Enjoy your session!"
 msgstr "La séance est sur le point de démarrer. Bonne séance!"
 
@@ -235,15 +237,22 @@ msgstr "Appareils"
 
 #~ msgid "Error creating user left session event"
 #~ msgstr ""
-#~ "Erreur lors de la création de l'événement \"Utilisateur a quitté la séance\""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Utilisateur a quitté la "
+#~ "séance\""
 
 #~ msgid "Error creating participant left session event"
 #~ msgstr ""
-#~ "Erreur lors de la création de l'événement \"Participant a quitté la séance\""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Participant a quitté la "
+#~ "séance\""
 
 #~ msgid "Error creating device left session event"
 #~ msgstr ""
-#~ "Erreur lors de la création de l'événement \"Appareil a quitté la séance\""
+#~ "Erreur lors de la création de "
+#~ "l'événement \"Appareil a quitté la "
+#~ "séance\""
 
 #~ msgid "Cannot create refused session event"
 #~ msgstr "Erreur lors de la création de l'événement \"Invitation refusée\""
+

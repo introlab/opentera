@@ -17,9 +17,13 @@
         <input id="remoteSpeakerStatus{##view_id##}" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
     </div>
 
+    <!-- Picture in picture -->
+    <div id="remoteStatus{##view_id##}" class="overlay-bottom-right status-zone" style="display: none;">
+        <img id="remoteMusic{##view_id##}" type="image" alt="image" class="image-status" src="images/music_on.png"/>
+        <div id="remoteStatusVideo{##view_id##}" class="h-100 w-100 video-pip" ></div>
+    </div>
+
     <!-- Video ! -->
-    <video id="remoteVideo{##view_id##}" playsinline
-           oncontextmenu="return false;"
-           onclick=""
-           onwheel="" class="" style=""></video>
+    <video id="remoteVideo{##view_id##}" playsinline oncontextmenu="return false;"></video>
+
 </div>

@@ -140,9 +140,10 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                 new_service_project.id_project = obj_to_check.session_type_project_project.id_project
                 TeraServiceProject.insert(new_service_project)
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         sessions = TeraSession.get_sessions_for_project(project_id=self.id_project,
-                                                        session_type_id=self.id_session_type)
+                                                        session_type_id=self.id_session_type,
+                                                        with_deleted=with_deleted)
         if len(sessions) > 0:
             return IntegrityError('Session type has sessions in this project', self.id_session_type, 't_sessions')
         return None

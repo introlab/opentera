@@ -60,9 +60,9 @@ class TeraSite(BaseModel, SoftDeleteMixin):
     def get_site_by_id(site_id: int, with_deleted: bool = False):
         return TeraSite.query.execution_options(include_deleted=with_deleted).filter_by(id_site=site_id).first()
 
-    def delete_check_integrity(self) -> IntegrityError | None:
+    def delete_check_integrity(self, with_deleted: bool = False) -> IntegrityError | None:
         for project in self.site_projects:
-            cannot_be_deleted_exception = project.delete_check_integrity()
+            cannot_be_deleted_exception = project.delete_check_integrity(with_deleted=with_deleted)
             if cannot_be_deleted_exception:
                 return IntegrityError('Still have projects with participants with sessions', self.id_site,
                                       't_projects')
@@ -87,3 +87,6 @@ class TeraSite(BaseModel, SoftDeleteMixin):
         access_role.id_site = site.id_site
         access_role.service_role_name = 'user'
         TeraServiceRole.insert(access_role)
+
+    def get_undelete_cascade_relations(self) -> list:
+        return ['site_services_roles']

@@ -119,3 +119,11 @@ class TeraDeviceProjectTest(BaseModelsTest):
         self.assertTrue('id_project' in json_data)
         self.assertFalse('device_project_device' in json_data)
         self.assertFalse('device_project_project' in json_data)
+
+    @staticmethod
+    def new_test_device_project(id_device: int, id_project: int) -> TeraDeviceProject:
+        device_project = TeraDeviceProject()
+        device_project.id_project = id_project
+        device_project.id_device = id_device
+        TeraDeviceProject.insert(device_project)
+        return device_project

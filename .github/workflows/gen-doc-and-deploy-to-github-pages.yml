@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.10.7]
+        python-version: [3.11.4]
 
     steps:
     - uses: actions/checkout@v3
@@ -56,7 +56,7 @@ jobs:
       run: |
         cmake .
         make python-all
-        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.10/bin/python)" >> $GITHUB_ENV
+        echo "OPENTERA_PYTHON=$(echo $PWD/python/env/python-3.11/bin/python)" >> $GITHUB_ENV
         echo "PYTHONPATH=$(echo $PWD/python)" >> $GITHUB_ENV
 
     - name: Generate Self Signed TLS Certificates
