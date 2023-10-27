@@ -44,7 +44,7 @@ From your base directory create a directory named `nginx` and two files named [n
 
 > NOTE: You might have to copy manually certificates to the `certificates` shared volume.
 
-#### Step 45: Create OpenTera Server Configuration Files
+#### Step 5: Create OpenTera Server Configuration Files
 
 From your base directory create a directory named `teraserver` and five files named [Dockerfile](teraserver/Dockerfile), [FileTransferService.json](teraserver/FileTransferService.json), [LoggingService.json](teraserver/LoggingService.json), [TeraServerConfig.ini](teraserver/TeraServerConfig.ini) and  [VideoRehabService.json](teraserver/VideoRehabService.json).
 
@@ -52,7 +52,7 @@ First create the `teraserver` directory and the `Dockerfile` that will generate 
 
 > Please note that this example does not provide a STUN/TURN server. Modify the file [ice_servers.json](teraserver/ice_servers.json) to configure your favorite or custom STUN/TURN servers.
 
-### Step 6: Copy your SSL certificates to the certificates directory
+#### Step 6: Copy your SSL Certificates to the Certificates Directory
 
 The shared volume `certificates` is used to read the SSL certificate configuration.
 
@@ -65,7 +65,7 @@ You need the following files to match with [nginx.conf](nginx/nginx.conf) config
 > Certificate generation / updates could be automated with a certbot or copied / linked directly to your host machine configuration.
 > You can generate a local CA certificate and key with the script [CreateCertificates.py](../../teraserver/python/CreateCertificates.py)
 
-#### Step 7: Launch the containers with Docker-Compose
+#### Step 7: Launch the Containers with Docker-Compose
 
 Once everything is configured, launch the containers with the following command :
 
@@ -87,7 +87,7 @@ Congratulations, you are done!
 
 You can use the GUI application OpenTeraPlus to connect and configure the server. [The application can be downloaded from OpenTeraPlus files release](https://github.com/introlab/openteraplus/releases). Alternatively, you can compile the application. More information are available on [OpenTeraPlus GitHub project](https://github.com/introlab/openteraplus).
 
-### Configuring OpenTeraPlus with your Local Server
+### Configuring OpenTeraPlus with Your Local Server
 
 You might want to add "opentera-docker-prod" server in the Documents/OpenTeraPlus/config/OpenTeraPlus.json for OpenTeraPlus  :
 
