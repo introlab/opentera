@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM debian:bookworm
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
@@ -47,4 +47,3 @@ WORKDIR /root/opentera/teraserver/python
 
 # RUN TERA SERVER
 CMD ["/bin/bash", "-c", "$PYTHON3_EXEC TeraServer.py"]
-
