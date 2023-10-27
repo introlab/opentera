@@ -4,22 +4,22 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VideoRehab Service &mdash; OpenTera 1.2.3 documentation</title>
+  <title>VideoRehab Service &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Code structure" href="../developers/Code-Structure.html" />
+    <link rel="next" title="Developers setup guide" href="../developers/Developers.html" />
     <link rel="prev" title="Logging Service" href="Logging-Service.html" /> 
 </head>
 
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -95,6 +95,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
@@ -134,7 +135,7 @@
            <div itemprop="articleBody">
              
   <section id="videorehab-service">
-<h1>VideoRehab Service<a class="headerlink" href="#videorehab-service" title="Permalink to this heading"></a></h1>
+<h1>VideoRehab Service<a class="headerlink" href="#videorehab-service" title="Link to this heading"></a></h1>
 <p>The VideoRehab service is one of the system service in the OpenTera platform. Its role is to provide the required
 framework for video-based rehabilitation sessions. Based on <a class="reference external" href="https://webrtc.org/">WebRTC</a>, providing an adapted
 user-interface for such usage. Implementation uses <a class="reference external" href="https://nodejs.org">Node.js</a> and
@@ -142,18 +143,18 @@ user-interface for such usage. Implementation uses <a class="reference external"
 <p>When requested to launch a video rehab session, this service will spawn a <code class="docutils literal notranslate"><span class="pre">Node</span></code> process for each of the session,
 creating isolated sessions and ensuring that only the invitees can access that session.</p>
 <section id="main-script">
-<h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
+<h2>Main script<a class="headerlink" href="#main-script" title="Link to this heading"></a></h2>
 <p>The VideoRehab service can be launched by running the
 <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/services/VideoRehabService/VideoRehabService.py">VideoRehabService.py</a>
 script. As a system service, it is also launched automatically when running the
 <a class="reference internal" href="teraserver/teraserver.html"><span class="std std-doc">main OpenTera service</span></a></p>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>Configuration file for the VideoRehab service is similar to the basic <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a>. It
 however adds a specific section for that service, and removes the <code class="docutils literal notranslate"><span class="pre">Database</span></code> since no database is used in that service.</p>
 <section id="webrtc-configuration-section">
-<h3>WebRTC configuration section<a class="headerlink" href="#webrtc-configuration-section" title="Permalink to this heading"></a></h3>
+<h3>WebRTC configuration section<a class="headerlink" href="#webrtc-configuration-section" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">WebRTC</span></code> section in the configuration file specifies the parameters required to launch the WebRTC framework.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hostname</span></code>: the <strong>external</strong> hostname that will be used to connect to the WebRTC signaling server (Open-EasyRTC). It
@@ -178,17 +179,17 @@ used by this service. However, if a custom or another script is needed, this is 
 </section>
 </section>
 <section id="service-setup">
-<h2>Service setup<a class="headerlink" href="#service-setup" title="Permalink to this heading"></a></h2>
+<h2>Service setup<a class="headerlink" href="#service-setup" title="Link to this heading"></a></h2>
 <p>As this service relies on Node.js and external scripts, it is required to setup the environment of that service before
 using it. See <a class="reference internal" href="../Deployment.html"><span class="doc std std-doc">server deployment</span></a> and the <a class="reference internal" href="../developers/Developers.html"><span class="std std-doc">developers</span></a> sections for more
 information on how to properly setup that environment.</p>
 </section>
 <section id="default-port-and-location">
-<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
+<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Link to this heading"></a></h2>
 <p>By default, the service will listen to port 4070 (non-ssl) and will be at the <code class="docutils literal notranslate"><span class="pre">/rehab</span></code> path on the base server URL.</p>
 </section>
 <section id="web-urls">
-<h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
+<h2>Web URLs<a class="headerlink" href="#web-urls" title="Link to this heading"></a></h2>
 <p>As each session will spawn in a different process and listen on a different internal (local) port, the Web URLs for that
 service are dynamic, which contribute to the overall <a class="reference internal" href="../Security.html"><span class="doc std std-doc">security</span></a> of the OpenTera platform.</p>
 <p>The base service is located at the <code class="docutils literal notranslate"><span class="pre">/rehab</span></code> path, while each of the video rehab sessions are located at the <code class="docutils literal notranslate"><span class="pre">/webrtc</span></code>
@@ -198,27 +199,27 @@ and redirect it to the correct listening server. This takes the form of, for exa
 <code class="docutils literal notranslate"><span class="pre">https://127.0.0.1:40075/webrtc/8081/</span></code> which will redirect the request to the server listening on the internal port 8081.</p>
 </section>
 <section id="rest-api">
-<h2>REST API<a class="headerlink" href="#rest-api" title="Permalink to this heading"></a></h2>
+<h2>REST API<a class="headerlink" href="#rest-api" title="Link to this heading"></a></h2>
 <p>This service doesn’t expose any REST API.</p>
 </section>
 <section id="web-frontend">
-<h2>Web Frontend<a class="headerlink" href="#web-frontend" title="Permalink to this heading"></a></h2>
+<h2>Web Frontend<a class="headerlink" href="#web-frontend" title="Link to this heading"></a></h2>
 <p>The web frontends are provided and managed by the Node.js express server. The base files are located
 <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/protected">here</a>. Included javascript files and
 assets are located <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc/static">here</a>.</p>
 </section>
 <section id="rpc-api">
-<h2>RPC API<a class="headerlink" href="#rpc-api" title="Permalink to this heading"></a></h2>
+<h2>RPC API<a class="headerlink" href="#rpc-api" title="Link to this heading"></a></h2>
 <p>This service uses the <a class="reference internal" href="../developers/Internal-services-communication-module.html"><span class="doc std std-doc">asynchronous communication system</span></a>,
 but also provides the following RPC API:</p>
 <section id="session-manage">
-<h3><code class="docutils literal notranslate"><span class="pre">session_manage</span></code><a class="headerlink" href="#session-manage" title="Permalink to this heading"></a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">session_manage</span></code><a class="headerlink" href="#session-manage" title="Link to this heading"></a></h3>
 <section id="description">
-<h4>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h4>
+<h4>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h4>
 <p>This function controls a session by allowing to start, stop, add and remove participants from it.</p>
 </section>
 <section id="parameters">
-<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h4>
+<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h4>
 <p>A <code class="docutils literal notranslate"><span class="pre">session_manage</span></code> JSON formatted input string (format: <code class="docutils literal notranslate"><span class="pre">session_manage</span> <span class="pre">{action:</span> <span class="pre">'',</span> <span class="pre">...</span> <span class="pre">}</span></code>) with the following fields
 and structure:</p>
 <ul class="simple">
@@ -237,7 +238,7 @@ and structure:</p>
 </ul>
 </section>
 <section id="specific-fields-for-start-action">
-<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">start</span></code> action<a class="headerlink" href="#specific-fields-for-start-action" title="Permalink to this heading"></a></h4>
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">start</span></code> action<a class="headerlink" href="#specific-fields-for-start-action" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">id_creator_user</span></code></strong> (int): the ID of the user that created that session. For now, only users can create a video
 rehab session, though this might change in the future. Required only when creating a new session (<code class="docutils literal notranslate"><span class="pre">id_session</span></code> == 0).</p></li>
@@ -248,14 +249,14 @@ invite to that session.</p></li>
 </ul>
 </section>
 <section id="specific-fields-for-invite-and-remove-action">
-<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite</span></code> and <code class="docutils literal notranslate"><span class="pre">remove</span></code> action<a class="headerlink" href="#specific-fields-for-invite-and-remove-action" title="Permalink to this heading"></a></h4>
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite</span></code> and <code class="docutils literal notranslate"><span class="pre">remove</span></code> action<a class="headerlink" href="#specific-fields-for-invite-and-remove-action" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">session_participants</span></code>, <code class="docutils literal notranslate"><span class="pre">session_users</span></code>, <code class="docutils literal notranslate"><span class="pre">session_devices</span></code></strong> (list): the participants, users and devices UUID to
 invite to that session or to remove from.</p></li>
 </ul>
 </section>
 <section id="specific-fields-for-invite-reply-action">
-<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite_reply</span></code> action<a class="headerlink" href="#specific-fields-for-invite-reply-action" title="Permalink to this heading"></a></h4>
+<h4>Specific fields for <code class="docutils literal notranslate"><span class="pre">invite_reply</span></code> action<a class="headerlink" href="#specific-fields-for-invite-reply-action" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">parameters</span></code></strong> (dict): a dictionary of parameters to send in the
 <a class="reference external" href="https://github.com/introlab/opentera_messages/blob/master/proto/JoinSessionReplyEvent.proto">JoinSessionReplyEvent</a> message:</p>
@@ -267,7 +268,7 @@ invite to that session or to remove from.</p></li>
 </ul>
 </section>
 <section id="return-value">
-<h4>Return value<a class="headerlink" href="#return-value" title="Permalink to this heading"></a></h4>
+<h4>Return value<a class="headerlink" href="#return-value" title="Link to this heading"></a></h4>
 <p>The return value will be a dictionary with the following fields:</p>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">status</span></code></strong> (string): the status of the action command:</p>
@@ -301,7 +302,7 @@ the session (based on the <a class="reference internal" href="../developers/Data
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Logging-Service.html" class="btn btn-neutral float-left" title="Logging Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../developers/Code-Structure.html" class="btn btn-neutral float-right" title="Code structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../developers/Developers.html" class="btn btn-neutral float-right" title="Developers setup guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

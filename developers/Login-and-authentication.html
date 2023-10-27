@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login &amp; Authentication &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Login &amp; Authentication &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -65,6 +65,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -131,7 +132,7 @@
            <div itemprop="articleBody">
              
   <section id="login-authentication">
-<h1>Login &amp; Authentication<a class="headerlink" href="#login-authentication" title="Permalink to this heading"></a></h1>
+<h1>Login &amp; Authentication<a class="headerlink" href="#login-authentication" title="Link to this heading"></a></h1>
 <p>In OpenTera, login and authentication are 2 separate concepts.</p>
 <ul class="simple">
 <li><p><strong>Authentication</strong> refers to the process of having sufficient credentials to access the</p></li>
@@ -142,19 +143,19 @@ and, optionally, opens a <a class="reference internal" href="Websockets-communic
 </ul>
 <hr class="docutils" />
 <section id="authentication">
-<h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading"></a></h2>
+<h2>Authentication<a class="headerlink" href="#authentication" title="Link to this heading"></a></h2>
 <p>Supported authentication depends on the <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API level</span></a> that is accessed.</p>
 <section id="user-api">
-<h3>User API<a class="headerlink" href="#user-api" title="Permalink to this heading"></a></h3>
+<h3>User API<a class="headerlink" href="#user-api" title="Link to this heading"></a></h3>
 <section id="http-basic-auth">
-<h4>HTTP Basic Auth<a class="headerlink" href="#http-basic-auth" title="Permalink to this heading"></a></h4>
+<h4>HTTP Basic Auth<a class="headerlink" href="#http-basic-auth" title="Link to this heading"></a></h4>
 <p>Using username and password authentication, the requester can be identified and allowed (or not)
 to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications
 for security purpose when <a class="reference internal" href="../Deployment.html"><span class="doc std std-doc">deploying to a server</span></a>. Otherwise, login credentials may be at risk since they
 would be sent over an unencrypted connection.</p>
 </section>
 <section id="token-bearer">
-<h4>Token Bearer<a class="headerlink" href="#token-bearer" title="Permalink to this heading"></a></h4>
+<h4>Token Bearer<a class="headerlink" href="#token-bearer" title="Link to this heading"></a></h4>
 <p>Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication
 <strong>after</strong> having obtained a valid token.</p>
 <ul class="simple">
@@ -168,9 +169,9 @@ token</strong>. To get the initial token, an HTTP Basic Auth scheme must be used
 </section>
 </section>
 <section id="participant-api">
-<h3>Participant API<a class="headerlink" href="#participant-api" title="Permalink to this heading"></a></h3>
+<h3>Participant API<a class="headerlink" href="#participant-api" title="Link to this heading"></a></h3>
 <section id="id1">
-<h4>HTTP Basic Auth<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<h4>HTTP Basic Auth<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
 <p>Using username and password authentication, the requester can be identified and allowed (or not)
 to access that API. Since basic auth is implemented, it is quite important to always use SSL to encrypt communications
 for security purpose when <a class="reference internal" href="../Deployment.html"><span class="doc std std-doc">deploying to a server</span></a>.</p>
@@ -181,7 +182,7 @@ this scheme will not work.</p></li>
 </ul>
 </section>
 <section id="id2">
-<h4>Token Bearer<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<h4>Token Bearer<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <p>Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication
 instead of the standard username-password authentication. Each participant can also have a static access token.</p>
 <ul class="simple">
@@ -211,9 +212,9 @@ scheme.</p></li>
 </section>
 </section>
 <section id="device-api">
-<h3>Device API<a class="headerlink" href="#device-api" title="Permalink to this heading"></a></h3>
+<h3>Device API<a class="headerlink" href="#device-api" title="Link to this heading"></a></h3>
 <section id="id3">
-<h4>Token Bearer<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h4>
+<h4>Token Bearer<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <p>Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication
 for devices.</p>
 <ul class="simple">
@@ -225,12 +226,12 @@ somewhere safe on the device. See <a class="reference internal" href="Database-S
 </ul>
 </section>
 <section id="token-request-argument">
-<h4>Token request argument<a class="headerlink" href="#token-request-argument" title="Permalink to this heading"></a></h4>
+<h4>Token request argument<a class="headerlink" href="#token-request-argument" title="Link to this heading"></a></h4>
 <p>Instead of using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header, it is also possible to append the token to a request by using the
 <code class="docutils literal notranslate"><span class="pre">token</span></code> argument.</p>
 </section>
 <section id="certificates">
-<h4>Certificates<a class="headerlink" href="#certificates" title="Permalink to this heading"></a></h4>
+<h4>Certificates<a class="headerlink" href="#certificates" title="Link to this heading"></a></h4>
 <p>A device can also be authenticated using certificates.</p>
 <ol class="arabic simple">
 <li><p>The device must send a certificate signing request (standard x509 CSR) to the server using the <code class="docutils literal notranslate"><span class="pre">device/register</span></code> API.</p></li>
@@ -241,9 +242,9 @@ request made to the server.</p></li>
 </section>
 </section>
 <section id="service-api">
-<h3>Service API<a class="headerlink" href="#service-api" title="Permalink to this heading"></a></h3>
+<h3>Service API<a class="headerlink" href="#service-api" title="Link to this heading"></a></h3>
 <section id="id4">
-<h4>Token Bearer<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h4>
+<h4>Token Bearer<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <p>Using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header in a request, it is possible to use a token for authentication for services:</p>
 <ul class="simple">
 <li><p>In the <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> request header of the HTTP request, the <code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> value must be set to <code class="docutils literal notranslate"><span class="pre">OpenTera</span></code> and the
@@ -257,7 +258,7 @@ See <a class="reference internal" href="Database-Structure.html"><span class="do
 <a class="reference external" href="https://pypi.org/project/opentera/">OpenTera PyPi package</a></p>
 </section>
 <section id="id5">
-<h4>Token request argument<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h4>
+<h4>Token request argument<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <p>Instead of using the HTTP <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header, it is also possible to append the token to a request by using the
 <code class="docutils literal notranslate"><span class="pre">token</span></code> argument.</p>
 </section>
@@ -265,7 +266,7 @@ See <a class="reference internal" href="Database-Structure.html"><span class="do
 </section>
 <hr class="docutils" />
 <section id="login">
-<h2>Login<a class="headerlink" href="#login" title="Permalink to this heading"></a></h2>
+<h2>Login<a class="headerlink" href="#login" title="Link to this heading"></a></h2>
 <p>Even if the replies can vary a little depending on the <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">API level</span></a> being accessed, the
 login process is similar in each case. The login process is needed to get the <a class="reference internal" href="Websockets-communication.html"><span class="doc std std-doc">websocket</span></a> (if
 requested), basic information about the logged on object and to get a dynamic token, if required, depending on the API
@@ -290,7 +291,7 @@ connections.</p></li>
 </ol>
 </section>
 <section id="logout">
-<h2>Logout<a class="headerlink" href="#logout" title="Permalink to this heading"></a></h2>
+<h2>Logout<a class="headerlink" href="#logout" title="Link to this heading"></a></h2>
 <p>While recommended, a call to the <code class="docutils literal notranslate"><span class="pre">logout</span></code> is optional.</p>
 <p>When logging out, clean-up and dynamic token disabling will occur. If a websocket connection has been established, it
 will close automatically.</p>

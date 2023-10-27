@@ -10,11 +10,12 @@
 .. toctree::
    :maxdepth: 5
    :hidden:
-   :caption: Getting started
+   :caption: Installation
 
    Deployment
-   Configuration-files
-   developers/Developers
+   deployment/DeployWithDockerCompose
+   deployment/DeployWithLinuxNative
+   Configuration-Files
 
 .. toctree::
    :hidden:
@@ -24,10 +25,11 @@
    services/services
 
 .. toctree::
+   :maxdepth: 5
    :hidden:
    :caption: Developers
 
-
+   developers/Developers
    developers/Code-Structure
    developers/Service-Creation
    developers/Database-Structure

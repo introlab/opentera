@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeraServer Service &mdash; OpenTera 1.2.3 documentation</title>
+  <title>TeraServer Service &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -36,7 +36,7 @@
               <img src="../../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -84,6 +84,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Database-Structure.html">Database Structure</a></li>
@@ -123,24 +124,24 @@
            <div itemprop="articleBody">
              
   <section id="teraserver-service">
-<h1>TeraServer Service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h1>
+<h1>TeraServer Service<a class="headerlink" href="#teraserver-service" title="Link to this heading"></a></h1>
 <p>The TeraServer service is the core service of the OpenTera platform. It runs the different
 <a class="reference external" href="../../Architecture-Overview">modules</a> of the platform. An OpenTera server cannot exist without that service!</p>
 <section id="main-script">
-<h2>Main script<a class="headerlink" href="#main-script" title="Permalink to this heading"></a></h2>
+<h2>Main script<a class="headerlink" href="#main-script" title="Link to this heading"></a></h2>
 <p>The TeraServer service can be launched by running the
 <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/TeraServer.py">TeraServer.py</a> script.</p>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>Configuration files for the TeraServer service are described <a class="reference external" href="../../Configuration-files">here</a>.</p>
 </section>
 <section id="default-port-and-location">
-<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Permalink to this heading"></a></h2>
+<h2>Default port and location<a class="headerlink" href="#default-port-and-location" title="Link to this heading"></a></h2>
 <p>By default, the service will listen to port 4040 (non-ssl) and will be at the root of the web server url (/).</p>
 </section>
 <section id="web-urls">
-<h2>Web URLs<a class="headerlink" href="#web-urls" title="Permalink to this heading"></a></h2>
+<h2>Web URLs<a class="headerlink" href="#web-urls" title="Link to this heading"></a></h2>
 <p><strong>About page</strong> - by default at <a class="reference external" href="https://127.0.0.1:40075/about">https://127.0.0.1:40075/about</a>. Will display the about
 page of the server, including the version and possible <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a> client
 versions available to download</p>
@@ -149,7 +150,7 @@ versions available to download</p>
 be available if not enabled in the <a class="reference external" href="../../Configuration-files">configuration file</a>.</p>
 </section>
 <section id="specific-topics">
-<h2>Specific topics<a class="headerlink" href="#specific-topics" title="Permalink to this heading"></a></h2>
+<h2>Specific topics<a class="headerlink" href="#specific-topics" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="OpenTera_AccessRoles.html">Access Roles</a></li>

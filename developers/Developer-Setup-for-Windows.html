@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started for Developers - Windows 10 &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Getting Started for Developers - Windows 10 &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,10 +52,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="Developers.html">Developers setup guide</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started for Developers - Windows 10</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
@@ -76,17 +85,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Docker.html">Getting Started for Developers - Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Docker.html">Setup a dev Environment with Docker-Compose on Mac/Linux/Windows</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
-<ul>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -126,9 +127,9 @@
            <div itemprop="articleBody">
              
   <section id="getting-started-for-developers-windows-10">
-<h1>Getting Started for Developers - Windows 10<a class="headerlink" href="#getting-started-for-developers-windows-10" title="Permalink to this heading"></a></h1>
+<h1>Getting Started for Developers - Windows 10<a class="headerlink" href="#getting-started-for-developers-windows-10" title="Link to this heading"></a></h1>
 <section id="pre-requisites">
-<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
+<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Link to this heading"></a></h2>
 <p>To get started on Windows, the following components are needed:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://git-scm.com">Git</a> required to get the code. Optionally, a helper software such as <a class="reference external" href="https://tortoisegit.org/">TurtoiseGit</a> or <a class="reference external" href="https://desktop.github.com/">GitHub Desktop</a> could be used.</p></li>
@@ -144,22 +145,22 @@
 </ul>
 <p>Install every pre-requisite, making sure to consider the specific install options below for some of them.</p>
 <section id="installing-miniconda">
-<h3>Installing Miniconda<a class="headerlink" href="#installing-miniconda" title="Permalink to this heading"></a></h3>
+<h3>Installing Miniconda<a class="headerlink" href="#installing-miniconda" title="Link to this heading"></a></h3>
 <p>In the install process, please make sure to install Miniconda “Just for me” and into the “home” directory (path should look like: <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;username&gt;\miniconda3</span></code>). This is important as the <code class="docutils literal notranslate"><span class="pre">cmakefiles</span></code> used to generate the environment will look into that folder for Miniconda.</p>
 </section>
 <section id="installing-postgresql">
-<h3>Installing PostgreSQL<a class="headerlink" href="#installing-postgresql" title="Permalink to this heading"></a></h3>
+<h3>Installing PostgreSQL<a class="headerlink" href="#installing-postgresql" title="Link to this heading"></a></h3>
 <p>The install process is straightforward. The <code class="docutils literal notranslate"><span class="pre">postgresql</span></code> should be noted as the port if the defaults are not used. <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">Configuration files</span></a> will need to be adjusted accordingly.</p>
 <p>Stack Builder is not required for the simple setup.</p>
 <p>The PostgreSQL should be run as a system service, though you could also manually launch it before running the <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">OpenTera main script</span></a>.</p>
 </section>
 <section id="installing-redis-server">
-<h3>Installing Redis Server<a class="headerlink" href="#installing-redis-server" title="Permalink to this heading"></a></h3>
+<h3>Installing Redis Server<a class="headerlink" href="#installing-redis-server" title="Link to this heading"></a></h3>
 <p>Make sure to install the server as a service or to properly manually launch it before running the <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">OpenTera main script</span></a>.</p>
 <p>If you are setting a user and a password, you will need to adjust the <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a> accordingly.</p>
 </section>
 <section id="installing-and-running-nginx">
-<h3>Installing (and running) NGINX<a class="headerlink" href="#installing-and-running-nginx" title="Permalink to this heading"></a></h3>
+<h3>Installing (and running) NGINX<a class="headerlink" href="#installing-and-running-nginx" title="Link to this heading"></a></h3>
 <p>NGINX for Windows doesn’t provide an installer. Installation should be done manually by extracting the archive in a specific folder (such as <code class="docutils literal notranslate"><span class="pre">C:\nginx</span></code>). Note that path for further use.</p>
 <p>There is no built-in way to run NGINX as a service without using third-party options (such as <a class="reference external" href="https://nssm.cc">NSSM</a>). The server will need to be started manually with the following commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">C</span><span class="p">:</span>\<span class="o">&lt;</span><span class="n">nginx</span> <span class="n">install</span> <span class="n">folder</span><span class="o">&gt;</span>
@@ -174,13 +175,13 @@
 <p>Those commands could be put in a batch (.bat) file for easy start/stop procedure.</p>
 </section>
 <section id="installing-qt-creator">
-<h3>Installing Qt Creator<a class="headerlink" href="#installing-qt-creator" title="Permalink to this heading"></a></h3>
+<h3>Installing Qt Creator<a class="headerlink" href="#installing-qt-creator" title="Link to this heading"></a></h3>
 <p>While this step is optional, it could ease the environment building process.
 When installing Qt, only the Qt Creator is needed for this project. You would, however, include CMake from there or a supported Qt environment if you’re planning to also setup a development environment for <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus</a></p>
 </section>
 </section>
 <section id="environment-setup">
-<h2>Environment setup<a class="headerlink" href="#environment-setup" title="Permalink to this heading"></a></h2>
+<h2>Environment setup<a class="headerlink" href="#environment-setup" title="Link to this heading"></a></h2>
 <p><strong>1. Get the code!</strong></p>
 <p>To get started with this project and develop, clone the project in a working directory.</p>
 <p>If you need a stable branch, you should clone the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. Otherwise, it is recommended to start and clone the <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch. If using a command line interface, the following command should be used, replacing the <code class="docutils literal notranslate"><span class="pre">&lt;branch&gt;</span></code> tag:</p>
@@ -206,7 +207,7 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 </ol>
 <p>The pgAdmin interface will then be ready for the next steps.</p>
 <section id="creating-users">
-<h3>Creating users<a class="headerlink" href="#creating-users" title="Permalink to this heading"></a></h3>
+<h3>Creating users<a class="headerlink" href="#creating-users" title="Link to this heading"></a></h3>
 <p>A single user, <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> with the default password <code class="docutils literal notranslate"><span class="pre">tera</span></code> will need to be created before creating the required databases. A different user and/or a different password could be used, but the <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a> will need to be adjusted accordingly.</p>
 <ol class="arabic simple">
 <li><p>Right-click on the <code class="docutils literal notranslate"><span class="pre">Login/Group</span> <span class="pre">Roles</span></code> section in the left tree of the pgAdmin interface</p></li>
@@ -223,7 +224,7 @@ When installing Qt, only the Qt Creator is needed for this project. You would, h
 <p>The <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user should have been created.</p>
 </section>
 <section id="creating-databases">
-<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Permalink to this heading"></a></h3>
+<h3>Creating databases<a class="headerlink" href="#creating-databases" title="Link to this heading"></a></h3>
 <p>Each system service will requires its own database. The default database that needs to be created are as follow:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">opentera</span></code>, the <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">main OpenTera service</span></a> database</p></li>
@@ -262,7 +263,7 @@ Self-signed certificates should be generated for the development server and to s
 </section>
 </section>
 <section id="starting-the-main-opentera-service">
-<h2>Starting the main OpenTera service<a class="headerlink" href="#starting-the-main-opentera-service" title="Permalink to this heading"></a></h2>
+<h2>Starting the main OpenTera service<a class="headerlink" href="#starting-the-main-opentera-service" title="Link to this heading"></a></h2>
 <p>If all the configuration was properly done, you should now be able to run the main script, <code class="docutils literal notranslate"><span class="pre">TeraServer.py</span></code>.</p>
 <p>Don’t forget to start the NGINX router beforehand and any other component that were not set to auto-run or as a Windows service.</p>
 <p>If all went well, you should be able to see the <code class="docutils literal notranslate"><span class="pre">About</span></code> page in your browser: <a class="reference external" href="https://localhost:40075/about">https://localhost:40075/about</a></p>

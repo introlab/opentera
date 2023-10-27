@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Translations &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Translations &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -65,6 +65,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -108,7 +109,7 @@
            <div itemprop="articleBody">
              
   <section id="translations">
-<h1>Translations<a class="headerlink" href="#translations" title="Permalink to this heading"></a></h1>
+<h1>Translations<a class="headerlink" href="#translations" title="Link to this heading"></a></h1>
 <p>OpenTera uses <a class="reference external" href="https://python-babel.github.io/flask-babel/">Flask-Babel</a> to translate the various API messages. Each
 <a class="reference internal" href="../services/OpenTera_Services.html"><span class="doc std std-doc">core services</span></a> has an associated portable object file (.po) containing the text
 translations.</p>
@@ -120,7 +121,7 @@ a dictionary), but has the disadvantage of having to redo some translations if t
 (such a <code class="docutils literal notranslate"><span class="pre">en</span></code> for English and <code class="docutils literal notranslate"><span class="pre">fr</span></code> for French). The <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">core TeraServer service</span></a>
 has its translations in <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/translations">this path</a>.</p>
 <section id="client-translation-selection">
-<h2>Client translation selection<a class="headerlink" href="#client-translation-selection" title="Permalink to this heading"></a></h2>
+<h2>Client translation selection<a class="headerlink" href="#client-translation-selection" title="Link to this heading"></a></h2>
 <p>Client can select the server response language by setting the <code class="docutils literal notranslate"><span class="pre">Accept-Language</span></code> value in the request header. Fallback
 will occurs in English if the selected language is not valid (no translation existing for this language) or if that
 header value is not found in the request.</p>
@@ -128,7 +129,7 @@ header value is not found in the request.</p>
 is however possible to change that value manually and to set it, as required, if other client are used.</p>
 </section>
 <section id="creating-editing-translations">
-<h2>Creating/editing translations<a class="headerlink" href="#creating-editing-translations" title="Permalink to this heading"></a></h2>
+<h2>Creating/editing translations<a class="headerlink" href="#creating-editing-translations" title="Link to this heading"></a></h2>
 <p>An integration with the <a class="reference external" href="https://cmake.org/">cmake</a> script is done to automatically runs the <code class="docutils literal notranslate"><span class="pre">pybabel</span></code> utility and
 extract all the strings to translate in the services. By running <code class="docutils literal notranslate"><span class="pre">cmake</span></code> with one of the target ending with the
 <code class="docutils literal notranslate"><span class="pre">translations</span></code> keyword, all strings encapsulated with the <code class="docutils literal notranslate"><span class="pre">gettext</span></code> function will be detected, and the translation
@@ -137,7 +138,7 @@ file (.po) will be updated accordingly.</p>
 <a class="reference external" href="https://poedit.net/">PoEdit</a> is suggested to ease the translation process.</p>
 </section>
 <section id="compiling-generating-translations">
-<h2>Compiling/generating translations<a class="headerlink" href="#compiling-generating-translations" title="Permalink to this heading"></a></h2>
+<h2>Compiling/generating translations<a class="headerlink" href="#compiling-generating-translations" title="Link to this heading"></a></h2>
 <p>OpenTera will use a compiled translation file (.mo). It is possible to manually generates such a file, but the <code class="docutils literal notranslate"><span class="pre">cmake</span></code>
 integration will also automatically generates such a translation when selecting a target ending with the
 <code class="docutils literal notranslate"><span class="pre">translations</span></code> keyword.</p>

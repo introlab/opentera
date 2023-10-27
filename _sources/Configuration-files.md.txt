@@ -1,14 +1,17 @@
-# Configuration files
+# Configuration Files
+
 Each service, including the core service, [TeraServer](services/teraserver/teraserver.rst), has an associated config file.
 
-The details of those files are presented in each of the service. 
+The details of those files are presented in each of the service.
 
 For the core service, [TeraServer](services/teraserver/teraserver.rst), there are 2 configuration files: the main configuration file and the NGINX configuration files.
 
-## Core service - Configuration file 
+## Core service - Configuration file
+
 The base configuration file can be found [here](https://github.com/introlab/opentera/blob/main/teraserver/python/config/TeraServerConfig.ini). It is a JSON-formatted file, separated in different sections. The following describe the required sections, and the parameters in each of them.
 
 ### Server section
+
 `name` - the server name. Only used for display purpose. On a [deployed server](Deployment), this should be the internal name of the server, not the DNS of it.
 
 `hostname` - the hostname that the server will listen on. Unless deploying on multiple servers, this should be left to the localhost value (127.0.0.1)
@@ -24,6 +27,7 @@ The base configuration file can be found [here](https://github.com/introlab/open
 The other parameters still left in the config file are deprecated and will be removed soon, if not already.
 
 ### Database section
+
 `db_type` - the type of database used. This parameter, while in this config file, is currently unused since only [PostgreSQL](https://www.postgresql.org/) databases are used right now (except for [unit tests](developers/Running-tests), which use a local [SqlLite](https://www.sqlite.org) database).
 
 `name` - the name of the database used by the core module.
@@ -35,6 +39,7 @@ The other parameters still left in the config file are deprecated and will be re
 `username` & `password` - the username and password used to connect to the database server. **Please ensure that the user has full access to the database**, as errors will occur. See [deployment instructions](Deployment) for more information on how to create the initial database.
 
 ### Redis section
+
 `hostname`- hostname (URL) hosting the [Redis](https://redis.io/) server. In a typical scenario, the Redis server will be running as localhost (127.0.0.1).
 
 `port` - the port of the Redis server. Typically, this should be left to the default value of 6379.
@@ -50,6 +55,7 @@ The other parameters still left in the config file are deprecated and will be re
 The NGINX configuration is split into 2 files: [nginx.conf](https://github.com/introlab/opentera/blob/main/teraserver/python/config/nginx.conf) and [opentera.conf](https://github.com/introlab/opentera/blob/main/teraserver/python/config/opentera.conf).
 
 ### nginx.conf
+
 This contains the main NGINX server configuration. Usually, there is no need to change that config file. However, the following elements might be of interest in a specific [server deployment](Deployment).
 
 `listen 40075 ssl` - by default, sets the external listening port to 40075 using SSL encryption. The port could be changed to anything, and the `ssl` keyword could be removed if no encryption is required (**not recommended**).
@@ -57,6 +63,7 @@ This contains the main NGINX server configuration. Usually, there is no need to 
 `ssl_certificate`, `ssl_certificate_key` and `ssl_client_certificate` - path to the various certificates required by SSL encryption. Could be changed to match your specific server configuration. By default, will use certificates in the "certificates" folder.
 
 ### opentera.conf
+
 This config file is included by the main `nginx.conf` file and contains the routing rules for each of the services in the system.
 
 **You will need to adjust that file by yourself if you change the default services ports and according to the service you run on your system**.

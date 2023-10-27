@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Manager Module &mdash; OpenTera 1.2.3 documentation</title>
+  <title>User Manager Module &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -36,7 +36,7 @@
               <img src="../../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -88,6 +88,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Database-Structure.html">Database Structure</a></li>
@@ -128,10 +129,10 @@
            <div itemprop="articleBody">
              
   <section id="user-manager-module">
-<h1>User Manager Module<a class="headerlink" href="#user-manager-module" title="Permalink to this heading"></a></h1>
+<h1>User Manager Module<a class="headerlink" href="#user-manager-module" title="Link to this heading"></a></h1>
 <p>The user manager module acts as a central registry for the various connected user types (users, participants, devices). It tracks their current status in the system and can be queried using the <a class="reference internal" href="../../developers/Internal-services-communication-module.html"><span class="doc std std-doc">RPC</span></a> communication system.</p>
 <section id="states-and-tracked-information">
-<h2>States and tracked information<a class="headerlink" href="#states-and-tracked-information" title="Permalink to this heading"></a></h2>
+<h2>States and tracked information<a class="headerlink" href="#states-and-tracked-information" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>Online</strong> state indicates that the specific object type (user, participant, device) has an active <a class="reference internal" href="../../developers/Websockets-communication.html"><span class="doc std std-doc">websocket connection</span></a>. If the object hasn’t established any persistent connection (when only using the <a class="reference internal" href="api/API.html"><span class="doc std std-doc">REST API</span></a> for example), it will <strong>not appear online</strong>. It monitors the <a class="reference internal" href="../../developers/Messages-structure.html"><span class="doc std std-doc">UserEvent, DeviceEvent and ParticipantEvent messages</span></a> to update this state.</p></li>
 <li><p><strong>Busy</strong> state indicated that the specific object type (user, participant, device) is currently in an active live session. It monitors the <a class="reference internal" href="../../developers/Messages-structure.html"><span class="doc std std-doc">JoinSessionEvent, StopSessionEvent, LeaveSessionEvent and JoinSessionReplyEvent</span></a> to update this state.</p></li>
@@ -139,7 +140,7 @@
 </ul>
 </section>
 <section id="rpc-functions">
-<h2>RPC functions<a class="headerlink" href="#rpc-functions" title="Permalink to this heading"></a></h2>
+<h2>RPC functions<a class="headerlink" href="#rpc-functions" title="Link to this heading"></a></h2>
 <p>The user manager module can be queried using RPC calls. The following functions are available:</p>
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">online_users</span></code></strong>: returns a list of <code class="docutils literal notranslate"><span class="pre">user_uuid</span></code> of each of the currently online users</p></li>

@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unit Tests &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Unit Tests &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -65,6 +65,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -112,7 +113,7 @@
            <div itemprop="articleBody">
              
   <section id="unit-tests">
-<h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading"></a></h1>
+<h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Link to this heading"></a></h1>
 <p>OpenTera aims to deploy robust and tested releases. To do so, unit tests are designed to test the various components of
 the system, such as <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database models</span></a> and various <a class="reference internal" href="../services/teraserver/api/API.html"><span class="doc std std-doc">APIs</span></a>.</p>
 <p>Tests are based on <a class="reference external" href="https://www.pytest.org">PyTest</a> and <a class="reference external" href="https://docs.python.org/3/library/unittest.html">unittest</a> and
@@ -120,7 +121,7 @@ are located in the <a class="reference external" href="https://github.com/introl
 <p>While it’s hard to develop tests that cover every situation, effort is being put into each new features and releases to
 ensure that features are tested before being deployed on a production server.</p>
 <section id="self-contained-environment">
-<h2>Self-contained environment<a class="headerlink" href="#self-contained-environment" title="Permalink to this heading"></a></h2>
+<h2>Self-contained environment<a class="headerlink" href="#self-contained-environment" title="Link to this heading"></a></h2>
 <p>Unit tests are designed to run even if the server itself is not running. By creating a local
 <a class="reference external" href="https://flask.palletsprojects.com">Flask</a> component to serve the OpenTera API and using a local
 <a class="reference external" href="https://www.sqlite.org">SqlLite database</a>, tests are self-contained and do no interact with an actual OpenTera server
@@ -130,7 +131,7 @@ have a larger scope than the class itself, which helps prevent unwanted cross-in
 that would fail because the database data changed.</p>
 </section>
 <section id="creating-unit-tests">
-<h2>Creating unit tests<a class="headerlink" href="#creating-unit-tests" title="Permalink to this heading"></a></h2>
+<h2>Creating unit tests<a class="headerlink" href="#creating-unit-tests" title="Link to this heading"></a></h2>
 <p>Developers are encouraged to develop unit tests while expanding OpenTera core service (and also in their own services,
 even if this is beyond the scope of this documentation).</p>
 <p>A few guidelines need to be followed while doing so:</p>
@@ -146,18 +147,18 @@ unexpected impacts on other parts of the project, considering the large codebase
 </ol>
 </section>
 <section id="running-unit-tests">
-<h2>Running unit tests<a class="headerlink" href="#running-unit-tests" title="Permalink to this heading"></a></h2>
+<h2>Running unit tests<a class="headerlink" href="#running-unit-tests" title="Link to this heading"></a></h2>
 <p>While developing features, it is recommended to run (and update) manual tests once in a while to ensure the quality of
 the modifications. An automatic testing feature is also automated on GitHub.</p>
 <section id="manual-testing">
-<h3>Manual testing<a class="headerlink" href="#manual-testing" title="Permalink to this heading"></a></h3>
+<h3>Manual testing<a class="headerlink" href="#manual-testing" title="Link to this heading"></a></h3>
 <p>Tests can be manually run simply by running the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> command in a python console, followed by the path containing
 the tests to be executed. It is possible to run all the tests with the base <code class="docutils literal notranslate"><span class="pre">tests</span></code> path.</p>
 <p>If using <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm IDE</a>, tests can be simply run with the contextual menu (displayed
 by right-clicking on a test folder) and selecting the <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">pytest</span> <span class="pre">in...</span></code> option.</p>
 </section>
 <section id="automatic-testing-on-pull-requests">
-<h3>Automatic testing on pull requests<a class="headerlink" href="#automatic-testing-on-pull-requests" title="Permalink to this heading"></a></h3>
+<h3>Automatic testing on pull requests<a class="headerlink" href="#automatic-testing-on-pull-requests" title="Link to this heading"></a></h3>
 <p>GitHub automation is used to run all the tests on every pull request (and changes made to it). If a pull request does
 not successfully run the tests, it will not be merged.</p>
 </section>

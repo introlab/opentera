@@ -4,23 +4,23 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenTera Services Structure &mdash; OpenTera 1.2.3 documentation</title>
+  <title>OpenTera Services Structure &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Core Services" href="services.html" />
-    <link rel="prev" title="Getting Started for Developers - Docker" href="../developers/Developer-Setup-for-Docker.html" /> 
+    <link rel="prev" title="Deploying OpenTera on a Linux Server" href="../deployment/DeployWithLinuxNative.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -74,6 +74,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Database-Structure.html">Database Structure</a></li>
@@ -112,23 +113,23 @@
            <div itemprop="articleBody">
              
   <section id="opentera-services-structure">
-<h1>OpenTera Services Structure<a class="headerlink" href="#opentera-services-structure" title="Permalink to this heading"></a></h1>
+<h1>OpenTera Services Structure<a class="headerlink" href="#opentera-services-structure" title="Link to this heading"></a></h1>
 <p>The core of OpenTera is based on (micro)-services. This allow for extensibility and freedom for the developers to create
 new features according to needs in a separate way.</p>
 <section id="general-structure-and-definition">
-<h2>General structure and definition<a class="headerlink" href="#general-structure-and-definition" title="Permalink to this heading"></a></h2>
+<h2>General structure and definition<a class="headerlink" href="#general-structure-and-definition" title="Link to this heading"></a></h2>
 <p>A service can be defined as a standalone software (which could be written using any framework / programming language)
 that provides features that goes beyond the scope of the <a class="reference internal" href="services.html"><span class="std std-doc">core services</span></a> in OpenTera. Each service can manage
 its own database and API, and provides client implementations (or not).</p>
 <p>Basic service architecture is described in the <a class="reference internal" href="../Architecture-Overview.html"><span class="doc std std-doc">architecture overview</span></a>.</p>
 </section>
 <section id="communication-mechanisms">
-<h2>Communication mechanisms<a class="headerlink" href="#communication-mechanisms" title="Permalink to this heading"></a></h2>
+<h2>Communication mechanisms<a class="headerlink" href="#communication-mechanisms" title="Link to this heading"></a></h2>
 <p>Services can communicate with each other using a specific <a class="reference internal" href="teraserver/api/API.html"><span class="doc std std-doc">service API</span></a>, but also using
 <a class="reference internal" href="../developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal communication structure</span></a>.</p>
 </section>
 <section id="system-services">
-<h2>System services<a class="headerlink" href="#system-services" title="Permalink to this heading"></a></h2>
+<h2>System services<a class="headerlink" href="#system-services" title="Link to this heading"></a></h2>
 <p>Those services are internal services that are available in the core OpenTera. Those services provides common features to
 the system, and should not be disabled unless specific requirements call for (such as never providing file transfer
 capability to a server setup).</p>
@@ -141,7 +142,7 @@ as assets</p></li>
 rehabilitation context.</p></li>
 </ul>
 <section id="teraserver-service">
-<h3>TeraServer service<a class="headerlink" href="#teraserver-service" title="Permalink to this heading"></a></h3>
+<h3>TeraServer service<a class="headerlink" href="#teraserver-service" title="Link to this heading"></a></h3>
 <p>The OpenTera main server (TeraServer) is considered to be a specific case of system service. It is the base service
 and is mandatory in any deployed solution.</p>
 <p>Considering TeraServer as a service allows to properly manage <a class="reference internal" href="Services-Access.html"><span class="doc std std-doc">project and site access</span></a>, and can be addressed
@@ -149,7 +150,7 @@ in communication mechanisms, if needed.</p>
 </section>
 </section>
 <section id="services-configuration">
-<h2>Services configuration<a class="headerlink" href="#services-configuration" title="Permalink to this heading"></a></h2>
+<h2>Services configuration<a class="headerlink" href="#services-configuration" title="Link to this heading"></a></h2>
 <p>Each service can have a specific configuration depending on the user, participant or device. This configuration is
 defined in the <code class="docutils literal notranslate"><span class="pre">TeraServiceConfig</span></code> database model on the OpenTera service. That configuration could allow to specify
 values such as specific devices to use or a specific UI configuration. Default configuration is specified in the
@@ -184,7 +185,7 @@ specific configuration is client-defined, and could refer to a PC unique identif
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../developers/Developer-Setup-for-Docker.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Docker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../deployment/DeployWithLinuxNative.html" class="btn btn-neutral float-left" title="Deploying OpenTera on a Linux Server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="services.html" class="btn btn-neutral float-right" title="Core Services" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

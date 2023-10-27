@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Services Access Roles &mdash; OpenTera 1.2.4 documentation</title>
+  <title>Deploying with Docker on Linux Servers &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Unit Tests" href="../developers/Running-tests.html" />
-    <link rel="prev" title="Login &amp; Authentication" href="../developers/Login-and-authentication.html" /> 
+    <link rel="next" title="Deploying OpenTera on a Linux Server" href="DeployWithLinuxNative.html" />
+    <link rel="prev" title="Deployment Notes" href="../Deployment.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,18 +53,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="OpenTera_Services.html">OpenTera Services Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="services.html">Core Services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/OpenTera_Services.html">OpenTera Services Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Service-Creation.html">Creating a new service</a></li>
@@ -73,14 +73,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../developers/Messages-structure.html">Internal messages structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Internal-services-communication-module.html">Inter-service communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Login-and-authentication.html">Login &amp; Authentication</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Services Access Roles</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#access-roles-association">Access roles association</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#opentera-projects-and-sites-roles">OpenTera projects and sites roles</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#services-and-projects-association">Services and projects association</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../services/Services-Access.html">Services Access Roles</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Running-tests.html">Unit Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Translations.html">Translations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developers/Websockets-communication.html">Websockets communication</a></li>
@@ -100,9 +93,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Services Access Roles</li>
+      <li class="breadcrumb-item active">Deploying with Docker on Linux Servers</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/services/Services-Access.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/deployment/DeployWithDockerCompose.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -110,39 +103,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="services-access-roles">
-<h1>Services Access Roles<a class="headerlink" href="#services-access-roles" title="Link to this heading"></a></h1>
-<p>Each service can define its own roles that are not limited to “admin” or “user”. Specific services roles are stored in
-the OpenTera service in the <code class="docutils literal notranslate"><span class="pre">TeraServiceRole</span></code> database model.</p>
-<p>Service can further refine those roles by optionally attaching them to a specific project or site.</p>
-<section id="access-roles-association">
-<h2>Access roles association<a class="headerlink" href="#access-roles-association" title="Link to this heading"></a></h2>
-<p>Access roles can be attached to either of the following: user group, device or participant group. This architecture
-allows to adapt to various configurations, but adds more complexity to the use or implementation. The
-<code class="docutils literal notranslate"><span class="pre">TeraServiceAccess</span></code> database model in the OpenTera service defines those relationship.</p>
-<p>Specific uses case includes associating an user group as “Admin” of a videoconferencing service, for example, allowing
-that user group to have additional access in that service.</p>
-<section id="opentera-projects-and-sites-roles">
-<h3>OpenTera projects and sites roles<a class="headerlink" href="#opentera-projects-and-sites-roles" title="Link to this heading"></a></h3>
-<p>OpenTera main server (TeraServer) uses that mechanism to define access to projects and sites. On the creation of a new
-site or project, the server creates “admin” and “user” roles for the OpenTera service and the specific site or project.</p>
-</section>
-</section>
-<section id="services-and-projects-association">
-<h2>Services and projects association<a class="headerlink" href="#services-and-projects-association" title="Link to this heading"></a></h2>
-<p>Each service can be associated to projects. This association is defined in the <code class="docutils literal notranslate"><span class="pre">TeraServiceProject</span></code> database model in
-the OpenTera service. This association allows to expose only some of the services in the system to a specific project,
-limiting the options for services linked to Session Types and allowing to use a single server instead for various
-projects that depends on different services.</p>
-</section>
+  <section id="deploying-with-docker-on-linux-servers">
+<h1>Deploying with Docker on Linux Servers<a class="headerlink" href="#deploying-with-docker-on-linux-servers" title="Link to this heading"></a></h1>
+<p>A complete <a class="reference external" href="https://github.com/introlab/opentera/tree/main/docker/main">sample configuration for production is provided on GitHub</a>. You can modify it to fit your needs.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../developers/Login-and-authentication.html" class="btn btn-neutral float-left" title="Login &amp; Authentication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../developers/Running-tests.html" class="btn btn-neutral float-right" title="Unit Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../Deployment.html" class="btn btn-neutral float-left" title="Deployment Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DeployWithLinuxNative.html" class="btn btn-neutral float-right" title="Deploying OpenTera on a Linux Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

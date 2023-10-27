@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>REST API &mdash; OpenTera 1.2.3 documentation</title>
+  <title>REST API &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -36,7 +36,7 @@
               <img src="../../../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -99,6 +99,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../developers/Database-Structure.html">Database Structure</a></li>
@@ -139,16 +140,16 @@
            <div itemprop="articleBody">
              
   <section id="rest-api">
-<h1>REST API<a class="headerlink" href="#rest-api" title="Permalink to this heading"></a></h1>
+<h1>REST API<a class="headerlink" href="#rest-api" title="Link to this heading"></a></h1>
 <p>OpenTera REST API is served by a <a class="reference external" href="https://flask.palletsprojects.com">Flask</a> web server.</p>
 <section id="general-structure">
-<h2>General structure<a class="headerlink" href="#general-structure" title="Permalink to this heading"></a></h2>
+<h2>General structure<a class="headerlink" href="#general-structure" title="Link to this heading"></a></h2>
 <p>OpenTera REST API main purpose is to interact with the <a class="reference internal" href="../../../developers/Database-Structure.html"><span class="doc std std-doc">database objects</span></a>, to
 control the server itself, query information and to do various actions related to the modules and system services.</p>
 <p>Since OpenTera is based on a micro-service architecture, each service can expose (or not) their own REST API. Only the
 OpenTera API is described here, as various services might implement other scheme and features.</p>
 <section id="on-a-need-to-know-basis">
-<h3>On a need-to-know basis<a class="headerlink" href="#on-a-need-to-know-basis" title="Permalink to this heading"></a></h3>
+<h3>On a need-to-know basis<a class="headerlink" href="#on-a-need-to-know-basis" title="Link to this heading"></a></h3>
 <p>Every return value coming from the API will be filtered and checked against the requester
 <a class="reference internal" href="../OpenTera_AccessRoles.html"><span class="doc std std-doc">access level</span></a>. For example, a user querying for projects will only have projects that it can
 access, other projects being filtered out at the server level. This ensure that data cannot leak by making a general
@@ -159,7 +160,7 @@ would return everything needed by a client with a single query (which would also
 implementation requires the exact same information).</p>
 </section>
 <section id="api-levels">
-<h3>API levels<a class="headerlink" href="#api-levels" title="Permalink to this heading"></a></h3>
+<h3>API levels<a class="headerlink" href="#api-levels" title="Link to this heading"></a></h3>
 <p>There is 4 API levels in OpenTera: <code class="docutils literal notranslate"><span class="pre">user</span> <span class="pre">API</span></code>, <code class="docutils literal notranslate"><span class="pre">participant</span> <span class="pre">API</span></code>, <code class="docutils literal notranslate"><span class="pre">device</span> <span class="pre">API</span></code> and <code class="docutils literal notranslate"><span class="pre">service</span> <span class="pre">API</span></code>. A separation of those
 API was done in order to better control what each of these base user types can access.</p>
 <p>Each API request can require <a class="reference internal" href="../../../developers/Login-and-authentication.html"><span class="doc std std-doc">authentication</span></a>, or can be fully opened,
@@ -180,7 +181,7 @@ though only features useful to services are implemented in that API.</p></li>
 </ul>
 </section>
 <section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h3>
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
 <p>Since code changes with time and that static documentation (such as this one) usually struggles to follow-up, an
 approach based on <a class="reference external" href="https://flask-restx.readthedocs.io/en/latest/">Flask-RESTX</a> and <a class="reference external" href="https://swagger.io/">Swagger</a> was
 implemented.</p>
@@ -193,13 +194,13 @@ supported in the system.</p>
 </section>
 </section>
 <section id="request-basics">
-<h2>Request basics<a class="headerlink" href="#request-basics" title="Permalink to this heading"></a></h2>
+<h2>Request basics<a class="headerlink" href="#request-basics" title="Link to this heading"></a></h2>
 <p>Requests to the server can easily be initiated using the correct endpoint. The base endpoint for the API is <code class="docutils literal notranslate"><span class="pre">/api</span></code>,
 followed by the API level required. For example, the <code class="docutils literal notranslate"><span class="pre">user</span></code> API can be accessed using the <code class="docutils literal notranslate"><span class="pre">/api/user</span></code> endpoint.</p>
 <p>To access a specific function, the function name must be appended to the endpoint, followed by the parameters. For
 example, an user querying projects would use the <code class="docutils literal notranslate"><span class="pre">/api/user/projects</span></code> function.</p>
 <section id="get">
-<h3>GET<a class="headerlink" href="#get" title="Permalink to this heading"></a></h3>
+<h3>GET<a class="headerlink" href="#get" title="Link to this heading"></a></h3>
 <p>GET request are probably the most varied in term of parameters. See the documentation of each of those functions for a
 full list of the parameters.</p>
 <p>All return values of the GET API are JSON-formatted string, and may include lists, dictionaries and any combination of
@@ -217,7 +218,7 @@ objects.</p></li>
 </ul>
 </section>
 <section id="post">
-<h3>POST<a class="headerlink" href="#post" title="Permalink to this heading"></a></h3>
+<h3>POST<a class="headerlink" href="#post" title="Link to this heading"></a></h3>
 <p>When posting data to update or create new information, some structural convention must be respected:</p>
 <ul class="simple">
 <li><p>Posted data should be in JSON format and in the <code class="docutils literal notranslate"><span class="pre">json</span></code> part of the request</p></li>
@@ -236,13 +237,13 @@ what values can be posted by looking at the definition of each objects (or the d
 </ul>
 </section>
 <section id="delete">
-<h3>DELETE<a class="headerlink" href="#delete" title="Permalink to this heading"></a></h3>
+<h3>DELETE<a class="headerlink" href="#delete" title="Link to this heading"></a></h3>
 <p>Delete queries are standardized, taking only an <code class="docutils literal notranslate"><span class="pre">id</span></code> parameter, corresponding to the id of the object to delete. There
 is no need to specify the specific id name related to the object needed to be deleted.</p>
 </section>
 </section>
 <section id="further-explanation-on-some-of-the-api-functions">
-<h2>Further explanation on some of the API functions<a class="headerlink" href="#further-explanation-on-some-of-the-api-functions" title="Permalink to this heading"></a></h2>
+<h2>Further explanation on some of the API functions<a class="headerlink" href="#further-explanation-on-some-of-the-api-functions" title="Link to this heading"></a></h2>
 <p>Some API functions have a specific purpose that goes beyond the scope of the standard definition, and are described
 below.</p>
 <ul class="simple">

@@ -4,23 +4,21 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configuration files &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Configuration Files &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=928db92d"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Developers setup guide" href="developers/Developers.html" />
-    <link rel="prev" title="Deploying OpenTera on a server" href="Deployment.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +34,7 @@
               <img src="_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -52,24 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#core-service-configuration-file">Core service - Configuration file</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#server-section">Server section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#database-section">Database section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#redis-section">Redis section</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#nginx-configuration-file">NGINX configuration file</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#nginx-conf">nginx.conf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#opentera-conf">opentera.conf</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -78,6 +63,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developers/Database-Structure.html">Database Structure</a></li>
@@ -105,7 +91,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Configuration files</li>
+      <li class="breadcrumb-item active">Configuration Files</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/Configuration-files.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -116,15 +102,15 @@
            <div itemprop="articleBody">
              
   <section id="configuration-files">
-<h1>Configuration files<a class="headerlink" href="#configuration-files" title="Permalink to this heading"></a></h1>
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h1>
 <p>Each service, including the core service, <a class="reference internal" href="services/teraserver/teraserver.html"><span class="std std-doc">TeraServer</span></a>, has an associated config file.</p>
 <p>The details of those files are presented in each of the service.</p>
 <p>For the core service, <a class="reference internal" href="services/teraserver/teraserver.html"><span class="std std-doc">TeraServer</span></a>, there are 2 configuration files: the main configuration file and the NGINX configuration files.</p>
 <section id="core-service-configuration-file">
-<h2>Core service - Configuration file<a class="headerlink" href="#core-service-configuration-file" title="Permalink to this heading"></a></h2>
+<h2>Core service - Configuration file<a class="headerlink" href="#core-service-configuration-file" title="Link to this heading"></a></h2>
 <p>The base configuration file can be found <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/TeraServerConfig.ini">here</a>. It is a JSON-formatted file, separated in different sections. The following describe the required sections, and the parameters in each of them.</p>
 <section id="server-section">
-<h3>Server section<a class="headerlink" href="#server-section" title="Permalink to this heading"></a></h3>
+<h3>Server section<a class="headerlink" href="#server-section" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the server name. Only used for display purpose. On a <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deployed server</span></a>, this should be the internal name of the server, not the DNS of it.</p>
 <p><code class="docutils literal notranslate"><span class="pre">hostname</span></code> - the hostname that the server will listen on. Unless deploying on multiple servers, this should be left to the localhost value (127.0.0.1)</p>
 <p><code class="docutils literal notranslate"><span class="pre">port</span></code> - the internal port that the server will listen to. The external port that the server will respond to is managed by NGINX itself. Unless a very specific configuration needs to be put in place, this should be changed from the default value (4040).</p>
@@ -134,7 +120,7 @@
 <p>The other parameters still left in the config file are deprecated and will be removed soon, if not already.</p>
 </section>
 <section id="database-section">
-<h3>Database section<a class="headerlink" href="#database-section" title="Permalink to this heading"></a></h3>
+<h3>Database section<a class="headerlink" href="#database-section" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">db_type</span></code> - the type of database used. This parameter, while in this config file, is currently unused since only <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> databases are used right now (except for <a class="reference internal" href="developers/Running-tests.html"><span class="doc std std-doc">unit tests</span></a>, which use a local <a class="reference external" href="https://www.sqlite.org">SqlLite</a> database).</p>
 <p><code class="docutils literal notranslate"><span class="pre">name</span></code> - the name of the database used by the core module.</p>
 <p><code class="docutils literal notranslate"><span class="pre">url</span></code> - the URL of the database server. Typically, should be left to 127.0.0.1 unless running the database engine on a different server.</p>
@@ -142,7 +128,7 @@
 <p><code class="docutils literal notranslate"><span class="pre">username</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">password</span></code> - the username and password used to connect to the database server. <strong>Please ensure that the user has full access to the database</strong>, as errors will occur. See <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">deployment instructions</span></a> for more information on how to create the initial database.</p>
 </section>
 <section id="redis-section">
-<h3>Redis section<a class="headerlink" href="#redis-section" title="Permalink to this heading"></a></h3>
+<h3>Redis section<a class="headerlink" href="#redis-section" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">hostname</span></code>- hostname (URL) hosting the <a class="reference external" href="https://redis.io/">Redis</a> server. In a typical scenario, the Redis server will be running as localhost (127.0.0.1).</p>
 <p><code class="docutils literal notranslate"><span class="pre">port</span></code> - the port of the Redis server. Typically, this should be left to the default value of 6379.</p>
 <p><code class="docutils literal notranslate"><span class="pre">db</span></code> - index of the Redis database to use. Defaults to 0.</p>
@@ -151,16 +137,16 @@
 </section>
 <hr class="docutils" />
 <section id="nginx-configuration-file">
-<h2>NGINX configuration file<a class="headerlink" href="#nginx-configuration-file" title="Permalink to this heading"></a></h2>
+<h2>NGINX configuration file<a class="headerlink" href="#nginx-configuration-file" title="Link to this heading"></a></h2>
 <p>The NGINX configuration is split into 2 files: <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/nginx.conf">nginx.conf</a> and <a class="reference external" href="https://github.com/introlab/opentera/blob/main/teraserver/python/config/opentera.conf">opentera.conf</a>.</p>
 <section id="nginx-conf">
-<h3>nginx.conf<a class="headerlink" href="#nginx-conf" title="Permalink to this heading"></a></h3>
+<h3>nginx.conf<a class="headerlink" href="#nginx-conf" title="Link to this heading"></a></h3>
 <p>This contains the main NGINX server configuration. Usually, there is no need to change that config file. However, the following elements might be of interest in a specific <a class="reference internal" href="Deployment.html"><span class="doc std std-doc">server deployment</span></a>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">listen</span> <span class="pre">40075</span> <span class="pre">ssl</span></code> - by default, sets the external listening port to 40075 using SSL encryption. The port could be changed to anything, and the <code class="docutils literal notranslate"><span class="pre">ssl</span></code> keyword could be removed if no encryption is required (<strong>not recommended</strong>).</p>
 <p><code class="docutils literal notranslate"><span class="pre">ssl_certificate</span></code>, <code class="docutils literal notranslate"><span class="pre">ssl_certificate_key</span></code> and <code class="docutils literal notranslate"><span class="pre">ssl_client_certificate</span></code> - path to the various certificates required by SSL encryption. Could be changed to match your specific server configuration. By default, will use certificates in the “certificates” folder.</p>
 </section>
 <section id="opentera-conf">
-<h3>opentera.conf<a class="headerlink" href="#opentera-conf" title="Permalink to this heading"></a></h3>
+<h3>opentera.conf<a class="headerlink" href="#opentera-conf" title="Link to this heading"></a></h3>
 <p>This config file is included by the main <code class="docutils literal notranslate"><span class="pre">nginx.conf</span></code> file and contains the routing rules for each of the services in the system.</p>
 <p><strong>You will need to adjust that file by yourself if you change the default services ports and according to the service you run on your system</strong>.</p>
 <p>Each <code class="docutils literal notranslate"><span class="pre">location</span></code> subsection should be self-explanatory and easy to understand and adjust, if required.</p>
@@ -171,10 +157,7 @@
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Deployment.html" class="btn btn-neutral float-left" title="Deploying OpenTera on a server" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="developers/Developers.html" class="btn btn-neutral float-right" title="Developers setup guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

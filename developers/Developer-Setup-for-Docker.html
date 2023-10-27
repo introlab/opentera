@@ -4,22 +4,22 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started for Developers - Docker &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Setup a dev Environment with Docker-Compose on Mac/Linux/Windows &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="OpenTera Services Structure" href="../services/OpenTera_Services.html" />
+    <link rel="next" title="Code structure" href="Code-Structure.html" />
     <link rel="prev" title="Getting Started for Developers - Ubuntu-based Linux distros" href="Developer-Setup-for-Linux.html" /> 
 </head>
 
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,30 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="Developers.html">Developers setup guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting Started for Developers - Docker</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#pre-requisites">Pre-requisites</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#install-docker-desktop">Install Docker Desktop</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#install-visual-studio-code">Install Visual Studio Code</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#visual-studio-code-extensions">Visual Studio Code Extensions</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#open-opentera-base-folder-in-visual-studio-code">Open OpenTera Base Folder in Visual Studio Code</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#build-the-development-environment-with-docker-compose">Build the Development Environment with docker-compose</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#debugging-with-vs-code">Debugging with VS Code</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -83,7 +64,39 @@
 <li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
-<ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="Developers.html">Developers setup guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Setup a dev Environment with Docker-Compose on Mac/Linux/Windows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#warnings">Warnings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#install-docker-desktop">Install Docker Desktop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#install-visual-studio-code">Install Visual Studio Code</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#visual-studio-code-extensions">Visual Studio Code Extensions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#open-opentera-base-folder-in-visual-studio-code">Open OpenTera Base Folder in Visual Studio Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#build-the-development-environment-with-docker-compose">Build the Development Environment with docker-compose</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connecting-to-the-local-server-with-openteraplus">Connecting to the Local Server with OpenTeraPlus</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#configuring-openteraplus-with-your-local-server">Configuring OpenTeraPlus with your Local Server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#advanced-options">Advanced Options</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#connect-to-the-local-database-using-pgadmin">Connect to the Local Database using pgAdmin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connect-to-redis">Connect to Redis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-with-vs-code">Debugging with VS Code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -112,7 +125,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="Developers.html">Developers setup guide</a></li>
-      <li class="breadcrumb-item active">Getting Started for Developers - Docker</li>
+      <li class="breadcrumb-item active">Setup a dev Environment with Docker-Compose on Mac/Linux/Windows</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/developers/Developer-Setup-for-Docker.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -122,49 +135,51 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="getting-started-for-developers-docker">
-<h1>Getting Started for Developers - Docker<a class="headerlink" href="#getting-started-for-developers-docker" title="Permalink to this heading"></a></h1>
-<section id="pre-requisites">
-<h2>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this heading"></a></h2>
+  <section id="setup-a-dev-environment-with-docker-compose-on-mac-linux-windows">
+<h1>Setup a dev Environment with Docker-Compose on Mac/Linux/Windows<a class="headerlink" href="#setup-a-dev-environment-with-docker-compose-on-mac-linux-windows" title="Link to this heading"></a></h1>
+<p><a class="reference external" href="https://docs.docker.com/compose/">Docker Compose</a> is a tool that simplifies the management of multi-container <a class="reference external" href="https://docs.docker.com/">Docker</a> applications. It allows you to define and run complex applications using a simple YAML file, specifying the services, networks, and volumes needed, making it easier to orchestrate and manage multiple Docker containers as a single application. An example Docker Compose configuration is provided with OpenTeraServer on GitHub in the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/docker/dev">docker/dev</a> directory.</p>
+<section id="warnings">
+<h2>Warnings<a class="headerlink" href="#warnings" title="Link to this heading"></a></h2>
+<p>The following example is provided for testing on a local machine and is not suited for production.</p>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.docker.com/products/docker-desktop/">Install Docker Desktop for Windows/Linux/Mac</a></p></li>
 <li><p><a class="reference external" href="https://code.visualstudio.com/download">Install Visual Studio Code</a></p></li>
 <li><p>Enough free space on your disk (10Gb+)</p></li>
 </ul>
 <section id="install-docker-desktop">
-<h3>Install Docker Desktop<a class="headerlink" href="#install-docker-desktop" title="Permalink to this heading"></a></h3>
+<h3>Install Docker Desktop<a class="headerlink" href="#install-docker-desktop" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Follow installation procedures and use default settings.</p></li>
+<li><p>Follow installation procedures for your operating system and use default settings. You might need to have Administration rights to proceed with installation.</p></li>
 </ul>
 </section>
 <section id="install-visual-studio-code">
-<h3>Install Visual Studio Code<a class="headerlink" href="#install-visual-studio-code" title="Permalink to this heading"></a></h3>
+<h3>Install Visual Studio Code<a class="headerlink" href="#install-visual-studio-code" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Follow installation procedures and use default settings.</p></li>
+<li><p>Follow installation procedures for your operating system and use default settings. You might need to have Administration rights to proceed with installation.</p></li>
 </ul>
 <section id="visual-studio-code-extensions">
-<h4>Visual Studio Code Extensions<a class="headerlink" href="#visual-studio-code-extensions" title="Permalink to this heading"></a></h4>
+<h4>Visual Studio Code Extensions<a class="headerlink" href="#visual-studio-code-extensions" title="Link to this heading"></a></h4>
+<p>Launch Visual Studio Code and install the following <a class="reference external" href="https://code.visualstudio.com/docs/editor/extension-marketplace">extensions</a>:</p>
 <ul class="simple">
-<li><p>Install the following extensions:</p>
-<ul>
 <li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a></p></li>
 <li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a></p></li>
 <li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker">Docker</a></p></li>
 <li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=twxs.cmake">CMake</a></p></li>
 <li><p><a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown</a></p></li>
 </ul>
-</li>
-</ul>
 </section>
 </section>
 </section>
 <section id="open-opentera-base-folder-in-visual-studio-code">
-<h2>Open OpenTera Base Folder in Visual Studio Code<a class="headerlink" href="#open-opentera-base-folder-in-visual-studio-code" title="Permalink to this heading"></a></h2>
-<p>You must select the root directory of the opentera git project.</p>
-</section>
+<h2>Open OpenTera Base Folder in Visual Studio Code<a class="headerlink" href="#open-opentera-base-folder-in-visual-studio-code" title="Link to this heading"></a></h2>
+<p>We assume here that you have cloned the <a class="reference external" href="https://github.com/introlab/opentera.git">code from GitHub</a>.
+You must select the root directory of the opentera git project.</p>
 <section id="build-the-development-environment-with-docker-compose">
-<h2>Build the Development Environment with docker-compose<a class="headerlink" href="#build-the-development-environment-with-docker-compose" title="Permalink to this heading"></a></h2>
-<p>A sample <a class="reference internal" href="#./docker-compose.yml"><span class="xref myst">docker-compose.yml</span></a> file is provided that generates a full environment with the following components running in individual containers :</p>
+<h3>Build the Development Environment with docker-compose<a class="headerlink" href="#build-the-development-environment-with-docker-compose" title="Link to this heading"></a></h3>
+<p>A sample <a class="reference external" href="https://github.com/introlab/opentera/blob/main/docker/dev/docker-compose.yml">docker-compose.yml</a> file is provided that generates a full environment with the following components running in individual containers :</p>
 <ul class="simple">
 <li><p>Redis server</p></li>
 <li><p>PostgresSQL server</p></li>
@@ -172,34 +187,57 @@
 <li><p>A certificate generator for https self-signed certificates</p></li>
 <li><p>TeraServer and base services</p></li>
 </ul>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>Right-click on the <a class="reference internal" href="#./docker-compose.yml"><span class="xref myst">docker-compose.yml</span></a> and select “Compose Up”. This can take several minutes the first time to download all the images and start the containers.</p></li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="2">
+<p>Procedure:</p>
+<ol class="arabic simple">
+<li><p>Right-click on the <a class="reference external" href="https://github.com/introlab/opentera/blob/main/docker/dev/docker-compose.yml">docker-compose.yml</a> and select “Compose Up”. This can take several minutes the first time to download all the images and start the containers.</p></li>
 <li><p>Docker compose will create <strong>volumes</strong> (shared disks) to store your databases, configurations, files as specified in the “volume:” section. Those directories are automatically mounted when the containers are started.</p></li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="3">
 <li><p>When running for the first time, databases with default values are generated.</p></li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="4">
-<li><p>The default user is “admin” with password “admin”.</p></li>
-</ol>
-</div></blockquote>
-<blockquote>
-<div><ol class="arabic simple" start="5">
+<li><p><strong>The default user is “admin” with password “admin”.</strong></p></li>
 <li><p>The opentera source code is copied (not mounted) at the moment. If you make changes in the code, you need to do “Compose Up” again to generate the new container.</p></li>
 </ol>
-</div></blockquote>
+<p><strong>At this stage you have a running OpenTeraServer on your local machine on port 40075. Congratulations!</strong></p>
+<p>API Documentation can be viewed by browsing to <a class="reference external" href="https://localhost:40075/doc">https://localhost:40075/doc</a>. Accept the security risks if your browser is giving you a warning, this is caused because by your local server using a self generated certificate.</p>
+</section>
+<section id="connecting-to-the-local-server-with-openteraplus">
+<h3>Connecting to the Local Server with OpenTeraPlus<a class="headerlink" href="#connecting-to-the-local-server-with-openteraplus" title="Link to this heading"></a></h3>
+<p>You can use the GUI application OpenTeraPlus to connect and configure the server. <a class="reference external" href="https://github.com/introlab/openteraplus/releases">The application can be downloaded from OpenTeraPlus files release</a>. Alternatively, you can compile the application. More information are available on <a class="reference external" href="https://github.com/introlab/openteraplus">OpenTeraPlus GitHub project</a>.</p>
+<section id="configuring-openteraplus-with-your-local-server">
+<h4>Configuring OpenTeraPlus with your Local Server<a class="headerlink" href="#configuring-openteraplus-with-your-local-server" title="Link to this heading"></a></h4>
+<p>The default OpenTeraPlus configuration should allow you to connect to the server named: “Local - Port 40075”. You might want to add “Local-Docker” server in the Documents/OpenTeraPlus/config/OpenTeraPlus.json for OpenTeraPlus if you decide to change your docker-compose configuration with a new port :</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;Settings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;showServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;logToFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;Servers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;Local - Port 40075&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40075</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;Local-Docker&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">40075</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="advanced-options">
+<h2>Advanced Options<a class="headerlink" href="#advanced-options" title="Link to this heading"></a></h2>
+<section id="connect-to-the-local-database-using-pgadmin">
+<h3>Connect to the Local Database using pgAdmin<a class="headerlink" href="#connect-to-the-local-database-using-pgadmin" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://www.pgadmin.org/">pgAdmin</a> is an open-source administration and management tool for the PostgreSQL database. It provides a user-friendly graphical interface for interacting with PostgreSQL databases, allowing users to perform tasks like querying the database, managing tables and data, and configuring server settings without needing to use command-line tools.</p>
+<p>You can connect to the PostgreSQL database running in your container by using port <strong>5433</strong> and using <strong>user: “postgres”</strong> and <strong>password: “postgres”</strong>. This is useful for debugging databases or to understand its structure.</p>
+</section>
+<section id="connect-to-redis">
+<h3>Connect to Redis<a class="headerlink" href="#connect-to-redis" title="Link to this heading"></a></h3>
+<p>Redis connexion is available on port <strong>6380</strong>. You can use your favorite tool to inspect the cache and publish/subscribe to topics for debugging.</p>
 </section>
 <section id="debugging-with-vs-code">
-<h2>Debugging with VS Code<a class="headerlink" href="#debugging-with-vs-code" title="Permalink to this heading"></a></h2>
+<h3>Debugging with VS Code<a class="headerlink" href="#debugging-with-vs-code" title="Link to this heading"></a></h3>
 <p>Using the Visual Studio Code remote debugger, you can connect to running code in the opentera-server container on port 5678. A mapping to the local code corresponding to the container TeraServer code is required. You can create a configuration file named “launch.json” in the .vscode directory that contains :</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">    </span><span class="c1">// Use IntelliSense to learn about possible attributes.</span>
@@ -230,13 +268,14 @@
 <p>With this configuration, you can put breakpoints in the local python code and you will be able to inspect variables.</p>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Developer-Setup-for-Linux.html" class="btn btn-neutral float-left" title="Getting Started for Developers - Ubuntu-based Linux distros" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../services/OpenTera_Services.html" class="btn btn-neutral float-right" title="OpenTera Services Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Code-Structure.html" class="btn btn-neutral float-right" title="Code structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

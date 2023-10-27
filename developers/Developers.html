@@ -4,23 +4,23 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Developers setup guide &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Developers setup guide &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Getting Started for Developers - Windows 10" href="Developer-Setup-for-Windows.html" />
-    <link rel="prev" title="Configuration files" href="../Configuration-files.html" /> 
+    <link rel="prev" title="VideoRehab Service" href="../services/Videorehab-Service.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,17 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers setup guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Docker.html">Getting Started for Developers - Docker</a></li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -70,7 +64,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../services/services.html">Core Services</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
-<ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developers setup guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Developer-Setup-for-Docker.html">Setup a dev Environment with Docker-Compose on Mac/Linux/Windows</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Database-Structure.html">Database Structure</a></li>
@@ -109,7 +110,7 @@
            <div itemprop="articleBody">
              
   <section id="developers-setup-guide">
-<h1>Developers setup guide<a class="headerlink" href="#developers-setup-guide" title="Permalink to this heading"></a></h1>
+<h1>Developers setup guide<a class="headerlink" href="#developers-setup-guide" title="Link to this heading"></a></h1>
 <p>OpenTera uses cross-platform languages, allowing development to occur on multiple platform, be it Windows, Mac or Linux.</p>
 <p>Using standard modules and technology is useful to maintain such a project over long term, but it also brings some complexity to building up a development setup. Whatever your platform of choice, you’ll need the following tools:</p>
 <ul class="simple">
@@ -131,7 +132,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Windows.html">Getting Started for Developers - Windows 10</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Mac.html">Getting Started for Developers - Mac OS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Linux.html">Getting Started for Developers - Ubuntu-based Linux distros</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Docker.html">Getting Started for Developers - Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Developer-Setup-for-Docker.html">Setup a dev Environment with Docker-Compose on Mac/Linux/Windows</a></li>
 </ul>
 </div>
 </section>
@@ -140,7 +141,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Configuration-files.html" class="btn btn-neutral float-left" title="Configuration files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../services/Videorehab-Service.html" class="btn btn-neutral float-left" title="VideoRehab Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Developer-Setup-for-Windows.html" class="btn btn-neutral float-right" title="Getting Started for Developers - Windows 10" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

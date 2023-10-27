@@ -4,23 +4,23 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Code structure &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Code structure &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Creating a new service" href="Service-Creation.html" />
-    <link rel="prev" title="VideoRehab Service" href="../services/Videorehab-Service.html" /> 
+    <link rel="prev" title="Setup a dev Environment with Docker-Compose on Mac/Linux/Windows" href="Developer-Setup-for-Docker.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -65,6 +65,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Code structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#root">Root</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#source-folder">Source folder</a></li>
@@ -108,10 +109,10 @@
            <div itemprop="articleBody">
              
   <section id="code-structure">
-<h1>Code structure<a class="headerlink" href="#code-structure" title="Permalink to this heading"></a></h1>
+<h1>Code structure<a class="headerlink" href="#code-structure" title="Link to this heading"></a></h1>
 <p>The OpenTera project is logically organized into folders based on the <a class="reference internal" href="../Architecture-Overview.html"><span class="doc std std-doc">architecture</span></a> of the platform.</p>
 <section id="root">
-<h2>Root<a class="headerlink" href="#root" title="Permalink to this heading"></a></h2>
+<h2>Root<a class="headerlink" href="#root" title="Link to this heading"></a></h2>
 <p>At the root of the project:</p>
 <ul class="simple">
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/docker"><code class="docutils literal notranslate"><span class="pre">docker</span></code></a></strong> containing the <a class="reference external" href="https://www.docker.com/">docker</a> files used to <a class="reference internal" href="../Deployment.html"><span class="doc std std-doc">deploy in a docker environment</span></a></p></li>
@@ -120,7 +121,7 @@
 </ul>
 </section>
 <section id="source-folder">
-<h2><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver">Source folder</a><a class="headerlink" href="#source-folder" title="Permalink to this heading"></a></h2>
+<h2><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver">Source folder</a><a class="headerlink" href="#source-folder" title="Link to this heading"></a></h2>
 <p>The base source folder contains the following folders:</p>
 <ul class="simple">
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/easyrtc"><code class="docutils literal notranslate"><span class="pre">easyrtc</span></code></a></strong> containing the <a class="reference internal" href="../services/Videorehab-Service.html"><span class="doc std std-doc">video rehab service</span></a> web files used by the WebRTC subsystem</p></li>
@@ -129,7 +130,7 @@
 </ul>
 </section>
 <section id="teraserver-folder">
-<h2><a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">TeraServer folder</span></a><a class="headerlink" href="#teraserver-folder" title="Permalink to this heading"></a></h2>
+<h2><a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">TeraServer folder</span></a><a class="headerlink" href="#teraserver-folder" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/alembic"><code class="docutils literal notranslate"><span class="pre">alembic</span></code></a></strong> containing the <a class="reference external" href="https://alembic.sqlalchemy.org">Alembic</a> versions used when upgrading the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database structure</span></a></p></li>
 <li><p><strong><a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/certificates"><code class="docutils literal notranslate"><span class="pre">certificates</span></code></a></strong> used to store signing certificates for devices and, optionally, external certificates used by NGINX</p></li>
@@ -152,7 +153,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../services/Videorehab-Service.html" class="btn btn-neutral float-left" title="VideoRehab Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Developer-Setup-for-Docker.html" class="btn btn-neutral float-left" title="Setup a dev Environment with Docker-Compose on Mac/Linux/Windows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Service-Creation.html" class="btn btn-neutral float-right" title="Creating a new service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

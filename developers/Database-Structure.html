@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Database Structure &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Database Structure &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +36,7 @@
               <img src="../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul>
@@ -65,6 +65,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Structure</a><ul>
@@ -118,11 +119,11 @@
            <div itemprop="articleBody">
              
   <section id="database-structure">
-<h1>Database Structure<a class="headerlink" href="#database-structure" title="Permalink to this heading"></a></h1>
+<h1>Database Structure<a class="headerlink" href="#database-structure" title="Link to this heading"></a></h1>
 <p>An SQL database, currently <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a>, is at the core of the OpenTera platform. The
 database stores all the data and establish all the relationship between the different database objects in the system.</p>
 <section id="database-objects">
-<h2>Database objects<a class="headerlink" href="#database-objects" title="Permalink to this heading"></a></h2>
+<h2>Database objects<a class="headerlink" href="#database-objects" title="Link to this heading"></a></h2>
 <p>The following image shows a high level overview of the different objects used in OpenTera and their relationship to each
 other.</p>
 <p><img alt="OpenTera Database Objects" src="../_images/OpenTera_Objects.png" /></p>
@@ -191,12 +192,12 @@ preferences on each of the specific installation of that client, even if not on 
 </ul>
 </section>
 <section id="database-schema">
-<h2>Database schema<a class="headerlink" href="#database-schema" title="Permalink to this heading"></a></h2>
+<h2>Database schema<a class="headerlink" href="#database-schema" title="Link to this heading"></a></h2>
 <p>The following image displays the current database schema.
 <img alt="Database schema" src="../_images/opentera_dbschema.png" /></p>
 </section>
 <section id="objects-models">
-<h2>Objects models<a class="headerlink" href="#objects-models" title="Permalink to this heading"></a></h2>
+<h2>Objects models<a class="headerlink" href="#objects-models" title="Link to this heading"></a></h2>
 <p>OpenTera uses an object relational mapper (ORM) based on <a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a>. Database upgrades
 are managed using <a class="reference external" href="https://alembic.sqlalchemy.org">Alembic</a>.</p>
 <p>Each of the database object has an
@@ -204,14 +205,14 @@ are managed using <a class="reference external" href="https://alembic.sqlalchemy
 the structure of the underlying database table and relationship, and also allows to directly manipulate those objects
 from the code without having to execute SQL queries directly from the code.</p>
 <section id="objects-structure">
-<h3>Objects structure<a class="headerlink" href="#objects-structure" title="Permalink to this heading"></a></h3>
+<h3>Objects structure<a class="headerlink" href="#objects-structure" title="Link to this heading"></a></h3>
 <p>Each object has its own model. Those model provide the database structure underlying each object, and provide some
 utility functions to query more information or related information from a specific object.</p>
 <p>The model doesn’t provide any access-level filtering, and is not considered to be safe in that regard if objects are
 used without using the database manager (see below).</p>
 </section>
 <section id="base-model">
-<h3>Base model<a class="headerlink" href="#base-model" title="Permalink to this heading"></a></h3>
+<h3>Base model<a class="headerlink" href="#base-model" title="Link to this heading"></a></h3>
 <p>Each object model inherits from a base model. That base model provides helper functions that can be re-implemented, if
 needed, by the child object. This also ensures that each model has at least some common basic functions, easing the
 development and readability of codes. The following functions are part of the base model:</p>
@@ -228,7 +229,7 @@ and allows for customization in inherited models.</p></li>
 </ul>
 </section>
 <section id="naming-convention">
-<h3>Naming convention<a class="headerlink" href="#naming-convention" title="Permalink to this heading"></a></h3>
+<h3>Naming convention<a class="headerlink" href="#naming-convention" title="Link to this heading"></a></h3>
 <p>The following naming convention is used when defining a new model:</p>
 <ul class="simple">
 <li><p>Model name starts with a service identifier (for example <code class="docutils literal notranslate"><span class="pre">Tera</span></code> is used for the
@@ -241,7 +242,7 @@ and allows for customization in inherited models.</p></li>
 </ul>
 </section>
 <section id="version-conflicts">
-<h3>Version conflicts<a class="headerlink" href="#version-conflicts" title="Permalink to this heading"></a></h3>
+<h3>Version conflicts<a class="headerlink" href="#version-conflicts" title="Link to this heading"></a></h3>
 <p>To prevent version conflicts at the database level, a column <code class="docutils literal notranslate"><span class="pre">version_id</span></code> is automatically added by the <code class="docutils literal notranslate"><span class="pre">BaseModel</span></code> to
 each table. On each <code class="docutils literal notranslate"><span class="pre">update</span></code> or <code class="docutils literal notranslate"><span class="pre">insert</span></code> query, that column is timestamped with the current time. By doing so, if
 another operation is started while the previous one is in progress, the second operation will fail as the data integrity
@@ -249,13 +250,13 @@ will not be respected.</p>
 </section>
 </section>
 <section id="database-manager">
-<h2>Database manager<a class="headerlink" href="#database-manager" title="Permalink to this heading"></a></h2>
+<h2>Database manager<a class="headerlink" href="#database-manager" title="Link to this heading"></a></h2>
 <p>Inside the Database module, a database manager was created to manage the database connection, to generate
 <a class="reference internal" href="Messages-structure.html"><span class="doc std std-doc">events</span></a> when database objects are edited and to provide access verification on objects when required.
 The database manager also creates the default database (when detecting that some tables are not present) and database
 upgrade (using <a class="reference external" href="https://alembic.sqlalchemy.org">Alembic</a>).</p>
 <section id="access-verification">
-<h3>Access verification<a class="headerlink" href="#access-verification" title="Permalink to this heading"></a></h3>
+<h3>Access verification<a class="headerlink" href="#access-verification" title="Link to this heading"></a></h3>
 <p>Instead of manipulating database objects directly, an additional layer was build to filter queries and thus restrain the
 information returned depending on the <a class="reference internal" href="../services/teraserver/OpenTera_AccessRoles.html"><span class="doc std std-doc">access levels</span></a>. Those access objects
 are available directly inside the <a class="reference external" href="https://github.com/introlab/opentera/tree/main/teraserver/python/modules/DatabaseModule">Database module</a></p>

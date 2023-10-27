@@ -4,18 +4,18 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Access Roles &mdash; OpenTera 1.2.3 documentation</title>
+  <title>Access Roles &mdash; OpenTera 1.2.4 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -36,7 +36,7 @@
               <img src="../../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.3
+                1.2.4
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,11 +52,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../Architecture-Overview.html">OpenTera Architecture Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../Security.html">Security</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deploying OpenTera on a server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Configuration-files.html">Configuration files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Deployment.html">Deployment Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithDockerCompose.html">Deploying with Docker on Linux Servers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/DeployWithLinuxNative.html">Deploying OpenTera on a Linux Server</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Services and Modules</span></p>
 <ul class="current">
@@ -92,6 +92,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developers/Developers.html">Developers setup guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Code-Structure.html">Code structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Service-Creation.html">Creating a new service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developers/Database-Structure.html">Database Structure</a></li>
@@ -132,7 +133,7 @@
            <div itemprop="articleBody">
              
   <section id="access-roles">
-<h1>Access Roles<a class="headerlink" href="#access-roles" title="Permalink to this heading"></a></h1>
+<h1>Access Roles<a class="headerlink" href="#access-roles" title="Link to this heading"></a></h1>
 <p>OpenTera access to <a class="reference internal" href="api/API.html"><span class="doc std std-doc">REST API</span></a> is limited depending on the role the currently logged on usertype (user,
 participant, device, service) has for a specific service.</p>
 <p>Since the core module of OpenTera (TeraServer) is a service by itself, it defines its own access levels based on
@@ -147,12 +148,12 @@ depending on the API.</p>
 can be modified.</p>
 <hr class="docutils" />
 <section id="users">
-<h2>Users<a class="headerlink" href="#users" title="Permalink to this heading"></a></h2>
+<h2>Users<a class="headerlink" href="#users" title="Link to this heading"></a></h2>
 <p>This table shows the various features that are available according the user groups access level, and for super admin
 access.</p>
 </section>
 <section id="data-access">
-<h2>Data access<a class="headerlink" href="#data-access" title="Permalink to this heading"></a></h2>
+<h2>Data access<a class="headerlink" href="#data-access" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Data [1]</p></th>
@@ -509,7 +510,7 @@ sites where the user have access with its user groups are read.</p>
 <p>[4] Any user group with a <strong>Site Role: Admin</strong> automatically have a <strong>Project Role: Admin</strong></p>
 </section>
 <section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h2>
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Feature [1]</p></th>
@@ -650,7 +651,7 @@ that user won’t be able to use any feature on that project.</p>
 </section>
 <hr class="docutils" />
 <section id="participants">
-<h2>Participants<a class="headerlink" href="#participants" title="Permalink to this heading"></a></h2>
+<h2>Participants<a class="headerlink" href="#participants" title="Link to this heading"></a></h2>
 <p>Access roles for participants are quite simpler than the users access roles. A participant only has access to objects
 that are directly linked to them. For example, a participant can only query the devices and sessions that are associated
 to it.</p>
@@ -658,7 +659,7 @@ to it.</p>
 </section>
 <hr class="docutils" />
 <section id="devices">
-<h2>Devices<a class="headerlink" href="#devices" title="Permalink to this heading"></a></h2>
+<h2>Devices<a class="headerlink" href="#devices" title="Link to this heading"></a></h2>
 <p>A device only has access to objects that are directly linked to them. For example, a device can only query the
 participants associated to it or the sessions into which the device was involved.</p>
 <p>Similarly, a device can only create data related to an object linked to it. For example, it can only create assets for a
@@ -666,7 +667,7 @@ session into which it was involved.</p>
 </section>
 <hr class="docutils" />
 <section id="services">
-<h2>Services<a class="headerlink" href="#services" title="Permalink to this heading"></a></h2>
+<h2>Services<a class="headerlink" href="#services" title="Link to this heading"></a></h2>
 <p>Services don’t have specific roles. As they likely require more access than a user, a participant or a device, they
 don’t have any specific limitation based on roles on what they can do with their API.</p>
 <p>Of course, not all objects are exposed with the service API, and
