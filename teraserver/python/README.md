@@ -10,7 +10,7 @@ External microservices can use this package as a base.
 OpenTera is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) . 
 
 # Documentation
-Please visit our [WiKi documentation on GitHub](https://github.com/introlab/opentera/wiki)
+Please visit our [Documentation on GitHub](https://introlab.github.io/opentera/)
 
 # Dependencies
 OpenTera is based or uses the following Open Source technologies :
