@@ -154,24 +154,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http post">
-<dt class="sig sig-object http" id="post--user-assets">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#post--user-assets" title="Link to this definition"></a></dt>
-<dd><p>Delete asset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to update asset information from here</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-assets">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#get--user-assets" title="Link to this definition"></a></dt>
@@ -206,6 +188,24 @@
 </dl>
 </dd></dl>
 
+<dl class="http post">
+<dt class="sig sig-object http" id="post--user-assets">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/assets</span></span><a class="headerlink" href="#post--user-assets" title="Link to this definition"></a></dt>
+<dd><p>Delete asset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to update asset information from here</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-devices">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices</span></span><a class="headerlink" href="#delete--user-devices" title="Link to this definition"></a></dt>
@@ -223,6 +223,42 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Wrong ID/ No ID</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device (can delete if superadmin)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devices">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices</span></span><a class="headerlink" href="#get--user-devices" title="Link to this definition"></a></dt>
+<dd><p>Get devices information. Only one of the ID parameter is supported at once. If no ID is specified, returns all accessible devices for the logged user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – ID of the device to query</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device to query</p></li>
+<li><p><strong>device_uuid</strong> (<em>string</em>) – Device uuid of the device to query</p></li>
+<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “device_uuid”</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated devices</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all associated devices</p></li>
+<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of device type from which to get all devices. Can be combined with id_site or id_project.</p></li>
+<li><p><strong>id_device_subtype</strong> (<em>integer</em>) – Device subtype id to get all devices of that subtype.</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Name of the device to query</p></li>
+<li><p><strong>projects</strong> (<em>boolean</em>) – Flag that indicates if associated project(s) information should be included in the returned device list</p></li>
+<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled devices.</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>with_participants</strong> (<em>boolean</em>) – Flag that indicates if associated participant(s) information should be included in the returned device list</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Flag that indicates if associated site(s) information should be included in the returned device list</p></li>
+<li><p><strong>with_status</strong> (<em>boolean</em>) – Include status information - offline, online, busy for each device</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – User Error : Too Many IDs</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -267,42 +303,6 @@
 </dd></dl>
 
 <dl class="http get">
-<dt class="sig sig-object http" id="get--user-devices">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices</span></span><a class="headerlink" href="#get--user-devices" title="Link to this definition"></a></dt>
-<dd><p>Get devices information. Only one of the ID parameter is supported at once. If no ID is specified, returns all accessible devices for the logged user.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – ID of the device to query</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device to query</p></li>
-<li><p><strong>device_uuid</strong> (<em>string</em>) – Device uuid of the device to query</p></li>
-<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “device_uuid”</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated devices</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all associated devices</p></li>
-<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of device type from which to get all devices. Can be combined with id_site or id_project.</p></li>
-<li><p><strong>id_device_subtype</strong> (<em>integer</em>) – Device subtype id to get all devices of that subtype.</p></li>
-<li><p><strong>name</strong> (<em>string</em>) – Name of the device to query</p></li>
-<li><p><strong>projects</strong> (<em>boolean</em>) – Flag that indicates if associated project(s) information should be included in the returned device list</p></li>
-<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled devices.</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>with_participants</strong> (<em>boolean</em>) – Flag that indicates if associated participant(s) information should be included in the returned device list</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Flag that indicates if associated site(s) information should be included in the returned device list</p></li>
-<li><p><strong>with_status</strong> (<em>boolean</em>) – Include status information - offline, online, busy for each device</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – User Error : Too Many IDs</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
 <dt class="sig sig-object http" id="get--user-devices-online">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/online</span></span><a class="headerlink" href="#get--user-devices-online" title="Link to this definition"></a></dt>
 <dd><p>Get online devices uuids.</p>
@@ -341,6 +341,31 @@
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devices-participants">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/participants</span></span><a class="headerlink" href="#get--user-devices-participants" title="Link to this definition"></a></dt>
+<dd><p>Get devices that are related to a participant. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated participants</p></li>
+<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to request all associated devices</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all devices and associated participants</p></li>
+<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of device type from which to get all devices and associated participants</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - participants association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for participant</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-devices-participants">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/devices/participants</span></span><a class="headerlink" href="#post--user-devices-participants" title="Link to this definition"></a></dt>
@@ -369,31 +394,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-devices-participants">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/participants</span></span><a class="headerlink" href="#get--user-devices-participants" title="Link to this definition"></a></dt>
-<dd><p>Get devices that are related to a participant. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated participants</p></li>
-<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to request all associated devices</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all devices and associated participants</p></li>
-<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of device type from which to get all devices and associated participants</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - participants association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for participant</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-devices-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/projects</span></span><a class="headerlink" href="#delete--user-devices-projects" title="Link to this definition"></a></dt>
@@ -410,6 +410,32 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to project or one of the device’s site)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-project association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devices-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/projects</span></span><a class="headerlink" href="#get--user-devices-projects" title="Link to this definition"></a></dt>
+<dd><p>Get devices that are associated with a project. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated projects</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all associated devices</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_device. Also return projects that don’t have any association with that device</p></li>
+<li><p><strong>with_devices</strong> (<em>boolean</em>) – Used with id_project. Also return devices that don’t have any association with that project</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_device. Also return site information of the returned projects.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - project association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for projects</p></li>
 </ul>
 </dd>
 </dl>
@@ -443,32 +469,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-devices-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/projects</span></span><a class="headerlink" href="#get--user-devices-projects" title="Link to this definition"></a></dt>
-<dd><p>Get devices that are associated with a project. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated projects</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all associated devices</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_device. Also return projects that don’t have any association with that device</p></li>
-<li><p><strong>with_devices</strong> (<em>boolean</em>) – Used with id_project. Also return devices that don’t have any association with that project</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_device. Also return site information of the returned projects.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - project association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for projects</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-devices-sites">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devices/sites</span></span><a class="headerlink" href="#delete--user-devices-sites" title="Link to this definition"></a></dt>
@@ -485,6 +485,31 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device association (no admin access to site)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device-site association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devices-sites">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/sites</span></span><a class="headerlink" href="#get--user-devices-sites" title="Link to this definition"></a></dt>
+<dd><p>Get devices that are related to a site. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated sites</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated devices</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_devices</strong> (<em>boolean</em>) – Used with id_project. Also return devices that don’t have any association with that project</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - sites association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for sites</p></li>
 </ul>
 </dd>
 </dl>
@@ -518,31 +543,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-devices-sites">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devices/sites</span></span><a class="headerlink" href="#get--user-devices-sites" title="Link to this definition"></a></dt>
-<dd><p>Get devices that are related to a site. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to request all associated sites</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated devices</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_devices</strong> (<em>boolean</em>) – Used with id_project. Also return devices that don’t have any association with that project</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices - sites association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for sites</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-devicesubtypes">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicesubtypes</span></span><a class="headerlink" href="#delete--user-devicesubtypes" title="Link to this definition"></a></dt>
@@ -559,6 +559,30 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device subtype (can delete if site admin)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device subtype not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devicesubtypes">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devicesubtypes</span></span><a class="headerlink" href="#get--user-devicesubtypes" title="Link to this definition"></a></dt>
+<dd><p>Get devices subtypes. Only one of the ID parameter is supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_device_subtype</strong> (<em>integer</em>) – ID of the device subtype to query</p></li>
+<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of the device type from which to get all subtypes</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Return minimal information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices subtypes</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access to the device type specified. Please check that the user has access to a session type containing that device type.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -592,30 +616,6 @@
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-devicesubtypes">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devicesubtypes</span></span><a class="headerlink" href="#get--user-devicesubtypes" title="Link to this definition"></a></dt>
-<dd><p>Get devices subtypes. Only one of the ID parameter is supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_device_subtype</strong> (<em>integer</em>) – ID of the device subtype to query</p></li>
-<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of the device type from which to get all subtypes</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Return minimal information</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices subtypes</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access to the device type specified. Please check that the user has access to a session type containing that device type.</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-devicetypes">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/devicetypes</span></span><a class="headerlink" href="#delete--user-devicetypes" title="Link to this definition"></a></dt>
@@ -634,6 +634,30 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete device type (can delete if site admin)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Device type not found or database error.</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Tried to delete with 2 parameters</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-devicetypes">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devicetypes</span></span><a class="headerlink" href="#get--user-devicetypes" title="Link to this definition"></a></dt>
+<dd><p>Get devices types. Only one of the ID parameter is supported at once. The ID is dominant on the device_type_key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of the device type</p></li>
+<li><p><strong>device_type_key</strong> (<em>string</em>) – Key of the device type</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – List of all device types</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices types</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access to the device type specified. Please check that the user has access to a session type containing that device type.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -662,30 +686,6 @@
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified device type</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occured when saving device type</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-devicetypes">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/devicetypes</span></span><a class="headerlink" href="#get--user-devicetypes" title="Link to this definition"></a></dt>
-<dd><p>Get devices types. Only one of the ID parameter is supported at once. The ID is dominant on the device_type_key</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_device_type</strong> (<em>integer</em>) – ID of the device type</p></li>
-<li><p><strong>device_type_key</strong> (<em>string</em>) – Key of the device type</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – List of all device types</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices types</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden access to the device type specified. Please check that the user has access to a session type containing that device type.</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -783,6 +783,29 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-groups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#get--user-groups" title="Link to this definition"></a></dt>
+<dd><p>Get participant groups information. Only one of the ID parameter is supported at once. If no ID is specified, returns all accessible groups for the logged user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_group</strong> (<em>integer</em>) – ID of the participant group to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all participant groups</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_group”</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participant groups</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-groups">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#post--user-groups" title="Link to this definition"></a></dt>
@@ -806,29 +829,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified device</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occurred when saving device</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-groups">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/groups</span></span><a class="headerlink" href="#get--user-groups" title="Link to this definition"></a></dt>
-<dd><p>Get participant groups information. Only one of the ID parameter is supported at once. If no ID is specified, returns all accessible groups for the logged user</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_group</strong> (<em>integer</em>) – ID of the participant group to query</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all participant groups</p></li>
-<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_group”</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participant groups</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -891,6 +891,43 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-participants">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/participants</span></span><a class="headerlink" href="#get--user-participants" title="Link to this definition"></a></dt>
+<dd><p>Get participants information. Only one of the ID parameter is supported and required at once</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant to query</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_participant”</p></li>
+<li><p><strong>username</strong> (<em>string</em>) – Username of the participant to query</p></li>
+<li><p><strong>participant_uuid</strong> (<em>string</em>) – Participant uuid of the participant to query</p></li>
+<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “participant_uuid”</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all participants</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all participants</p></li>
+<li><p><strong>id_group</strong> (<em>integer</em>) – ID of the participant groups from which to get all participants</p></li>
+<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session from which to get all participants</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all participants associated</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Name of the participant to query</p></li>
+<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled participants</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>full</strong> (<em>boolean</em>) – Flag that expands the returned data to include all information</p></li>
+<li><p><strong>orderby_recents</strong> (<em>boolean</em>) – Returns participants ordered by most recently updated</p></li>
+<li><p><strong>limit</strong> (<em>integer</em>) – Returns at most “limit” participants</p></li>
+<li><p><strong>no_group</strong> (<em>boolean</em>) – Flag that limits the returned data with only participants without a group</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participants</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-participants">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/participants</span></span><a class="headerlink" href="#post--user-participants" title="Link to this definition"></a></dt>
@@ -924,43 +961,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of them]) in the JSON body, or mismatch between id_project and participant group project</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified participant</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving participant</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-participants">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/participants</span></span><a class="headerlink" href="#get--user-participants" title="Link to this definition"></a></dt>
-<dd><p>Get participants information. Only one of the ID parameter is supported and required at once</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant to query</p></li>
-<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_participant”</p></li>
-<li><p><strong>username</strong> (<em>string</em>) – Username of the participant to query</p></li>
-<li><p><strong>participant_uuid</strong> (<em>string</em>) – Participant uuid of the participant to query</p></li>
-<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “participant_uuid”</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all participants</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project from which to get all participants</p></li>
-<li><p><strong>id_group</strong> (<em>integer</em>) – ID of the participant groups from which to get all participants</p></li>
-<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session from which to get all participants</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all participants associated</p></li>
-<li><p><strong>name</strong> (<em>string</em>) – Name of the participant to query</p></li>
-<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled participants</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>full</strong> (<em>boolean</em>) – Flag that expands the returned data to include all information</p></li>
-<li><p><strong>orderby_recents</strong> (<em>boolean</em>) – Returns participants ordered by most recently updated</p></li>
-<li><p><strong>limit</strong> (<em>integer</em>) – Returns at most “limit” participants</p></li>
-<li><p><strong>no_group</strong> (<em>boolean</em>) – Flag that limits the returned data with only participants without a group</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participants</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1005,32 +1005,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http post">
-<dt class="sig sig-object http" id="post--user-projectaccess">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/projectaccess</span></span><a class="headerlink" href="#post--user-projectaccess" title="Link to this definition"></a></dt>
-<dd><p>Create/update project access for an user.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>project_access</strong> (<em>any</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t modify this project or user access (project admin access required)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-projectaccess">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/projectaccess</span></span><a class="headerlink" href="#get--user-projectaccess" title="Link to this definition"></a></dt>
@@ -1058,6 +1032,32 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http post">
+<dt class="sig sig-object http" id="post--user-projectaccess">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/projectaccess</span></span><a class="headerlink" href="#post--user-projectaccess" title="Link to this definition"></a></dt>
+<dd><p>Create/update project access for an user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>project_access</strong> (<em>any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t modify this project or user access (project admin access required)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/projects</span></span><a class="headerlink" href="#delete--user-projects" title="Link to this definition"></a></dt>
@@ -1074,6 +1074,33 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete project (only site admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/projects</span></span><a class="headerlink" href="#get--user-projects" title="Link to this definition"></a></dt>
+<dd><p>Get projects information. Only one of the ID parameter is supported and required at once</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_project”</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all projects</p></li>
+<li><p><strong>id_service</strong> (<em>integer</em>) – ID of the service from which to get all projects</p></li>
+<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID from which to get all projects that are accessible</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Project to query by name</p></li>
+<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled projects</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participants</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1104,33 +1131,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_site or id_project) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified project</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occured when saving project</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/projects</span></span><a class="headerlink" href="#get--user-projects" title="Link to this definition"></a></dt>
-<dd><p>Get projects information. Only one of the ID parameter is supported and required at once</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query</p></li>
-<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_project”</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all projects</p></li>
-<li><p><strong>id_service</strong> (<em>integer</em>) – ID of the service from which to get all projects</p></li>
-<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID from which to get all projects that are accessible</p></li>
-<li><p><strong>name</strong> (<em>string</em>) – Project to query by name</p></li>
-<li><p><strong>enabled</strong> (<em>boolean</em>) – Flag that limits the returned data to the enabled projects</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of participants</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1178,6 +1178,35 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services</span></span><a class="headerlink" href="#get--user-services" title="Link to this definition"></a></dt>
+<dd><p>Get services information. Only one of the ID parameter is supported and required at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_service</strong> (<em>integer</em>) – ID of the service to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query services from</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query services from</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_service”</p></li>
+<li><p><strong>service_uuid</strong> (<em>string</em>) – Service UUID to query</p></li>
+<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “service_uuid”</p></li>
+<li><p><strong>service_key</strong> (<em>string</em>) – Service Key to query</p></li>
+<li><p><strong>key</strong> (<em>string</em>) – Alias for “service_key”</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>with_config</strong> (<em>boolean</em>) – Only return services with editable configuration</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-services">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/services</span></span><a class="headerlink" href="#post--user-services" title="Link to this definition"></a></dt>
@@ -1218,35 +1247,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services</span></span><a class="headerlink" href="#get--user-services" title="Link to this definition"></a></dt>
-<dd><p>Get services information. Only one of the ID parameter is supported and required at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_service</strong> (<em>integer</em>) – ID of the service to query</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query services from</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query services from</p></li>
-<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_service”</p></li>
-<li><p><strong>service_uuid</strong> (<em>string</em>) – Service UUID to query</p></li>
-<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “service_uuid”</p></li>
-<li><p><strong>service_key</strong> (<em>string</em>) – Service Key to query</p></li>
-<li><p><strong>key</strong> (<em>string</em>) – Alias for “service_key”</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>with_config</strong> (<em>boolean</em>) – Only return services with editable configuration</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-services-access">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/access</span></span><a class="headerlink" href="#delete--user-services-access" title="Link to this definition"></a></dt>
@@ -1263,6 +1263,31 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not admin of the associated elements)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services-access">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/access</span></span><a class="headerlink" href="#get--user-services-access" title="Link to this definition"></a></dt>
+<dd><p>Get access roles for a specific items. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – Usergroup ID to query service access</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – User ID to query service access</p></li>
+<li><p><strong>id_participant_group</strong> (<em>integer</em>) – Participant group ID to query service access</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – Device ID to query service access</p></li>
+<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated access from</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of access roles</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -1298,31 +1323,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services-access">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/access</span></span><a class="headerlink" href="#get--user-services-access" title="Link to this definition"></a></dt>
-<dd><p>Get access roles for a specific items. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – Usergroup ID to query service access</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – User ID to query service access</p></li>
-<li><p><strong>id_participant_group</strong> (<em>integer</em>) – Participant group ID to query service access</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – Device ID to query service access</p></li>
-<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated access from</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of access roles</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-services-configs">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/configs</span></span><a class="headerlink" href="#delete--user-services-configs" title="Link to this definition"></a></dt>
@@ -1339,6 +1339,34 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete config (must have admin access to the related object - user,device or participant, or be its own config)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services-configs">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/configs</span></span><a class="headerlink" href="#get--user-services-configs" title="Link to this definition"></a></dt>
+<dd><p>Get service configuration. id_service can be combined with id_user, id_participant or id_device, if required. If no id_user, id_participant and id_device specified, will return config the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_service</strong> (<em>integer</em>) – ID of service to get all configs from. Use in combination with another ID field to filter.</p></li>
+<li><p><strong>service_key</strong> (<em>string</em>) – Service key to query. Can be used instead of id_service. If usedwith id_service, service_key will be ignored.</p></li>
+<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to get the service specified with id_service or all configs</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user from which to get the service specified with id_service or all configs</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get the service specified with id_service or all configs</p></li>
+<li><p><strong>id_specific</strong> (<em>string</em>) – ID of the specific configuration to get.</p></li>
+<li><p><strong>with_empty</strong> (<em>boolean</em>) – Also include empty configs for services without config.</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Also includes a list of all available specifics configs.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of configurations</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified - id_service is at least required</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1375,34 +1403,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services-configs">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/configs</span></span><a class="headerlink" href="#get--user-services-configs" title="Link to this definition"></a></dt>
-<dd><p>Get service configuration. id_service can be combined with id_user, id_participant or id_device, if required. If no id_user, id_participant and id_device specified, will return config the current user.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_service</strong> (<em>integer</em>) – ID of service to get all configs from. Use in combination with another ID field to filter.</p></li>
-<li><p><strong>service_key</strong> (<em>string</em>) – Service key to query. Can be used instead of id_service. If usedwith id_service, service_key will be ignored.</p></li>
-<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to get the service specified with id_service or all configs</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user from which to get the service specified with id_service or all configs</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get the service specified with id_service or all configs</p></li>
-<li><p><strong>id_specific</strong> (<em>string</em>) – ID of the specific configuration to get.</p></li>
-<li><p><strong>with_empty</strong> (<em>boolean</em>) – Also include empty configs for services without config.</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Also includes a list of all available specifics configs.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of configurations</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified - id_service is at least required</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-services-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/projects</span></span><a class="headerlink" href="#delete--user-services-projects" title="Link to this definition"></a></dt>
@@ -1419,6 +1419,33 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not site admin of the associated project)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/projects</span></span><a class="headerlink" href="#get--user-services-projects" title="Link to this definition"></a></dt>
+<dd><p>Get services that are associated with a project. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated services</p></li>
+<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated projects from</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_service. Also return projects that don’t have any association with that service</p></li>
+<li><p><strong>with_services</strong> (<em>boolean</em>) – Used with id_project. Also return services that don’t have any association with that project</p></li>
+<li><p><strong>with_roles</strong> (<em>boolean</em>) – Used with id_project. Returns detailled information oneach role for this service.</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services - projects association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -1454,33 +1481,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/projects</span></span><a class="headerlink" href="#get--user-services-projects" title="Link to this definition"></a></dt>
-<dd><p>Get services that are associated with a project. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated services</p></li>
-<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated projects from</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_service. Also return projects that don’t have any association with that service</p></li>
-<li><p><strong>with_services</strong> (<em>boolean</em>) – Used with id_project. Also return services that don’t have any association with that project</p></li>
-<li><p><strong>with_roles</strong> (<em>boolean</em>) – Used with id_project. Returns detailled information oneach role for this service.</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services - projects association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-services-roles">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/roles</span></span><a class="headerlink" href="#delete--user-services-roles" title="Link to this definition"></a></dt>
@@ -1497,6 +1497,28 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete role (not super admin)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services-roles">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/roles</span></span><a class="headerlink" href="#get--user-services-roles" title="Link to this definition"></a></dt>
+<dd><p>Get service roles for either a specific service or for all available services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_service</strong> (<em>integer</em>) – Specific service ID to query roles for</p></li>
+<li><p><strong>globals</strong> (<em>boolean</em>) – Only return global roles, e.g. not related to a site or a project</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Return minimal information about the roles</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of service roles</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting roles</p></li>
 </ul>
 </dd>
 </dl>
@@ -1532,28 +1554,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services-roles">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/roles</span></span><a class="headerlink" href="#get--user-services-roles" title="Link to this definition"></a></dt>
-<dd><p>Get service roles for either a specific service or for all available services.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_service</strong> (<em>integer</em>) – Specific service ID to query roles for</p></li>
-<li><p><strong>globals</strong> (<em>boolean</em>) – Only return global roles, e.g. not related to a site or a project</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Return minimal information about the roles</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of service roles</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting roles</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-services-sites">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/services/sites</span></span><a class="headerlink" href="#delete--user-services-sites" title="Link to this definition"></a></dt>
@@ -1570,6 +1570,32 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (only super admins can)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-services-sites">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/sites</span></span><a class="headerlink" href="#get--user-services-sites" title="Link to this definition"></a></dt>
+<dd><p>Get services that are associated with a site. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_site</strong> (<em>integer</em>) – Site ID to query associated services</p></li>
+<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated projects from</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return sites that don’t have any association with that service</p></li>
+<li><p><strong>with_services</strong> (<em>boolean</em>) – Used with id_site. Also return services that don’t have any association with that site</p></li>
+<li><p><strong>with_roles</strong> (<em>boolean</em>) – Used with id_site. Returns detailed information oneach role for this service.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services - sites association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -1603,32 +1629,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-services-sites">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/services/sites</span></span><a class="headerlink" href="#get--user-services-sites" title="Link to this definition"></a></dt>
-<dd><p>Get services that are associated with a site. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_site</strong> (<em>integer</em>) – Site ID to query associated services</p></li>
-<li><p><strong>id_service</strong> (<em>integer</em>) – Service ID to query associated projects from</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return sites that don’t have any association with that service</p></li>
-<li><p><strong>with_services</strong> (<em>boolean</em>) – Used with id_site. Also return services that don’t have any association with that site</p></li>
-<li><p><strong>with_roles</strong> (<em>boolean</em>) – Used with id_site. Returns detailed information oneach role for this service.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of services - sites association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-sessions">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions</span></span><a class="headerlink" href="#delete--user-sessions" title="Link to this definition"></a></dt>
@@ -1645,6 +1645,38 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete session (must have access to all participants and users in the session to delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sessions">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessions</span></span><a class="headerlink" href="#get--user-sessions" title="Link to this definition"></a></dt>
+<dd><p>Get sessions information. Only one of the ID parameter is supported and required at once</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session to query</p></li>
+<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to get all sessions</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user from which to get all sessions</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all sessions</p></li>
+<li><p><strong>status</strong> (<em>integer</em>) – Limit to specific session status</p></li>
+<li><p><strong>limit</strong> (<em>integer</em>) – Maximum number of results to return</p></li>
+<li><p><strong>offset</strong> (<em>integer</em>) – Number of items to ignore in results, offset from 0-index</p></li>
+<li><p><strong>session_uuid</strong> (<em>string</em>) – Session UUID to query</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>start_date</strong> (<em>string</em>) – Start date, sessions before that date will be ignored</p></li>
+<li><p><strong>end_date</strong> (<em>string</em>) – End date, sessions after that date will be ignored</p></li>
+<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Include session type informations</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of sessions</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1688,38 +1720,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sessions">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessions</span></span><a class="headerlink" href="#get--user-sessions" title="Link to this definition"></a></dt>
-<dd><p>Get sessions information. Only one of the ID parameter is supported and required at once</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session to query</p></li>
-<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant from which to get all sessions</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user from which to get all sessions</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all sessions</p></li>
-<li><p><strong>status</strong> (<em>integer</em>) – Limit to specific session status</p></li>
-<li><p><strong>limit</strong> (<em>integer</em>) – Maximum number of results to return</p></li>
-<li><p><strong>offset</strong> (<em>integer</em>) – Number of items to ignore in results, offset from 0-index</p></li>
-<li><p><strong>session_uuid</strong> (<em>string</em>) – Session UUID to query</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>start_date</strong> (<em>string</em>) – Start date, sessions before that date will be ignored</p></li>
-<li><p><strong>end_date</strong> (<em>string</em>) – End date, sessions after that date will be ignored</p></li>
-<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Include session type informations</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of sessions</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – No parameters specified at least one id must be used</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-sessions-events">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/events</span></span><a class="headerlink" href="#delete--user-sessions-events" title="Link to this definition"></a></dt>
@@ -1736,6 +1736,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete event (no access to that session)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sessions-events">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/events</span></span><a class="headerlink" href="#get--user-sessions-events" title="Link to this definition"></a></dt>
+<dd><p>Get events for a specific session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session to query events for</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of events</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (id_session)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1767,27 +1788,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified event</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving device</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sessions-events">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessions/events</span></span><a class="headerlink" href="#get--user-sessions-events" title="Link to this definition"></a></dt>
-<dd><p>Get events for a specific session</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session</strong> (<em>integer</em>) – ID of the session to query events for</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of events</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (id_session)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -1853,6 +1853,29 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sessiontypes">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes</span></span><a class="headerlink" href="#get--user-sessiontypes" title="Link to this definition"></a></dt>
+<dd><p>Get session type information. If no id_session_type specified, returns all available session types</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session_type</strong> (<em>integer</em>) – ID of the session type to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get session type for</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get session types for</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-sessiontypes">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes</span></span><a class="headerlink" href="#post--user-sessiontypes" title="Link to this definition"></a></dt>
@@ -1885,29 +1908,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sessiontypes">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes</span></span><a class="headerlink" href="#get--user-sessiontypes" title="Link to this definition"></a></dt>
-<dd><p>Get session type information. If no id_session_type specified, returns all available session types</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session_type</strong> (<em>integer</em>) – ID of the session type to query</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get session type for</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get session types for</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-sessiontypes-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/projects</span></span><a class="headerlink" href="#delete--user-sessiontypes-projects" title="Link to this definition"></a></dt>
@@ -1924,6 +1924,32 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to session-type or project)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sessiontypes-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/projects</span></span><a class="headerlink" href="#get--user-sessiontypes-projects" title="Link to this definition"></a></dt>
+<dd><p>Get devices types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated session types from</p></li>
+<li><p><strong>id_session_type</strong> (<em>integer</em>) – Session type ID to query associated projects from</p></li>
+<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_session_type. Also return projects that don’t have any association with that type</p></li>
+<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Used with id_project. Also return types that don’t have any association with that project</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_session_type. Also return site information of the returned projects.</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices-types - projects association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -1957,32 +1983,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sessiontypes-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/projects</span></span><a class="headerlink" href="#get--user-sessiontypes-projects" title="Link to this definition"></a></dt>
-<dd><p>Get devices types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated session types from</p></li>
-<li><p><strong>id_session_type</strong> (<em>integer</em>) – Session type ID to query associated projects from</p></li>
-<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_session_type. Also return projects that don’t have any association with that type</p></li>
-<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Used with id_project. Also return types that don’t have any association with that project</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_session_type. Also return site information of the returned projects.</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of devices-types - projects association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-sessiontypes-sites">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/sites</span></span><a class="headerlink" href="#delete--user-sessiontypes-sites" title="Link to this definition"></a></dt>
@@ -1999,6 +1999,31 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sessiontypes-sites">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/sites</span></span><a class="headerlink" href="#get--user-sessiontypes-sites" title="Link to this definition"></a></dt>
+<dd><p>Get session types that are related to a site. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session_type</strong> (<em>integer</em>) – ID of the session type from which to request all associated sites</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated session types</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Used with id_session_type. Also return session types that don’t have any association with that site</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types - sites association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for sites</p></li>
 </ul>
 </dd>
 </dl>
@@ -2032,31 +2057,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sessiontypes-sites">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sessiontypes/sites</span></span><a class="headerlink" href="#get--user-sessiontypes-sites" title="Link to this definition"></a></dt>
-<dd><p>Get session types that are related to a site. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session_type</strong> (<em>integer</em>) – ID of the session type from which to request all associated sites</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated session types</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_session_type</strong> (<em>boolean</em>) – Used with id_session_type. Also return session types that don’t have any association with that site</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_service. Also return site information of the returned projects.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types - sites association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occurred when loading devices for sites</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-siteaccess">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/siteaccess</span></span><a class="headerlink" href="#delete--user-siteaccess" title="Link to this definition"></a></dt>
@@ -2073,32 +2073,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site access(only user who is admin in that site can remove it)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http post">
-<dt class="sig sig-object http" id="post--user-siteaccess">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/siteaccess</span></span><a class="headerlink" href="#post--user-siteaccess" title="Link to this definition"></a></dt>
-<dd><p>Create/update site access for a user group.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>site_access</strong> (<em>any</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_user or id_site) in the JSON body</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t modify this site or user access (site admin access required)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2131,6 +2105,32 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http post">
+<dt class="sig sig-object http" id="post--user-siteaccess">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/siteaccess</span></span><a class="headerlink" href="#post--user-siteaccess" title="Link to this definition"></a></dt>
+<dd><p>Create/update site access for a user group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>site_access</strong> (<em>any</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields(id_user or id_site) in the JSON body</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t modify this site or user access (site admin access required)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-sites">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/sites</span></span><a class="headerlink" href="#delete--user-sites" title="Link to this definition"></a></dt>
@@ -2147,6 +2147,30 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete site (only super admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-sites">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sites</span></span><a class="headerlink" href="#get--user-sites" title="Link to this definition"></a></dt>
+<dd><p>Get site information. Only one of the ID parameter is supported and required at once</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query</p></li>
+<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_site”</p></li>
+<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all related sites</p></li>
+<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID from which to get all sites that are accessible</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Site name to query</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of sites</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2174,30 +2198,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing field(id_site) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified site</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving site</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-sites">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/sites</span></span><a class="headerlink" href="#get--user-sites" title="Link to this definition"></a></dt>
-<dd><p>Get site information. Only one of the ID parameter is supported and required at once</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query</p></li>
-<li><p><strong>id</strong> (<em>integer</em>) – Alias for “id_site”</p></li>
-<li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all related sites</p></li>
-<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID from which to get all sites that are accessible</p></li>
-<li><p><strong>name</strong> (<em>string</em>) – Site name to query</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of sites</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2254,24 +2254,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http post">
-<dt class="sig sig-object http" id="post--user-tests">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/tests</span></span><a class="headerlink" href="#post--user-tests" title="Link to this definition"></a></dt>
-<dd><p>Delete test.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to update test from here - use service!</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-tests">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/tests</span></span><a class="headerlink" href="#get--user-tests" title="Link to this definition"></a></dt>
@@ -2301,6 +2283,24 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http post">
+<dt class="sig sig-object http" id="post--user-tests">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/tests</span></span><a class="headerlink" href="#post--user-tests" title="Link to this definition"></a></dt>
+<dd><p>Delete test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Unable to update test from here - use service!</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-testtypes">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes</span></span><a class="headerlink" href="#delete--user-testtypes" title="Link to this definition"></a></dt>
@@ -2317,6 +2317,32 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete test type (no admin access to project related to that type or tests of that type exists in the system somewhere)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-testtypes">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes</span></span><a class="headerlink" href="#get--user-testtypes" title="Link to this definition"></a></dt>
+<dd><p>Get test type information. If no id_test_type specified, returns all available test types</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type to query</p></li>
+<li><p><strong>test_type_key</strong> (<em>string</em>) – Key of the test type to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get test types for</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get test types for</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>with_urls</strong> (<em>boolean</em>) – Also include test types urls</p></li>
+<li><p><strong>with_only_token</strong> (<em>boolean</em>) – Only includes the access token. Will ignore with_urls if specified.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test types</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2356,32 +2382,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-testtypes">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes</span></span><a class="headerlink" href="#get--user-testtypes" title="Link to this definition"></a></dt>
-<dd><p>Get test type information. If no id_test_type specified, returns all available test types</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type to query</p></li>
-<li><p><strong>test_type_key</strong> (<em>string</em>) – Key of the test type to query</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get test types for</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get test types for</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>with_urls</strong> (<em>boolean</em>) – Also include test types urls</p></li>
-<li><p><strong>with_only_token</strong> (<em>boolean</em>) – Only includes the access token. Will ignore with_urls if specified.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test types</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-testtypes-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/projects</span></span><a class="headerlink" href="#delete--user-testtypes-projects" title="Link to this definition"></a></dt>
@@ -2398,6 +2398,32 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no access to test-type or project)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-testtypes-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/projects</span></span><a class="headerlink" href="#get--user-testtypes-projects" title="Link to this definition"></a></dt>
+<dd><p>Get test types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated test types from</p></li>
+<li><p><strong>id_test_type</strong> (<em>integer</em>) – Test type ID to query associated projects from</p></li>
+<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_test_type. Also return projects that don’t have any association with that type</p></li>
+<li><p><strong>with_test_types</strong> (<em>boolean</em>) – Used with id_project. Also return types that don’t have any association with that project</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_test_type. Also return site information of the returned projects.</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test-types - projects association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -2431,32 +2457,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-testtypes-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/projects</span></span><a class="headerlink" href="#get--user-testtypes-projects" title="Link to this definition"></a></dt>
-<dd><p>Get test types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated test types from</p></li>
-<li><p><strong>id_test_type</strong> (<em>integer</em>) – Test type ID to query associated projects from</p></li>
-<li><p><strong>with_projects</strong> (<em>boolean</em>) – Used with id_test_type. Also return projects that don’t have any association with that type</p></li>
-<li><p><strong>with_test_types</strong> (<em>boolean</em>) – Used with id_project. Also return types that don’t have any association with that project</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_test_type. Also return site information of the returned projects.</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test-types - projects association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-testtypes-sites">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/sites</span></span><a class="headerlink" href="#delete--user-testtypes-sites" title="Link to this definition"></a></dt>
@@ -2473,6 +2473,31 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (no admin access to site)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Session type - site association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-testtypes-sites">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/sites</span></span><a class="headerlink" href="#get--user-testtypes-sites" title="Link to this definition"></a></dt>
+<dd><p>Get session types that are related to a site. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type from which to request all associated sites</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated test types</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
+<li><p><strong>with_test_types</strong> (<em>boolean</em>) – Used with id_test_type. Also return test types that don’t have any association with that site</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_site. Also return site information of the returned test types.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types - sites association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occured when loading devices for sites</p></li>
 </ul>
 </dd>
 </dl>
@@ -2506,31 +2531,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-testtypes-sites">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/testtypes/sites</span></span><a class="headerlink" href="#get--user-testtypes-sites" title="Link to this definition"></a></dt>
-<dd><p>Get session types that are related to a site. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type from which to request all associated sites</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site from which to get all associated test types</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ids only)</p></li>
-<li><p><strong>with_test_types</strong> (<em>boolean</em>) – Used with id_test_type. Also return test types that don’t have any association with that site</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_site. Also return site information of the returned test types.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of session types - sites association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error occured when loading devices for sites</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-usergroups">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/usergroups</span></span><a class="headerlink" href="#delete--user-usergroups" title="Link to this definition"></a></dt>
@@ -2547,6 +2547,29 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user group (only a site admin that includes that user group in their site can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-usergroups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/usergroups</span></span><a class="headerlink" href="#get--user-usergroups" title="Link to this definition"></a></dt>
+<dd><p>Get user group information. If no id specified, returns all accessible users groups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to get all user groups</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get all user groups with access in that site</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2579,29 +2602,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-usergroups">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/usergroups</span></span><a class="headerlink" href="#get--user-usergroups" title="Link to this definition"></a></dt>
-<dd><p>Get user group information. If no id specified, returns all accessible users groups</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to get all user groups</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to get all user groups with access in that site</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--user-users">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/user/users</span></span><a class="headerlink" href="#delete--user-users" title="Link to this definition"></a></dt>
@@ -2618,6 +2618,37 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete user (only super admin can delete)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-users">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users</span></span><a class="headerlink" href="#get--user-users" title="Link to this definition"></a></dt>
+<dd><p>Get user information. If no id specified, returns all accessible users</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – ID of the user to query</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to query</p></li>
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to get all users from</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get all users that has access to it</p></li>
+<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID to query</p></li>
+<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “user_uuid”</p></li>
+<li><p><strong>username</strong> (<em>string</em>) – Username of the user to query</p></li>
+<li><p><strong>self</strong> (<em>boolean</em>) – Query information about the currently logged user</p></li>
+<li><p><strong>enabled</strong> (<em>boolean</em>) – Only returns users with the specified enabled status</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ID, name, enabled)</p></li>
+<li><p><strong>with_usergroups</strong> (<em>boolean</em>) – Include usergroups information for each user.</p></li>
+<li><p><strong>with_status</strong> (<em>boolean</em>) – Include status information - offline, online, busy for each user</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2656,37 +2687,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified user</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.10">409 Conflict</a></span> – Username is already taken</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving user</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-users">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users</span></span><a class="headerlink" href="#get--user-users" title="Link to this definition"></a></dt>
-<dd><p>Get user information. If no id specified, returns all accessible users</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<em>integer</em>) – ID of the user to query</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to query</p></li>
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to get all users from</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to get all users that has access to it</p></li>
-<li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID to query</p></li>
-<li><p><strong>uuid</strong> (<em>string</em>) – Alias for “user_uuid”</p></li>
-<li><p><strong>username</strong> (<em>string</em>) – Username of the user to query</p></li>
-<li><p><strong>self</strong> (<em>boolean</em>) – Query information about the currently logged user</p></li>
-<li><p><strong>enabled</strong> (<em>boolean</em>) – Only returns users with the specified enabled status</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information (ID, name, enabled)</p></li>
-<li><p><strong>with_usergroups</strong> (<em>boolean</em>) – Include usergroups information for each user.</p></li>
-<li><p><strong>with_status</strong> (<em>boolean</em>) – Include status information - offline, online, busy for each user</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -2783,6 +2783,29 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-users-usergroups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#get--user-users-usergroups" title="Link to this definition"></a></dt>
+<dd><p>Get user - user group information. At least one “id” field must be specified</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
+<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to get all user groups</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
+<li><p><strong>with_empty</strong> (<em>boolean</em>) – Used with id_user, also returns users groups that the user is not part of. Used with id_user_group, also returns users not part of that user group.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--user-users-usergroups">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#post--user-users-usergroups" title="Link to this definition"></a></dt>
@@ -2806,29 +2829,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing field(id_user_group) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t create/update the specified user group</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving user group</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--user-users-usergroups">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/users/usergroups</span></span><a class="headerlink" href="#get--user-users-usergroups" title="Link to this definition"></a></dt>
-<dd><p>Get user - user group information. At least one “id” field must be specified</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
-<li><p><strong>id_user</strong> (<em>integer</em>) – ID of the user to get all user groups</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – Flag that limits the returned data to minimal information</p></li>
-<li><p><strong>with_empty</strong> (<em>boolean</em>) – Used with id_user, also returns users groups that the user is not part of. Used with id_user_group, also returns users not part of that user group.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -3041,6 +3041,26 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--device-sessions">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#get--device-sessions" title="Link to this definition"></a></dt>
+<dd><p>Get session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session</strong> (<em>integer</em>) – Session ID</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – List all sessions</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden for security reasons.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--device-sessions">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#post--device-sessions" title="Link to this definition"></a></dt>
@@ -3073,26 +3093,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--device-sessions">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/sessions</span></span><a class="headerlink" href="#get--device-sessions" title="Link to this definition"></a></dt>
-<dd><p>Get session</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session</strong> (<em>integer</em>) – Session ID</p></li>
-<li><p><strong>list</strong> (<em>boolean</em>) – List all sessions</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden for security reasons.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--device-sessions-events">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/device/sessions/events</span></span><a class="headerlink" href="#delete--device-sessions-events" title="Link to this definition"></a></dt>
@@ -3100,6 +3100,25 @@ versions</p>
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--device-sessions-events">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/sessions/events</span></span><a class="headerlink" href="#get--device-sessions-events" title="Link to this definition"></a></dt>
+<dd><p>Get session events</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_session</strong> (<em>integer</em>) – Session ID</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden for security reasons.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3122,25 +3141,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged device doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal server error</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--device-sessions-events">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/sessions/events</span></span><a class="headerlink" href="#get--device-sessions-events" title="Link to this definition"></a></dt>
-<dd><p>Get session events</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_session</strong> (<em>integer</em>) – Session ID</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Forbidden for security reasons.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3433,27 +3433,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http post">
-<dt class="sig sig-object http" id="post--service-assets">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#post--service-assets" title="Link to this definition"></a></dt>
-<dd><p>Adds a new asset to the OpenTera database</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - asset correctly added</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad request - wrong or missing parameters in query</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to post that asset</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-assets">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#get--service-assets" title="Link to this definition"></a></dt>
@@ -3482,6 +3461,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--service-assets">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/assets</span></span><a class="headerlink" href="#post--service-assets" title="Link to this definition"></a></dt>
+<dd><p>Adds a new asset to the OpenTera database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - asset correctly added</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad request - wrong or missing parameters in query</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to post that asset</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
 </ul>
 </dd>
 </dl>
@@ -3649,6 +3649,29 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#get--service-projects" title="Link to this definition"></a></dt>
+<dd><p>Return projects information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query projects for</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--service-projects">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#post--service-projects" title="Link to this definition"></a></dt>
@@ -3679,29 +3702,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/projects</span></span><a class="headerlink" href="#get--service-projects" title="Link to this definition"></a></dt>
-<dd><p>Return projects information.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query</p></li>
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query projects for</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--service-roles">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/roles</span></span><a class="headerlink" href="#delete--service-roles" title="Link to this definition"></a></dt>
@@ -3718,6 +3718,25 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete role (not related to that service)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-roles">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/roles</span></span><a class="headerlink" href="#get--service-roles" title="Link to this definition"></a></dt>
+<dd><p>Get service roles for that service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of roles</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -3752,25 +3771,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-roles">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/roles</span></span><a class="headerlink" href="#get--service-roles" title="Link to this definition"></a></dt>
-<dd><p>Get service roles for that service</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of roles</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--service-serviceaccess">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/serviceaccess</span></span><a class="headerlink" href="#delete--service-serviceaccess" title="Link to this definition"></a></dt>
@@ -3787,6 +3787,27 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user can’t delete association (not related to this service)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Association not found or database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-serviceaccess">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/serviceaccess</span></span><a class="headerlink" href="#get--service-serviceaccess" title="Link to this definition"></a></dt>
+<dd><p>Get access roles for a specific items. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – Usergroup ID to query service access</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of access roles</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -3817,27 +3838,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing fields in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t modify association (only self access can be modified)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error occurred when saving association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-serviceaccess">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/serviceaccess</span></span><a class="headerlink" href="#get--service-serviceaccess" title="Link to this definition"></a></dt>
-<dd><p>Get access roles for a specific items. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – Usergroup ID to query service access</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of access roles</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -4101,27 +4101,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http post">
-<dt class="sig sig-object http" id="post--service-tests">
-<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#post--service-tests" title="Link to this definition"></a></dt>
-<dd><p>Adds a new test to the OpenTera database</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - test correctly added</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad request - wrong or missing parameters in query</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to post that test</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-tests">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#get--service-tests" title="Link to this definition"></a></dt>
@@ -4151,6 +4130,27 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http post">
+<dt class="sig sig-object http" id="post--service-tests">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/tests</span></span><a class="headerlink" href="#post--service-tests" title="Link to this definition"></a></dt>
+<dd><p>Adds a new test to the OpenTera database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - test correctly added</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Bad request - wrong or missing parameters in query</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to post that test</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--service-testtypes">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes</span></span><a class="headerlink" href="#delete--service-testtypes" title="Link to this definition"></a></dt>
@@ -4167,6 +4167,32 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete test type</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-testtypes">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes</span></span><a class="headerlink" href="#get--service-testtypes" title="Link to this definition"></a></dt>
+<dd><p>Return test types information for the current service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query test types for</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query test types for</p></li>
+<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant to query types for</p></li>
+<li><p><strong>test_type_key</strong> (<em>string</em>) – Test type key to query for</p></li>
+<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type to query for</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
 </ul>
 </dd>
 </dl>
@@ -4206,32 +4232,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-testtypes">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes</span></span><a class="headerlink" href="#get--service-testtypes" title="Link to this definition"></a></dt>
-<dd><p>Return test types information for the current service</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query test types for</p></li>
-<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query test types for</p></li>
-<li><p><strong>id_participant</strong> (<em>integer</em>) – ID of the participant to query types for</p></li>
-<li><p><strong>test_type_key</strong> (<em>string</em>) – Test type key to query for</p></li>
-<li><p><strong>id_test_type</strong> (<em>integer</em>) – ID of the test type to query for</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--service-testtypes-projects">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes/projects</span></span><a class="headerlink" href="#delete--service-testtypes-projects" title="Link to this definition"></a></dt>
@@ -4248,6 +4248,29 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Association not found (invalid id?)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t delete association (no access to test-type or project)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-testtypes-projects">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes/projects</span></span><a class="headerlink" href="#get--service-testtypes-projects" title="Link to this definition"></a></dt>
+<dd><p>Get test types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated test types from</p></li>
+<li><p><strong>id_test_type</strong> (<em>integer</em>) – Test type ID to query associated projects from</p></li>
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_test_type. Also return site information of the returned projects.</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test-types - projects association</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
 </ul>
 </dd>
 </dl>
@@ -4281,29 +4304,6 @@ versions</p>
 </dl>
 </dd></dl>
 
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-testtypes-projects">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/testtypes/projects</span></span><a class="headerlink" href="#get--service-testtypes-projects" title="Link to this definition"></a></dt>
-<dd><p>Get test types that are associated with a project. Only one “ID” parameter required and supported at once.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query associated test types from</p></li>
-<li><p><strong>id_test_type</strong> (<em>integer</em>) – Test type ID to query associated projects from</p></li>
-<li><p><strong>with_sites</strong> (<em>boolean</em>) – Used with id_test_type. Also return site information of the returned projects.</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of test-types - projects association</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing (must have at least one id)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Error when getting association</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="http delete">
 <dt class="sig sig-object http" id="delete--service-usergroups">
 <span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/usergroups</span></span><a class="headerlink" href="#delete--service-usergroups" title="Link to this definition"></a></dt>
@@ -4320,6 +4320,26 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service can’t delete user group (no access to it)</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-usergroups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/usergroups</span></span><a class="headerlink" href="#get--service-usergroups" title="Link to this definition"></a></dt>
+<dd><p>Get user group information. If no id specified, returns all accessible users groups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
@@ -4347,26 +4367,6 @@ versions</p>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Badly formed JSON or missing field(id_user_group) in the JSON body</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged service can’t create/update the specified user group</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal error when saving user group</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="http get">
-<dt class="sig sig-object http" id="get--service-usergroups">
-<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/usergroups</span></span><a class="headerlink" href="#get--service-usergroups" title="Link to this definition"></a></dt>
-<dd><p>Get user group information. If no id specified, returns all accessible users groups</p>
-<dl class="field-list simple">
-<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
-<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
-</ul>
-</dd>
-<dt class="field-even">Status Codes<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error</p></li>
 </ul>
 </dd>
 </dl>
