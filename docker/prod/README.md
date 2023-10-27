@@ -42,6 +42,8 @@ From your base directory create a directory named `db` and a file named [init.sq
 
 From your base directory create a directory named `nginx` and two files named [nginx.conf](nginx/nginx.conf) and [opentera.conf](nginx/opentera.conf). The files are specifically configured to work with Docker.
 
+> NOTE: You might have to copy manually certificates to the `certificates` shared volume.
+
 #### Step 45: Create OpenTera Server Configuration Files
 
 From your base directory create a directory named `teraserver` and five files named [Dockerfile](teraserver/Dockerfile), [FileTransferService.json](teraserver/FileTransferService.json), [LoggingService.json](teraserver/LoggingService.json), [TeraServerConfig.ini](teraserver/TeraServerConfig.ini) and  [VideoRehabService.json](teraserver/VideoRehabService.json).

@@ -36,9 +36,9 @@ services:
       - ./nginx/opentera.conf:/etc/nginx/opentera.conf
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       # All your SSL certificates will need to be in the certificates volume.
-      - ./certificates/site_cert.pem:/etc/certificates/site_cert.pem
-      - ./certificates/site_key.pem:/etc/certificates/site_key.pem
-      - ./certificates/ca_cert.pem:/etc/certificates/ca_cert.pem
+      # - ./certificates/site_cert.pem:/etc/certificates/site_cert.pem
+      # - ./certificates/site_key.pem:/etc/certificates/site_key.pem
+      # - ./certificates/ca_cert.pem:/etc/certificates/ca_cert.pem
       - certificates:/etc/certificates
       - nginx-logs:/etc/nginx/logs
     ports:
