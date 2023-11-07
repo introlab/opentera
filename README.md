@@ -1,6 +1,8 @@
 # About OpenTera
 
 [![Actions Status](https://github.com/introlab/opentera/actions/workflows/python-package-pypi.yml/badge.svg)](https://github.com/introlab/opentera/actions)
+[![DOI](https://zenodo.org/badge/168543624.svg)](https://zenodo.org/doi/10.5281/zenodo.10078846)
+
 
 OpenTera is a micro-services based backend primarily built to support research projects. Focusing on years in the research field, common features between the different projects emerged:
 
