@@ -1,20 +1,20 @@
 pypiwin32==223; sys_platform == 'win32'
-Twisted==23.8.0
-treq==22.2.0
-cryptography==41.0.4
+Twisted==23.10.0
+treq==23.11.0
+cryptography==41.0.7
 autobahn==23.6.2
-SQLAlchemy==2.0.21
+SQLAlchemy==2.0.23
 sqlalchemy-schemadisplay==1.3
 pydot==1.4.2
 psycopg2-binary==2.9.9
 Flask==2.3.3
 Flask-SQLAlchemy==3.1.1
-Flask-Login==0.6.2
+Flask-Login==0.6.3
 Flask-Login-Multi==0.1.2
 Flask-HTTPAuth==4.8.0
 Flask-SocketIO==5.3.6
 Flask-Session==0.5.0
-flask-restx==1.1.0
+flask-restx==1.2.0
 Flask-Security==3.0.0
 Flask-Babel==4.0.0
 Flask-BabelEx==0.9.4
@@ -26,18 +26,19 @@ Flask-Principal==0.4.0
 redis==5.0.1
 txredisapi==1.4.10
 passlib==1.7.4
-bcrypt==4.0.1
-WTForms==3.0.1
-pyOpenSSL==23.2.0
+bcrypt==4.1.1
+WTForms==3.1.1
+pyOpenSSL==23.3.0
 service-identity==23.1.0
 PyJWT==2.8.0
 pylzma==0.5.0
 bz2file==0.98
 python-slugify==8.0.1
-websocket-client==1.6.3
-pytest==7.4.2
-jsonschema==4.19.1
+websocket-client==1.7.0
+pytest==7.4.3
+# Hold jsonschema until flask-restx gets updated
+jsonschema==4.17.3
 Jinja2==3.1.2
 ua-parser==0.18.0
-#Remove this when Flask-Login is updated with latest Werkseug 3.x.x
-Werkzeug==2.3.7
+#Remove this when Flask-Login / flask-restx is updated with latest Werkseug 3.x.x
+Werkzeug==2.3.8
