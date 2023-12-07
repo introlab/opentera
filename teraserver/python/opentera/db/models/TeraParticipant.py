@@ -1,7 +1,7 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, lazyload
 from sqlalchemy.exc import IntegrityError
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraServerSettings import TeraServerSettings
@@ -161,19 +161,29 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return self.participant_uuid
 
     def get_first_session(self):
-        sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
-        if sessions:
-            return sessions[0]
+        session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant)
+                   .order_by(TeraSessionParticipants.id_session.asc()).limit(1).first())
+        if session:
+            # Turn off lazy loading for session
+            return TeraSession.query.filter_by(id_session=session.id_session).options(lazyload("*")).first()
+        # sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
+        # if sessions:
+        #     return sessions[0]
         return None
 
     def get_last_session(self):
-        from opentera.db.models.TeraSession import TeraSessionStatus
-        sessions = [session for session in self.participant_sessions
-                    if session.session_status == TeraSessionStatus.STATUS_COMPLETED.value or
-                    session.session_status == TeraSessionStatus.STATUS_TERMINATED.value]
-        sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
-        if sessions:
-            return sessions[-1]
+        # from opentera.db.models.TeraSession import TeraSessionStatus
+        # sessions = [session for session in self.participant_sessions
+        #             if session.session_status == TeraSessionStatus.STATUS_COMPLETED.value or
+        #             session.session_status == TeraSessionStatus.STATUS_TERMINATED.value]
+        # sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
+        # if sessions:
+        #     return sessions[-1]
+        session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant)
+                   .order_by(TeraSessionParticipants.id_session.desc()).limit(1).first())
+        if session:
+            # Turn off lazy loading for session
+            return TeraSession.query.filter_by(id_session=session.id_session).options(lazyload("*")).first()
         return None
 
     @staticmethod
