@@ -578,7 +578,7 @@ class BaseWebRTCService(ServiceOpenTera):
             api_req = {'session': {'id_session': id_session,  # New session
                                    'session_participants_uuids': session_info['session_participants'],
                                    'session_users_uuids': session_info['session_users'],
-                                   'sessiom_devices_uuids': session_info['session_devices'],
+                                   'session_devices_uuids': session_info['session_devices'],
                                    }
                        }
             api_response = self.post_to_opentera('/api/service/sessions', api_req)
