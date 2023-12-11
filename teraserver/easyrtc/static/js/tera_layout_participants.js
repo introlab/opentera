@@ -98,7 +98,7 @@ function updateUserLocalViewLayout(){
     let remote_num = usedRemoteVideosIndexes.length;
     let usedLocalVideosIndexes = getVideoStreamsIndexes(localStreams);
     let local_num = usedLocalVideosIndexes.length;
-    //console.log(usedLocalVideosIndexes);
+
 
     if (currentLargeViewId.startsWith('local') && local_num === 1){
         setColWidth(largeView, 10);
@@ -112,6 +112,7 @@ function updateUserLocalViewLayout(){
     }
 
     switch(local_num){
+        case 0:
         case 1:
             selfViewRow2.hide();
             break;

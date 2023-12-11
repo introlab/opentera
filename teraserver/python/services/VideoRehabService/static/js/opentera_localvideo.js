@@ -1,6 +1,7 @@
 let videoSources = [];
 let currentVideoSourceIndex = 0;
 let timerHandle = 0;
+let currentVideoStream = undefined;
 
 let currentConfig = {'currentVideoName': undefined};
 
@@ -59,6 +60,7 @@ function handleVideo(stream) {
 
 	//console.log("Success! Device Name: " + stream.getVideoTracks()[0].label);
 	video.srcObject = stream;
+	currentVideoStream = stream;
 }
 
 function videoError(err) {
@@ -106,6 +108,12 @@ function fillVideoSourceList(selected_source=undefined){
 function updateVideoSource(){
 	let select = document.getElementById('videoSelect');
 	if (select.selectedIndex>=0){
+
+	    // Stop other camera tracks, otherwise, won't work on some devices
+	    if (currentVideoStream){
+            currentVideoStream.getVideoTracks()[0].stop();
+            currentVideoStream = undefined;
+        }
 		currentVideoSourceIndex = select.selectedIndex;
 		currentConfig.currentVideoName = videoSources[currentVideoSourceIndex].label;
 		if (typeof(localPTZCapabilities) !== 'undefined'){
