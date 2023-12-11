@@ -27,3 +27,41 @@ class UserQueryOnlineParticipantsTest(BaseUserAPITest):
         for participant_info in response.json:
             self.assertTrue('participant_online' in participant_info)
             self.assertTrue('participant_busy' in participant_info)
+
+    def test_with_projects(self):
+        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                 params={'with_projects': True})
+        self.assertEqual(response.status_code, 200)
+
+        # Check for important status fields
+        for participant_info in response.json:
+            self.assertTrue('participant_online' in participant_info)
+            self.assertTrue('participant_busy' in participant_info)
+            self.assertTrue('id_project' in participant_info)
+            self.assertTrue('project_name' in participant_info)
+
+    def test_with_sites(self):
+        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                 params={'with_sites': True})
+        self.assertEqual(response.status_code, 200)
+
+        # Check for important status fields
+        for participant_info in response.json:
+            self.assertTrue('participant_online' in participant_info)
+            self.assertTrue('participant_busy' in participant_info)
+            self.assertTrue('id_site' in participant_info)
+            self.assertTrue('site_name' in participant_info)
+
+    def test_with_projects_and_sites(self):
+        response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                 params={'with_projects': True, 'with_sites': True})
+        self.assertEqual(response.status_code, 200)
+
+        # Check for important status fields
+        for participant_info in response.json:
+            self.assertTrue('participant_online' in participant_info)
+            self.assertTrue('participant_busy' in participant_info)
+            self.assertTrue('id_project' in participant_info)
+            self.assertTrue('project_name' in participant_info)
+            self.assertTrue('id_site' in participant_info)
+            self.assertTrue('site_name' in participant_info)

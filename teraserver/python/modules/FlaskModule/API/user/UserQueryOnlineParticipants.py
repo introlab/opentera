@@ -1,5 +1,5 @@
 from flask import session
-from flask_restx import Resource
+from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -11,6 +11,8 @@ from opentera.modules.BaseModule import ModuleNames
 from modules.DatabaseModule.DBManager import DBManager
 
 get_parser = api.parser()
+get_parser.add_argument('with_sites', type=inputs.boolean, help='Include site informations for each participant.')
+get_parser.add_argument('with_projects', type=inputs.boolean, help='Include project informations for each participant.')
 
 
 class UserQueryOnlineParticipants(Resource):
@@ -45,10 +47,18 @@ class UserQueryOnlineParticipants(Resource):
             participants = TeraParticipant.query.filter(TeraParticipant.participant_uuid.in_(
                 filtered_participants_uuids)).order_by(TeraParticipant.participant_name.asc()).all()
 
-            participants_json = [participant.to_json(minimal=True) for participant in participants]
-            for participant in participants_json:
-                participant['participant_online'] = status_participants[participant['participant_uuid']]['online']
-                participant['participant_busy'] = status_participants[participant['participant_uuid']]['busy']
+            participants_json = []
+            for participant in participants:
+                part_json = participant.to_json(minimal=True)
+                if args['with_projects']:
+                    part_json['id_project'] = participant.id_project
+                    part_json['project_name'] = participant.participant_project.project_name
+                if args['with_sites']:
+                    part_json['id_site'] = participant.participant_project.id_site
+                    part_json['site_name'] = participant.participant_project.project_site.site_name
+                part_json['participant_online'] = status_participants[part_json['participant_uuid']]['online']
+                part_json['participant_busy'] = status_participants[part_json['participant_uuid']]['busy']
+                participants_json.append(part_json)
 
             return participants_json
 
