@@ -125,8 +125,6 @@ class ServiceLauncherModule(BaseModule):
         elif service.service_key == 'FileTransferService':
             path = os.path.join(os.getcwd(), 'services', 'FileTransferService', 'FileTransferService.py')
             executable_args.append(path)
-            if self.enable_tests:
-                executable_args.append('--enable_tests=1')
             working_directory = os.path.join(os.getcwd(), 'services', 'FileTransferService')
         # elif service.service_key == 'BureauActif':
         #     path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')
@@ -140,6 +138,10 @@ class ServiceLauncherModule(BaseModule):
             print('Unable to start :', service.service_key)
             self.logger.log_error(self.module_name, 'Unable to start', service.service_key)
             return
+
+        # Append test mode argument to all launched services
+        if self.enable_tests:
+            executable_args.append('--enable_tests=1')
 
         # Start process
         process = subprocess.Popen(executable_args, cwd=os.path.realpath(working_directory))

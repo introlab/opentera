@@ -78,6 +78,7 @@ class DBManager (BaseModule):
         self.db = SQLAlchemy(engine_options={'future': True}, session_options={'future': True})
         self.db_uri = None
         self.app = app
+        self.db_in_ram = False
 
         # Database cleanup task set to run at next midnight
         self.cleanup_database_task = self.start_cleanup_task()
@@ -319,6 +320,7 @@ class DBManager (BaseModule):
         # IN RAM
         if ram:
             self.db_uri = 'sqlite://'
+            self.db_in_ram = True
         else:
             self.db_uri = 'sqlite:///%(filename)s' % db_infos
 
@@ -399,6 +401,18 @@ class DBManager (BaseModule):
 
         # Stamp database
         command.stamp(config, revision, sql, tag)
+
+    def reset_db(self):
+        if not self.db_in_ram:
+            return  # Safety: only possible to reset a db if database is in RAM!
+        BaseModel.metadata.drop_all(self.db.engine.connect())
+        BaseModel.create_all()
+        self.create_defaults(self.config, True)
+
+        # Set versions
+        from opentera.utils.TeraVersions import TeraVersions
+        versions = TeraVersions()
+        versions.save_to_db()
 
     def cleanup_database(self):
         print("Cleaning up database...")

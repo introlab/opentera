@@ -73,16 +73,18 @@ user_api_ns = api.namespace('user', description='API for user calls')
 device_api_ns = api.namespace('device', description='API for device calls')
 participant_api_ns = api.namespace('participant', description='API for participant calls')
 service_api_ns = api.namespace('service', description='API for service calls')
+test_api_ns = api.namespace('test', description='API for tests')
 
 
 class FlaskModule(BaseModule):
 
-    def __init__(self,  config: ConfigManager):
+    def __init__(self,  config: ConfigManager, test_mode=False):
 
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
         # Use debug mode flag
         flask_app.debug = config.server_config['debug_mode']
+        self.test_mode = test_mode
 
         # Change secret key to use server UUID
         # This is used for session encryption
@@ -110,6 +112,8 @@ class FlaskModule(BaseModule):
         FlaskModule.init_device_api(self, device_api_ns)
         FlaskModule.init_participant_api(self, participant_api_ns)
         FlaskModule.init_service_api(self, service_api_ns)
+        if self.test_mode:
+            FlaskModule.init_test_api(self, test_api_ns)
 
         # Init Views
         self.init_views()
@@ -328,6 +332,15 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
+
+    @staticmethod
+    def init_test_api(module: object, namespace: Namespace, additional_args: dict = dict()):
+        # Default arguments
+        kwargs = {'flaskModule': module}
+        kwargs |= additional_args
+
+        from modules.FlaskModule.API.test.TestDBReset import TestDBReset
+        namespace.add_resource(TestDBReset, '/database/reset', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from modules.FlaskModule.Views.About import About

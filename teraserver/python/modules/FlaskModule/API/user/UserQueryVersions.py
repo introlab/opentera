@@ -36,8 +36,11 @@ class UserQueryVersions(Resource):
         # As soon as we are authorized, we can output the server versions
         args = get_parser.parse_args()
 
-        current_settings = json.loads(TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
-        return current_settings
+        current_settings = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions)
+        if not current_settings:
+            return gettext('No version information found'), 500
+
+        return json.loads(current_settings)
 
     @api.doc(description='Post server versions',
              responses={200: 'Success - asset posted',

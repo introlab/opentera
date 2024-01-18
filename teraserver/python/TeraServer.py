@@ -168,7 +168,7 @@ if __name__ == '__main__':
         init_opentera_service(config=config_man)
 
         # Main Flask module
-        flask_module = FlaskModule(config_man)
+        flask_module = FlaskModule(config_man, test_mode=args.enable_tests)
 
         # LOGIN MANAGER, must be initialized after Flask
         #################################################
