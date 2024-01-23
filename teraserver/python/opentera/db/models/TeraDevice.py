@@ -215,7 +215,8 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
     @classmethod
     def insert(cls, device):
         # Generate UUID
-        device.device_uuid = str(uuid.uuid4())
+        if not device.device_uuid:
+            device.device_uuid = str(uuid.uuid4())
 
         # Clear last online field
         device.device_lastonline = None
