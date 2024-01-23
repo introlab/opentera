@@ -5,9 +5,6 @@ Revises: f41b70d6513e
 Create Date: 2024-01-23 08:15:07.224075
 
 """
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy import orm
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 
 
