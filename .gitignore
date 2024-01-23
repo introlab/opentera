@@ -80,3 +80,5 @@ joss-paper/paper.pdf
 python-3.11
 build-teraserver-Desktop_Qt_6_6_1_MSVC2019_64bit-Debug
 python-3.10
+/teraserver/python/config/certificates
+/teraserver/python/tests/*.pem

@@ -18,6 +18,7 @@ class TeraServerSettings(BaseModel):
     ServerParticipantTokenKey = "ParticipantTokenEncryptionKey"
     ServerUUID = "ServerUUID"
     ServerVersions = "ServerVersions"
+    ServerDeviceRegisterKey = "DeviceRegisterKey"
 
     @staticmethod
     def create_defaults(test=False):
@@ -28,6 +29,9 @@ class TeraServerSettings(BaseModel):
 
         TeraServerSettings.set_server_setting(TeraServerSettings.ServerParticipantTokenKey,
                                               TeraServerSettings.generate_token_key(32))
+
+        TeraServerSettings.set_server_setting(TeraServerSettings.ServerDeviceRegisterKey,
+                                              TeraServerSettings.generate_token_key(10))
 
         # Unique server id
         server_uuid = str(uuid.uuid4())
@@ -49,8 +53,7 @@ class TeraServerSettings(BaseModel):
 
     @staticmethod
     def get_server_setting(setting_name: string):
-        return TeraServerSettings.query.filter_by(
-            server_settings_name=setting_name).first()
+        return TeraServerSettings.query.filter_by(server_settings_name=setting_name).first()
 
     @staticmethod
     def set_server_setting(setting_name: string, setting_value: string):
