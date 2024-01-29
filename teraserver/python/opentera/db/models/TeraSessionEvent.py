@@ -42,7 +42,6 @@ class TeraSessionEvent(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sessions_events'
     id_session_event = Column(Integer, Sequence('id_session_events_sequence'), primary_key=True, autoincrement=True)
     id_session = Column(Integer, ForeignKey('t_sessions.id_session', ondelete='cascade'), nullable=False)
-    # TODO: Typo that should be fixed someday...
     id_session_event_type = Column(Integer, nullable=False)
     session_event_datetime = Column(TIMESTAMP(timezone=True), nullable=False)
     session_event_text = Column(String, nullable=True)

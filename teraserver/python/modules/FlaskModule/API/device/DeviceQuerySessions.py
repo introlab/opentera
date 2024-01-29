@@ -84,7 +84,7 @@ class DeviceQuerySessions(Resource):
         # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
-            return gettext('Missing arguments'), 400
+            return gettext('Missing session'), 400
 
         json_session = request.json['session']
 
@@ -92,16 +92,16 @@ class DeviceQuerySessions(Resource):
 
         # Validate if we have an id
         if 'id_session' not in json_session:
-            return gettext('Missing arguments'), 400
+            return gettext('Missing id_session value'), 400
 
         # Validate if we have an id
         if 'id_session_type' not in json_session:
-            return gettext('Missing arguments'), 400
+            return gettext('Missing id_session_type value'), 400
 
         # Validate that we have session participants or users for new sessions
         if ('session_participants' not in json_session and 'session_users' not in json_session) \
-                and json_session['id_session'] == 0:
-            return gettext('Missing arguments'), 400
+                and 'session_devices' not in json_session and json_session['id_session'] == 0:
+            return gettext('Missing session participants and/or users and/or devices'), 400
 
         # We know we have a device
         # Avoid identity thief
@@ -111,7 +111,7 @@ class DeviceQuerySessions(Resource):
         session_types = device_access.get_accessible_session_types_ids()
 
         if not json_session['id_session_type'] in session_types:
-            return gettext('Unauthorized'), 403
+            return gettext('No access to session type'), 403
 
         # Check if a session of that type and name already exists. If so, don't create it, just returns it.
         if json_session['id_session'] == 0:
@@ -141,6 +141,7 @@ class DeviceQuerySessions(Resource):
 
             # Already existing
             # TODO handle participant list (remove, add) in session
+
             try:
                 if 'session_participants' in json_session:
                     participants = json_session.pop('session_participants')
