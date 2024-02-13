@@ -72,3 +72,11 @@ class TeraServerSettings(BaseModel):
             TeraServerSettings.db().session.add(current_setting)
         # Store object
         current_setting.commit()
+
+    def to_json_create_event(self):
+        return self.to_json(ignore_fields=['ServerDeviceTokenKey', 'ServerParticipantTokenKey', 'ServerUUID',
+                                           'ServerVersions', 'ServerDeviceRegisterKey'])
+
+    def to_json_update_event(self):
+        return self.to_json(ignore_fields=['ServerDeviceTokenKey', 'ServerParticipantTokenKey', 'ServerUUID',
+                                           'ServerVersions', 'ServerDeviceRegisterKey'])
