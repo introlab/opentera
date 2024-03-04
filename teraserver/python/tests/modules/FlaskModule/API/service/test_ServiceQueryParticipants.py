@@ -54,9 +54,14 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
                 params = {'participant_uuid': participant.participant_uuid}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
-                self.assertEqual(200, response.status_code)
-                participant_json = participant.to_json()
-                self.assertEqual(participant_json, response.json)
+
+                if participant.id_project == 1:
+                    self.assertEqual(200, response.status_code)
+                    participant_json = participant.to_json()
+                    self.assertEqual(participant_json, response.json)
+                else:
+                    self.assertEqual(403, response.status_code)
+
 
     def test_get_endpoint_with_project_id(self):
         with self._flask_app.app_context():
