@@ -83,10 +83,11 @@ function preloadCamera(devices, current_index){
 
     navigator.mediaDevices.getUserMedia({video: {deviceId: { exact: devices[current_index].deviceId }},
         audio: false}).then(function(stream){
-            console.log("Preloaded camera " + devices[current_index].label);
+            console.log("Preloaded camera " + devices[current_index].label + "(" + devices[current_index].deviceId + ")");
             stream.getTracks().forEach(track => track.stop());
             // Did we get at least the first stream? If so, start everything!
-            if (current_index === 0){
+            //if (current_index === 0){
+            if (!connected){
                 playSound("audioCalling");
                 connected = true;
                 updateLocalAudioVideoSource(1);
@@ -451,7 +452,13 @@ function localVideoStreamSuccess(stream){
 }
 
 function localVideoStreamError(errorCode, errorText){
-    showError("initMediaSource", "Error #" + errorCode + ": " + errorText, true);
+    if (currentConfig.currentVideoSourceIndex + 1 < videoSources.length){
+        console.log("initMediaSource - Unable to open current source " + videoSources[currentConfig.currentVideoSourceIndex].label + " - Trying next one..." );
+        currentConfig.currentVideoSourceIndex += 1;
+        updateLocalAudioVideoSource(1);
+    }else{
+        showError("initMediaSource", "Error #" + errorCode + ": " + errorText, true);
+    }
 }
 
 function forwardData(data)

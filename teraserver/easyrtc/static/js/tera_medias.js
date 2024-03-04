@@ -11,26 +11,59 @@ async function fillDefaultSourceList(){
     videoSources.length=0;
     audioSources.length=0;
 
-    // Open a stream to ask for permissions and allow listing of full name of devices.
-    try{
-        /*await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: {
-                width: {ideal: 1280, max: 1920 },
-                height: {ideal: 720, max: 1080 },
-                frameRate: {min: 15}//, ideal: 30}
-            }
-        });*/
-        await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true
-        });
+    // Get devices ids in case the first camera returned by getUserMedia isn't valid (we use usermedia here only to get
+    // camera names
+    let all_devices;
+    try {
+        all_devices = await navigator.mediaDevices.enumerateDevices();
     }catch(err) {
-        showError("fillDefaultSourceList() - getUserMedia",
-            translator.translateForKey("errors.no-media-access", currentLang) + "<br><br>" +
-            translator.translateForKey("errors.error-msg", currentLang) +
-            ":<br>" + err.name + " - " + err.message, true);
+        showError("fillDefaultSourceList() - enumerate Initial Devices", err.name + " - " + err.message, true);
         throw err;
+    }
+
+    // Open a stream to ask for permissions and allow listing of full name of devices.
+    if (all_devices.length === 0){
+        showError(translator.translateForKey("errors.no-media-access", currentLang),
+            translator.translateForKey("errors.error-msg", currentLang), true);
+        return;
+    }
+    let current_dev_index = 0;
+    let ready = false;
+    let devices_anom = [];
+    all_devices.forEach(device => {
+        if (device.kind === "videoinput"){
+            devices_anom.push(device);
+        }
+    });
+    while(!ready){
+        try{
+            // await navigator.mediaDevices.getUserMedia({
+            //     audio: true,
+            //     video: {
+            //         width: {ideal: 1280, max: 1920 },
+            //         height: {ideal: 720, max: 1080 },
+            //         frameRate: {min: 15}//, ideal: 30}
+            //     }
+            // });
+            await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: {
+                    deviceId: devices_anom[current_dev_index].deviceId
+                }
+            }).then(function() {
+                ready = true;
+            });
+        }catch(err) {
+            current_dev_index+=1; // Will try next source
+            if (current_dev_index >= devices_anom.length){
+                // Tried every device
+                showError("fillDefaultSourceList() - getUserMedia",
+                    translator.translateForKey("errors.no-media-access", currentLang) + "<br><br>" +
+                    translator.translateForKey("errors.error-msg", currentLang) +
+                    ":<br>" + err.name + " - " + err.message, true);
+                throw err;
+            }
+        }
     }
 
     try {
