@@ -35,6 +35,17 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
                                                              params=params, endpoint=self.test_endpoint)
                 self.assertEqual(400, response.status_code)
 
+    def test_get_endpoint_with_token_auth_with_forbidden_uuid(self):
+        with self._flask_app.app_context():
+            # Get all participants from DB
+            secret_participant = TeraParticipant.get_participant_by_name('Secret Participant')
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params={'participant_uuid':
+                                                                 secret_participant.participant_uuid},
+                                                         endpoint=self.test_endpoint)
+
+            self.assertEqual(403, response.status_code)
+
     def test_get_endpoint_with_token_auth_with_participant_uuid(self):
         with self._flask_app.app_context():
             # Get all participants from DB
@@ -46,6 +57,88 @@ class ServiceQueryParticipantsTest(BaseServiceAPITest):
                 self.assertEqual(200, response.status_code)
                 participant_json = participant.to_json()
                 self.assertEqual(participant_json, response.json)
+
+    def test_get_endpoint_with_project_id(self):
+        with self._flask_app.app_context():
+            project_id = 1
+            params = {'id_project': project_id}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            participants_count = TeraParticipant.get_count({'id_project': project_id})
+            self.assertEqual(participants_count, len(response.json))
+
+    def test_get_endpoint_with_forbidden_project_id(self):
+        with self._flask_app.app_context():
+            project_id = 2
+            params = {'id_project': project_id}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_participant_group_id(self):
+        with self._flask_app.app_context():
+            group_id = 1
+            params = {'id_participant_group': group_id}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            participants_count = TeraParticipant.get_count({'id_participant_group': group_id})
+            self.assertEqual(participants_count, len(response.json))
+
+    def test_get_endpoint_with_forbidden_participant_group_id(self):
+        with self._flask_app.app_context():
+            group_id = 2
+            params = {'id_participant_group': group_id}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_search_by_name_in_project(self):
+        with self._flask_app.app_context():
+            params = {'id_project': 1, 'name': '#1'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))  # Only one participant has "#1" in their name
+
+            params = {'id_project': 1, 'name': 'iciPAnt'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            # Should return all participants in the project, since they all have that pattern in their name
+            self.assertEqual(len(TeraParticipant.query_with_filters({'id_project': 1})), len(response.json))
+
+    def test_get_endpoint_search_by_name_in_group(self):
+        with self._flask_app.app_context():
+            params = {'id_participant_group': 1, 'name': '#2'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))  # No participant has "#1" in their name in that group
+
+            params = {'id_participant_group': 1, 'name': 'ICipant'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            # Should return all participants in the project, since they all have that pattern in their name
+            self.assertEqual(len(TeraParticipant.query_with_filters({'id_participant_group': 1})), len(response.json))
+
+    def test_get_endpoint_search_by_name_global(self):
+        with self._flask_app.app_context():
+            params = {'name': 'Secret'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            # No participant available with that pattern (even if it exists)
+            self.assertEqual(0, len(response.json))
+
+            params = {'name': 'ICipant'}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            # Should return all participants, but only from the accessible project (1) for this service
+            self.assertEqual(len(TeraParticipant.query_with_filters({'id_project': 1})), len(response.json))
 
     def test_post_endpoint_without_token_auth(self):
         with self._flask_app.app_context():

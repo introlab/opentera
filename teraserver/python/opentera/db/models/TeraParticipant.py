@@ -273,6 +273,15 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return TeraParticipant.query.filter_by(participant_username=username).first() is None
 
     @staticmethod
+    def search_participant_by_name(name: str, other_filters: dict | None):
+        if other_filters is None:
+            other_filters = dict()
+        search_query = (TeraParticipant.query.filter_by(**other_filters).
+                        filter(TeraParticipant.participant_name.like('%' + name + '%')))
+        return search_query.all()
+
+
+    @staticmethod
     def create_defaults(test=False):
         if test:
             from opentera.db.models.TeraProject import TeraProject
