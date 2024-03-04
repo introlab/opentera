@@ -52,17 +52,12 @@ class ServiceQueryParticipantGroups(Resource):
                 return gettext('Forbidden'), 403
             # Retrieve participant group by ID
             participant_group = TeraParticipantGroup.get_participant_group_by_id(args['id_participant_group'])
-            # If participant group is found, check if 'id_project' matches
-            if participant_group:
-                # Check if the 'id_project' and 'id_participant_group' is matching
-                if args['id_project'] and args['id_project'] != participant_group.id_project:
-                    # Check if user has access to the specified project
-                    if args['id_project'] not in service_access.get_accessible_projects_ids():
-                        return gettext('Forbidden'), 403
-                    return gettext('No group matching the provided id_participant_group and id_project was found'), 404
 
-                # Return the JSON representation of the participant group
-                return participant_group.to_json(minimal=True)
+            if not participant_group:
+                return gettext('Not found'), 404
+
+            # Return the JSON representation of the participant group
+            return participant_group.to_json(minimal=True)
 
         # Check if 'id_project' is specified in args
         if args['id_project']:
@@ -120,7 +115,6 @@ class ServiceQueryParticipantGroups(Resource):
 
         # Check if it's a new participant group or an update
         if participant_group_info['id_participant_group'] == 0:
-            verif = service_access.get_accessible_projects_ids()
             # Check if the project ID is valid
             if ('id_project' in participant_group_info and participant_group_info['id_project']
                     not in service_access.get_accessible_projects_ids()):

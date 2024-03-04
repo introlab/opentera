@@ -16,13 +16,11 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
             response = self.test_client.get(self.test_endpoint)
             self.assertEqual(401, response.status_code)
 
-
     def test_get_endpoint_with_token_auth_no_params(self):
         with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=None, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code)
-
 
     def test_get_endpoint_with_token_auth_and_invalid_id_project(self):
         with self._flask_app.app_context():
@@ -31,7 +29,6 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
-
     def test_get_endpoint_with_token_auth_and_invalid_id_participant_group(self):
         with self._flask_app.app_context():
             params = {'id_participant_group': -1}
@@ -39,14 +36,12 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
-
     def test_get_endpoint_with_token_auth_and_invalid_id_project_and_invalid_id_participant_group(self):
         with self._flask_app.app_context():
             params = {'id_project': -1, 'id_participant_group': -1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
-
 
     def test_get_endpoint_with_token_auth_and_valid_id_participant_group(self):
         with self._flask_app.app_context():
@@ -58,14 +53,13 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
             group: TeraParticipantGroup = TeraParticipantGroup.get_participant_group_by_id(1)
             self.assertEqual(group.to_json(minimal=True), response.json)
 
-
     def test_get_endpoint_with_token_auth_and_valid_id_project(self):
         with self._flask_app.app_context():
             params = {'id_project': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
-            self.assertGreaterEqual(len(response.json),1 )
+            self.assertGreaterEqual(len(response.json), 1)
             groups: TeraParticipantGroup = TeraParticipantGroup.get_participant_group_for_project(1)
             i = 0
             for group in groups:
@@ -89,15 +83,12 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
                                                              params=params, endpoint=self.test_endpoint)
                 self.assertEqual(403, response.status_code)
 
-
     def test_get_endpoint_with_token_auth_and_valid_but_denied_id_participant_group(self):
         with self._flask_app.app_context():
             params = {'id_participant_group': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
-
-
 
     def test_post_and_delete_endpoint_with_token(self):
         with self._flask_app.app_context():
@@ -155,7 +146,6 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
             self.assertEqual(1, project_id)
             self.assertEqual("New name", name)
 
-
             # Test case: Creation
             json_data['participant_group']['id_participant_group'] = 0
             json_data['participant_group']['id_project'] = 1
@@ -165,7 +155,6 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
             group_data = response.json
             project_id = group_data['id_project']
             self.assertEqual(1, project_id)
-
 
             # Test case: Post update to project without association to service
             json_data = {
@@ -198,7 +187,6 @@ class ServiceQueryParticipantGroupsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client, token=self.service_token,
                                                           json=json_data)
             self.assertEqual(500, response.status_code, msg="Invalid parameter")
-
 
             del json_data['participant_group']['invalid_parameter']
             response = self._post_with_service_token_auth(self.test_client, token=self.service_token,

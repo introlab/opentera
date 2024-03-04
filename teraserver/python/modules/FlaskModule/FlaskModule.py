@@ -313,11 +313,13 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
         from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
+        from modules.FlaskModule.API.service.ServiceQueryParticipantGroups import ServiceQueryParticipantGroups
 
         namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryParticipantGroups,       '/groups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryParticipants,            '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryProjects,                '/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryRoles,                   '/roles', resource_class_kwargs=kwargs)
