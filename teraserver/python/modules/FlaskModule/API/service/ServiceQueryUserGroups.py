@@ -13,6 +13,8 @@ import modules.Globals as Globals
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_user_group', type=int, help='ID of the user group to query')
+get_parser.add_argument('id_project', type=int, help='ID of the project to query user group with access to')
+get_parser.add_argument('id_site', type=int, help='ID of the site to query user group with access to')
 
 post_parser = api.parser()
 post_schema = api.schema_model('service_user_group', {'properties': TeraUserGroup.get_json_schema(), 'type': 'object',
@@ -43,6 +45,14 @@ class ServiceQueryUserGroups(Resource):
         if args['id_user_group']:
             if args['id_user_group'] in service_access.get_accessible_usergroups_ids():
                 user_groups.append(TeraUserGroup.get_user_group_by_id(args['id_user_group']))
+        elif args['id_project']:
+            if args['id_project'] not in service_access.get_accessible_projects_ids():
+                return gettext('Forbidden'), 403
+            user_groups = service_access.query_usergroups_for_project(args['id_project'])
+        elif args['id_site']:
+            if args['id_site'] not in service_access.get_accessibles_sites_ids():
+                return gettext('Forbidden'), 403
+            user_groups = service_access.query_usergroups_for_site(args['id_site'])
         else:
             # If we have no arguments, return all accessible user groups
             user_groups = service_access.get_accessible_usergroups()
