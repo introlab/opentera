@@ -17,6 +17,10 @@ class redisProtocol(txredis.SubscriberProtocol):
     @defer.inlineCallbacks
     def connectionMade(self):
         # print('redisProtocol connectionMade')
+
+        # Call base class connectionMade to handle password and other init stuff
+        super().connectionMade()
+
         if self.parent:
             ret = yield self.execute_command('client', 'setname', 'txredis_' + self.parent.__class__.__name__)
             self.parent.redisConnectionMade()
@@ -32,6 +36,10 @@ class redisProtocol(txredis.SubscriberProtocol):
 
     def connectionLost(self, reason):
         # print("redisProtocol lost connection", reason)
+
+        # Call base class connectionLost
+        super().connectionLost(reason)
+
         if self.parent:
             self.parent.redisConnectionLost(reason)
         else:
