@@ -95,7 +95,7 @@ def init_opentera_service(config: ConfigManager):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='OpenTera Server')
     parser.add_argument('--enable_tests', help='Test mode for server.', default=False)
-    parser.add_argument('--create-defaults', help='Create default server values (test mode)', default=False)
+    parser.add_argument('--create_defaults', help='Create default server values (test mode)', default=False)
     args = parser.parse_args()
 
     config_man = ConfigManager()
