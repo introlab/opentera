@@ -1,8 +1,6 @@
 name: JOSS Paper Draft PDF
 
 on:
-  push:
-    branches: [main, joss-paper-review]
   workflow_dispatch:
     branches: [main, joss-paper-review]
 
