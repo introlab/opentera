@@ -95,6 +95,7 @@ def init_opentera_service(config: ConfigManager):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='OpenTera Server')
     parser.add_argument('--enable_tests', help='Test mode for server.', default=False)
+    parser.add_argument('--create-defaults', help='Create default server values (test mode)', default=False)
     args = parser.parse_args()
 
     config_man = ConfigManager()
@@ -147,7 +148,7 @@ if __name__ == '__main__':
             Globals.db_man.open(config_man.server_config['debug_mode'])
 
             # Create minimal values, if required
-            Globals.db_man.create_defaults(config=config_man, test=False)
+            Globals.db_man.create_defaults(config=config_man, test=args.create_defaults)
 
     except OperationalError as e:
         print("Unable to connect to database - please check settings in config file!", e)
