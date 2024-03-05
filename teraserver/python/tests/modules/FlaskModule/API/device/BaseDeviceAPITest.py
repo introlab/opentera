@@ -205,6 +205,13 @@ class BaseDeviceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
+    def _get_data_no_auth(self, client: FlaskClient, token: str = '', params={}, endpoint=None):
+        if params is None:
+            params = {}
+        if endpoint is None:
+            endpoint = self.test_endpoint
+        return client.get(endpoint, query_string=params)
+
     def _post_with_device_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
                                      params: dict = {}, endpoint: str = None):
         if params is None:

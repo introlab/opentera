@@ -49,8 +49,9 @@ class TeraDeviceSubType(BaseModel):
         return TeraDeviceSubType.query.all()
 
     @staticmethod
-    def get_device_subtype(dev_subtype: int):
-        return TeraDeviceSubType.query.filter_by(id_device_subtype=dev_subtype).first()
+    def get_device_subtype_by_name(name: str, id_device_type: int):
+        return (TeraDeviceSubType.query.filter_by(device_subtype_name=name).filter_by(id_device_type=id_device_type)
+                .first())
 
     @staticmethod
     def get_device_subtype_by_id(dev_subtype: int):

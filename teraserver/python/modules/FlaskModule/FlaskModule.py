@@ -73,16 +73,18 @@ user_api_ns = api.namespace('user', description='API for user calls')
 device_api_ns = api.namespace('device', description='API for device calls')
 participant_api_ns = api.namespace('participant', description='API for participant calls')
 service_api_ns = api.namespace('service', description='API for service calls')
+test_api_ns = api.namespace('test', description='API for tests')
 
 
 class FlaskModule(BaseModule):
 
-    def __init__(self,  config: ConfigManager):
+    def __init__(self,  config: ConfigManager, test_mode=False):
 
         BaseModule.__init__(self, ModuleNames.FLASK_MODULE_NAME.value, config)
 
         # Use debug mode flag
         flask_app.debug = config.server_config['debug_mode']
+        self.test_mode = test_mode
 
         # Change secret key to use server UUID
         # This is used for session encryption
@@ -110,6 +112,8 @@ class FlaskModule(BaseModule):
         FlaskModule.init_device_api(self, device_api_ns)
         FlaskModule.init_participant_api(self, participant_api_ns)
         FlaskModule.init_service_api(self, service_api_ns)
+        if self.test_mode:
+            FlaskModule.init_test_api(self, test_api_ns)
 
         # Init Views
         self.init_views()
@@ -176,6 +180,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
         from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
+        from modules.FlaskModule.API.user.UserQueryServerSettings import UserQueryServerSettings
         from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
 
         # Resources
@@ -206,6 +211,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryServerSettings,       '/server/settings', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServices,             '/services', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceProjects,      '/services/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServiceSites,         '/services/sites', resource_class_kwargs=kwargs)
@@ -307,11 +313,13 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
         from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
+        from modules.FlaskModule.API.service.ServiceQueryParticipantGroups import ServiceQueryParticipantGroups
 
         namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryParticipantGroups,       '/groups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryParticipants,            '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryProjects,                '/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryRoles,                   '/roles', resource_class_kwargs=kwargs)
@@ -328,6 +336,15 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUsers,                   '/users', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySiteProjectAccessRoles,  '/users/access', resource_class_kwargs=kwargs)
+
+    @staticmethod
+    def init_test_api(module: object, namespace: Namespace, additional_args: dict = dict()):
+        # Default arguments
+        kwargs = {'flaskModule': module}
+        kwargs |= additional_args
+
+        from modules.FlaskModule.API.test.TestDBReset import TestDBReset
+        namespace.add_resource(TestDBReset, '/database/reset', resource_class_kwargs=kwargs)
 
     def init_views(self):
         from modules.FlaskModule.Views.About import About

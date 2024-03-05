@@ -449,12 +449,15 @@ class UserManagerModule(BaseModule):
                 self.participant_registry.participant_leave_session(participant, session_uuid)
                 participant_event.type = ParticipantEvent.PARTICIPANT_LEFT_SESSION
 
-            # TODO: Get others infos for that participant
             from opentera.db.models.TeraParticipant import TeraParticipant
             part_data = TeraParticipant.get_participant_by_uuid(participant)
-            participant_event.participant_name = part_data.participant_name
-            participant_event.participant_project_name = part_data.participant_project.project_name
-            participant_event.participant_site_name = part_data.participant_project.project_site.site_name
+            if part_data:
+                participant_event.participant_name = part_data.participant_name
+                participant_event.participant_project_name = part_data.participant_project.project_name
+                participant_event.participant_site_name = part_data.participant_project.project_site.site_name
+            else:
+                # TODO: Find when this can happen!
+                pass
             self.send_event_message(participant_event, self.event_topic_name())
 
     def set_devices_in_session(self, session_uuid: str, device_uuids: list, in_session: bool):

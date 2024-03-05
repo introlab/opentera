@@ -12,10 +12,13 @@ let localStreams = []; // {peerid, streamname, stream: MediaStream}, order is im
 var connected = false;
 var needToCallOtherUsers = false;
 
+let preinitCameras = true;
+
 function connect() {
 
     console.log("Connecting...");
-    playSound("audioCalling");
+    if (!preinitCameras)
+        playSound("audioCalling");
 
     /*var localFilter = easyrtc.buildLocalSdpFilter( {
         audioRecvBitrate:20, videoRecvBitrate:30 ,videoRecvCodec:"h264"
@@ -41,11 +44,61 @@ function connect() {
     //Post-connect Event listeners
     //easyrtc.setOnHangup(streamDisconnected);
     //easyrtc.setOnCall(newStreamStarted);
+    if (preinitCameras)
+        preloadCameras();
+    else{
+        connected = true;
+        updateLocalAudioVideoSource(1);
+        showLayout(true);
+    }
 
-    connected = true;
-    updateLocalAudioVideoSource(1);
 
-    showLayout(true);
+}
+
+// On some devices, there's a strange bug that delays access to the camera, unless we try to access it at least once...
+function preloadCameras(){
+    navigator.mediaDevices.enumerateDevices()
+        .then(function(devices) {
+            let preload_devices = [];
+            devices.forEach(function(device) {
+                if (device.kind === "videoinput"){
+                    if (!device.label.includes(" IR ")) { // Filter "IR" camera, since they won't work.
+                        preload_devices.push(device);
+                    }
+                }
+                //console.log(device.kind + ": " + device.label + " id = " + device.deviceId);
+            });
+            preloadCamera(preload_devices, 0);
+        })
+        .catch(function(err) {
+            console.log(err.name + ": " + err.message);
+        });
+
+}
+
+function preloadCamera(devices, current_index){
+    if (current_index >= devices.length || current_index < 0){
+        return;
+    }
+
+    navigator.mediaDevices.getUserMedia({video: {deviceId: { exact: devices[current_index].deviceId }},
+        audio: false}).then(function(stream){
+            console.log("Preloaded camera " + devices[current_index].label + "(" + devices[current_index].deviceId + ")");
+            stream.getTracks().forEach(track => track.stop());
+            // Did we get at least the first stream? If so, start everything!
+            //if (current_index === 0){
+            if (!connected){
+                playSound("audioCalling");
+                connected = true;
+                updateLocalAudioVideoSource(1);
+                showLayout(true);
+            }
+            preloadCamera(devices, current_index + 1);
+    }).catch(async function() {
+        console.log("Can't preload camera: " + devices[current_index].label);
+        /*await new Promise(resolve => setTimeout(resolve, 1000))*/
+        preloadCamera(devices, current_index + 1);
+    });
 }
 
 function muteMicro(local, index, new_state){
@@ -264,14 +317,15 @@ function setPrimaryView(peer_id, streamname){
     setPrimaryViewIcon(primaryView.peerid, primaryView.streamName);
 }
 
-function updateLocalAudioVideoSource(streamindex){
+async function updateLocalAudioVideoSource(streamindex){
     if (connected === true){
         let streamname = "localStream" + streamindex;
         if (streamindex === 1) // Default stream = no name.
             streamname = "";
-        if (streamindex < localStreams.length){
+        if (streamindex <= localStreams.length){
             console.log("Updating audio/video source: " + streamname);
-
+            // Stopping previous stream
+            localStreams[streamindex-1].stream.getTracks().forEach(track => track.stop());
         }else {
             console.log("Creating audio/video source: " + streamname);
         }
@@ -398,7 +452,13 @@ function localVideoStreamSuccess(stream){
 }
 
 function localVideoStreamError(errorCode, errorText){
-    showError("initMediaSource", "Error #" + errorCode + ": " + errorText, true);
+    if (currentConfig.currentVideoSourceIndex + 1 < videoSources.length){
+        console.log("initMediaSource - Unable to open current source " + videoSources[currentConfig.currentVideoSourceIndex].label + " - Trying next one..." );
+        currentConfig.currentVideoSourceIndex += 1;
+        updateLocalAudioVideoSource(1);
+    }else{
+        showError("initMediaSource", "Error #" + errorCode + ": " + errorText, true);
+    }
 }
 
 function forwardData(data)

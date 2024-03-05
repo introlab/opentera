@@ -100,9 +100,9 @@ class ServiceQueryProjects(Resource):
 
         # Do the update!
         if json_project['id_project'] > 0:
-            # Already existing - can only modifify is service is associated to that project
+            # Already existing - can only modifify if service is associated to that project
             project: TeraProject = TeraProject.get_project_by_id(json_project['id_project'])
-            if not project or project.id_site not in service_access.get_accessible_projects_ids():
+            if not project or project.id_project not in service_access.get_accessible_projects_ids():
                 return gettext('Forbidden'), 403
 
             try:

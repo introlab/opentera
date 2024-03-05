@@ -5,7 +5,7 @@ from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraProject import TeraProject
 
-from sqlalchemy import or_, not_
+from sqlalchemy import or_, not_, and_
 
 
 class DBManagerTeraServiceAccess:
@@ -143,10 +143,22 @@ class DBManagerTeraServiceAccess:
         return [user.id_user for user in self.get_accessible_users(admin_only=admin_only)]
 
     def get_accessible_usergroups(self):
+        # Usergroup is accessible if it has a direct association to this service
+        access = TeraServiceAccess.query.join(TeraServiceRole). \
+            filter(TeraServiceRole.id_service == self.service.id_service). \
+            filter(TeraServiceAccess.id_user_group != None).all()
+
         # Usergroup is accessible if it has access to a service site / project or if it has a role in the service
-        access = TeraServiceAccess.query.join(TeraServiceRole).\
-            filter(TeraServiceRole.id_service == self.service.id_service).\
-            filter(TeraServiceAccess.id_user_group is not None).all()
+        # project_ids = self.get_accessible_projects_ids()
+        # site_ids = self.get_accessibles_sites_ids()
+        # access = TeraServiceAccess.query.join(TeraServiceRole).\
+        #     filter(or_(TeraServiceRole.id_service == self.service.id_service,
+        #                and_(TeraServiceRole.id_service == TeraService.get_openteraserver_service().id_service,
+        #                     or_(TeraServiceRole.id_project == None, TeraServiceRole.id_project.in_(project_ids)),
+        #                     or_(TeraServiceRole.id_site == None, TeraServiceRole.id_site.in_(site_ids)),
+        #                     ).self_group()
+        #                )
+        #            ).filter(TeraServiceAccess.id_user_group != None).all()
 
         usergroups = []
         if access:
@@ -274,3 +286,26 @@ class DBManagerTeraServiceAccess:
                 return session
 
         return None
+
+    def query_usergroups_for_site(self, site_id: int):
+        all_users_groups = self.get_accessible_usergroups()
+        users_groups = {}
+        for user_group in all_users_groups:
+            sites = {key.id_site: value for key, value in user_group.get_sites_roles().items()
+                     if key.id_site == site_id}
+            if site_id in sites:
+                users_groups[user_group] = sites[site_id]
+        return users_groups
+
+    def query_usergroups_for_project(self, project_id: int):
+        all_users_groups = self.get_accessible_usergroups()
+        users_groups = {}
+        for user_group in all_users_groups:
+
+            projects = {key.id_project: value for key, value in user_group.get_projects_roles().items()
+                        if key.id_project == project_id}
+
+            if project_id in projects:
+                users_groups[user_group] = projects[project_id]
+
+        return users_groups

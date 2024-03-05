@@ -116,7 +116,7 @@ class UserQueryDeviceSubTypes(Resource):
             # Already existing
             try:
                 device_subtype: TeraDeviceSubType = \
-                    TeraDeviceSubType.get_device_subtype(json_device_subtype['id_device_subtype'])
+                    TeraDeviceSubType.get_device_subtype_by_id(json_device_subtype['id_device_subtype'])
                 if not device_subtype:
                     return gettext('Invalid device subtype'), 400
                 json_device_subtype['id_device_type'] = device_subtype.id_device_type
@@ -144,8 +144,7 @@ class UserQueryDeviceSubTypes(Resource):
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
 
-        # TODO: Publish update to everyone who is subscribed to devices update...
-        update_device = TeraDeviceSubType.get_device_subtype(json_device_subtype['id_device_subtype'])
+        update_device = TeraDeviceSubType.get_device_subtype_by_id(json_device_subtype['id_device_subtype'])
 
         return [update_device.to_json()]
 
@@ -165,7 +164,7 @@ class UserQueryDeviceSubTypes(Resource):
         if not user_access.user.user_superadmin:
             return gettext('Forbidden'), 403
 
-        todel = TeraDeviceSubType.get_device_subtype(id_todel)
+        todel = TeraDeviceSubType.get_device_subtype_by_id(id_todel)
         if not todel:
             return gettext('Device subtype not found'), 400
 

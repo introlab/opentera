@@ -2,6 +2,7 @@ from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraUserAccess
 
@@ -248,9 +249,9 @@ class UserQueryUserStats(Resource):
         devices_total = len(project.project_devices)
         devices_enabled = len([dev for dev in project.project_devices if dev.device_enabled])
         sessions_total = 0
-        for part in project.project_participants:
-            sessions_total += TeraSessionParticipants.get_session_count_for_participant(
-                    id_participant=part.id_participant)
+        # for part in project.project_participants:
+        #     sessions_total += TeraSessionParticipants.get_session_count_for_participant(
+        #             id_participant=part.id_participant)
 
         stats = {'users_total_count': len(project_users),
                  'users_enabled_count': len(project_users_enabled),
@@ -359,6 +360,7 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_participant_list_stats(participant: TeraParticipant):
+
         first_session = participant.get_first_session()
         first_session_date = None
         if first_session:
@@ -377,7 +379,8 @@ class UserQueryUserStats(Resource):
         stats = {'id_participant': participant.id_participant,
                  'participant_name': participant.participant_name,
                  'participant_enabled': participant.participant_enabled,
-                 'participant_sessions_count': len(participant.participant_sessions),
+                 'participant_sessions_count':
+                     TeraSessionParticipants.get_session_count_for_participant(participant.id_participant),
                  'participant_first_session': first_session_date,
                  'participant_last_session': last_session_date,
                  'participant_last_online': last_online_date

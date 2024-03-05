@@ -60,7 +60,7 @@ class BaseMixin(object):
                 if name == 'deleted_at' and value is None:
                     continue  # If deleted field, but not deleted, don't add to the json
                 if self.is_valid_property_value(value):
-                    if isinstance(value, datetime.datetime):
+                    if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
                         value = value.isoformat()
                     if isinstance(value, datetime.timedelta):
                         # Strip too many zeros at the end
@@ -132,10 +132,10 @@ class BaseMixin(object):
 
     @classmethod
     def get_count(cls, filters: dict = None, with_deleted: bool = False) -> int:
-        query = cls.db().session.query(cls).execution_options(include_deleted=with_deleted)
+        count_query = cls.db().session.query(cls).execution_options(include_deleted=with_deleted)
         if filters:
-            query = query.filter_by(**filters)
-        return query.count()
+            count_query = count_query.filter_by(**filters)
+        return count_query.count()
 
     @classmethod
     def get_primary_key_name(cls) -> str:

@@ -87,6 +87,34 @@ class ServiceQueryUserGroupsTest(BaseServiceAPITest):
             self._checkJson(json_data[0], minimal=True)
             self.assertEqual(json_data[0]['id_user_group'], 1)
 
+    def test_get_usergroups_for_forbidden_project(self):
+        with self._flask_app.app_context():
+            params = {'id_project': 2}
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params=params)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_usergroups_for_project(self):
+        with self._flask_app.app_context():
+            params = {'id_project': 1}
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params=params)
+            self.assertEqual(200, response.status_code)
+            for json_data in response.json:
+                self._checkJson(json_data)
+
+    def test_get_usergroups_for_forbidden_site(self):
+        with self._flask_app.app_context():
+            params = {'id_site': 2}
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params=params)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_usergroups_for_site(self):
+        with self._flask_app.app_context():
+            params = {'id_site': 1}
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params=params)
+            self.assertEqual(200, response.status_code)
+            for json_data in response.json:
+                self._checkJson(json_data)
+
     def test_post_and_delete(self):
         with self._flask_app.app_context():
             json_data = {

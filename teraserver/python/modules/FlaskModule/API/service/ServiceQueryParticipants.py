@@ -2,8 +2,9 @@ from flask import request
 from flask_restx import Resource
 from flask_babel import gettext
 from sqlalchemy.exc import IntegrityError
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
+from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 import uuid
 from datetime import datetime
@@ -11,6 +12,9 @@ from datetime import datetime
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
+get_parser.add_argument('id_project', type=int, help='Project ID to query all participants for')
+get_parser.add_argument('id_participant_group', type=int, help='Participant group to query all participants for')
+get_parser.add_argument('name', type=str, help='Return participants with at least a partial match on their name.')
 
 post_parser = api.parser()
 
@@ -60,11 +64,42 @@ class ServiceQueryParticipants(Resource):
     def get(self):
         args = get_parser.parse_args()
 
+        service_access = DBManager.serviceAccess(current_service)
+
         # args['participant_uuid'] Will be None if not specified in args
         if args['participant_uuid']:
+            if args['participant_uuid'] not in service_access.get_accessible_participants_uuids():
+                return gettext('Forbidden'), 403
             participant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
             if participant:
                 return participant.to_json()
+
+        if args['id_project']:
+            if args['id_project'] not in service_access.get_accessible_projects_ids():
+                return gettext('Forbidden'), 403
+            filters = {'id_project': args['id_project']}
+            if not args['name']:
+                participants = TeraParticipant.query_with_filters(filters)
+            else:
+                participants = TeraParticipant.search_participant_by_name(args['name'], filters)
+            return [participant.to_json() for participant in participants]
+
+        if args['id_participant_group']:
+            if args['id_participant_group'] not in service_access.get_accessible_participants_groups_ids():
+                return gettext('Forbidden'), 403
+            filters = {'id_participant_group': args['id_participant_group']}
+            if not args['name']:
+                participants = TeraParticipant.query_with_filters(filters)
+            else:
+                participants = TeraParticipant.search_participant_by_name(args['name'], filters)
+            return [participant.to_json() for participant in participants]
+
+        if args['name']:
+            # Search for participants with name in all availables
+            participants = (TeraParticipant.query.filter(
+                TeraParticipant.id_participant.in_(service_access.get_accessible_participants_ids()))
+                            .filter(TeraParticipant.participant_name.like('%' + args['name'] + '%')).all())
+            return [participant.to_json(minimal=True) for participant in participants]
 
         return gettext('Missing arguments'), 400
 

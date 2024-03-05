@@ -51,20 +51,14 @@ docs/_build/
 docs/--no-check-certificate
 docs/swagger.json
 
-build-teraplus-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 *.user
-build-teraserver-Desktop_Qt_5_12_0_MSVC2017_64bit-Debug
 .idea
-python-3.6
 
 # Docker
 docker/prod/certificates/*.pem
 
 # Node modules
 node_modules/
-/teraplus/CMakeLists.txt.user.4.9-pre1
-/teraserver/CMakeLists.txt.user.4.9-pre1
-/teraserver/python/config/TeraServerConfig.ini~0b30c4625222f7c8696ca353a9e47d17d15d6cb5
 /teraserver/python/messages/python/*
 /teraserver/python/certificates/ca_cert.pem
 /teraserver/python/certificates/ca_key.pem
@@ -72,28 +66,19 @@ node_modules/
 /teraserver/python/certificates/devices/client_key.pem
 /teraserver/python/certificates/site_cert.pem
 /teraserver/python/certificates/site_key.pem
-/teraplus/client/resources/icons/device.psd
 /teraserver/python/uploads
-build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
-build-teraserver-Desktop_Qt_5_13_1_MSVC2017_64bit-Debug
-build-teraplus-Desktop_Qt_5_13_1_MSVC2017_64bit-Release
-build-teraserver-Desktop_Qt_5_13_2_MSVC2017_64bit-Debug
-build-teraserver-Desktop_Qt_5_14_0_MSVC2017_64bit-Debug
-build-teraserver-Desktop_Qt_5_14_1_MSVC2017_64bit-Debug
 protobuf
-teraserver/python/env/_python-3.6
-build-teraserver-Desktop_Qt_5_14_2_MSVC2017_64bit-Debug
-python-3.8
-teraserver/python/services/BureauActif/uploads/
 /teraserver/python/OpenTeraServerVersion.py
 /teraserver/python/services/FileTransferService/upload
 files
 build-teraserver-Desktop_Qt_5_15_2_MSVC2019_64bit-Debug
-python-3.10
 /teraserver/easyrtc/package-lock.json
 venv
 joss-paper/paper.jats
 joss-paper/paper.pdf
 /.vscode
-_python-3.10
 python-3.11
+build-teraserver-Desktop_Qt_6_6_1_MSVC2019_64bit-Debug
+python-3.10
+/teraserver/python/config/certificates
+/teraserver/python/tests/*.pem

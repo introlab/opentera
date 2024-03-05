@@ -123,6 +123,12 @@ if __name__ == '__main__':
         print('Invalid config')
         exit(1)
 
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Logging Service')
+    parser.add_argument('--enable_tests', help='Test mode for service.', default=False)
+    args = parser.parse_args()
+
     # Global redis client
     Globals.redis_client = RedisClient(Globals.config_man.redis_config)
     Globals.api_user_token_key = Globals.redis_client.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
@@ -171,14 +177,19 @@ if __name__ == '__main__':
         'port': Globals.config_man.db_config['port']
     }
 
-    try:
-        Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
-    except OperationalError as e:
-        print("Unable to connect to database - please check settings in config file!", e)
-        quit()
+    Globals.db_man.test = args.enable_tests
 
-    with flask_app.app_context():
-        Globals.db_man.create_defaults(Globals.config_man)
+    if not args.enable_tests:
+        try:
+            Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
+        except OperationalError as e:
+            print("Unable to connect to database - please check settings in config file!", e)
+            quit()
+
+        with flask_app.app_context():
+            Globals.db_man.create_defaults(Globals.config_man)
+
+    # In test mode, db manager will not save anything into a database
 
     # Create the Service
     Globals.service = LoggingService(Globals.config_man, service_info)

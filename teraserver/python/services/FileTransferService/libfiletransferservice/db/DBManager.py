@@ -56,7 +56,7 @@ class DBManager:
             # Apply any database upgrade, if needed
             self.upgrade_db()
 
-    def open_local(self, db_infos, echo=False):
+    def open_local(self, echo=False):
         self.db_uri = 'sqlite://'
 
         flask_app.config.update({

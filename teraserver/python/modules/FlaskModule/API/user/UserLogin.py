@@ -62,7 +62,7 @@ class UserLogin(Resource):
 
         if current_user.user_uuid not in online_users:
             websocket_url = "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id']
-            print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
+            # print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
             self.module.redisSet(session['_id'], session['_user_id'], ex=60)
         elif args['with_websocket']:
             # User is online and a websocket is required
@@ -134,8 +134,8 @@ class UserLogin(Resource):
                                                                     message=gettext('Client version mismatch'))
 
                                 return gettext('Client major version too old, not accepting login'), 426
-                else:
-                    return gettext('Invalid client name :') + client_name, 403
+                # else:
+                #     return gettext('Invalid client name :') + client_name, 403
             except BaseException as e:
                 self.module.logger.log_error(self.module.module_name,
                                              UserLogin.__name__,

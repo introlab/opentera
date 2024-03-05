@@ -284,7 +284,7 @@ class DBManagerTeraUserAccess:
 
         site_id_list = self.get_accessible_sites_ids(admin_only=admin_only)
         query = TeraSessionType.query.join(TeraSessionTypeSite)\
-            .filter(TeraSessionTypeSite.id_site.in_(site_id_list))
+            .filter(TeraSessionTypeSite.id_site.in_(site_id_list)).order_by(TeraSessionType.session_type_name.asc())
         return query.all()
 
     def get_accessible_session_types_ids(self, admin_only=False):

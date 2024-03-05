@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -6,7 +6,6 @@ from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.utils.TeraVersions import TeraVersions, ClientVersions
 import json
-from opentera.db.models.TeraUser import TeraUser
 
 # Parser definition(s)
 # GET
@@ -26,7 +25,7 @@ class UserQueryVersions(Resource):
         self.test = kwargs.get('test', False)
 
     @api.doc(description='Get server versions',
-             responses={200: 'Success - returns list of assets',
+             responses={200: 'Success - returns versions information',
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
              params={'token': 'Secret token'})
@@ -36,8 +35,11 @@ class UserQueryVersions(Resource):
         # As soon as we are authorized, we can output the server versions
         args = get_parser.parse_args()
 
-        current_settings = json.loads(TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions))
-        return current_settings
+        current_settings = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions)
+        if not current_settings:
+            return gettext('No version information found'), 500
+
+        return json.loads(current_settings)
 
     @api.doc(description='Post server versions',
              responses={200: 'Success - asset posted',

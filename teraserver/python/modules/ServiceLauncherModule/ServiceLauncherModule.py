@@ -1,6 +1,7 @@
 from opentera.modules.BaseModule import BaseModule, ModuleNames, create_module_event_topic_from_name
 from opentera.config.ConfigManager import ConfigManager
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServerSettings import TeraServerSettings
 import opentera.messages.python as messages
 from twisted.internet import defer
 import os
@@ -45,7 +46,9 @@ class ServiceLauncherModule(BaseModule):
         print('ServiceLauncherModule - Registering to events...')
         # Always register to user events
         yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
-            ModuleNames.DATABASE_MODULE_NAME, 'service'), self.database_event_received_for_service)
+            ModuleNames.DATABASE_MODULE_NAME, 'service'), self.database_event_received)
+        yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            ModuleNames.DATABASE_MODULE_NAME, 'server_settings'), self.database_event_received)
 
         # Launch all internal services
         services = TeraService.query.all()
@@ -61,7 +64,7 @@ class ServiceLauncherModule(BaseModule):
         # Need to register to events (base class)
         super().setup_module_pubsub()
 
-    def database_event_received_for_service(self, pattern, channel, message):
+    def database_event_received(self, pattern, channel, message):
         # Process database event
         try:
             tera_event = messages.TeraEvent()
@@ -75,30 +78,47 @@ class ServiceLauncherModule(BaseModule):
             # Look for DatabaseEvent
             for any_msg in tera_event.events:
                 if any_msg.Unpack(database_event):
-                    # Process event
-                    try:
-                        service_dict = json.loads(database_event.object_value)
+                    if database_event.object_type == 'service':
+                        # Process event
+                        try:
+                            service_dict = json.loads(database_event.object_value)
 
-                        if database_event.type == database_event.DB_CREATE or \
-                                database_event.type == database_event.DB_UPDATE:
-                            # Update redis values
-                            if 'id_service' in service_dict:
-                                if service_dict['service_enabled'] and 'deleted_at' not in service_dict:
-                                    self.update_specific_service_info(service_dict['service_key'], service_dict)
-                                else:
+                            if database_event.type == database_event.DB_CREATE or \
+                                    database_event.type == database_event.DB_UPDATE:
+                                # Update redis values
+                                if 'id_service' in service_dict:
+                                    if service_dict['service_enabled'] and 'deleted_at' not in service_dict:
+                                        self.update_specific_service_info(service_dict['service_key'], service_dict)
+                                    else:
+                                        self.delete_specific_service_info(service_dict['service_key'])
+                            elif database_event.type == database_event.DB_DELETE:
+                                if 'service_key' in service_dict:
                                     self.delete_specific_service_info(service_dict['service_key'])
-                        elif database_event.type == database_event.DB_DELETE:
-                            if 'service_key' in service_dict:
-                                self.delete_specific_service_info(service_dict['service_key'])
 
-                    except json.JSONDecodeError as json_decode_error:
-                        print('ServiceLauncherModule:database_event_received_for_service - JSONDecodeError ',
-                              str(database_event.object_value), str(json_decode_error))
+                        except json.JSONDecodeError as json_decode_error:
+                            print('ServiceLauncherModule:database_event_received service - JSONDecodeError ',
+                                  str(database_event.object_value), str(json_decode_error))
+                    if database_event.object_type == 'server_settings':
+                        try:
+                            settings_dict = json.loads(database_event.object_value)
+                            if database_event.type == database_event.DB_CREATE or \
+                                    database_event.type == database_event.DB_UPDATE:
+                                if settings_dict['server_settings_name'] == TeraServerSettings.ServerDeviceTokenKey:
+                                    self.redisSet(RedisVars.RedisVar_DeviceStaticTokenAPIKey,
+                                                  settings_dict['server_settings_value'])
+                                if (settings_dict['server_settings_name'] ==
+                                        TeraServerSettings.ServerParticipantTokenKey):
+                                    self.redisSet(RedisVars.RedisVar_ParticipantStaticTokenAPIKey,
+                                                  settings_dict['server_settings_value'])
+                        except json.JSONDecodeError as json_decode_error:
+                            print('ServiceLauncherModule:database_event_received server settings - JSONDecodeError ',
+                                  str(database_event.object_value), str(json_decode_error))
+
         except DecodeError as decode_error:
-            print('ServiceLauncherModule:database_event_received_for_service - DecodeError ', pattern, channel, message,
+            print('ServiceLauncherModule:database_event_received - DecodeError ', pattern, channel, message,
                   decode_error)
         except ParseError as parse_error:
-            print('ServiceLauncherModule:database_event_received_for_service - Failure in database_event_received',
+            print('ServiceLauncherModule:database_event_received - Failure in database_event_received',
                   parse_error)
 
     def notify_module_messages(self, pattern, channel, message):
@@ -125,8 +145,6 @@ class ServiceLauncherModule(BaseModule):
         elif service.service_key == 'FileTransferService':
             path = os.path.join(os.getcwd(), 'services', 'FileTransferService', 'FileTransferService.py')
             executable_args.append(path)
-            if self.enable_tests:
-                executable_args.append('--enable_tests=1')
             working_directory = os.path.join(os.getcwd(), 'services', 'FileTransferService')
         # elif service.service_key == 'BureauActif':
         #     path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')
@@ -140,6 +158,10 @@ class ServiceLauncherModule(BaseModule):
             print('Unable to start :', service.service_key)
             self.logger.log_error(self.module_name, 'Unable to start', service.service_key)
             return
+
+        # Append test mode argument to all launched services
+        if self.enable_tests:
+            executable_args.append('--enable_tests=1')
 
         # Start process
         process = subprocess.Popen(executable_args, cwd=os.path.realpath(working_directory))

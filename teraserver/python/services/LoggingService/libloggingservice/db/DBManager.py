@@ -168,8 +168,12 @@ class DBManager:
             entry.sender = event.sender
             entry.timestamp = datetime.datetime.fromtimestamp(event.timestamp)
             entry.message = event.message
-            self.db.session.add(entry)
-            self.db.session.commit()
+            if not self.test:
+                self.db.session.add(entry)
+                self.db.session.commit()
+            else:
+                import json
+                print('Logging: ' + json.dumps(entry.to_json()))
 
     def store_login_event(self, event: LoginEvent):
         with self.app.app_context():
@@ -190,8 +194,12 @@ class DBManager:
             entry.login_os_name = event.os_name
             entry.login_os_version = event.os_version
             entry.login_message = event.log_header.message
-            self.db.session.add(entry)
-            self.db.session.commit()
+            if not self.test:
+                self.db.session.add(entry)
+                self.db.session.commit()
+            else:
+                import json
+                print('Logging - Login: ' + json.dumps(entry.to_json()))
 
 
 # Fix foreign_keys on sqlite

@@ -56,6 +56,7 @@ You are welcome to participate in this effort. Leave us comments or report [Issu
 
 ## Publication(s)
 
+* [![DOI](https://joss.theoj.org/papers/10.21105/joss.05497/status.svg)](https://doi.org/10.21105/joss.05497) Létourneau, D., Brière , S.,  et al., [OpenTera: A Framework for Telehealth Applications](https://doi.org/10.21105/joss.05497), Journal of Open Source Software, vol. 8, no 91, p. 5497 (2023)
 * Panchea, A.M., Létourneau, D., Brière, S. et al., [OpenTera: A microservice architecture solution for rapid prototyping of robotic solutions to COVID-19 challenges in care facilities](https://rdcu.be/cHzmf),  Health Technol. 12, 583–596 (2022)
 
 ## Videos
