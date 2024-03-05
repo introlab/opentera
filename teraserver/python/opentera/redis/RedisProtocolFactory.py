@@ -78,7 +78,7 @@ class RedisProtocolFactory(txredis.SubscriberFactory):
             # p = self.protocol(parent=self.parent)
             p = self.protocol(self.charset,
                               parent=self.parent,
-                              password=self.redis_config['password'],
+                              password=None if self.redis_config['password'] == '' else self.redis_config['password'],
                               dbid=self.redis_config['db'])
         else:
             # Forcing no encoding
