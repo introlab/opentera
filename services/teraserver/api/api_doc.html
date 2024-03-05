@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Documentation &mdash; OpenTera 1.2.4 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>API Documentation &mdash; OpenTera 1.2.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=928db92d"></script>
+        <script src="../../../_static/documentation_options.js?v=36f53d34"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -36,7 +38,7 @@
               <img src="../../../_static/LogoOpenTera200px.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                1.2.4
+                1.2.5
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -76,6 +78,7 @@
 <li class="toctree-l5"><a class="reference internal" href="#device">device</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#participant">participant</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#service">service</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test">test</a></li>
 </ul>
 </li>
 </ul>
@@ -973,6 +976,8 @@ versions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>with_sites</strong> (<em>boolean</em>) – Include site informations for each participant.</p></li>
+<li><p><strong>with_projects</strong> (<em>boolean</em>) – Include project informations for each participant.</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
@@ -1151,6 +1156,27 @@ versions</p>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Server error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--user-server-settings">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/server/settings</span></span><a class="headerlink" href="#get--user-server-settings" title="Link to this definition"></a></dt>
+<dd><p>Get server setting key</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uuid</strong> (<em>boolean</em>) – Get server UUID</p></li>
+<li><p><strong>device_register_key</strong> (<em>boolean</em>) – Get device registration key</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns setting value</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
 </ul>
 </dd>
 </dl>
@@ -2846,7 +2872,7 @@ versions</p>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns list of assets</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns versions information</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Required parameter is missing</p></li>
 <li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
 </ul>
@@ -3014,16 +3040,38 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http get">
+<dt class="sig sig-object http" id="get--device-register">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/device/register</span></span><a class="headerlink" href="#get--device-register" title="Link to this definition"></a></dt>
+<dd><p>Register a device to use token identification. This endpoint is rate limited. If the device type key doesn’t exist, a new one will be created. Same behavior for subtype name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>string</em>) – Server device registration key</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Device name to use</p></li>
+<li><p><strong>type_key</strong> (<em>string</em>) – Device type key to use</p></li>
+<li><p><strong>subtype_name</strong> (<em>string</em>) – Device subtype name to use</p></li>
+<li><p><strong>onlineable</strong> (<em>boolean</em>) – Device can get online status</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http post">
 <dt class="sig sig-object http" id="post--device-register">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/device/register</span></span><a class="headerlink" href="#post--device-register" title="Link to this definition"></a></dt>
-<dd><p>Register a device with certificate or token request. This endpoint is rate limited. Use application/octet-stream to send CSR or application/json Content-Type for token generation.</p>
+<dd><p>Register a device with certificate request. This endpoint is rate limited. If the device type key doesn’t exist, a new one will be created. Same behavior for subtype name.Use application/octet-stream to send CSR.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Status Codes<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success, will return registration information. Devices must then be enabled by admin.</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Missing parameter(s)</p></li>
-<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Internal server error</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - returns registration information. Devices must then be enabled by admin.</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – Missing or invalid parameter</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – Unauthorized - provided registration key is invalid</p></li>
 </ul>
 </dd>
 </dl>
@@ -3577,6 +3625,78 @@ versions</p>
 </dl>
 </dd></dl>
 
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--service-groups">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/service/groups</span></span><a class="headerlink" href="#delete--service-groups" title="Link to this definition"></a></dt>
+<dd><p>Delete a specific participant group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – ID to delete</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--service-groups">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/groups</span></span><a class="headerlink" href="#get--service-groups" title="Link to this definition"></a></dt>
+<dd><p>Return participant group information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_participant_group</strong> (<em>integer</em>) – ID to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID project to query information</p></li>
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Service doesn’t have permission to access the requested data</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--service-groups">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/service/groups</span></span><a class="headerlink" href="#post--service-groups" title="Link to this definition"></a></dt>
+<dd><p>Update participant group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
+</ul>
+</dd>
+<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>participant_group.id_participant_group</strong> (<em>integer</em>) – </p></li>
+<li><p><strong>participant_group.id_project</strong> (<em>integer</em>) – </p></li>
+<li><p><strong>participant_group.participant_group_name</strong> (<em>string</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success - To be documented</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.4">403 Forbidden</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.1">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.5.2">501 Not Implemented</a></span> – Not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--service-participants">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/service/participants</span></span><a class="headerlink" href="#get--service-participants" title="Link to this definition"></a></dt>
@@ -3585,6 +3705,9 @@ versions</p>
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>participant_uuid</strong> (<em>string</em>) – Participant uuid of the participant to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – Project ID to query all participants for</p></li>
+<li><p><strong>id_participant_group</strong> (<em>integer</em>) – Participant group to query all participants for</p></li>
+<li><p><strong>name</strong> (<em>string</em>) – Return participants with at least a partial match on their name.</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
@@ -4333,6 +4456,8 @@ versions</p>
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id_user_group</strong> (<em>integer</em>) – ID of the user group to query</p></li>
+<li><p><strong>id_project</strong> (<em>integer</em>) – ID of the project to query user group with access to</p></li>
+<li><p><strong>id_site</strong> (<em>integer</em>) – ID of the site to query user group with access to</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Secret token</p></li>
 </ul>
 </dd>
@@ -4419,6 +4544,22 @@ versions</p>
 </dd></dl>
 
 </section>
+<section id="test">
+<h2>test<a class="headerlink" href="#test" title="Link to this heading"></a></h2>
+<dl class="http get">
+<dt class="sig sig-object http" id="get--test-database-reset">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/test/database/reset</span></span><a class="headerlink" href="#get--test-database-reset" title="Link to this definition"></a></dt>
+<dd><p>Reset database to default values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – Success</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 
@@ -4432,7 +4573,7 @@ versions</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Simon Brière, Dominic Létourneau.</p>
+    <p>&#169; Copyright 2024, Simon Brière, Dominic Létourneau.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
