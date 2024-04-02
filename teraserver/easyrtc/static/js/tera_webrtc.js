@@ -82,7 +82,7 @@ function preloadCamera(devices, current_index){
     }
 
     navigator.mediaDevices.getUserMedia({video: {deviceId: { exact: devices[current_index].deviceId }},
-        audio: false}).then(function(stream){
+        audio: false}).then(async function(stream){
             console.log("Preloaded camera " + devices[current_index].label + "(" + devices[current_index].deviceId + ")");
             stream.getTracks().forEach(track => track.stop());
             // Did we get at least the first stream? If so, start everything!
@@ -94,10 +94,10 @@ function preloadCamera(devices, current_index){
                 showLayout(true);
             }
             preloadCamera(devices, current_index + 1);
-    }).catch(async function() {
-        console.log("Can't preload camera: " + devices[current_index].label);
-        /*await new Promise(resolve => setTimeout(resolve, 1000))*/
-        preloadCamera(devices, current_index + 1);
+    }).catch(async function(err) {
+        console.log("Can't preload camera: " + devices[current_index].label + "(" + devices[current_index].deviceId + ") - " + err);
+        //await new Promise(resolve => setTimeout(resolve, 5000));
+        preloadCamera(devices, current_index+1);
     });
 }
 
@@ -1083,18 +1083,21 @@ function dataReception(sendercid, msgType, msgData, targeting) {
                 //setPrimaryView(msgData.peerid, "default");
                 setLargeView(getVideoViewId(false, index+1));
             }
-
             setTitle(false, index+1, remoteContacts[contact_index].name, msgData.isUser);
         }
-
     }
 
     if (msgType === "Chrono"){
         // Start - stop local chrono
-        if (msgData.state === true){
-            startChrono(true, 1, msgData.increment, msgData.duration, msgData.title);
-        }else{
+        if (msgData.state === 1){
+            setupChrono(true, 1, msgData.increment, msgData.duration, msgData.title, msgData.value);
+            startChrono();
+        }
+        if (msgData.state === 0){
             stopChrono(true, 1);
+        }
+        if (msgData.state === 2){
+            pauseChrono(true, 1);
         }
     }
 
@@ -1382,7 +1385,8 @@ function enableAllTracks(stream, enable){
         audioTracks[i].enabled = enable;
 }
 
-function sendChronoMessage(target_peerids, state, msg = undefined, duration=undefined, increment=-1){
+// States: 0 = Stop, 1 = Start, 2 = Pause
+function sendChronoMessage(target_peerids, state, msg = undefined, duration=undefined, increment=-1, value= undefined){
 
     let request = {"state": state};
     if (msg !== undefined)
@@ -1392,6 +1396,11 @@ function sendChronoMessage(target_peerids, state, msg = undefined, duration=unde
         request.duration = duration;
 
     request.increment = increment;
+
+    if (value !== undefined)
+        request.value = value;
+    else
+        request.value = -1;
 
     if (easyrtc.webSocketConnected){
         for (let i=0; i<target_peerids.length; i++){

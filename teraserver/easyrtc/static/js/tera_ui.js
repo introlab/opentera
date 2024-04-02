@@ -745,25 +745,44 @@ function showMeasuresDialog(){
     $('#measureDialog').modal('show');
 }
 
-function showTextDisplay(local, index, show){
+function showChrono(local, index, show){
     let view_prefix = ((local === true) ? 'local' : 'remote');
-    let display = $('#' + view_prefix + 'Display' + index);
+    let display = $('#' + view_prefix + 'Chrono' + index);
     if (display.length){
         (show) ? display.show() : display.hide();
     }
+
+    showChronoButtons(local, index, !show, false);
+
 }
 
-function setTextDisplay(local, index, text){
+function showChronoButtons(local, index, playing, stopped){
     let view_prefix = ((local === true) ? 'local' : 'remote');
-    let display = $('#' + view_prefix + 'Text' + index);
+    let play = $('#' + view_prefix + 'ChronoPlay' + index);
+    if (play.length){
+        (!playing && !stopped) ? play.show() : play.hide();
+    }
+    let pause = $('#' + view_prefix + 'ChronoPause' + index);
+    if (pause.length){
+        (playing) ? pause.show() : pause.hide();
+    }
+    let stop = $('#' + view_prefix + 'ChronoStop' + index);
+    if (stop.length){
+        (playing) ? stop.show() : stop.hide();
+    }
+}
+
+function setChronoText(local, index, text){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'ChronoText' + index);
     if (display.length){
         display[0].innerHTML = text;
     }
 }
 
-function getTextDisplay(local, index){
+function getChronoTextDisplay(local, index){
     let view_prefix = ((local === true) ? 'local' : 'remote');
-    let display = $('#' + view_prefix + 'Text' + index);
+    let display = $('#' + view_prefix + 'ChronoText' + index);
     if (display.length){
         return display[0].innerHTML;
     }

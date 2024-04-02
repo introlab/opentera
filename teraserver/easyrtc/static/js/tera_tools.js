@@ -2,77 +2,107 @@
 // CHRONOS TOOLS
 ///////////////////////////////////////////
 let localChronoTimerHandle = 0;
-let chronoValues = [0, 0, 0, 0];
-let localChronoValue = 0;
-let chronoValuesIncrement = [-1, -1, -1, -1];
-let localChronoIncrement = -1;
+let chronoInfos = {}; // List of dict by key (peer id) - increment, duration, message
 
 function startChronosFromDialog(){
     // Build list of participants to send
-    let target_ids = [];
     let partSelect = Number($('#chronosPartSelect').children("option:selected").val());
-    let msgSelect = $('#chronosTitleSelect').children("option:selected")[0].text;
+    /*let message = $('#chronosTitleSelect').children("option:selected")[0].text;
     if ($('#chronosTitleSelect').children("option:selected").val() === "")
-        msgSelect = "";
+        message = "";*/
     //let durationSelect = Number($('#chronosDurationSelect').children("option:selected").val());
-    let durationSelect = Number($('#chronosDurationMinutes')[0].value) * 60
-        + Number($('#chronosDurationSeconds')[0].value);
+    let duration = Number($('#chronosDurationMinutes')[0].value) * 60 + Number($('#chronosDurationSeconds')[0].value);
     let chronoType = Number($('input[name="optChronoType"]:checked').val());
     let increment = -1;
+    let message = "";
+
+    // Reset values
+    chronoInfos = {};
+    showChrono(true, 1, false);
+    for (let i=0; i<remoteStreams.length; i++){
+        showChrono(false, i+1, false);
+    }
 
     if (chronoType === 2){
         // Chronometer
         increment = 1;
-        durationSelect = 0; // Always start chronometer at 0
+        duration = 0; // Always start chronometer at 0
     }
-
 
     if (partSelect === -1) {
         // Self only
-        startChrono(true, 1, increment, durationSelect, msgSelect);
+        setupChrono(true, 1, increment, duration, message);
         return;
     }
 
     if (partSelect === 0){
         // All participants
         for (let i=0; i<remoteStreams.length; i++){
-            target_ids.push(remoteStreams[i].peerid);
+            //target_ids.push(remoteStreams[i].peerid);
+            setupChrono(false, i, increment, duration, message);
+            //chronoTargetsIds.push(remoteStreams[i].peerid);
         }
     }else{
         // One participant... for now!
-        target_ids = [remoteStreams[partSelect-1].peerid];
-    }
-
-    // Send message
-    sendChronoMessage(target_ids, true, msgSelect, durationSelect, increment);
-
-    // Start chronos
-    for (let i=0; i<target_ids.length; i++){
-        let stream_index = getStreamIndexForPeerId(target_ids[i]);
-        if (stream_index !== undefined){
-            startChrono(false, stream_index+1, increment, durationSelect, msgSelect);
-        }
+        //target_ids = [remoteStreams[partSelect-1].peerid];
+        //chronoTargetsIds.push(remoteStreams[partSelect-1].peerid);
+        setupChrono(false, partSelect-1, increment, duration, message);
     }
 }
 
-function startChrono(local, index, increment=-1, duration = undefined, title=undefined){
-
-    // Start chrono
-    if (local === false){
-        chronoValues[index-1] = duration;
-        chronoValuesIncrement[index-1] = increment;
+function startChrono(){
+    let target_peers = Object.keys(chronoInfos);
+    if (target_peers.includes(local_peerid)){
+        showChronoButtons(true, 1, true, false);
     }else{
-        localChronoValue = duration;
-        localChronoIncrement = increment;
+        target_peers.forEach( function(target){
+                if (!isParticipant){
+                    sendChronoMessage([target], 1, chronoInfos[target].message, chronoInfos[target].duration,
+                        chronoInfos[target].increment, chronoInfos[target].value);
+                }
+                showChronoButtons(false, getStreamIndexForPeerId(target)+1, true, false);
+            }
+
+        )
     }
-    updateChronoDisplay(local, index, duration, increment, title);
-    showTextDisplay(local, index, true);
 
     // Start timer
     if (localChronoTimerHandle === 0){
         localChronoTimerHandle = setInterval(chronoTimerTimeout, 1000);
     }
+}
 
+function setupChrono(local, index, increment=-1, duration = undefined, title=undefined, initial_value = -1){
+    // Start chrono
+    let peer_id;
+    if (local === false){
+        // Get peer id for index
+        peer_id = remoteContacts[index].peerid;
+    }else{
+        peer_id = local_peerid;
+        index = 0;
+    }
+
+    let value = 0;
+    if (initial_value >= 0){
+        value = initial_value;
+    }else{
+        if (increment < 0){
+            value = duration;
+        }
+    }
+
+    chronoInfos[peer_id] = {"increment": increment, "duration": duration, "value": value, "message": title};
+
+    // Stop current local Chrono if needed
+    if (localChronoTimerHandle > 0){
+        // Stop current timer if needed
+        clearTimeout(localChronoTimerHandle);
+        localChronoTimerHandle = 0;
+    }
+
+    updateChronoDisplay(local, index+1, value, increment, title);
+    showChrono(local, index+1, true);
 }
 
 function updateChronoDisplay(local, index, duration, increment, title=undefined){
@@ -85,21 +115,21 @@ function updateChronoDisplay(local, index, duration, increment, title=undefined)
         if (title !== "")
             full_title += ": ";
         full_title += count_str;
-        setTextDisplay(local, index, full_title)
+        setChronoText(local, index, full_title)
     }else{
         // Only update time
-        let displayed = getTextDisplay(local, index);
-        let prev_count_str = chronoSecondsToText(duration-1);
-        displayed = displayed.substr(0, displayed.length-prev_count_str.length) + count_str;
-        setTextDisplay(local, index, displayed);
+        let displayed = getChronoTextDisplay(local, index);
+        let prev_count_str = chronoSecondsToText(duration-increment);
+        displayed = displayed.substring(0, displayed.length-prev_count_str.length) + count_str;
+        setChronoText(local, index, displayed);
     }
 }
 
 function chronoSecondsToText(duration){
     if (duration < 3600) // No hours
-        return new Date(duration * 1000).toISOString().substr(14, 5);
+        return new Date(duration * 1000).toISOString().substring(14, 19);
     else
-        return new Date(duration * 1000).toISOString().substr(11, 8);
+        return new Date(duration * 1000).toISOString().substring(11, 19);
 }
 
 function chronoShowCompleted(local, index, duration){
@@ -107,38 +137,30 @@ function chronoShowCompleted(local, index, duration){
             "</font>";
     if (duration > 0) // Display chrono value if > 0
         display_text += " - " + chronoSecondsToText(duration);
-    setTextDisplay(local, index, display_text);
+    setChronoText(local, index, display_text);
 
     // Start hide chrono timer in 5 seconds
-    setTimeout(showTextDisplay, 5000, local, index, false);
+    setTimeout(showChrono, 5000, local, index, false);
 }
 
 function chronoTimerTimeout(){
     // Update all active chronos
-    let active = false;
-    for (let i=0; i<chronoValues.length; i++){
-        if (chronoValues[i] > 0 || chronoValuesIncrement[i] > 0){
-            active = true;
-            chronoValues[i] += chronoValuesIncrement[i];
-            if (chronoValues[i] <= 0 && chronoValuesIncrement[i] < 0){
-                // Countdown completed!
-                chronoShowCompleted(false, i+1, chronoValues[i]);
-            }else{
-                updateChronoDisplay(false, i+1, chronoValues[i], chronoValuesIncrement[i]);
-            }
+    let active = true;
+    Object.keys(chronoInfos).forEach(function(peer_id) {
+        chronoInfos[peer_id].value += chronoInfos[peer_id].increment;
+        let index = 0;
+        if (peer_id !== local_peerid){
+            index = getStreamIndexForPeerId(peer_id);
         }
-    }
-
-    if (localChronoValue > 0 || localChronoIncrement > 0){
-        active = true;
-        localChronoValue += localChronoIncrement;
-        if (localChronoValue <= 0 && localChronoIncrement < 0){
-            // Start hide chrono timer in 5 seconds
-            chronoShowCompleted(true, 1, localChronoValue);
+        if (chronoInfos[peer_id].value <= 0 && chronoInfos[peer_id].increment < 0){
+            // Countdown completed!
+            chronoShowCompleted(peer_id === local_peerid, index+1, chronoInfos[peer_id].value);
+            active = false;
         }else{
-            updateChronoDisplay(true, 1, localChronoValue, localChronoIncrement);
+            updateChronoDisplay(peer_id === local_peerid, index+1,chronoInfos[peer_id].value,
+                chronoInfos[peer_id].increment);
         }
-    }
+    });
 
     if (active === false){
         clearTimeout(localChronoTimerHandle);
@@ -147,20 +169,41 @@ function chronoTimerTimeout(){
 }
 
 function stopChrono(local, index, no_msg=false){
+    let final_value = 0;
     if (local === false){
-        chronoShowCompleted(local, index, chronoValues[index-1]);
-        chronoValues[index-1] = 0;
-        chronoValuesIncrement[index-1] = -1;
-        let target_peer = remoteStreams[index-1].peerid;
+        let peer_id = remoteStreams[index-1].peerid;
+        if (!Object.keys(chronoInfos).includes(peer_id))
+            return; // Nothing to stop!
+        final_value = chronoInfos[peer_id].value;
         if (!no_msg)
-            sendChronoMessage([target_peer], false);
+            sendChronoMessage([peer_id], 0);
+        delete chronoInfos[peer_id];
     }else{
-        chronoShowCompleted(local, index, localChronoValue);
-        localChronoValue = 0;
-        localChronoIncrement = -1;
+        if (!Object.keys(chronoInfos).includes(local_peerid))
+            return; // Nothing to stop!
+        final_value = chronoInfos[local_peerid].value;
+        delete chronoInfos[local_peerid];
     }
+    chronoShowCompleted(local, index, final_value);
+
+    showChronoButtons(local, index, false, true);
 
     //showTextDisplay(local,index,false);
+}
+
+function pauseChrono(local, index){
+    if (local === false){
+        let peer_id = remoteStreams[index-1].peerid;
+        if (!Object.keys(chronoInfos).includes(peer_id))
+            return; // Nothing to pause!
+        sendChronoMessage([peer_id], 2);
+    }else{
+        if (!Object.keys(chronoInfos).includes(local_peerid))
+            return; // Nothing to pause!
+    }
+    clearTimeout(localChronoTimerHandle);
+    showChronoButtons(local, index, false, false);
+    localChronoTimerHandle = 0;
 }
 
 ///////////////////////////////////////////

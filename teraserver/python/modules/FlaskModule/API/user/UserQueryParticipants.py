@@ -150,7 +150,6 @@ class UserQueryParticipants(Resource):
                         # List
                         participant_json = participant.to_json(minimal=args['list'])
                         if args['list'] is None:
-
                             if args['id_participant']:
                                 # Adds project information to participant
                                 # participant_json['id_project'] = participant.participant_project.id_project

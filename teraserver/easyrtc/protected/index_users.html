@@ -121,14 +121,14 @@
                         <label for="chronosPartSelect" class="col-form-label col-4" data-i18n="chronosDialog.participants">Participant(s): </label>
                         <select id="chronosPartSelect" class="col combobox"></select>
                     </div>
-                    <div class="form-group row pr-2">
+                    <!--<div class="form-group row pr-2">
                         <label for="chronosTitleSelect" class="col-form-label col-4" data-i18n="chronosDialog.chrono-label">Libellé: </label>
                         <select id="chronosTitleSelect" class="col combobox">
                             <option value="" data-i18n="chronosDialog.label-none" selected>(Aucun)</option>
                             <option value="Exercices" data-i18n="chronosDialog.label-exercices">Exercices</option>
                             <option value="Repos" data-i18n="chronosDialog.label-rest">Repos</option>
                         </select>
-                    </div>
+                    </div>-->
                     <div class="form-group row pr-2">
                         <label class="col-form-label col-4" data-i18n="chronosDialog.chrono-type">Type: </label>
                         <div id="chronosTypeRadio" class="col col-form-label pl-0">
@@ -147,9 +147,9 @@
                             <option value="600">10:00</option>
                             <option value="900">15:00</option>
                         </select>-->
-                        <input id="chronosDurationMinutes" class="col-2" type="number" min="0" max="55" step="1" value="0" />
+                        <input id="chronosDurationMinutes" class="col-2" type="number" min="0" max="55" step="1" value="2" />
                         <label class="col-form-label col-2" data-i18n="chronosDialog.minutes">minutes</label>
-                        <input id="chronosDurationSeconds" class="col-2" type="number" min="0" max="55" step="5" value="30" />
+                        <input id="chronosDurationSeconds" class="col-2" type="number" min="0" max="55" step="5" value="0" />
                         <label class="col-form-label col-2" data-i18n="chronosDialog.seconds">secondes</label>
                     </div>
                 </form>
@@ -250,9 +250,12 @@
                         <input id="localBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
-                    <!-- Text display -->
-                    <div id="localDisplay1" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="localText1" onclick="stopChrono(true, 1);">Temps restant: xx:xx</label>
+                    <!-- Chrono display -->
+                    <div id="localChrono1" class="overlay-top-center" style="display:none">
+                        <label class="chrono" id="localChronoText1">Temps restant: xx:xx</label>
+                        <input class="image-icon chrono-button" id="localChronoPlay1" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
+                        <input class="image-icon chrono-button" id="localChronoPause1" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(true,1);"/>
+                        <input class="image-icon chrono-button" id="localChronoStop1" type="image" alt="image" src="images/stop.png" onclick="stopChrono(true, 1);"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
