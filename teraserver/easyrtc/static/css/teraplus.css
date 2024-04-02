@@ -196,6 +196,14 @@ video {
 	vertical-align: middle;
 }
 
+.counter{
+	background-color: rgba(100,100,200,0.75);
+}
+
+.counter-large{
+	background-color: rgba(100,100,200,0.75);
+}
+
 .overlay {
 	height: 0;
 	width: 100%;

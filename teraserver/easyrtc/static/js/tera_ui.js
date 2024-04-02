@@ -745,15 +745,30 @@ function showMeasuresDialog(){
     $('#measureDialog').modal('show');
 }
 
+function showCounterDialog(){
+    let partSelect = $('#counterPartSelect')[0];
+    partSelect.options.length = 0;
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("counterDialog.all", currentLang), "0");
+
+    for (let i=0; i<remoteContacts.length; i++){
+        let index = getStreamIndexForPeerId(remoteContacts[i].peerid, 'default');
+        if (index !== undefined){
+            partSelect.options[partSelect.options.length] = new Option(getTitle(false, index+1), index+1);
+        }
+    }
+    partSelect.options[partSelect.options.length] = new Option(translator.translateForKey("counterDialog.self", currentLang), "-1");
+
+    $('#counterDialog').modal('show');
+
+}
+
 function showChrono(local, index, show){
     let view_prefix = ((local === true) ? 'local' : 'remote');
     let display = $('#' + view_prefix + 'Chrono' + index);
     if (display.length){
         (show) ? display.show() : display.hide();
     }
-
     showChronoButtons(local, index, !show, false);
-
 }
 
 function showChronoButtons(local, index, playing, stopped){
@@ -785,6 +800,22 @@ function getChronoTextDisplay(local, index){
     let display = $('#' + view_prefix + 'ChronoText' + index);
     if (display.length){
         return display[0].innerHTML;
+    }
+}
+
+function setCounterText(local, index, text){
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'CounterText' + index);
+    if (display.length){
+        display[0].innerHTML = text;
+    }
+}
+
+function showCounter(local, index, show) {
+    let view_prefix = ((local === true) ? 'local' : 'remote');
+    let display = $('#' + view_prefix + 'Counter' + index);
+    if (display.length) {
+        (show) ? display.show() : display.hide();
     }
 }
 

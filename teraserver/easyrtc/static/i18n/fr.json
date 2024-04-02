@@ -33,6 +33,14 @@
 		"all": "Tous",
 		"self": "Seulement moi"
 	},
+	"counterDialog": {
+		"title": "Décomptes",
+		"participants": "Participant(s)",
+		"start": "Démarrer",
+		"cancel": "Annuler",
+		"all": "Tous",
+		"self": "Seulement moi"
+	},
 	"measureDialog": {
 		"title": "Mesures",
 		"close": "Fermer",
@@ -73,6 +81,7 @@
 		"speaker-all": "Son - Tous",
 		"tools": "Outils",
 		"chronos": "Chronos",
+		"counter": "Compteurs",
 		"measures": "Mesures",
 		"zoom": "Zoom",
 		"zoom-max": "Max",

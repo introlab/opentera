@@ -38,14 +38,11 @@ function startChronosFromDialog(){
     if (partSelect === 0){
         // All participants
         for (let i=0; i<remoteStreams.length; i++){
-            //target_ids.push(remoteStreams[i].peerid);
-            setupChrono(false, i, increment, duration, message);
-            //chronoTargetsIds.push(remoteStreams[i].peerid);
+            if (remoteStreams[i].streamname === 'default')
+                setupChrono(false, i, increment, duration, message);
         }
     }else{
         // One participant... for now!
-        //target_ids = [remoteStreams[partSelect-1].peerid];
-        //chronoTargetsIds.push(remoteStreams[partSelect-1].peerid);
         setupChrono(false, partSelect-1, increment, duration, message);
     }
 }
@@ -73,11 +70,11 @@ function startChrono(){
 }
 
 function setupChrono(local, index, increment=-1, duration = undefined, title=undefined, initial_value = -1){
-    // Start chrono
+    // Setup chrono
     let peer_id;
     if (local === false){
         // Get peer id for index
-        peer_id = remoteContacts[index].peerid;
+        peer_id = remoteStreams[index].peerid;
     }else{
         peer_id = local_peerid;
         index = 0;
@@ -371,3 +368,106 @@ $(document).on('mousemove', '#measureVideoCanvas', function(evt) {
     measureCurrentAngle(x,y);
 
 });
+
+///////////////////////////////////////////
+// COUNTER TOOLS
+///////////////////////////////////////////
+let counterInfos = {};
+function startCountersFromDialog(){
+    // Build list of participants to send
+    let partSelect = Number($('#counterPartSelect').children("option:selected").val());
+
+    // Reset values
+    counterInfos = {};
+    showCounter(true, 1, false);
+    for (let i=0; i<remoteStreams.length; i++){
+        showCounter(false, i+1, false);
+    }
+
+    if (partSelect === -1) {
+        // Self only
+        setupCounter(true, 1);
+        return;
+    }
+
+    if (partSelect === 0){
+        // All participants
+        for (let i=0; i<remoteStreams.length; i++){
+            if (remoteStreams[i].streamname === 'default'){
+                setupCounter(false, i);
+                sendCounterMessage([remoteStreams[i].peerid], true, counterInfos[remoteStreams[i].peerid].value);
+            }
+        }
+
+    }else{
+        // One participant... for now!
+        setupCounter(false, partSelect-1);
+        sendCounterMessage([remoteStreams[partSelect-1].peerid], true, counterInfos[remoteStreams[partSelect-1].peerid].value);
+    }
+}
+
+function setupCounter(local, index, initial_value=0){
+    let peer_id;
+    if (local === false){
+        // Get peer id for index
+        peer_id = remoteStreams[index].peerid;
+    }else{
+        peer_id = local_peerid;
+        index = 0;
+    }
+
+    counterInfos[peer_id] = {"value": initial_value};
+
+    setCounterText(local, index+1, initial_value);
+    showCounter(local, index+1, true);
+}
+
+function counterPlus(local, index){
+    let peer_id;
+    if (local === false){
+        // Get peer id for index
+        peer_id = remoteStreams[index-1].peerid;
+    }else{
+        peer_id = local_peerid;
+    }
+
+    counterInfos[peer_id].value = counterInfos[peer_id].value + 1;
+    setCounterText(local, index, counterInfos[peer_id].value);
+    if (local === false){
+        sendCounterMessage([peer_id], true, counterInfos[peer_id].value);
+    }
+
+}
+
+function counterMinus(local, index){
+    let peer_id;
+    if (local === false){
+        // Get peer id for index
+        peer_id = remoteStreams[index-1].peerid;
+    }else{
+        peer_id = local_peerid;
+    }
+
+    counterInfos[peer_id].value = counterInfos[peer_id].value - 1;
+    if (counterInfos[peer_id].value < 0)
+        counterInfos[peer_id].value = 0;
+    setCounterText(local, index, counterInfos[peer_id].value);
+    if (local === false){
+        sendCounterMessage([peer_id], true, counterInfos[peer_id].value);
+    }
+}
+
+function stopCounter(local, index){
+    let peer_id;
+    if (local === false){
+        // Get peer id for index
+        peer_id = remoteStreams[index-1].peerid;
+    }else{
+        peer_id = local_peerid;
+    }
+    delete counterInfos[peer_id];
+    showCounter(local, index, false);
+    if (!local){
+        sendCounterMessage([peer_id], false, 0);
+    }
+}

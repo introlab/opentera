@@ -733,6 +733,7 @@ function streamDisconnected(callerid, mediaStream, streamName){
     // Stop chronos if it's the default stream that was stopped
     if (streamName === 'default'){
         stopChrono(isParticipant, slot+1, true);
+        showCounter(isParticipant, slot+1, false);
         playSound("audioDisconnected");
     }
 
@@ -1101,6 +1102,14 @@ function dataReception(sendercid, msgType, msgData, targeting) {
         }
     }
 
+    if (msgType === "Counter"){
+        if (msgData.state === true){
+            setupCounter(true, 1, msgData.value);
+        }else{
+            showCounter(true, 1, false);
+        }
+    }
+
     if (msgType === "queryConfig"){
         // Send audio & video sources, and current config
         // Check if querying peer is a user, otherwise ignore.
@@ -1405,6 +1414,22 @@ function sendChronoMessage(target_peerids, state, msg = undefined, duration=unde
     if (easyrtc.webSocketConnected){
         for (let i=0; i<target_peerids.length; i++){
             easyrtc.sendDataWS( target_peerids[i], 'Chrono', request,
+                function(ackMesg) {
+                    //console.error("ackMsg:",ackMesg);
+                    if( ackMesg.msgType === 'error' ) {
+                        console.error(ackMesg.msgData.errorText);
+                    }
+                });
+        }
+    }
+}
+
+function sendCounterMessage(target_peerids, state, value){
+    let request = {"state": state, "value": value};
+
+    if (easyrtc.webSocketConnected){
+        for (let i=0; i<target_peerids.length; i++){
+            easyrtc.sendDataWS( target_peerids[i], 'Counter', request,
                 function(ackMesg) {
                     //console.error("ackMsg:",ackMesg);
                     if( ackMesg.msgType === 'error' ) {
