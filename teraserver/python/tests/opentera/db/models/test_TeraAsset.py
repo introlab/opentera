@@ -55,6 +55,7 @@ class TeraAssetTest(BaseModelsTest):
                     self.assertTrue('asset_service_uuid' in json)
                     self.assertTrue('asset_type' in json)
                     self.assertTrue('asset_datetime' in json)
+                    self.assertTrue('asset_expiration_datetime' in json)
 
                     # Make sure deleted at field not there
                     self.assertFalse('deleted_at' in json)
@@ -72,6 +73,8 @@ class TeraAssetTest(BaseModelsTest):
                 self.assertEqual(new_asset.id_asset, asset.id_asset)
                 self.assertEqual(new_asset.id_device, asset.id_device)
                 self.assertEqual(new_asset.id_session, asset.id_session)
+                self.assertEqual(new_asset.asset_datetime, asset.asset_datetime)
+                self.assertEqual(new_asset.asset_expiration_datetime, asset.asset_expiration_datetime)
 
     def test_ids_uuids_get_methods(self):
         with self._flask_app.app_context():
@@ -238,6 +241,7 @@ class TeraAssetTest(BaseModelsTest):
             self.assertIsNone(asset.id_user)
             self.assertIsNone(asset.id_service)
             self.assertIsNone(asset.asset_datetime)
+            self.assertIsNone(asset.asset_expiration_datetime)
 
             # Destroy asset
             TeraAsset.delete(asset.id_asset)
