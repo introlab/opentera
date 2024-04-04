@@ -164,6 +164,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
         from modules.FlaskModule.API.user.UserQueryDeviceSubTypes import UserQueryDeviceSubTypes
         from modules.FlaskModule.API.user.UserQueryAssets import UserQueryAssets
+        from modules.FlaskModule.API.user.UserQueryAssetsArchive import UserQueryAssetsArchive
         from modules.FlaskModule.API.user.UserQueryServices import UserQueryServices
         from modules.FlaskModule.API.user.UserQueryServiceProjects import UserQueryServiceProjects
         from modules.FlaskModule.API.user.UserQueryServiceSites import UserQueryServiceSites
@@ -185,6 +186,7 @@ class FlaskModule(BaseModule):
 
         # Resources
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryAssetsArchive,        '/assets/archive', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
         # namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
