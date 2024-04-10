@@ -18,6 +18,7 @@ import subprocess
 import json
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisVars import RedisVars
+import datetime
 
 # Parser definition(s)
 # GET
@@ -149,12 +150,18 @@ class UserQueryAssetsArchive(Resource):
         # Clean up unused service in asset map
         asset_map_per_service = {k: v for k, v in asset_map_per_service.items() if len(v['service_assets']) > 0}
 
+        # Generate archive file name with current time
+        # create a string with the current date and time
+        archive_name = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_archive.zip"
+
         job_info = {'job_id': job_id,
                     'server_name': server_name,
                     'port': port,
                     'service_key': service_key.decode('utf-8'),
                     'status': 'running',
-                    'assets_map': asset_map_per_service}
+                    'assets_map': asset_map_per_service,
+                    'owner_uuid': current_user.user_uuid,
+                    'archive_name': archive_name}
 
         # TODO set job information with expiration
         self.module.redisSet(job_id, json.dumps(job_info), ex=60)
@@ -165,78 +172,6 @@ class UserQueryAssetsArchive(Resource):
         process = subprocess.Popen(command)
 
         return asset_map_per_service
-
-        # user_access = DBManager.userAccess(current_user)
-        #
-        # service_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
-        # servername = self.module.config.server_config['hostname']
-        # port = self.module.config.server_config['port']
-        # if 'X_EXTERNALSERVER' in request.headers:
-        #     servername = request.headers['X_EXTERNALSERVER']
-        #
-        # if 'X_EXTERNALPORT' in request.headers:
-        #     port = request.headers['X_EXTERNALPORT']
-        #
-        # # Load all enabled services
-        # services_infos = {service.service_uuid: service.service_clientendpoint
-        #                   for service in TeraService.query_with_filters({'service_enabled': True})}
-        #
-        # # Create an in-memory binary stream to store the zip file
-        # zip_buffer = BytesIO()
-        #
-        # # Create a ZipFile object to write to the in-memory stream
-        # with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
-        #
-        #     project: TeraProject = TeraProject.get_project_by_id(1)
-        #     site = project.project_site
-        #
-        #     # Already filtered with accessible participants
-        #     participants: list[TeraParticipant] = user_access.query_all_participants_for_project(project.id_project)
-        #
-        #     for participant in participants:
-        #         # Get all assets from participant
-        #         sessions: list[TeraSession] = TeraSession.get_sessions_for_participant(participant.id_participant)
-        #
-        #         for sess in sessions:
-        #             assets: list[TeraAsset] = TeraAsset.get_assets_for_session(sess.id_session)
-        #             for asset in assets:
-        #
-        #                 # Verify if service is enabled
-        #                 if asset.asset_service_uuid in services_infos and asset.asset_service_owner:
-        #
-        #                     # Get the file (from the service that created the file)
-        #                     service = asset.asset_service_owner
-        #                     service_token = service.get_token(service_key)
-        #
-        #                     # Generate access token
-        #                     access_token = asset.get_access_token([asset.asset_uuid], service_key,
-        #                                                           service.service_uuid)
-        #
-        #                     # What to do with duplicated names ?
-        #                     filepath = site.site_name + '/' + project.project_name + '/' + participant.participant_name \
-        #                                + '/' + sess.session_name + '/' + asset.asset_name
-        #
-        #                     # Generate URL to fetch asset
-        #                     params = {'access_token': access_token, 'asset_uuid': asset.asset_uuid}
-        #                     url = 'https://' + servername + ':' + str(port) \
-        #                           + services_infos[asset.asset_service_uuid] + '/api/assets'
-        #
-        #                     headers = {'Authorization': 'OpenTera ' + service_token}
-        #                     response = requests.get(url=url, params=params, headers=headers, verify=False)
-        #
-        #                     if response.status_code == 200:
-        #                         zip_file.writestr(filepath, response.content)
-        #
-        # # Set the BytesIO object's position to the beginning
-        # zip_buffer.seek(0)
-        #
-        # # Create a Flask response with the zip file as the data
-        # response = Response(zip_buffer.getvalue(), mimetype='application/zip')
-        #
-        # # Set appropriate content-disposition headers
-        # response.headers['Content-Disposition'] = 'attachment; filename=data.zip'
-        #
-        # return response
 
     @api.doc(description='Create asset archive.',
              responses={501: 'Unable to create asset information from here'},
