@@ -49,7 +49,21 @@ class UserQueryAssetsArchive(Resource):
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
-        assets_list = []
+        asset_map_per_service = {}
+
+        service_key = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
+
+        # Load all enabled services and store information
+        for service in TeraService.query_with_filters({'service_enabled': True}):
+            if service.service_key == 'OpenTeraServer':
+                continue
+
+            service_token = service.get_token(service_key)
+            # Fill all required info for service
+            asset_map_per_service[service.service_key] = {'service_uuid': service.service_uuid,
+                                                          'service_assets': [],
+                                                          'service_endpoint': service.service_clientendpoint,
+                                                          'service_token': service_token}
 
         # Base server information
         service_key: bytes = self.module.redisGet(RedisVars.RedisVar_ServiceTokenAPIKey)
@@ -68,8 +82,10 @@ class UserQueryAssetsArchive(Resource):
 
         def add_asset_to_list(asset: TeraAsset, path: str = ''):
             value = asset.to_json(minimal=False)
-            value['path'] = f"{path}/{asset.asset_name}"
-            assets_list.append(value)
+            value['path'] = f"{path}"
+            current_service = TeraService.get_service_by_uuid(asset.asset_service_uuid)
+            if current_service.service_key in asset_map_per_service:
+                asset_map_per_service[current_service.service_key]['service_assets'].append(value)
 
         def get_assets_for_session(sess: TeraSession, path: str = ''):
             assets: list[TeraAsset] = TeraAsset.get_assets_for_session(sess.id_session)
@@ -94,26 +110,51 @@ class UserQueryAssetsArchive(Resource):
 
             p = TeraProject.get_project_by_id(args['id_project'])
             site = p.project_site
-            get_assets_for_project(p, site.site_name)
+            get_assets_for_project(p, f"/{site.site_name}")
 
         elif args['id_participant'] is not None:
             # Get all assets for participant
-            pass
+            if args['id_participant'] not in user_access.get_accessible_participants_ids():
+                return gettext('Forbidden'), 403
+
+            participant = TeraParticipant.get_participant_by_id(args['id_participant'])
+            project = participant.participant_project
+            site = project.project_site
+            get_assets_for_participant(participant,
+                                       f"/{site.site_name}/{project.projet_name}")
+
         elif args['id_session'] is not None:
             # Get all assets for session
-            pass
+            if args['id_session'] not in user_access.get_accessible_sessions_ids():
+                return gettext('Forbidden'), 403
+
+            sess = TeraSession.get_session_by_id(args['id_session'])
+
+            # Session is not related to a participant, get all assets with no path
+            if len(sess.session_participants) == 0:
+                get_assets_for_session(sess)
+            else:
+                for participant in sess.session_participants:
+                    project = participant.participant_project
+                    site = project.project_site
+                    get_assets_for_session(sess,
+                                           f"/{site.site_name}/{project.project_name}/{participant.participant_name}")
+
         else:
             return gettext('Missing required parameter'), 400
 
         # Create a job ID (will need a better way to generate ids)
         job_id = 'job.id.1'
 
+        # Clean up unused service in asset map
+        asset_map_per_service = {k: v for k, v in asset_map_per_service.items() if len(v['service_assets']) > 0}
+
         job_info = {'job_id': job_id,
                     'server_name': server_name,
                     'port': port,
                     'service_key': service_key.decode('utf-8'),
                     'status': 'running',
-                    'assets': assets_list}
+                    'assets_map': asset_map_per_service}
 
         # TODO set job information with expiration
         self.module.redisSet(job_id, json.dumps(job_info), ex=60)
@@ -123,7 +164,7 @@ class UserQueryAssetsArchive(Resource):
                    '--job_id', job_id]
         process = subprocess.Popen(command)
 
-        return assets_list
+        return asset_map_per_service
 
         # user_access = DBManager.userAccess(current_user)
         #

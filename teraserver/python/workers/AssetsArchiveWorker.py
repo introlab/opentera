@@ -11,8 +11,7 @@ from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
 
 import requests
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='AssetsArchiveWorker')
@@ -24,13 +23,6 @@ if __name__ == '__main__':
     # Load configuration
     config = ConfigManager()
     config.load_config(args.config)
-
-    # Setup DB
-    db_url = 'postgresql://%(username)s:%(password)s@%(url)s:%(port)s/%(name)s' % config.db_config
-    db_engine = create_engine(db_url, echo=False)
-
-    # Create a sessionmaker
-    SessionMaker = sessionmaker(bind=db_engine)
 
     # Load redis job info
     redis_client = RedisClient(config.redis_config)
@@ -48,7 +40,7 @@ if __name__ == '__main__':
         print('Port not found in job info')
         sys.exit(1)
 
-    if 'assets' not in job_info:
+    if 'assets_map' not in job_info:
         print('Assets not found in job info')
         sys.exit(1)
 
@@ -56,18 +48,11 @@ if __name__ == '__main__':
     port = job_info['port']
     service_key = job_info['service_key'].encode('utf-8')
 
-    for asset in job_info['assets']:
-        with (SessionMaker() as db_session):
+    for _, service_data in job_info['assets_map'].items():
+        for asset in service_data['service_assets']:
+
             path = asset['path'] if 'path' in asset else ''
-
-            # Query service from database
-            service: TeraService = db_session.query(TeraService) \
-                .filter(TeraService.service_uuid == asset['asset_service_uuid']).first()
-
-            if service is None:
-                continue
-
-            service_token = service.get_token(service_key)
+            service_token = service_data['service_token']
 
             # Generate key for asset, request by service
             access_token = TeraAsset.get_access_token([asset['asset_uuid']], service_key,
@@ -78,7 +63,7 @@ if __name__ == '__main__':
             params = {'access_token': access_token, 'asset_uuid': asset['asset_uuid']}
 
             # Request file from service
-            url = 'https://' + server_name + ':' + str(port) + service.service_clientendpoint + '/api/assets'
+            url = 'https://' + server_name + ':' + str(port) + service_data['service_endpoint'] + '/api/assets'
 
             # Certificate will be verified if verify arg is True
             response = requests.get(url=url, params=params, headers=headers, verify=args.verify)
