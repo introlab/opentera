@@ -122,7 +122,7 @@ class UserQueryAssetsArchive(Resource):
             project = participant.participant_project
             site = project.project_site
             get_assets_for_participant(participant,
-                                       f"/{site.site_name}/{project.projet_name}")
+                                       f"/{site.site_name}/{project.project_name}")
 
         elif args['id_session'] is not None:
             # Get all assets for session
