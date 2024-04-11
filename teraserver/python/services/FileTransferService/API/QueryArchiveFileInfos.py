@@ -2,7 +2,7 @@ from flask import request
 from flask_babel import gettext
 from flask_restx import Resource
 from services.FileTransferService.FlaskModule import file_api_ns as api
-from opentera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, current_user_client
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
 import services.FileTransferService.Globals as Globals
 
@@ -14,13 +14,29 @@ get_parser.add_argument('archive_uuid', type=str, required=True, help='UUID of t
 post_schema = api.schema_model('archive',
                                {'properties':
                                    {
-                                       'archive_uuid':
-                                           {
-                                               'type': 'string',
-                                               'location': 'json'
-                                           }
+                                        'id_archive_file_data':
+                                        {
+                                           'type': 'integer',
+                                           'location': 'json'
+                                        },
+                                        'archive_original_filename':
+                                        {
+                                           'type': 'string',
+                                           'location': 'json'
+                                        },
+                                        'archive_owner_uuid':
+                                        {
+                                              'type': 'string',
+                                              'location': 'json'
+                                        },
+                                        'archive_status':
+                                        {
+                                              'type': 'integer',
+                                              'location': 'json'
+                                        }
                                    }
-                                })
+                                }
+                               )
 
 
 class QueryArchiveFileInfos(Resource):
@@ -46,7 +62,7 @@ class QueryArchiveFileInfos(Resource):
 
         return archive.to_json()
 
-    @api.expect(post_schema)
+    @api.expect(post_schema, validate=False)
     @api.doc(description='Update information about stored archive',
              responses={200: 'Success - Return information about file archive',
                         400: 'Required parameter is missing',
@@ -57,14 +73,42 @@ class QueryArchiveFileInfos(Resource):
             return gettext('Badly formatted request'), 400
 
         archive_info = request.json['archive']
-        # if 'id_archive_file_data' not in archive_info:
-        #     return gettext('Badly formatted request'), 400
-        #
-        # if archive_info['id_archive_file_data'] == 0:
-        #     # Create new archive
-        #     archive = ArchiveFileData()
-        #     ArchiveFileData.insert(archive)
 
-        return gettext('Not implemented yet'), 501
+        if 'id_archive_file_data' not in archive_info:
+            return gettext('Badly formatted request'), 400
 
+        if 'archive_original_filename' not in archive_info:
+            return gettext('Missing original filename'), 400
+
+        if 'archive_owner_uuid' not in archive_info:
+            return gettext('Missing owner UUID'), 400
+
+        if archive_info['id_archive_file_data'] == 0:
+            archive = ArchiveFileData()
+            try:
+                archive.from_json(archive_info)
+                ArchiveFileData.insert(archive)
+            except Exception as e:
+                return gettext('Error parsing archive information'), 400
+
+            return archive.to_json()
+
+        else:
+            # Only allow status update for now
+            archive = ArchiveFileData.get_archive_by_id(archive_info['id_archive_file_data'])
+            if archive is None:
+                return gettext('No archive found'), 404
+
+            if 'archive_status' not in archive_info:
+                return gettext('Missing archive status'), 400
+            else:
+                try:
+                    archive.archive_status = archive_info['archive_status']
+                    archive.commit()
+                except Exception as e:
+                    return gettext('Error parsing archive information'), 400
+
+                return archive.to_json()
+
+            return gettext('Badly formatted request'), 400
 

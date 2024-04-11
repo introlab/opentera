@@ -5,6 +5,7 @@ from sqlalchemy import Column, ForeignKey, Sequence, Integer, String, BigInteger
 import os
 from enum import Enum
 from datetime import datetime
+import uuid
 
 
 class TeraArchiveStatus(Enum):
@@ -19,7 +20,7 @@ class ArchiveFileData(BaseModel):
     __tablename__ = "t_archive_file_data"
     id_archive_file_data = Column(Integer, Sequence('id_archive_file_data_sequence'), primary_key=True,
                                   autoincrement=True)
-    archive_uuid = Column(String(36), nullable=False, unique=True)
+    archive_uuid = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
     archive_original_filename = Column(String, nullable=False)
     archive_file_size = Column(BigInteger, nullable=False, default=0)
 

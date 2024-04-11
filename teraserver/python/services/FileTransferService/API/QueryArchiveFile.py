@@ -40,7 +40,7 @@ class QueryArchiveFile(Resource):
         # TODO verify permissions
         archive = ArchiveFileData.get_archive_by_uuid(args['archive_uuid'])
         if archive is None:
-            return gettext('No asset found'), 404
+            return gettext('No archive found'), 404
 
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
@@ -57,7 +57,7 @@ class QueryArchiveFile(Resource):
             return gettext('Wrong content type'), 400
 
         if 'file_archive' not in request.form:
-            return gettext('Missing file asset information'), 400
+            return gettext('Missing file archive information'), 400
 
         if 'file' not in request.files:
             return gettext('Missing uploaded file'), 400
@@ -89,4 +89,4 @@ class QueryArchiveFile(Resource):
             return gettext('No archive found'), 404
 
         archive.delete_file_archive(flask_app.config['UPLOAD_FOLDER'])
-        return 'Archive deleted', 200
+        return gettext('Archive deleted'), 200

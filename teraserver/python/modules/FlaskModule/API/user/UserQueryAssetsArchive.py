@@ -145,7 +145,7 @@ class UserQueryAssetsArchive(Resource):
             return gettext('Missing required parameter'), 400
 
         # Create a job ID (will need a better way to generate ids)
-        job_id = 'job.id.1'
+        job_id = f"worker.id.user.{current_user.user_uuid}.{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
 
         # Clean up unused service in asset map
         asset_map_per_service = {k: v for k, v in asset_map_per_service.items() if len(v['service_assets']) > 0}
@@ -154,14 +154,38 @@ class UserQueryAssetsArchive(Resource):
         # create a string with the current date and time
         archive_name = f"{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_archive.zip"
 
+        # Create archive basic entry in file transfer service
+        archive_info = {
+                            'archive':
+                            {
+                                'id_archive_file_data': 0,
+                                'archive_original_filename': archive_name,
+                                'archive_owner_uuid': current_user.user_uuid
+                            }
+                       }
+
+        # Send archive information to file transfer service
+        # TODO TLS verification
+        file_transfer_service_token = TeraService.get_service_by_key('FileTransferService').get_token(service_key)
+        archive_file_infos_url = f"https://{server_name}:{port}/file/api/archives/infos"
+        archive_file_upload_url = f"https://{server_name}:{port}/file/api/archives"
+
+        response = requests.post(archive_file_infos_url, json=archive_info,
+                                 headers={'Authorization': 'OpenTera ' + file_transfer_service_token}, verify=False)
+
+        if response.status_code != 200:
+            return gettext('Unable to create archive information from FileTransferService'), 501
+
         job_info = {'job_id': job_id,
                     'server_name': server_name,
                     'port': port,
                     'service_key': service_key.decode('utf-8'),
-                    'status': 'running',
+                    'archive_file_infos_url': archive_file_infos_url,
+                    'archive_file_upload_url': archive_file_upload_url,
+                    'service_token': file_transfer_service_token,
                     'assets_map': asset_map_per_service,
-                    'owner_uuid': current_user.user_uuid,
-                    'archive_name': archive_name}
+                    'archive_info': response.json()
+                    }
 
         # TODO set job information with expiration
         self.module.redisSet(job_id, json.dumps(job_info), ex=60)
@@ -171,7 +195,7 @@ class UserQueryAssetsArchive(Resource):
                    '--job_id', job_id]
         process = subprocess.Popen(command)
 
-        return asset_map_per_service
+        return response.json()
 
     @api.doc(description='Create asset archive.',
              responses={501: 'Unable to create asset information from here'},
