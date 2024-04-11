@@ -113,8 +113,11 @@ if __name__ == '__main__':
     # Set the BytesIO object's position to the beginning
     zip_buffer.seek(0)
 
-    # Transfer file to file transfer service
-
+    # Upload file to file transfer service
+    response = requests.post(archive_file_upload_url,
+                             files={'file': (archive_info['archive_original_filename'], zip_buffer)},
+                             data={'archive': json.dumps(archive_info)},
+                             headers={'Authorization': 'OpenTera ' + job_info['service_token']}, verify=args.verify)
 
     # Close will automatically delete file
     zip_buffer.close()
@@ -124,4 +127,4 @@ if __name__ == '__main__':
 
 
 
-    print(config, job_info)
+    print(response.json())

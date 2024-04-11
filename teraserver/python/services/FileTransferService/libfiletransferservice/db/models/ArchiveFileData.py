@@ -24,10 +24,12 @@ class ArchiveFileData(BaseModel):
     archive_original_filename = Column(String, nullable=False)
     archive_file_size = Column(BigInteger, nullable=False, default=0)
 
-    archive_datetime = Column(TIMESTAMP(timezone=True), nullable=False, default=lambda: str(datetime.now()))
+    archive_creation_datetime = Column(TIMESTAMP(timezone=True), nullable=False, default=lambda: str(datetime.now()))
+    archive_upload_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
     archive_expiration_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
     archive_status = Column(Integer, nullable=False, default=TeraArchiveStatus.STATUS_PENDING.value)
     archive_owner_uuid = Column(String(36), nullable=False)
+    archive_uploader_uuid = Column(String(36), nullable=True)
 
     @staticmethod
     def get_archive_by_uuid(uuid_archive: str):

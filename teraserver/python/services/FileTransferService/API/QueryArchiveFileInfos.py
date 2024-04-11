@@ -3,8 +3,10 @@ from flask_babel import gettext
 from flask_restx import Resource
 from services.FileTransferService.FlaskModule import file_api_ns as api
 from opentera.services.ServiceAccessManager import ServiceAccessManager, current_service_client, current_user_client
+from opentera.services.ServiceAccessManager import current_login_type, LoginType
+from opentera.services.ServiceAccessManager import current_device_client, current_participant_client
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
-import services.FileTransferService.Globals as Globals
+from werkzeug.utils import secure_filename
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -54,13 +56,27 @@ class QueryArchiveFileInfos(Resource):
     def get(self):
         args = get_parser.parse_args()
 
-        # TODO verify archive access
         archive = ArchiveFileData.get_archive_by_uuid(uuid_archive=args['archive_uuid'])
 
         if not archive:
             return gettext('No archive found'), 404
 
-        return archive.to_json()
+        if current_login_type == LoginType.USER_LOGIN:
+            if archive.archive_owner_uuid != current_user_client.user_uuid:
+                return gettext('Access denied for that archive'), 403
+            return archive.to_json()
+        elif current_login_type == LoginType.PARTICIPANT_LOGIN:
+            if archive.archive_owner_uuid != current_participant_client.participant_uuid:
+                return gettext('Access denied for that archive'), 403
+            return archive.to_json()
+        elif current_login_type == LoginType.DEVICE_LOGIN:
+            if archive.archive_owner_uuid != current_device_client.device_uuid:
+                return gettext('Access denied for that archive'), 403
+            return archive.to_json()
+        elif current_login_type == LoginType.SERVICE_LOGIN:
+            return archive.to_json()
+
+        return gettext('Access denied for that archive'), 403
 
     @api.expect(post_schema, validate=False)
     @api.doc(description='Update information about stored archive',
@@ -87,6 +103,8 @@ class QueryArchiveFileInfos(Resource):
             archive = ArchiveFileData()
             try:
                 archive.from_json(archive_info)
+                # Make sure file name is secure
+                archive.archive_original_filename = secure_filename(archive.archive_original_filename)
                 ArchiveFileData.insert(archive)
             except Exception as e:
                 return gettext('Error parsing archive information'), 400

@@ -197,12 +197,6 @@ class UserQueryAssetsArchive(Resource):
 
         return response.json()
 
-    @api.doc(description='Create asset archive.',
-             responses={501: 'Unable to create asset information from here'},
-             params={'token': 'Secret token'})
-    @user_multi_auth.login_required
-    def post(self):
-        pass
 
 
 
