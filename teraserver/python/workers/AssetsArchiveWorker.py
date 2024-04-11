@@ -123,8 +123,5 @@ if __name__ == '__main__':
     zip_buffer.close()
     end_time = datetime.now()
     duration_s = (end_time - start_time).total_seconds()
-    print(f"Duration: {duration_s}")
-
-
-
-    print(response.json())
+    print(f"Duration: {duration_s}, return code: {response.status_code}")
+    sys.exit(0)
