@@ -12,7 +12,7 @@ let localStreams = []; // {peerid, streamname, stream: MediaStream}, order is im
 var connected = false;
 var needToCallOtherUsers = false;
 
-let preinitCameras = true;
+let preinitCameras = false;
 
 function connect() {
 
