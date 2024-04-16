@@ -7,6 +7,7 @@ from opentera.services.ServiceAccessManager import current_login_type, LoginType
 from opentera.services.ServiceAccessManager import current_device_client, current_participant_client
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
 from werkzeug.utils import secure_filename
+from services.FileTransferService.API.send_archive_event import send_archive_event
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -109,6 +110,10 @@ class QueryArchiveFileInfos(Resource):
             except Exception as e:
                 return gettext('Error parsing archive information'), 400
 
+            # Send event
+            send_archive_event(archive)
+
+            # Send response
             return archive.to_json()
 
         else:
@@ -126,7 +131,8 @@ class QueryArchiveFileInfos(Resource):
                 except Exception as e:
                     return gettext('Error parsing archive information'), 400
 
+                # Send event
+                send_archive_event(archive)
+
+                # Send response
                 return archive.to_json()
-
-            return gettext('Badly formatted request'), 400
-

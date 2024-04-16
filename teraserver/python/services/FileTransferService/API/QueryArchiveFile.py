@@ -10,6 +10,7 @@ from opentera.services.ServiceAccessManager import ServiceAccessManager, current
 from services.FileTransferService.FlaskModule import flask_app
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import TeraArchiveStatus
+from services.FileTransferService.API.send_archive_event import send_archive_event
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -134,6 +135,8 @@ class QueryArchiveFile(Resource):
             # Update DB
             archive.commit()
 
+            send_archive_event(archive)
+
             return archive.to_json()
         except Exception as e:
             return gettext('Error parsing archive information : ') + str(e), 400
@@ -170,5 +173,11 @@ class QueryArchiveFile(Resource):
             return gettext('Access denied to the requested archive'), 403
 
         # Delete archive
+        archive_copy = ArchiveFileData()
+        archive_copy.from_json(archive.to_json())
+        archive_copy.archive_status = TeraArchiveStatus.STATUS_DELETED.value
+        send_archive_event(archive_copy)
+
         archive.delete_file_archive(flask_app.config['UPLOAD_FOLDER'])
+
         return gettext('Archive deleted'), 200

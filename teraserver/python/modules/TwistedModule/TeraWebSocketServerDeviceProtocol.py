@@ -4,7 +4,7 @@ from autobahn.websocket.types import ConnectionDeny
 # OpenTera
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-
+from opentera.redis.RedisVars import RedisVars
 
 # Messages
 import opentera.messages.python as messages
@@ -34,21 +34,25 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         # print(ret)
 
         if self.device:
-            # This will wait until subscribe result is available...
-            # Register only once to events from modules, will be filtered after
-            ret1 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            # Events from UserManagerModule
+            yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
             # Events from FlaskModule
-            ret2 = yield self.subscribe_pattern_with_callback(
+            yield self.subscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, self.device.device_uuid),
                 self.redis_tera_module_message_received)
 
-            ret3 = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            # Events from DatabaseModule
+            yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.DATABASE_MODULE_NAME), self.redis_event_message_received)
 
+            # Events from FileTransferService
+            yield self.subscribe_pattern_with_callback(
+                RedisVars.build_service_event_topic('FileTransferService'), self.redis_event_message_received)
+
             # Direct events
-            ret4 = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
             tera_message = self.create_tera_message(
@@ -129,21 +133,27 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
             self.publish(create_module_message_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                          tera_message.SerializeToString())
 
-            # Unsubscribe to events
-            ret1 = yield self.unsubscribe_pattern_with_callback(
+            # Events from UserManagerModule
+            yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
 
             # Events from FlaskModule
-            ret2 = yield self.unsubscribe_pattern_with_callback(
+            yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.TWISTED_MODULE_NAME, self.device.device_uuid),
                 self.redis_tera_module_message_received)
 
-            ret3 = yield self.unsubscribe_pattern_with_callback(
+            # Events from DatabaseModule
+            yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
                 self.redis_event_message_received)
 
-            ret4 = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            # Events from FileTransferService
+            yield self.unsubscribe_pattern_with_callback(
+                RedisVars.build_service_event_topic('FileTransferService'), self.redis_event_message_received)
+
+            # Direct events
+            yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
             self.logger.log_info(self, "Device websocket disconnected",

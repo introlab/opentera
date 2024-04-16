@@ -17,6 +17,7 @@ from twisted.internet import defer
 from modules.UserEventManager import UserEventManager
 
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
+from opentera.redis.RedisVars import RedisVars
 
 
 class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
@@ -42,13 +43,17 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             # Register only once to events from modules, will be filtered after
 
             # Events from UserManagerModule
-            ret = yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
+            yield self.subscribe_pattern_with_callback(create_module_event_topic_from_name(
                 ModuleNames.USER_MANAGER_MODULE_NAME), self.redis_event_message_received)
 
             # Events from FlaskModule
-            ret = yield self.subscribe_pattern_with_callback(
+            yield self.subscribe_pattern_with_callback(
                 create_module_event_topic_from_name(
                     ModuleNames.TWISTED_MODULE_NAME, self.user.user_uuid), self.redis_tera_module_message_received)
+
+            # Events from FileTransferService
+            yield self.subscribe_pattern_with_callback(
+                RedisVars.build_service_event_topic('FileTransferService'), self.redis_event_message_received)
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
@@ -60,7 +65,7 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                     self.redis_event_message_received)
 
             # Direct events
-            ret = yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
+            yield self.subscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # MAKE SURE TO SUBSCRIBE TO EVENTS BEFORE SENDING ONLINE MESSAGE
             # Advertise that we have a new user
@@ -143,15 +148,19 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                          tera_message.SerializeToString())
 
             # Unsubscribe to events
-            ret = yield self.unsubscribe_pattern_with_callback(
+            yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(ModuleNames.USER_MANAGER_MODULE_NAME),
                 self.redis_event_message_received)
 
             # Events from FlaskModule
-            ret = yield self.unsubscribe_pattern_with_callback(
+            yield self.unsubscribe_pattern_with_callback(
                 create_module_event_topic_from_name(
                     ModuleNames.TWISTED_MODULE_NAME, self.user.user_uuid),
                 self.redis_tera_module_message_received)
+
+            # Events from FileTransferService
+            yield self.unsubscribe_pattern_with_callback(
+                RedisVars.build_service_event_topic('FileTransferService'), self.redis_event_message_received)
 
             # Specific events from DatabaseModule
             # We are specific otherwise we receive every database event
