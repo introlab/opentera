@@ -111,3 +111,9 @@ class UserEventManager(EventManager):
         #
         # # Default = no access
         # return False
+
+    def filter_archive_event(self, event: messages.ArchiveEvent):
+        if event.owner_uuid == self.user.user_uuid:
+            return True
+        # Default = no access
+        return False

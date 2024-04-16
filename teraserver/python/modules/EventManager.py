@@ -44,6 +44,10 @@ class EventManager:
         # Default = no access
         return False
 
+    def filter_archive_event(self, event: messages.ArchiveEvent):
+        # Default = no access
+        return False
+
     def filter_events(self, message: messages.TeraEvent) -> messages.TeraEvent:
         # Will receive message containing events
         # Let's try to unpack the messages first and call the adequate method
@@ -70,38 +74,35 @@ class EventManager:
             leave_session_event = messages.LeaveSessionEvent()
             # Test for JoinSessionReply
             join_session_reply = messages.JoinSessionReplyEvent()
+            # Test for ArchiveEvent
+            archive_event = messages.ArchiveEvent()
 
             if any_msg.Unpack(device_event):
                 if not self.filter_device_event(device_event):
-                    print('removing:', device_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(join_session_event):
                 if not self.filter_join_session_event(join_session_event):
-                    print('removing:', join_session_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(participant_event):
                 if not self.filter_participant_event(participant_event):
-                    print('removing:', participant_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(stop_session_event):
                 if not self.filter_stop_session_event(stop_session_event):
-                    print('removing:', stop_session_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(leave_session_event):
                 if not self.filter_leave_session_event(leave_session_event):
-                    print('removing:', leave_session_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(user_event):
                 if not self.filter_user_event(user_event):
-                    print('removing:', user_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(database_event):
                 if not self.filter_database_event(database_event):
-                    print('removing', database_event)
                     filtered_message.events.remove(any_msg)
             elif any_msg.Unpack(join_session_reply):
                 if not self.filter_join_session_reply_event(join_session_reply):
-                    print('removing', join_session_reply)
+                    filtered_message.events.remove(any_msg)
+            elif any_msg.Unpack(archive_event):
+                if not self.filter_archive_event(archive_event):
                     filtered_message.events.remove(any_msg)
             else:
                 print('Unknown event, removing: ', any_msg)

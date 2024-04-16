@@ -13,7 +13,7 @@ class TeraArchiveStatus(Enum):
     STATUS_INPROGRESS = 1
     STATUS_COMPLETED = 2
     STATUS_CANCELLED = 3
-    STATUS_TERMINATED = 4
+    STATUS_DELETED = 4
 
 
 class ArchiveFileData(BaseModel):

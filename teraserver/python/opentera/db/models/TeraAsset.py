@@ -23,6 +23,7 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
     asset_service_uuid = Column(String(36), ForeignKey("t_services.service_uuid", ondelete='cascade'), nullable=False)
     asset_type = Column(String, nullable=False)  # MIME Type
     asset_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
+    asset_expiration_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
 
     asset_session = relationship("TeraSession", back_populates='session_assets')
     asset_device = relationship("TeraDevice", back_populates='device_assets')
