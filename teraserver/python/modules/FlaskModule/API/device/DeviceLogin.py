@@ -46,6 +46,12 @@ class DeviceLogin(Resource):
         # Reply device information
         response = {'device_info': current_device.to_json(minimal=False)}
 
+        # Append device type & subtype
+        if current_device.device_type:
+            response['device_info']['device_type'] = current_device.device_type.device_type_name
+        if current_device.device_subtype:
+            response['device_info']['device_device_subtype'] = current_device.device_subtype.device_subtype_name
+
         device_access = DBManager.deviceAccess(current_device)
 
         # Reply participant information
