@@ -41,7 +41,7 @@ class DeviceQueryDevicesTest(BaseDeviceAPITest):
                     self.assertTrue(field in response.json['device_info'])
 
                 ignore_fields = ['device_projects', 'device_participants', 'device_sessions', 'device_certificate',
-                                 'device_type', 'device_subtype', 'authenticated', 'device_assets', 'device_sites',
+                                 'authenticated', 'device_assets', 'device_sites',
                                  'device_onlineable', 'device_config', 'device_notes', 'device_lastonline',
                                  'device_infos', 'device_token']
                 for field in ignore_fields:
