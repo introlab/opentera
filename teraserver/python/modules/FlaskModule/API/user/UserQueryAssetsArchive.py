@@ -63,6 +63,8 @@ class UserQueryAssetsArchive(Resource):
             # Fill all required info for service
             asset_map_per_service[service.service_key] = {'service_uuid': service.service_uuid,
                                                           'service_assets': [],
+                                                          'service_hostname': service.service_hostname,
+                                                          'service_port': service.service_port,
                                                           'service_endpoint': service.service_clientendpoint,
                                                           'service_token': service_token}
 

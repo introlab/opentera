@@ -76,7 +76,8 @@ if __name__ == '__main__':
     # Change status of the file transfer to 'in progress'
     archive_info['archive_status'] = 1 # STATUS_INPROGRESS
     response = requests.post(archive_file_infos_url, json={'archive': archive_info},
-                             headers={'Authorization': 'OpenTera ' + job_info['service_token']}, verify=args.verify)
+                             headers={'Authorization': 'OpenTera ' + job_info['service_token']},
+                             timeout=30, verify=args.verify)
 
     # Create a temporary file to store the zip file, deleted when closed
     zip_buffer = tempfile.NamedTemporaryFile(delete=True)
@@ -99,10 +100,11 @@ if __name__ == '__main__':
                 params = {'access_token': access_token, 'asset_uuid': asset['asset_uuid']}
 
                 # Request file from service
-                url = 'https://' + server_name + ':' + str(port) + service_data['service_endpoint'] + '/api/assets'
+                # url = 'https://' + server_name + ':' + str(port) + service_data['service_endpoint'] + '/api/assets'
+                url = f'https://{service_data["service_hostname"]}:{service_data["service_port"]}/api/assets'
 
                 # Certificate will be verified if verify arg is True
-                response = requests.get(url=url, params=params, headers=headers, verify=args.verify)
+                response = requests.get(url=url, params=params, headers=headers, timeout=300, verify=args.verify)
 
                 if response.status_code == 200:
                     # Add to zip file
@@ -117,6 +119,7 @@ if __name__ == '__main__':
     response = requests.post(archive_file_upload_url,
                              files={'file': (archive_info['archive_original_filename'], zip_buffer)},
                              data={'archive': json.dumps(archive_info)},
+                             timeout=30,
                              headers={'Authorization': 'OpenTera ' + job_info['service_token']}, verify=args.verify)
 
     # Close will automatically delete file
