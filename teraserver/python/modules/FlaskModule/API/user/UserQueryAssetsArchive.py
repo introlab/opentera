@@ -166,12 +166,19 @@ class UserQueryAssetsArchive(Resource):
 
         # Send archive information to file transfer service
         # TODO TLS verification
-        file_transfer_service_token = TeraService.get_service_by_key('FileTransferService').get_token(service_key)
-        archive_file_infos_url = f"https://{server_name}:{port}/file/api/archives/infos"
-        archive_file_upload_url = f"https://{server_name}:{port}/file/api/archives"
+        file_transfer_service: TeraService = TeraService.get_service_by_key('FileTransferService')
+        file_transfer_service_token = file_transfer_service.get_token(service_key)
+        file_transfer_service_host = file_transfer_service.service_hostname
+        file_transfer_service_port = file_transfer_service.service_port
+
+        #archive_file_infos_url = f"https://{server_name}:{port}/file/api/archives/infos"
+        #archive_file_upload_url = f"https://{server_name}:{port}/file/api/archives"
+        archive_file_infos_url = f"http://{file_transfer_service_host}:{file_transfer_service_port}/api/archives/infos"
+        archive_file_upload_url = f"http://{file_transfer_service_host}:{file_transfer_service_port}/api/archives"
 
         response = requests.post(archive_file_infos_url, json=archive_info,
-                                 headers={'Authorization': 'OpenTera ' + file_transfer_service_token}, verify=False)
+                                 headers={'Authorization': 'OpenTera ' + file_transfer_service_token},
+                                 timeout=30, verify=False)
 
         if response.status_code != 200:
             return gettext('Unable to create archive information from FileTransferService'), 501
@@ -196,7 +203,3 @@ class UserQueryAssetsArchive(Resource):
         process = subprocess.Popen(command)
 
         return response.json()
-
-
-
-
