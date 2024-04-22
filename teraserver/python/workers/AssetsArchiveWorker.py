@@ -101,7 +101,7 @@ if __name__ == '__main__':
 
                 # Request file from service
                 # url = 'https://' + server_name + ':' + str(port) + service_data['service_endpoint'] + '/api/assets'
-                url = f'https://{service_data["service_hostname"]}:{service_data["service_port"]}/api/assets'
+                url = f'http://{service_data["service_hostname"]}:{service_data["service_port"]}/api/assets'
 
                 # Certificate will be verified if verify arg is True
                 response = requests.get(url=url, params=params, headers=headers, timeout=300, verify=args.verify)
