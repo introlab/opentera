@@ -53,7 +53,7 @@ class QueryArchiveFile(Resource):
             return gettext('No archive found'), 404
 
         # Verify ownership
-        if archive.owner_uuid != requester_uuid:
+        if archive.archive_owner_uuid != requester_uuid:
             return gettext('Access denied to the requested archive'), 403
 
         src_dir = flask_app.config['UPLOAD_FOLDER']

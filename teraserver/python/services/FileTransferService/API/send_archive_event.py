@@ -20,7 +20,7 @@ def send_archive_event(archive: ArchiveFileData):
         event.archive_uuid = archive.archive_uuid
         event.owner_uuid = archive.archive_owner_uuid
         endpoint = Globals.service.service_info['service_clientendpoint'] + '/api/archives'
-        event.archive_url = f"https://{servername}:{port}{endpoint}?archive_uuid={archive.archive_uuid}"
+        event.archive_url = f"{endpoint}?archive_uuid={archive.archive_uuid} "#f"https://{servername}:{port}{endpoint}?archive_uuid={archive.archive_uuid}"
 
         # Send event
         Globals.service.send_service_event_message(event)
