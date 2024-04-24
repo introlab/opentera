@@ -61,12 +61,19 @@ class FileTransferService(ServiceOpenTeraWithAssets):
                             # Delete the archive
                             if not archive.delete_file_archive(self.upload_directory):
                                 print('Error deleting archive')
+                                self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid}.')
+                            else:
+                                self.logger.log_info('FileTransferService', f'Archive {archive.archive_uuid} deleted.')
                             continue
                     # 2) Verify the state of the archive, if created more than 24 hours ago and not uploaded, delete it
                     elif archive.archive_creation_datetime < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24):
                         if archive.archive_upload_datetime is None:
                             # Delete the archive from DB
-                            ArchiveFileData.delete(archive.id_archive_file_data)
+                            self.logger.log_info('FileTransferService', f'Archive {archive.archive_uuid} deleted.')
+                            try:
+                                ArchiveFileData.delete(archive.id_archive_file_data)
+                            except Exception as e:
+                                self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid} : {e}.')
                             continue
 
 
