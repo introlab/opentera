@@ -58,6 +58,9 @@ class QueryArchiveFile(Resource):
 
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
+        # Log access
+        self.module.logger.log_info('FileTransferService.FlaskModule.QueryArchiveFile', f'User {requester_uuid} downloaded archive {archive.archive_uuid}')
+
         # Send file
         filename = archive.archive_original_filename
         return send_file(src_dir + '/' + str(archive.archive_uuid), as_attachment=True, download_name=filename)
