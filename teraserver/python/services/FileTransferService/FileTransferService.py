@@ -33,7 +33,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
 
         if self.upload_directory is not None:
             # Create cleaning task, every hour by default, can specify period (s) in arg.
-            self.archive_cleaning_task = self.setup_file_archive_cleanup_task(30.0)
+            self.archive_cleaning_task = self.setup_file_archive_cleanup_task(3600.0)
 
 
     def setup_file_archive_cleanup_task(self, period_s:float = 3600.0) -> task.LoopingCall:
