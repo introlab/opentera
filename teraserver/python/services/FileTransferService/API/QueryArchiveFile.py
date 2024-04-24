@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from flask import request, send_file
 from flask_babel import gettext
@@ -111,7 +111,7 @@ class QueryArchiveFile(Resource):
                 return gettext('Filename does not match the archive information'), 400
 
             # Get the data from the post
-            archive.archive_upload_datetime = datetime.now()
+            archive.archive_upload_datetime = datetime.now(timezone.utc)
             archive.archive_uploader_uuid = uploader_uuid
 
             # Save the file

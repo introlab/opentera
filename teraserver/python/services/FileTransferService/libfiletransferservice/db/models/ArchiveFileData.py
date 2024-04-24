@@ -4,7 +4,7 @@ from sqlalchemy import exc
 from sqlalchemy import Column, ForeignKey, Sequence, Integer, String, BigInteger, TIMESTAMP
 import os
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 
@@ -24,7 +24,7 @@ class ArchiveFileData(BaseModel):
     archive_original_filename = Column(String, nullable=False)
     archive_file_size = Column(BigInteger, nullable=False, default=0)
 
-    archive_creation_datetime = Column(TIMESTAMP(timezone=True), nullable=False, default=lambda: str(datetime.now()))
+    archive_creation_datetime = Column(TIMESTAMP(timezone=True), nullable=False, default=lambda: str(datetime.now(timezone.utc)))
     archive_upload_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
     archive_expiration_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
     archive_status = Column(Integer, nullable=False, default=TeraArchiveStatus.STATUS_PENDING.value)
@@ -56,4 +56,3 @@ class ArchiveFileData(BaseModel):
             return False
 
         return True
-
