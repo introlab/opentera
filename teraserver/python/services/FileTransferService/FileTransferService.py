@@ -44,7 +44,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
 
         # Add callbacks for stop and failure.
         d.addCallback(self.cbArchiveLoopDone)
-        d.addErrback(self.ebArvhiveLoopFailed)
+        d.addErrback(self.ebArchiveLoopFailed)
 
         return loop
 
@@ -60,7 +60,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
                         if archive.archive_expiration_datetime < datetime.datetime.now(datetime.timezone.utc):
                             # Delete the archive
                             if not archive.delete_file_archive(self.upload_directory):
-                                print('Error deleting archive')
+                                print(f'Error deleting archive {archive.archive_uuid}')
                                 self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid}.')
                             else:
                                 self.logger.log_info('FileTransferService', f'Archive {archive.archive_uuid} deleted.')
@@ -73,6 +73,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
                             try:
                                 ArchiveFileData.delete(archive.id_archive_file_data)
                             except Exception as e:
+                                print(f'Error deleting archive {archive.archive_uuid}')
                                 self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid} : {e}.')
                             continue
 
@@ -83,11 +84,12 @@ class FileTransferService(ServiceOpenTeraWithAssets):
         """
         print('cbArchiveLoopDone', result)
 
-    def ebArvhiveLoopFailed(self, failure):
+    def ebArchiveLoopFailed(self, failure):
         """
         Called when file archive cleanup task execution failed.
         """
-        print('ebArvhiveLoopFailed', failure)
+        self.logger.log_error('FileTransferService', f'ebArchiveLoopFailed : {failure}.')
+        print('ebArchiveLoopFailed', failure)
 
 
     def verify_file_upload_directory(self, config: ConfigManager, create=True):

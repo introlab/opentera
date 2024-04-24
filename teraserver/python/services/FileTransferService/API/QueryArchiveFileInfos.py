@@ -8,6 +8,7 @@ from opentera.services.ServiceAccessManager import current_device_client, curren
 from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
 from werkzeug.utils import secure_filename
 from services.FileTransferService.API.send_archive_event import send_archive_event
+import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -104,6 +105,13 @@ class QueryArchiveFileInfos(Resource):
             archive = ArchiveFileData()
             try:
                 archive.from_json(archive_info)
+
+                # Add Creation datetime
+                archive.archive_creation_datetime = datetime.datetime.now(datetime.timezone.utc)
+
+                # Add Expiration datetime in 30 days
+                archive.archive_expiration_datetime = archive.archive_creation_datetime + datetime.timedelta(days=30)
+
                 # Make sure file name is secure
                 archive.archive_original_filename = secure_filename(archive.archive_original_filename)
                 ArchiveFileData.insert(archive)
