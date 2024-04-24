@@ -1,6 +1,16 @@
+import requests
+import sys
+import subprocess
+import json
+import datetime
+import threading
+import zipfile
+from io import BytesIO
+
 from flask import session, request, Response
 from flask_restx import Resource, inputs
 from flask_babel import gettext
+
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule import FlaskModule
@@ -10,15 +20,10 @@ from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
-import zipfile
-from io import BytesIO
-import requests
-import sys
-import subprocess
-import json
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisVars import RedisVars
-import datetime
+
+from twisted.internet import reactor
 
 # Parser definition(s)
 # GET
@@ -196,12 +201,41 @@ class UserQueryAssetsArchive(Resource):
                     'archive_info': response.json()
                     }
 
-        # TODO set job information with expiration
+        # Set job information with expiration
         self.module.redisSet(job_id, json.dumps(job_info), ex=60)
 
         # Launch subprocess
         command = [sys.executable, 'workers/AssetsArchiveWorker.py', '--config', 'config/TeraServerConfig.ini',
                    '--job_id', job_id]
-        process = subprocess.Popen(command)
+        
+        # Launch process, will be monitored by a thread
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Monitor process termination with callback
+        def process_monitor_thread(process, job_id, flaskModule: FlaskModule):
+            start_time = datetime.datetime.now()
+            flaskModule.logger.log_info('TeraServer.FlaskModule.UserQueryAssetsArchive', f'job: {job_id} started.')
+            while process.poll() is None:
+                output, error = process.communicate()
+                if output:
+                    print(f"workers/AssetsArchiveWorker.py (stdout): {output.decode('utf-8')}")
+                if error:
+                    print(f"workers/AssetsArchiveWorker.py (stderr): {error.decode('utf-8')}")
+
+            process.wait()
+            # Get return code
+            return_code = process.returncode
+            end_time = datetime.datetime.now()
+            duration_s = (end_time - start_time).total_seconds()
+            
+            flaskModule.logger.log_info('TeraServer.FlaskModule.UserQueryAssetsArchive', 
+                                        f"job: {job_id} finished with code: {return_code}. Duration: {duration_s} seconds.")
+            
+            # Join thread later
+            thread = threading.currentThread()
+            reactor.callFromThread(lambda: thread.join())
+            
+        thread = threading.Thread(target=process_monitor_thread, args=(process, job_id, self.module))
+        thread.start()
 
         return response.json()
