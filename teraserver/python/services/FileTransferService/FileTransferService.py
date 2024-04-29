@@ -35,8 +35,7 @@ class FileTransferService(ServiceOpenTeraWithAssets):
             # Create cleaning task, every hour by default, can specify period (s) in arg.
             self.archive_cleaning_task = self.setup_file_archive_cleanup_task(3600.0)
 
-
-    def setup_file_archive_cleanup_task(self, period_s:float = 3600.0) -> task.LoopingCall:
+    def setup_file_archive_cleanup_task(self, period_s: float = 3600.0) -> task.LoopingCall:
         loop = task.LoopingCall(self.archive_cleanup_task_callback)
 
         # Start looping every period_s seconds.
@@ -77,7 +76,6 @@ class FileTransferService(ServiceOpenTeraWithAssets):
                                 self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid} : {e}.')
                             continue
 
-
     def cbArchiveLoopDone(self, result):
         """
         Called when file archive cleanup task was stopped with success.
@@ -90,7 +88,6 @@ class FileTransferService(ServiceOpenTeraWithAssets):
         """
         self.logger.log_error('FileTransferService', f'ebArchiveLoopFailed : {failure}.')
         print('ebArchiveLoopFailed', failure)
-
 
     def verify_file_upload_directory(self, config: ConfigManager, create=True):
         file_upload_path = config.filetransfer_config['files_directory']

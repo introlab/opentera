@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # zip_buffer = BytesIO()
 
     # Change status of the file transfer to 'in progress'
-    archive_info['archive_status'] = 1 # STATUS_INPROGRESS
+    archive_info['archive_status'] = 1  # STATUS_INPROGRESS
     response = requests.post(archive_file_infos_url, json={'archive': archive_info},
                              headers={'Authorization': 'OpenTera ' + job_info['service_token']},
                              timeout=30, verify=args.verify)
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     zip_buffer = tempfile.NamedTemporaryFile(delete=True)
 
     # Create a ZipFile object to write to the in-memory stream
-    with zipfile.ZipFile(zip_buffer, 'w') as zip_file:
-
+    with (zipfile.ZipFile(zip_buffer, 'w') as zip_file):
+        files_in_zip = {}
         for _, service_data in job_info['assets_map'].items():
             for asset in service_data['service_assets']:
 
@@ -108,7 +108,18 @@ if __name__ == '__main__':
 
                 if response.status_code == 200:
                     # Add to zip file
-                    file_path = pathlib.Path(path) / pathlib.Path(f"[{asset['asset_uuid']}]_{asset['asset_name']}")
+                    # file_path = pathlib.Path(path) / pathlib.Path(f"[{asset['asset_uuid']}]_{asset['asset_name']}")
+                    file_path = pathlib.Path(path) / pathlib.Path(f"{asset['asset_name']}")
+
+                    if file_path in files_in_zip:
+                        files_in_zip[file_path] = files_in_zip[file_path] + 1
+                        # File with that name already exists - insert number
+                        file_name_ext = '.' + asset['asset_name'].split('.')[-1]
+                        file_name = asset['asset_name'].removesuffix(file_name_ext) + '(' + \
+                            str(files_in_zip[file_path]) + ')' + file_name_ext
+                        file_path = pathlib.Path(path) / pathlib.Path(f"{file_name}")
+                    else:
+                        files_in_zip[file_path] = 1
                     # Compress
                     zip_file.writestr(str(file_path), response.content)
 

@@ -59,7 +59,8 @@ class QueryArchiveFile(Resource):
         src_dir = flask_app.config['UPLOAD_FOLDER']
 
         # Log access
-        self.module.logger.log_info('FileTransferService.FlaskModule.QueryArchiveFile', f'User {requester_uuid} downloaded archive {archive.archive_uuid}')
+        self.module.logger.log_info('FileTransferService.FlaskModule.QueryArchiveFile',
+                                    f'User {requester_uuid} downloaded archive {archive.archive_uuid}')
 
         # Send file
         filename = archive.archive_original_filename
@@ -143,8 +144,6 @@ class QueryArchiveFile(Resource):
             return archive.to_json()
         except Exception as e:
             return gettext('Error parsing archive information : ') + str(e), 400
-
-        return gettext("Not implemented"), 501
 
     @api.expect(delete_parser, validate=True)
     @api.doc(description='Delete archive',

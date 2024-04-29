@@ -109,8 +109,8 @@ class QueryArchiveFileInfos(Resource):
                 # Add Creation datetime
                 archive.archive_creation_datetime = datetime.datetime.now(datetime.timezone.utc)
 
-                # Add Expiration datetime in 30 days
-                archive.archive_expiration_datetime = archive.archive_creation_datetime + datetime.timedelta(days=30)
+                # Add Expiration datetime in 7 days
+                archive.archive_expiration_datetime = archive.archive_creation_datetime + datetime.timedelta(days=7)
 
                 # Make sure file name is secure
                 archive.archive_original_filename = secure_filename(archive.archive_original_filename)

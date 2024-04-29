@@ -118,7 +118,7 @@ class UserQueryAssetsArchive(Resource):
 
             p = TeraProject.get_project_by_id(args['id_project'])
             site = p.project_site
-            get_assets_for_project(p, f"/{site.site_name}")
+            get_assets_for_project(p, f"{site.site_name}")
 
         elif args['id_participant'] is not None:
             # Get all assets for participant
@@ -129,7 +129,7 @@ class UserQueryAssetsArchive(Resource):
             project = participant.participant_project
             site = project.project_site
             get_assets_for_participant(participant,
-                                       f"/{site.site_name}/{project.project_name}")
+                                       f"{site.site_name}/{project.project_name}")
 
         elif args['id_session'] is not None:
             # Get all assets for session
@@ -146,7 +146,7 @@ class UserQueryAssetsArchive(Resource):
                     project = participant.participant_project
                     site = project.project_site
                     get_assets_for_session(sess,
-                                           f"/{site.site_name}/{project.project_name}/{participant.participant_name}")
+                                           f"{site.site_name}/{project.project_name}/{participant.participant_name}")
 
         else:
             return gettext('Missing required parameter'), 400
@@ -178,8 +178,6 @@ class UserQueryAssetsArchive(Resource):
         file_transfer_service_host = file_transfer_service.service_hostname
         file_transfer_service_port = file_transfer_service.service_port
 
-        #archive_file_infos_url = f"https://{server_name}:{port}/file/api/archives/infos"
-        #archive_file_upload_url = f"https://{server_name}:{port}/file/api/archives"
         archive_file_infos_url = f"http://{file_transfer_service_host}:{file_transfer_service_port}/api/archives/infos"
         archive_file_upload_url = f"http://{file_transfer_service_host}:{file_transfer_service_port}/api/archives"
 
@@ -232,8 +230,8 @@ class UserQueryAssetsArchive(Resource):
                                         f"job: {job_id} finished with code: {return_code}. Duration: {duration_s} seconds.")
             
             # Join thread later
-            thread = threading.currentThread()
-            reactor.callFromThread(lambda: thread.join())
+            current_thread = threading.current_thread()
+            reactor.callFromThread(lambda: current_thread.join())
             
         thread = threading.Thread(target=process_monitor_thread, args=(process, job_id, self.module))
         thread.start()
