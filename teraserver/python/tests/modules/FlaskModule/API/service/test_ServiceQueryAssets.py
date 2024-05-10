@@ -162,7 +162,7 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
 
     def test_get_endpoint_query_asset_no_access(self):
         with self._flask_app.app_context():
-            params = {'id_asset': 5, 'with_urls': True}
+            params = {'id_asset': 15, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 200)

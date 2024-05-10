@@ -2,6 +2,7 @@ from typing import List
 from BaseDeviceAPITest import BaseDeviceAPITest
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraSession import TeraSession
 
 
 class DeviceQueryAssetsTest(BaseDeviceAPITest):
@@ -163,6 +164,50 @@ class DeviceQueryAssetsTest(BaseDeviceAPITest):
                             response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
                                                                         params=params)
                             self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_forbidden_id_session(self):
+        with self._flask_app.app_context():
+            devices: List[TeraDevice] = TeraDevice.query.all()
+
+            for device in devices:
+                for session in TeraSession.query.all():
+                    params = {
+                        'id_session': session.id_session,
+                        'with_urls': True
+                    }
+
+                    if device.device_token:
+                        if device.device_enabled:
+                            if session.id_creator_device != device.id_device:
+                                response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                            params=params)
+                                self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_session_id(self):
+        with self._flask_app.app_context():
+            devices: List[TeraDevice] = TeraDevice.query.all()
+
+            for device in devices:
+                for session in TeraSession.query.all():
+                    params = {
+                        'id_session': session.id_session,
+                        'with_urls': True
+                    }
+
+                    if device.device_token:
+                        if device.device_enabled:
+                            if session.id_creator_device == device.id_device:
+                                response = self._get_with_device_token_auth(self.test_client, token=device.device_token,
+                                                                            params=params)
+                                self.assertEqual(200, response.status_code)
+
+                                assets_ids = [asset.id_asset for asset in
+                                              TeraAsset.get_assets_for_session(session.id_session)]
+                                for asset_json in response.json:
+                                    self.assertTrue(asset_json['id_asset'] in assets_ids)
+                                    self._checkJson(asset_json, minimal=False)
+                                    assets_ids.remove(asset_json['id_asset'])
+                                self.assertFalse(assets_ids)
 
     def test_get_endpoint_with_token_auth_with_token_only(self):
         with self._flask_app.app_context():
