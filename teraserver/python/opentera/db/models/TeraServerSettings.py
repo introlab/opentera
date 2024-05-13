@@ -1,9 +1,8 @@
 from opentera.db.Base import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Sequence
 import string
 from string import digits, ascii_lowercase, ascii_uppercase
-import random
+import secrets
 import uuid
 
 
@@ -40,7 +39,7 @@ class TeraServerSettings(BaseModel):
     @staticmethod
     def generate_token_key(length: int) -> str:
         token_symbols = digits + ascii_uppercase + ascii_lowercase
-        token_key = ''.join(random.choice(token_symbols) for i in range(length))  # Key length = 32 chars
+        token_key = ''.join(secrets.choice(token_symbols) for i in range(length))  # Key length = 32 chars
         return token_key
 
     @staticmethod

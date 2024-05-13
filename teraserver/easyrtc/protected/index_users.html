@@ -121,14 +121,14 @@
                         <label for="chronosPartSelect" class="col-form-label col-4" data-i18n="chronosDialog.participants">Participant(s): </label>
                         <select id="chronosPartSelect" class="col combobox"></select>
                     </div>
-                    <div class="form-group row pr-2">
+                    <!--<div class="form-group row pr-2">
                         <label for="chronosTitleSelect" class="col-form-label col-4" data-i18n="chronosDialog.chrono-label">Libellé: </label>
                         <select id="chronosTitleSelect" class="col combobox">
                             <option value="" data-i18n="chronosDialog.label-none" selected>(Aucun)</option>
                             <option value="Exercices" data-i18n="chronosDialog.label-exercices">Exercices</option>
                             <option value="Repos" data-i18n="chronosDialog.label-rest">Repos</option>
                         </select>
-                    </div>
+                    </div>-->
                     <div class="form-group row pr-2">
                         <label class="col-form-label col-4" data-i18n="chronosDialog.chrono-type">Type: </label>
                         <div id="chronosTypeRadio" class="col col-form-label pl-0">
@@ -147,9 +147,9 @@
                             <option value="600">10:00</option>
                             <option value="900">15:00</option>
                         </select>-->
-                        <input id="chronosDurationMinutes" class="col-2" type="number" min="0" max="55" step="1" value="0" />
+                        <input id="chronosDurationMinutes" class="col-2" type="number" min="0" max="55" step="1" value="2" />
                         <label class="col-form-label col-2" data-i18n="chronosDialog.minutes">minutes</label>
-                        <input id="chronosDurationSeconds" class="col-2" type="number" min="0" max="55" step="5" value="30" />
+                        <input id="chronosDurationSeconds" class="col-2" type="number" min="0" max="55" step="5" value="0" />
                         <label class="col-form-label col-2" data-i18n="chronosDialog.seconds">secondes</label>
                     </div>
                 </form>
@@ -167,7 +167,7 @@
 <!-- Measurement dialog -->
 <div class="modal fade" id="measureDialog" tabindex="-1" role="dialog" aria-labelledby="measureDialogCenterTitle"
      aria-hidden="true">
-    <div class="modal-dialog large-modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog draggable large-modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="measureDialogLongTitle" data-i18n="measureDialog.title">Mesures</h5>
@@ -198,6 +198,33 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="measureClose" class="btn btn-primary" data-dismiss="modal" data-i18n="measureDialog.close">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CounterDialog -->
+<div class="modal fade" id="counterDialog" tabindex="-1" role="dialog" aria-labelledby="counterDialogCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="counterDialogLongTitle" data-i18n="counterDialog.title"></h5>
+
+            </div>
+            <div class="modal-body">
+                <form id="counterForm">
+                    <div class="form-group row pr-2">
+                        <label for="counterPartSelect" class="col-form-label col-4" data-i18n="counterDialog.participants">Participant(s): </label>
+                        <select id="counterPartSelect" class="col combobox"></select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="counterStart" class="btn btn-success" data-dismiss="modal"
+                        onclick="startCountersFromDialog();" data-i18n="counterDialog.start">
+                    Activer</button>
+                <button type="button" id="counterCancel" class="btn btn-primary" data-dismiss="modal" data-i18n="counterDialog.cancel">Annuler</button>
             </div>
         </div>
     </div>
@@ -250,10 +277,24 @@
                         <input id="localBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
-                    <!-- Text display -->
-                    <div id="localDisplay1" class="overlay-top-center" style="display:none">
-                        <label class="chrono" id="localText1" onclick="stopChrono(true, 1);">Temps restant: xx:xx</label>
+                    <!-- Chrono display -->
+                    <div id="localTools" class="overlay-top-center">
+                        <div id="localChrono1" style="display:none">
+                            <label class="chrono" id="localChronoText1">xx:xx</label>
+                            <input class="image-icon chrono-button" id="localChronoPlay1" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
+                            <input class="image-icon chrono-button" id="localChronoPause1" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(true,1);"/>
+                            <input class="image-icon chrono-button" id="localChronoStop1" type="image" alt="image" src="images/stop.png" onclick="stopChrono(true, 1);"/>
+                        </div>
+
+                        <!-- Counter display -->
+                        <div id="localCounter1" style="display:none">
+                            <input class="image-icon chrono-button" id="localCounterMinus1" type="image" alt="image" src="images/minus.png" onclick="counterMinus(true, 1);"/>
+                            <label class="chrono counter" id="localCounterText1">00</label>
+                            <input class="image-icon chrono-button" id="localCounterPlus1" type="image" alt="image" src="images/plus.png" onclick="counterPlus(true, 1);"/>
+                            <input class="image-icon chrono-button" id="localCounterStop1" type="image" alt="image" src="images/stop.png" onclick="stopCounter(true, 1);"/>
+                        </div>
                     </div>
+
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
@@ -379,6 +420,10 @@
                             <div class="dropdown-item" onclick="showChronosDialog();">
                                 <input class="tool-icon" id="btnChronos" type="image" alt="image" src="images/timer.png"/>
                                 <label data-i18n="ui.chronos">Chronos</label>
+                            </div>
+                            <div class="dropdown-item" onclick="showCounterDialog();">
+                                <input class="tool-icon" id="btnCounter" type="image" alt="image" src="images/counter.png"/>
+                                <label data-i18n="ui.counter">Chronos</label>
                             </div>
                             <div class="dropdown-item" onclick="showMeasuresDialog();">
                                 <input class="tool-icon" id="btnAngles" type="image" alt="image" src="images/angles.png"/>

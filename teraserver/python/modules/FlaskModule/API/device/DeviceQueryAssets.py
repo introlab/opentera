@@ -1,9 +1,9 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, inputs
+from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.redis.RedisVars import RedisVars
 
@@ -11,6 +11,7 @@ from opentera.redis.RedisVars import RedisVars
 get_parser = api.parser()
 get_parser.add_argument('asset_uuid', type=str, help='Asset UUID to query', default=None)
 get_parser.add_argument('id_asset', type=int, help='Asset ID to query', default=None)
+get_parser.add_argument('id_session', type=int, help='Session ID to query assets for', default=None)
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
@@ -24,7 +25,7 @@ class DeviceQueryAssets(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Get device assets based on the ID or, if no parameters, get all assets',
+    @api.doc(description='Get device assets based specified session or asset ID or, if no parameters, get all assets',
              responses={200: 'Success',
                         403: 'Device doesn\'t have access to the specified asset'})
     @api.expect(get_parser)
@@ -32,7 +33,13 @@ class DeviceQueryAssets(Resource):
     def get(self):
         args = get_parser.parse_args()
         device_access = DBManager.deviceAccess(current_device)
-        assets = device_access.get_accessible_assets(id_asset=args['id_asset'], uuid_asset=args['asset_uuid'])
+
+        if args['id_session']:
+            if args['id_session'] not in device_access.get_accessible_sessions_ids():
+                return gettext('No access to session'), 403
+
+        assets = device_access.get_accessible_assets(id_asset=args['id_asset'], uuid_asset=args['asset_uuid'],
+                                                     session_id=args['id_session'])
 
         # Create response
         servername = self.module.config.server_config['hostname']
@@ -44,6 +51,7 @@ class DeviceQueryAssets(Resource):
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
         services_infos = []
+
         if (args['with_urls'] or args['with_only_token']) and assets:
             services_infos = {service.service_uuid: service.service_clientendpoint
                               for service in device_access.get_accessible_services()}

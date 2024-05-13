@@ -71,23 +71,21 @@ class ServiceOpenTera(RedisClient):
     def build_interface(self):
         # TODO not sure of the interface using UUID or name here...
         # Will do  both!
-        ret1 = yield self.subscribe_pattern_with_callback(
+        yield self.subscribe_pattern_with_callback(
             RedisVars.build_service_message_topic( self.service_info['service_uuid']), self.notify_service_messages)
 
-        ret2 = yield self.subscribe_pattern_with_callback(
+        yield self.subscribe_pattern_with_callback(
             RedisVars.build_service_message_topic(self.service_info['service_key']), self.notify_service_messages)
 
-        ret3 = yield self.subscribe_pattern_with_callback(
+        yield self.subscribe_pattern_with_callback(
             RedisVars.build_service_rpc_topic(self.service_info['service_uuid']), self.notify_service_rpc)
 
-        ret4 = yield self.subscribe_pattern_with_callback(
+        yield self.subscribe_pattern_with_callback(
             RedisVars.build_service_rpc_topic(self.service_info['service_key']), self.notify_service_rpc)
 
-        print(ret1, ret2, ret3, ret4)
-
     def notify_service_rpc(self, pattern, channel, message):
-        import threading
-        print('ServiceOpenTera - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
+        # import threading
+        # print('ServiceOpenTera - Received rpc', self, pattern, channel, message, ' thread:', threading.current_thread())
 
         rpc_message = messages.RPCMessage()
 
@@ -171,6 +169,10 @@ class ServiceOpenTera(RedisClient):
         any_message.Pack(event)
         message.events.extend([any_message])
         return self.publish(message.header.topic, message.SerializeToString())
+
+    def send_service_event_message(self, event):
+        topic = RedisVars.build_service_event_topic(self.service_info['service_key'])
+        self.send_event_message(event, topic)
 
     def create_event_message(self, topic):
         event_message = messages.TeraEvent()

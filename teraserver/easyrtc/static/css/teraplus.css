@@ -179,6 +179,8 @@ video {
 	padding-left: 10px;
 	padding-right: 10px;
 	border-radius: 10px;
+	vertical-align: middle;
+	margin: 0;
 }
 
 .chrono-large{
@@ -190,52 +192,57 @@ video {
 	border-radius: 10px;
 }
 
+.chrono-button{
+	vertical-align: middle;
+}
 
-		.overlay {
-			height: 0;
-			width: 100%;
-			position: absolute;
-			z-index: 2;
-			top: 0;
-			left: 0;
-			margin: 0;
-			background-color: rgba(0,0,0,0);
-			overflow-x: hidden;
-			display: block;
-			/*transition: height 0.5s;*/
-		}
+.counter{
+	background-color: rgba(100,100,200,0.75);
+}
+
+.counter-large{
+	background-color: rgba(100,100,200,0.75);
+}
+
+.overlay {
+	height: 0;
+	width: 100%;
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	margin: 0;
+	background-color: rgba(0,0,0,0);
+	overflow-x: hidden;
+	display: block;
+	/*transition: height 0.5s;*/
+}
+
+.overlay-right {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 10%;
+	max-width: 48px;
+	height: 95%;
+	padding: 5px;
+	background-color: rgba(0,0,0,0.5);
+	transform: translate(0%, 50%);
+}
 
 
 
+.overlay-middle-left {
+	position: relative;
+	height: 100px;
+	width: 50px;
+	padding: 5px;
+	background-color: rgba(0,0,0,0);
+	float: left;
+	margin-left:10px;
+	top: 50%;
+}
 
-		
-		.overlay-right {
-			position: absolute;
-			right: 0;
-			top: 0;
-			width: 10%;
-			max-width: 48px;
-			height: 95%;
-			padding: 5px;
-			background-color: rgba(0,0,0,0.5);
-			transform: translate(0%, 50%);
-		}
-		
-
-		
-		.overlay-middle-left {
-			position: relative;
-			height: 100px;
-			width: 50px;
-			padding: 5px;
-			background-color: rgba(0,0,0,0);
-			float: left;
-			margin-left:10px;
-			top: 50%;
-		}
-		
-
-		
 .overlay-bottom-center {
 	position: absolute;
 	left: 50%;
@@ -248,26 +255,26 @@ video {
 	text-align: center;
 	z-index: 3;
 }
-		
-		.overlay a {
-			padding: 8px;
-			text-decoration: none;
-			font-size: 36px;
-			color: #818181;
-			display: block;
-			/*transition: 0.3s;*/
-		}
 
-		.overlay a:hover, .overlay a:focus {
-			color: #f1f1f1;
-		}
+.overlay a {
+	padding: 8px;
+	text-decoration: none;
+	font-size: 36px;
+	color: #818181;
+	display: block;
+	/*transition: 0.3s;*/
+}
 
-		.overlay .closebtn {
-			position: absolute;
-			top: 20px;
-			right: 45px;
-			font-size: 60px;
-		}
+.overlay a:hover, .overlay a:focus {
+	color: #f1f1f1;
+}
+
+.overlay .closebtn {
+	position: absolute;
+	top: 20px;
+	right: 45px;
+	font-size: 60px;
+}
 
 .videoMirror {
 	-webkit-transform: scaleX(-1);

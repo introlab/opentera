@@ -1,4 +1,5 @@
 from BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraAsset import TeraAsset
 
 
 class UserQueryAssetsTest(BaseUserAPITest):
@@ -72,7 +73,7 @@ class UserQueryAssetsTest(BaseUserAPITest):
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 1)
+            self.assertEqual(len(response.json), len(TeraAsset.get_assets_for_device(1)))
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)

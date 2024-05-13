@@ -235,9 +235,18 @@
             </div>
         </div>
         <div class="col-8 h-100" id="largeView">
-            <!-- Text display -->
-            <div id="localDisplay1" class="overlay-top-center" style="display:none">
-                <label class="chrono-large" id="localText1">Temps restant: xx:xx</label>
+            <div>
+                <div class="overlay-top-center d-flex">
+                    <!-- Chrono display -->
+                    <div id="localChrono1" class="mr-2" style="display:none">
+                        <label class="chrono-large" id="localChronoText1">Temps restant: xx:xx</label>
+                    </div>
+
+                    <!-- Counter display -->
+                    <div id="localCounter1" style="display:none">
+                        <label class="chrono-large counter-large" id="localCounterText1">0</label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-2 h-100" id="remoteViews">

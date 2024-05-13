@@ -37,8 +37,8 @@ class QueryAssetFileInfos(Resource):
         self.test = kwargs.get('test', False)
 
     @api.expect(get_parser, validate=True)
-    @api.doc(description='Query informations about stored file',
-             responses={200: 'Success - Return informations about file',
+    @api.doc(description='Query information about stored file',
+             responses={200: 'Success - Return information about file',
                         400: 'Bad request',
                         403: 'Access denied to the requested asset'})
     @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=False)
@@ -59,8 +59,8 @@ class QueryAssetFileInfos(Resource):
     @api.expect(post_schema)
     @api.doc(description='Query information about multiple assets at the same time or update an existing asset '
                          'information. If the \'asset_uuids\' list is present in the data, return assets. Otherwise, '
-                         'uses the \'file_asset\' informations to update the data',
-             responses={200: 'Success - Return informations about file assets',
+                         'uses the \'file_asset\' information to update the data',
+             responses={200: 'Success - Return information about file assets',
                         400: 'Required parameter is missing',
                         403: 'Access denied to the requested asset'})
     @ServiceAccessManager.service_or_others_token_required(allow_dynamic_tokens=True, allow_static_tokens=True)

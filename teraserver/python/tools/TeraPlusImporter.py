@@ -11,12 +11,12 @@ opentera_videorehab_service_id = None
 
 
 def generate_password(length: int):
-    import random
+    import secrets
     import string
 
     password = ''
     for i in range(0, length):
-        password = password + random.choice(string.ascii_uppercase + string.ascii_lowercase +
+        password = password + secrets.choice(string.ascii_uppercase + string.ascii_lowercase +
                                             string.digits + string.punctuation)
     return password
 

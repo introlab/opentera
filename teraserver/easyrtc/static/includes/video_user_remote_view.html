@@ -11,10 +11,25 @@
         <input id="remoteBtnSwapVideo{##view_id##}" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
     </div>
 
-    <!-- Text display -->
-    <div id="remoteDisplay{##view_id##}" class="overlay-top-center" style="display:none">
-        <label class="chrono" id="remoteText{##view_id##}" onclick="stopChrono(false, {##view_id##});">Temps restant: xx:xx</label>
+
+    <div class="overlay-top-center" >
+        <!-- Chrono display -->
+        <div id="remoteChrono{##view_id##}" style="display:none">
+            <label class="chrono" id="remoteChronoText{##view_id##}">Temps restant: xx:xx</label>
+            <input class="image-icon chrono-button" id="remoteChronoPlay{##view_id##}" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
+            <input class="image-icon chrono-button" id="remoteChronoPause{##view_id##}" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteChronoStop{##view_id##}" type="image" alt="image" src="images/stop.png" onclick="stopChrono(false, {##view_id##});"/>
+        </div>
+
+        <!-- Counter display -->
+        <div id="remoteCounter{##view_id##}" style="display:none">
+            <input class="image-icon chrono-button" id="remoteCounterMinus{##view_id##}" type="image" alt="image" src="images/minus.png" onclick="counterMinus(false, {##view_id##});"/>
+            <label class="chrono counter" id="remoteCounterText{##view_id##}">00</label>
+            <input class="image-icon chrono-button" id="remoteCounterPlus{##view_id##}" type="image" alt="image" src="images/plus.png" onclick="counterPlus(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteCounterStop{##view_id##}" type="image" alt="image" src="images/stop.png" onclick="stopCounter(false, {##view_id##});"/>
+        </div>
     </div>
+
 
     <!-- Micro, video, sensors, ... controls -->
     <div id="remoteViewControls{##view_id##}" class="overlay-bottom-center" >

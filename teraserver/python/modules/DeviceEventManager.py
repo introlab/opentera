@@ -61,3 +61,9 @@ class DeviceEventManager(EventManager):
     def filter_database_event(self, event: messages.DatabaseEvent):
         # Default = no access
         return False
+
+    def filter_archive_event(self, event: messages.ArchiveEvent):
+        if event.owner_uuid == self.device.device_uuid:
+            return True
+        # Default = no access
+        return False

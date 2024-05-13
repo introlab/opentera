@@ -233,9 +233,13 @@ class FlaskModule(BaseModule):
 
         from services.FileTransferService.API.QueryAssetFileInfos import QueryAssetFileInfos
         from services.FileTransferService.API.QueryAssetFile import QueryAssetFile
+        from services.FileTransferService.API.QueryArchiveFileInfos import QueryArchiveFileInfos
+        from services.FileTransferService.API.QueryArchiveFile import QueryArchiveFile
 
         namespace.add_resource(QueryAssetFileInfos, '/assets/infos', resource_class_kwargs=kwargs)
         namespace.add_resource(QueryAssetFile,      '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryArchiveFileInfos, '/archives/infos', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryArchiveFile,      '/archives', resource_class_kwargs=kwargs)
 
     def init_views(self):
         # Default arguments

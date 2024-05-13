@@ -1,7 +1,7 @@
 """
 Project OpenTera (https://github.com/introlab/opentera)
 
-Copyright (C) 2020
+Copyright (C) 2020-2024
 IntRoLab / ESTRAD, Université de Sherbrooke, Centre de Recherche sur le Vieillissement de Sherbrooke
 
 Authors:

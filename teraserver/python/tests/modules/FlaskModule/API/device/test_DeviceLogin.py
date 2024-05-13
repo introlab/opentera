@@ -38,6 +38,7 @@ class DeviceLoginTest(BaseDeviceAPITest):
                         self.assertTrue('participants_info' in response.json)
                         self.assertTrue('session_types_info' in response.json)
                         self.assertEqual(device['id_device'], response.json['device_info']['id_device'])
+                        self.assertTrue('device_type' in response.json['device_info'])
 
                         if device['device_onlineable']:
                             self.assertTrue('websocket_url' in response.json)

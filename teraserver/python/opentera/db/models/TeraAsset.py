@@ -23,6 +23,7 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
     asset_service_uuid = Column(String(36), ForeignKey("t_services.service_uuid", ondelete='cascade'), nullable=False)
     asset_type = Column(String, nullable=False)  # MIME Type
     asset_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
+    asset_expiration_datetime = Column(TIMESTAMP(timezone=True), nullable=True)
 
     asset_session = relationship("TeraSession", back_populates='session_assets')
     asset_device = relationship("TeraDevice", back_populates='device_assets')
@@ -106,6 +107,18 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
             new_asset.asset_type = 'video/mpeg'
             new_asset.id_service = 1
             TeraAsset.insert(new_asset)
+
+            device_session = TeraSession.get_session_by_name('Séance #9')
+            for i in range(3):
+                new_asset = TeraAsset()
+                new_asset.asset_name = "Device Asset"
+                new_asset.asset_session = device_session
+                new_asset.asset_device = asset_device
+                new_asset.asset_uuid = str(uuid.uuid4())
+                new_asset.asset_service_uuid = '00000000-0000-0000-0000-000000000001'
+                new_asset.asset_type = 'video/mpeg'
+                new_asset.id_service = 1
+                TeraAsset.insert(new_asset)
 
     @staticmethod
     def get_asset_by_id(asset_id: int, with_deleted: bool = False):

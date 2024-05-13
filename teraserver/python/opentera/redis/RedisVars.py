@@ -35,3 +35,8 @@ class RedisVars:
     @classmethod
     def build_service_message_topic(cls, service_key) -> str:
         return cls.RedisVar_ServicePrefixKey + service_key + '.messages'
+
+    @classmethod
+    def build_service_event_topic(cls, service_key) -> str:
+        """ Build service event topic from service key, used to subscribe events to a specific service. """
+        return cls.RedisVar_ServicePrefixKey + service_key + '.events'

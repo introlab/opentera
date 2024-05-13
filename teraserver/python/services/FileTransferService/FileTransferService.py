@@ -1,3 +1,4 @@
+import datetime
 from services.FileTransferService.FlaskModule import flask_app
 import services.FileTransferService.Globals as Globals
 from opentera.redis.RedisClient import RedisClient
@@ -6,7 +7,7 @@ from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.redis.RedisVars import RedisVars
 
 # Twisted
-from twisted.internet import reactor, defer
+from twisted.internet import reactor, defer, task
 from twisted.python import log
 import sys
 import os
@@ -16,12 +17,11 @@ from sqlalchemy.exc import OperationalError
 from services.FileTransferService.FlaskModule import FlaskModule
 import opentera.messages.python as messages
 
+from services.FileTransferService.libfiletransferservice.db.models.ArchiveFileData import ArchiveFileData
 
 class FileTransferService(ServiceOpenTeraWithAssets):
     def __init__(self, config_man: ConfigManager, this_service_info):
         ServiceOpenTeraWithAssets.__init__(self, config_man, this_service_info)
-
-        self.verify_file_upload_directory(config_man)
 
         # Create REST backend
         self.flaskModule = FlaskModule(config_man)
@@ -29,7 +29,65 @@ class FileTransferService(ServiceOpenTeraWithAssets):
         # Create twisted service
         self.flaskModuleService = self.flaskModule.create_service()
 
-        # self.application = service.Application(self.config['name'])
+        self.upload_directory = self.verify_file_upload_directory(config_man)
+
+        if self.upload_directory is not None:
+            # Create cleaning task, every hour by default, can specify period (s) in arg.
+            self.archive_cleaning_task = self.setup_file_archive_cleanup_task(3600.0)
+
+    def setup_file_archive_cleanup_task(self, period_s: float = 3600.0) -> task.LoopingCall:
+        loop = task.LoopingCall(self.archive_cleanup_task_callback)
+
+        # Start looping every period_s seconds.
+        d = loop.start(period_s, False)
+
+        # Add callbacks for stop and failure.
+        d.addCallback(self.cbArchiveLoopDone)
+        d.addErrback(self.ebArchiveLoopFailed)
+
+        return loop
+
+    def archive_cleanup_task_callback(self):
+        if self.upload_directory is not None:
+            with flask_app.app_context():
+                # Get all archives
+                archives = ArchiveFileData.query.all()
+                for archive in archives:
+                    # 1) Verify if we have an expiration date
+                    if archive.archive_expiration_datetime is not None:
+                        # Verify if the expiration date is passed
+                        if archive.archive_expiration_datetime < datetime.datetime.now(datetime.timezone.utc):
+                            # Delete the archive
+                            if not archive.delete_file_archive(self.upload_directory):
+                                print(f'Error deleting archive {archive.archive_uuid}')
+                                self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid}.')
+                            else:
+                                self.logger.log_info('FileTransferService', f'Archive {archive.archive_uuid} deleted.')
+                            continue
+                    # 2) Verify the state of the archive, if created more than 24 hours ago and not uploaded, delete it
+                    elif archive.archive_creation_datetime < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=24):
+                        if archive.archive_upload_datetime is None:
+                            # Delete the archive from DB
+                            self.logger.log_info('FileTransferService', f'Archive {archive.archive_uuid} deleted.')
+                            try:
+                                ArchiveFileData.delete(archive.id_archive_file_data)
+                            except Exception as e:
+                                print(f'Error deleting archive {archive.archive_uuid}')
+                                self.logger.log_error('FileTransferService', f'Error deleting archive {archive.archive_uuid} : {e}.')
+                            continue
+
+    def cbArchiveLoopDone(self, result):
+        """
+        Called when file archive cleanup task was stopped with success.
+        """
+        print('cbArchiveLoopDone', result)
+
+    def ebArchiveLoopFailed(self, failure):
+        """
+        Called when file archive cleanup task execution failed.
+        """
+        self.logger.log_error('FileTransferService', f'ebArchiveLoopFailed : {failure}.')
+        print('ebArchiveLoopFailed', failure)
 
     def verify_file_upload_directory(self, config: ConfigManager, create=True):
         file_upload_path = config.filetransfer_config['files_directory']
