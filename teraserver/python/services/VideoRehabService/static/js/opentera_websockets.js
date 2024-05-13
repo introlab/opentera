@@ -31,6 +31,8 @@ function ws_Opened(){
     console.log("Websocket opened");
 	document.getElementById("imgStatus").src="./static/images/green_button.png";
 	sessionStorage.removeItem("websocket_url");
+    document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
+        clientSource;
 }
 
 function ws_Error(error){

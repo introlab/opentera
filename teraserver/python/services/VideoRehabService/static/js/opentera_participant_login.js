@@ -3,16 +3,16 @@ let timeout = 0;
 let loaded = false;
 
 function loginParticipant(){
-    document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
+    /*document.getElementById('mainview').src = "participant_localview?token=" + participant_token + "&source=" +
         clientSource;
-    $('#mainview').on('load', function() {
+    $('#mainview').on('load', function() {*/
         if (ws === undefined && !loaded){
             // No websocket connection - login participant
             console.log("Mainview loaded - login participant...")
             loaded = true;
             doParticipantLogin(backend_hostname, backend_port, participant_token);
         }
-    });
+    //});
 
 }
 
