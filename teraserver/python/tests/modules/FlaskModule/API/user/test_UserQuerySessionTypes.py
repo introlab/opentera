@@ -115,7 +115,7 @@ class UserQuerySessionTypesTest(BaseUserAPITest):
     def test_query_specific_project_as_admin(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params="id_project=2")
+                                                     params="id_project=3")
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))

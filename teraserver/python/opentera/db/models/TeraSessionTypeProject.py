@@ -81,6 +81,7 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             stp.id_project = project.id_project
             TeraSessionTypeProject.db().session.add(stp)
 
+            project = TeraProject.get_project_by_projectname('Default Project #2')
             stp = TeraSessionTypeProject()
             stp.id_session_type = bureau_session.id_session_type
             stp.id_project = project.id_project

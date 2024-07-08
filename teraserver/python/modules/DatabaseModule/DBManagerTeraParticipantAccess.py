@@ -1,7 +1,12 @@
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSession import TeraSession
 
+from sqlalchemy import func
+
+import datetime
 
 class DBManagerTeraParticipantAccess:
     def __init__(self, participant: TeraParticipant):
@@ -46,3 +51,36 @@ class DBManagerTeraParticipantAccess:
 
         return [service_project.service_project_service for service_project in service_projects]
 
+    def get_accessible_session_types(self):
+        session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects)\
+            .filter_by(id_project=self.participant.id_project).all()
+
+        return session_types
+
+    def get_accessible_session_types_ids(self):
+        types = []
+        for my_type in self.get_accessible_session_types():
+            types.append(my_type.id_session_type)
+        return types
+
+    def query_existing_session(self, session_name: str, session_type_id: int, session_date: datetime,
+                               participant_uuids: list):
+        sessions = TeraSession.query.filter(TeraSession.id_creator_participant == self.participant.id_participant).\
+            filter(TeraSession.session_name == session_name).filter(TeraSession.id_session_type == session_type_id).\
+            filter(func.date(TeraSession.session_start_datetime) == session_date.date()).\
+            order_by(TeraSession.id_session.asc()).all()
+
+        for session in sessions:
+            sessions_participants_uuids = set([part.participant_uuid for part in session.session_participants])
+            if set(participant_uuids) == sessions_participants_uuids:
+                # We have a match on that session participants too
+                return session
+        return None
+
+    def get_accessible_sessions(self):
+        query = TeraSession.query.filter(TeraSession.id_creator_participant == self.participant.id_participant)
+        return query.all()
+
+    def get_accessible_sessions_ids(self):
+        sessions = self.get_accessible_sessions()
+        return [session.id_session for session in sessions]

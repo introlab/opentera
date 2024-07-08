@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-04 11:09-0500\n"
+"POT-Creation-Date: 2024-05-13 11:02-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -16,13 +16,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.15.0\n"
 
-#: modules/FlaskModule/API/device/DeviceLogin.py:82
+#: modules/FlaskModule/API/device/DeviceLogin.py:88
 msgid "Unable to get online devices."
 msgstr ""
 
-#: modules/FlaskModule/API/device/DeviceLogin.py:98
+#: modules/FlaskModule/API/device/DeviceLogin.py:104
 msgid "Device already logged in."
 msgstr ""
 
@@ -32,6 +32,10 @@ msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceLogout.py:31
 msgid "Device not logged in"
+msgstr ""
+
+#: modules/FlaskModule/API/device/DeviceQueryAssets.py:39
+msgid "No access to session"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQueryDevices.py:69
@@ -86,6 +90,9 @@ msgstr ""
 #: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:54
 #: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:106
 #: modules/FlaskModule/API/service/ServiceQueryUserGroups.py:207
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:117
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:126
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:137
 #: modules/FlaskModule/API/user/UserQueryDeviceProjects.py:301
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:122
 #: modules/FlaskModule/API/user/UserQueryDeviceSites.py:257
@@ -104,8 +111,8 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQueryDisconnect.py:84
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:107
 #: modules/FlaskModule/API/user/UserQueryParticipantGroup.py:159
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:363
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:366
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:362
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:365
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:204
 #: modules/FlaskModule/API/user/UserQueryProjectAccess.py:274
 #: modules/FlaskModule/API/user/UserQueryProjects.py:151
@@ -632,12 +639,12 @@ msgid "Invalid participant email"
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryParticipants.py:155
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:312
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:311
 msgid "Can't insert participant: participant's project is disabled or invalid."
 msgstr ""
 
 #: modules/FlaskModule/API/service/ServiceQueryParticipants.py:165
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:285
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:284
 msgid "Can't update participant: participant's project is disabled."
 msgstr ""
 
@@ -964,6 +971,18 @@ msgid ""
 "Filetransfer service)"
 msgstr ""
 
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:89
+msgid "Only one of the ID parameter is supported at once"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:152
+msgid "Missing required parameter"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserQueryAssetsArchive.py:189
+msgid "Unable to create archive information from FileTransferService"
+msgstr ""
+
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:128
 #: modules/FlaskModule/API/user/UserQueryDeviceParticipants.py:207
 msgid "User is not admin of the participant's project"
@@ -1107,7 +1126,7 @@ msgid "Unexisting ID/Forbidden access"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryDeviceTypes.py:79
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:400
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:399
 #: modules/FlaskModule/API/user/UserQueryServiceConfigs.py:182
 msgid "Database Error"
 msgstr ""
@@ -1251,53 +1270,53 @@ msgid ""
 "participants before deleting."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:220
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:219
 msgid "Missing participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:226
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:225
 msgid "Missing id_participant"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:230
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:229
 msgid "Missing id_project or id_participant_group"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:245
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:244
 msgid "No admin access to project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:253
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:252
 msgid "No admin access to group"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:262
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:261
 msgid "Participant group not found."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:266
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:265
 msgid "Mismatch between id_project and group's project"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:383
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:382
 msgid "Can't delete participant: please remove all related sessions beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:385
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:384
 msgid ""
 "Can't delete participant: please remove all sessions created by this "
 "participant beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:388
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:387
 msgid "Can't delete participant: please remove all related assets beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:390
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:389
 msgid "Can't delete participant: please remove all related tests beforehand."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQueryParticipants.py:392
+#: modules/FlaskModule/API/user/UserQueryParticipants.py:391
 msgid ""
 "Can't delete participant: please remove all related sessions, assets and "
 "tests before deleting."

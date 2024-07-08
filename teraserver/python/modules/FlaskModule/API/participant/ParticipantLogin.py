@@ -2,6 +2,7 @@ from flask import session, request
 from flask_restx import Resource, fields, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
+from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
 from opentera.redis.RedisVars import RedisVars
 from opentera.redis.RedisRPCClient import RedisRPCClient
@@ -98,6 +99,14 @@ class ParticipantLogin(Resource):
                      "participant_uuid": session['_user_id']}
             if websocket_url:
                 reply["websocket_url"] = websocket_url
+
+            # Reply accessible sessions type ids
+            participant_access = DBManager.participantAccess(current_participant)
+            session_types = participant_access.get_accessible_session_types()
+            reply['session_types_info'] = list()
+
+            for st in session_types:
+                reply['session_types_info'].append(st.to_json(minimal=True))
 
             # Set token according to API access (http auth is full access, token is not)
             if current_participant.fullAccess:

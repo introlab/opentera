@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta
 from BaseParticipantAPITest import BaseParticipantAPITest
+from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
+from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSession import TeraSession
+import uuid
 
 
 class ParticipantQuerySessionsTest(BaseParticipantAPITest):
@@ -121,7 +125,12 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                             password='opentera', params={'limit': 2, 'offset': 27})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(1, len(response.json))
+
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                limit=2, offset=27))
+
+            self.assertEqual(count, len(response.json))
 
     def test_query_with_status(self):
         with self._flask_app.app_context():
@@ -129,7 +138,12 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                             password='opentera', params={'status': 0})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(12, len(response.json))
+
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                status=0))
+
+            self.assertEqual(count, len(response.json))
 
             for data_item in response.json:
                 self.assertEqual(0, data_item['session_status'])
@@ -141,7 +155,10 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                             params={'list': 1, 'limit': 2, 'offset': 11, 'status': 0})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(1, len(response.json))
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                limit=2, offset=11, status=0))
+            self.assertEqual(count, len(response.json))
 
             for data_item in response.json:
                 self.assertEqual(0, data_item['session_status'])
@@ -155,7 +172,10 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                             params={'start_date': start_date, 'end_date': end_date})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(6, len(response.json))
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                start_date=datetime.now() - timedelta(days=6), end_date=datetime.now() - timedelta(days=4)))
+            self.assertEqual(count, len(response.json))
 
     def test_query_with_start_date(self):
         with self._flask_app.app_context():
@@ -164,7 +184,10 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                             password='opentera', params={'start_date': start_date})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(12, len(response.json))
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                start_date=datetime.now() - timedelta(days=3)))
+            self.assertEqual(count, len(response.json))
 
     def test_query_with_end_date(self):
         with self._flask_app.app_context():
@@ -174,4 +197,144 @@ class ParticipantQuerySessionsTest(BaseParticipantAPITest):
                                                                        params={'end_date': end_date})
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertEqual(9, len(response.json))
+            count = len(TeraSession.get_sessions_for_participant(
+                part_id=TeraParticipant.get_participant_by_username('participant1').id_participant,
+                end_date=end_date))
+            self.assertEqual(count, len(response.json))
+
+    def test_post_endpoint_with_valid_token_but_empty_schema(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                response = self._post_with_participant_token_auth(self.test_client,
+                                                                  token=participant.participant_token, json={})
+                self.assertEqual(response.status_code, 400)
+
+    def test_post_endpoint_with_valid_token_but_invalid_session(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                # Get all participant ids
+                participants_uuids = [participant.participant_uuid]
+
+                # Invalid session schema
+                session = {'session': {'id_session': 0, 'session_participants': participants_uuids}}
+                response = self._post_with_participant_token_auth(self.test_client,
+                                                                  token=participant.participant_token, json=session)
+                self.assertEqual(response.status_code, 400)
+
+    def test_post_endpoint_with_valid_token_valid_participants_valid_session_type_and_new_session(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                participants_uuids = [participant.participant_uuid]
+
+                access = DBManagerTeraParticipantAccess(participant)
+
+                # Get all the session types available
+                session_types = access.get_accessible_session_types_ids()
+
+                for session_type in session_types:
+                    session = {'session': {
+                                    'id_session': 0,
+                                    'session_participants': participants_uuids,
+                                    'id_session_type': session_type,
+                                    'session_name': 'TEST',
+                                    'session_status': 0,
+                                    'session_start_datetime': str(datetime.now())}}
+
+                    response = self._post_with_participant_token_auth(self.test_client,
+                                                                      token=participant.participant_token, json=session)
+
+                    self.assertEqual(response.status_code, 200)
+                    self.assertTrue('id_session' in response.json)
+                    self.assertGreater(response.json['id_session'], 0)
+                    self.assertEqual(response.json['id_creator_participant'], participant.id_participant)
+
+    def test_post_endpoint_with_valid_token_invalid_participants_valid_session_type_and_new_session(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                # Generate invalid participants
+                participants_uuids = [str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())]
+
+                access = DBManagerTeraParticipantAccess(participant)
+
+                # Get all the session types available
+                session_types = access.get_accessible_session_types_ids()
+
+                for session_type in session_types:
+                    session = {'session': {
+                        'id_session': 0,
+                        'session_participants': participants_uuids,
+                        'id_session_type': session_type,
+                        'session_name': 'TEST',
+                        'session_status': 0,
+                        'session_start_datetime': str(datetime.now())}}
+
+                    response = self._post_with_participant_token_auth(self.test_client,
+                                                                      token=participant.participant_token, json=session)
+                    self.assertEqual(response.status_code, 400)
+
+    def test_post_endpoint_with_valid_token_valid_participants_invalid_session_type_and_new_session(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                # Get all participant ids
+                participants_uuids = [participant.participant_uuid]
+
+                access = DBManagerTeraParticipantAccess(participant)
+
+                session_types = [5000, 0]
+
+                for session_type in session_types:
+                    session = {'session': {
+                        'id_session': 0,
+                        'session_participants': participants_uuids,
+                        'id_session_type': session_type,
+                        'session_name': 'TEST',
+                        'session_status': 0,
+                        'session_start_datetime': str(datetime.now())}}
+
+                    response = self._post_with_participant_token_auth(self.test_client,
+                                                                      token=participant.participant_token, json=session)
+
+                    self.assertEqual(response.status_code, 403)
+
+    def test_post_endpoint_with_valid_token_valid_participants_valid_session_type_and_update_session(self):
+        with self._flask_app.app_context():
+            for participant in TeraParticipant.query.all():
+                if not participant.participant_token:
+                    continue
+                access = DBManagerTeraParticipantAccess(participant)
+
+                # Get all available sessions
+                sessions = access.get_accessible_sessions_ids()
+                participants_uuids = [participant.participant_uuid]
+
+                for id_session in sessions:
+                    db_session = TeraSession.get_session_by_id(id_session)
+                    session = {'session': {
+                        'id_session': id_session,
+                        'session_participants': participants_uuids,
+                        'id_session_type': db_session.id_session_type,
+                        'session_name': 'TEST-UPDATE',
+                        'session_status': 0,
+                        'session_start_datetime': str(datetime.now())}}
+
+                    response = self._post_with_participant_token_auth(self.test_client,
+                                                                      token=participant.participant_token, json=session)
+
+                    if db_session.id_creator_participant is not participant.id_participant:
+                        self.assertEqual(response.status_code, 403)
+                        continue
+
+                    self.assertEqual(response.status_code, 200)
+                    self.assertTrue('id_session' in response.json)
+                    self.assertGreater(response.json['id_session'], 0)
+                    self.assertEqual(response.json['id_creator_participant'], participant.id_participant)
