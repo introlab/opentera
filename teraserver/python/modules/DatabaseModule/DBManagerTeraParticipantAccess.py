@@ -32,7 +32,7 @@ class DBManagerTeraParticipantAccess:
             filter_by(id_participant=self.participant.id_participant).all()
         return result
 
-    def get_accessible_assets(self, id_asset: int = None, uuid_asset: str = None):
+    def get_accessible_assets(self, id_asset: int = None, uuid_asset: str = None, session_id: int = None):
         from opentera.db.models.TeraAsset import TeraAsset
 
         # A participant can only have access to assets that are directly assigned to them (where id_participant is set
@@ -42,6 +42,8 @@ class DBManagerTeraParticipantAccess:
             query = query.filter(TeraAsset.id_asset == id_asset)
         elif uuid_asset:
             query = query.filter(TeraAsset.asset_uuid == uuid_asset)
+        elif session_id:
+            query = query.filter(TeraAsset.id_session == session_id)
 
         return query.all()
 

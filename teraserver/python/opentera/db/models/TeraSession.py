@@ -170,6 +170,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                     base_session.session_users = [base_session.session_creator_user, session_user2, session_user3]
                 if i == 3:
                     base_session.session_devices = [session_device]
+                if i == 1:
+                    base_session.id_creator_participant = session_part.id_participant
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
 
