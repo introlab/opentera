@@ -6,6 +6,16 @@
 alembic revision -m "create account table"
 ```
 
+## Changes for next version (Sept 5 2024)
+
+### TeraServer
+**Modified t_users table**
+* Add column user_2fa_enabled (Boolean, default=False)
+* Add column user_2fa_otp_enabled (Boolean, default=False)
+* Add column user_2fa_email_enabled (Boolean, default=False)
+* Add column user_2fa_otp_secret (String(32), nullable=True)
+* Add column user_force_password_change (Boolean, default=False)
+
 ## Changes for next version (Feb 6 2023)
 
 ### TeraServer
