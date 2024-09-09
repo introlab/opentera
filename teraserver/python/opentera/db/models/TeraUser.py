@@ -18,6 +18,7 @@ import datetime
 import json
 import time
 import jwt
+import pyotp
 
 
 # Generator for jti
@@ -46,6 +47,12 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     user_notes = Column(String, nullable=True)
     user_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
     user_superadmin = Column(Boolean, nullable=False, default=False)
+    # Fields added for 2FA
+    user_2fa_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_otp_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_email_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_otp_secret = Column(String, nullable=True)
+    user_force_password_change = Column(Boolean, nullable=False, default=False)
 
     # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
@@ -121,6 +128,16 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256')
+
+    def enable_2fa_otp(self) -> bool:
+        if self.user_2fa_enabled and self.user_2fa_otp_enabled and self.user_2fa_otp_secret:
+            return False
+
+        self.user_2fa_enabled = True
+        self.user_2fa_otp_enabled = True
+        self.user_2fa_email_enabled = False
+        self.user_2fa_otp_secret = pyotp.random_base32()
+        return True
 
     def get_service_access_dict(self):
         service_access = {}

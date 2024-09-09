@@ -9,32 +9,42 @@ from opentera.utils.UserAgentParser import UserAgentParser
 
 import opentera.messages.python as messages
 from opentera.redis.RedisVars import RedisVars
+import pyotp
 from opentera.db.models.TeraUser import TeraUser
 
-# model = api.model('Login', {
-#     'websocket_url': fields.String,
-#     'user_uuid': fields.String,
-#     'user_token': fields.String
-# })
-# Parser definition(s)
-
 get_parser = api.parser()
-get_parser.add_argument('with_websocket', type=inputs.boolean, help='If set, requires that a websocket url is returned.'
-                                                                    'If not possible to do so, return a 403 error.')
+get_parser.add_argument('with_websocket', type=inputs.boolean,
+                        help='If set, requires that a websocket url is returned.'
+                             'If not possible to do so, return a 403 error.',
+                        default=False)
+
+get_parser.add_argument('otp_code', type=str, required=True, help='2FA otp code')
 
 
-class UserLogin(Resource):
+class UserLogin2FA(Resource):
 
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)')
+    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
     @api.expect(get_parser)
     @user_http_auth.login_required
     def get(self):
-        args = get_parser.parse_args()
+        args = get_parser.parse_args(strict=True)
+
+        # Current user is logged in with HTTPAuth
+        # Let's verify if 2FA is enabled and if OTP is valid
+        if not current_user.user_2fa_enabled:
+            return gettext('User does not have 2FA enabled'), 403
+        if not current_user.user_2fa_otp_enabled or not current_user.user_2fa_otp_secret:
+            return gettext('User does not have 2FA OTP enabled'), 403
+
+        # Verify OTP
+        totp = pyotp.TOTP(current_user.user_2fa_otp_secret)
+        if not totp.verify(args['otp_code']):
+            return gettext('Invalid OTP code'), 403
 
         # Redis key is handled in LoginModule
         servername = self.module.config.server_config['hostname']
@@ -50,7 +60,7 @@ class UserLogin(Resource):
         # Get user token key from redis
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
 
-        # Get login informations for log
+        # Get login information for log
         login_infos = UserAgentParser.parse_request_for_login_infos(request)
 
         # Verify if user already logged in

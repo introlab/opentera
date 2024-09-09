@@ -138,6 +138,7 @@ class FlaskModule(BaseModule):
 
         # Users...
         from modules.FlaskModule.API.user.UserLogin import UserLogin
+        from modules.FlaskModule.API.user.UserLogin2FA import UserLogin2FA
         from modules.FlaskModule.API.user.UserLogout import UserLogout
         from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
         from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
@@ -200,6 +201,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryForms,                '/forms', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipantGroup,     '/groups', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogin,                     '/login', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLogin2FA,                  '/login_2fa', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)

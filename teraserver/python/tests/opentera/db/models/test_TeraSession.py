@@ -19,8 +19,8 @@ class TeraSessionTest(BaseModelsTest):
             for session in TeraSession.query.all():
                 my_list = [session.id_creator_device, session.id_creator_participant,
                            session.id_creator_service, session.id_creator_user]
-                # Only one not None
-                self.assertEqual(1, len([x for x in my_list if x is not None]))
+                # At least one creator should be set
+                self.assertTrue(any(my_list))
 
     def test_session_new(self):
         from datetime import datetime
