@@ -1,5 +1,6 @@
 from BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraUser import TeraUser
+import pyotp
 
 
 class UserLogin2FATest(BaseUserAPITest):
@@ -39,19 +40,76 @@ class UserLogin2FATest(BaseUserAPITest):
     def test_get_endpoint_login_2fa_enabled_user_no_code(self):
         with self._flask_app.app_context():
             # Create user with 2FA enabled
-            username = 'test'
-            password = 'test'
+            username = f'test_{pyotp.random_base32(32)}'
+            password = pyotp.random_base32(32)
             user = self.create_user_with_2fa_enabled(username, password)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertTrue(user.user_2fa_otp_enabled)
             # Login with user
             response = self._get_with_user_http_auth(self.test_client, username, password)
             self.assertEqual(400, response.status_code)
+
+    def test_get_endpoint_login_2fa_enabled_user_wrong_code(self):
+        with self._flask_app.app_context():
+            # Create user with 2FA enabled
+            username = f'test_{pyotp.random_base32(32)}'
+            password = pyotp.random_base32(32)
+            user = self.create_user_with_2fa_enabled(username, password)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertTrue(user.user_2fa_otp_enabled)
+            # Login with user
+            params = {'otp_code': 'invalid'}
+            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
+            self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_login_2fa_enabled_user_valid_code(self):
+        with self._flask_app.app_context():
+            # Create user with 2FA enabled
+            username = f'test_{pyotp.random_base32(32)}'
+            password = pyotp.random_base32(32)
+            user = self.create_user_with_2fa_enabled(username, password)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertTrue(user.user_2fa_otp_enabled)
+            # Login with user
+            totp = pyotp.TOTP(user.user_2fa_otp_secret)
+            params = {'otp_code': totp.now()}
+            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertGreater(len(response.json), 0)
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+
+    def test_get_endpoint_login_2fa_enabled_user_valid_code_with_websockets(self):
+        with self._flask_app.app_context():
+            # Create user with 2FA enabled
+            username = f'test_{pyotp.random_base32(32)}'
+            password = pyotp.random_base32(32)
+            user = self.create_user_with_2fa_enabled(username, password)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertTrue(user.user_2fa_otp_enabled)
+            # Login with user
+            totp = pyotp.TOTP(user.user_2fa_otp_secret)
+            params = {'otp_code': totp.now(), 'with_websocket': True}
+            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertGreater(len(response.json), 0)
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+            self.assertTrue('websocket_url' in response.json)
+            self.assertIsNotNone(response.json['websocket_url'])
 
     def create_user_with_2fa_enabled(self, username='test', password='test') -> TeraUser:
         # Create user with 2FA enabled
         user = TeraUser()
         user.user_firstname = 'Test'
         user.user_lastname = 'Test'
-        user.user_email = 'test@hotmail.com'
+        user.user_email = f'{username}@hotmail.com'
         user.user_username = username
         user.user_password = password  # Password will be hashed in insert
         user.user_enabled = True

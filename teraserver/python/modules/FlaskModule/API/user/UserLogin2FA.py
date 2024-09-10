@@ -1,4 +1,5 @@
 from flask import session, request
+from flask_login import logout_user
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current_user
@@ -37,8 +38,12 @@ class UserLogin2FA(Resource):
         # Current user is logged in with HTTPAuth
         # Let's verify if 2FA is enabled and if OTP is valid
         if not current_user.user_2fa_enabled:
+            logout_user()
+            session.clear()
             return gettext('User does not have 2FA enabled'), 403
         if not current_user.user_2fa_otp_enabled or not current_user.user_2fa_otp_secret:
+            logout_user()
+            session.clear()
             return gettext('User does not have 2FA OTP enabled'), 403
 
         # Verify OTP
