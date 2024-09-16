@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenTera Login Page</title>
+    <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./static/css/main_style.css" />
+    <script src="./static/js/jquery-3.7.1.min.js"></script>
+    <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <!-- Create a form to enter the 2FA code -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">2FA</div>
+                    <div class="card-body">
+                        <form action="/login_2fa" method="post">
+                            <div class="form-group row">
+                                <label for="2fa_code" class="col-md-4 col-form-label text-md-right">2FA Code</label>
+                                <div class="col-md-6">
+                                    <input type="text" id="2fa_code" class="form-control" name="2fa_code" required autofocus>
+                                </div>
+                            </div>
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

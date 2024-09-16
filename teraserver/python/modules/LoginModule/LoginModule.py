@@ -16,7 +16,7 @@ from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
-from flask import request, g
+from flask import request, g, session
 from flask_babel import gettext
 from werkzeug.local import LocalProxy
 from flask_restx import reqparse
@@ -796,3 +796,25 @@ class LoginModule(BaseModule):
             return gettext('Unauthorized'), 401
 
         return decorated
+
+    @staticmethod
+    def user_session_required(f):
+        """
+        Use this decorator if a user session is required. A session is created when a user logs in. The session contains
+        the user UUID.
+        """
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if '_user_id' in session:
+                # Verify if we have a valid user
+                user = TeraUser.get_user_by_uuid(session['_user_id'])
+                if user and user.user_enabled:
+                    g.current_user = user
+                    return f(*args, **kwargs)
+                else:
+                    return gettext('Unauthorized'), 401
+            else:
+                return gettext('Unauthorized'), 401
+
+        return decorated
+

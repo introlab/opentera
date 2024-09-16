@@ -353,6 +353,9 @@ class FlaskModule(BaseModule):
     def init_views(self):
         from modules.FlaskModule.Views.About import About
         from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
+        from modules.FlaskModule.Views.LoginView import LoginView
+        from modules.FlaskModule.Views.LoginEnable2FAView import LoginEnable2FAView
+        from modules.FlaskModule.Views.Login2FAView import Login2FAView
 
         # Default arguments
         args = []
@@ -360,6 +363,13 @@ class FlaskModule(BaseModule):
 
         # About
         flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
+
+        # Login
+        flask_app.add_url_rule('/login', view_func=LoginView.as_view('login', *args, **kwargs))
+        flask_app.add_url_rule('/login_enable_2fa', view_func=LoginEnable2FAView.as_view(
+            'login_enable_2fa', *args, **kwargs))
+        flask_app.add_url_rule('/login_2fa', view_func=Login2FAView.as_view(
+            'login_2fa', *args, **kwargs))
 
         if not self.config.server_config['enable_docs']:
             # Disabled docs view
