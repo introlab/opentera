@@ -6,7 +6,7 @@ from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
-    InvalidClientVersionHandlerError, UserAlreadyLoggedInError
+     UserAlreadyLoggedInError
 from werkzeug.exceptions import BadRequest
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -77,12 +77,9 @@ class UserLogin2FA(UserLoginBase):
                 'current_version': e.current_version,
                 'version_error': e.version_error,
                 'message': gettext('Client major version too old, not accepting login')}, 426
-        except InvalidClientVersionError as e:
-            # Invalid client version, will not be handled for now
-            pass
-        except InvalidClientVersionHandlerError as e:
-            self._user_logout()
-            return gettext('Invalid client version handler'), 500
+#        except InvalidClientVersionError as e:
+#            # Invalid client version, will not be handled for now
+#            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
             return gettext('User already logged in.'), 403

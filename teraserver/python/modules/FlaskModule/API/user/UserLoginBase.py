@@ -27,12 +27,6 @@ class InvalidClientVersionError(Exception):
         super().__init__(message)
 
 
-class InvalidClientVersionHandlerError(Exception):
-    # Raised when the client version handler is invalid
-    def __init__(self, message):
-        super().__init__(message)
-
-
 class UserAlreadyLoggedInError(Exception):
     # Raised when the user is already logged in
     def __init__(self, message):
