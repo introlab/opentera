@@ -151,65 +151,90 @@ class BaseUserAPITest(unittest.TestCase):
                                              TeraServerSettings.get_server_setting_value(
                                                  TeraServerSettings.ServerParticipantTokenKey))
 
-    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None):
+    def _get_with_user_token_auth(self, client: FlaskClient, token: str = '', params=None, endpoint=None,
+                                  opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _get_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                 params=None, endpoint=None):
+                                 params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
-            params = {}
+             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
 
         headers = {'Authorization': _basic_auth_str(username, password)}
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.get(endpoint, headers=headers, query_string=params)
 
     def _post_with_user_token_auth(self, client: FlaskClient, token: str = '', json: dict = {},
-                                   params: dict = None, endpoint: str = None):
+                                   params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _post_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                  json: dict = {}, params: dict = None, endpoint: str = None):
+                                  json: dict = {}, params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': _basic_auth_str(username, password)}
+        if opt_headers is not None:
+            headers.update(opt_headers)
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
     def _post_file_with_user_http_auth(self, client: FlaskClient, files: dict, username: str = '', password: str = '',
-                                       params: dict = None, endpoint: str = None):
+                                       params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': _basic_auth_str(username, password)}
+
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.post(endpoint, headers=headers, query_string=params, data=files)
 
     def _delete_with_user_token_auth(self, client: FlaskClient, token: str = '',
-                                     params: dict = None, endpoint: str = None):
+                                     params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': 'OpenTera ' + token}
+
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.delete(endpoint, headers=headers, query_string=params)
 
     def _delete_with_user_http_auth(self, client: FlaskClient, username: str = '', password: str = '',
-                                    params: dict = None, endpoint: str = None):
+                                    params: dict = None, endpoint: str = None, opt_headers: dict = None):
         if params is None:
             params = {}
         if endpoint is None:
             endpoint = self.test_endpoint
         headers = {'Authorization': _basic_auth_str(username, password)}
+
+        if opt_headers is not None:
+            headers.update(opt_headers)
+
         return client.delete(endpoint, headers=headers, query_string=params)

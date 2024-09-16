@@ -4,6 +4,10 @@ from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
+from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
+    InvalidClientVersionHandlerError, UserAlreadyLoggedInError
+from werkzeug.exceptions import BadRequest
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
 from opentera.utils.UserAgentParser import UserAgentParser
@@ -22,150 +26,75 @@ get_parser.add_argument('with_websocket', type=inputs.boolean,
 get_parser.add_argument('otp_code', type=str, required=True, help='2FA otp code')
 
 
-class UserLogin2FA(Resource):
+class UserLogin2FA(UserLoginBase):
 
     def __init__(self, _api, *args, **kwargs):
-        Resource.__init__(self, _api, *args, **kwargs)
-        self.module = kwargs.get('flaskModule', None)
-        self.test = kwargs.get('test', False)
+        UserLoginBase.__init__(self, _api, *args, **kwargs)
 
     @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
-    @api.expect(get_parser)
+    @api.expect(get_parser, validate=True)
     @user_http_auth.login_required
     def get(self):
-        args = get_parser.parse_args(strict=True)
+        try:
+            args = get_parser.parse_args(strict=True)
 
-        # Current user is logged in with HTTPAuth
-        # Let's verify if 2FA is enabled and if OTP is valid
-        if not current_user.user_2fa_enabled:
-            logout_user()
-            session.clear()
-            return gettext('User does not have 2FA enabled'), 403
-        if not current_user.user_2fa_otp_enabled or not current_user.user_2fa_otp_secret:
-            logout_user()
-            session.clear()
-            return gettext('User does not have 2FA OTP enabled'), 403
+            # Current user is logged in with HTTPAuth
+            # Let's verify if 2FA is enabled and if OTP is valid
+            if not current_user.user_2fa_enabled:
+                self._user_logout()
+                return gettext('User does not have 2FA enabled'), 403
+            if not current_user.user_2fa_otp_enabled or not current_user.user_2fa_otp_secret:
+                self._user_logout()
+                return gettext('User does not have 2FA OTP enabled or secret set'), 403
 
-        # Verify OTP
-        totp = pyotp.TOTP(current_user.user_2fa_otp_secret)
-        if not totp.verify(args['otp_code']):
-            return gettext('Invalid OTP code'), 403
+            # Verify OTP
+            totp = pyotp.TOTP(current_user.user_2fa_otp_secret)
+            if not totp.verify(args['otp_code']):
+                self._user_logout()
+                return gettext('Invalid OTP code'), 403
 
-        # Redis key is handled in LoginModule
-        servername = self.module.config.server_config['hostname']
-        port = self.module.config.server_config['port']
-        if 'X_EXTERNALSERVER' in request.headers:
-            servername = request.headers['X_EXTERNALSERVER']
+            # OTP validation completed, proceed with standard login
+            response = {}
 
-        if 'X_EXTERNALPORT' in request.headers:
-            port = request.headers['X_EXTERNALPORT']
+            version_info = self._verify_client_version()
 
-        websocket_url = None
+            if args['with_websocket']:
+                self._verify_user_already_logged_in()
+                response['websocket_url'] = self._generate_websocket_url()
 
-        # Get user token key from redis
-        token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
+            # Generate user token
+            response['user_uuid'] = current_user.user_uuid
+            response['user_token'] = self._generate_user_token()
 
-        # Get login information for log
-        login_infos = UserAgentParser.parse_request_for_login_infos(request)
+            if version_info:
+                response.update(version_info)
 
-        # Verify if user already logged in
-        online_users = []
-        if not self.test:
-            rpc = RedisRPCClient(self.module.config.redis_config)
-            online_users = rpc.call(ModuleNames.USER_MANAGER_MODULE_NAME.value, 'online_users')
+        except OutdatedClientVersionError as e:
+            self._user_logout()
 
-        if current_user.user_uuid not in online_users:
-            websocket_url = "wss://" + servername + ":" + str(port) + "/wss/user?id=" + session['_id']
-            # print('Login - setting key with expiration in 60s', session['_id'], session['_user_id'])
-            self.module.redisSet(session['_id'], session['_user_id'], ex=60)
-        elif args['with_websocket']:
-            # User is online and a websocket is required
-            self.module.logger.send_login_event(sender=self.module.module_name,
-                                                level=messages.LogEvent.LOGLEVEL_ERROR,
-                                                login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                                login_status=
-                                                messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
-                                                client_name=login_infos['client_name'],
-                                                client_version=login_infos['client_version'],
-                                                client_ip=login_infos['client_ip'],
-                                                os_name=login_infos['os_name'],
-                                                os_version=login_infos['os_version'],
-                                                user_uuid=current_user.user_uuid,
-                                                server_endpoint=login_infos['server_endpoint'])
-
+            return {
+                'version_latest': e.version_latest,
+                'current_version': e.current_version,
+                'version_error': e.version_error,
+                'message': gettext('Client major version too old, not accepting login')}, 426
+        except InvalidClientVersionError as e:
+            # Invalid client version, will not be handled for now
+            pass
+        except InvalidClientVersionHandlerError as e:
+            self._user_logout()
+            return gettext('Invalid client version handler'), 500
+        except UserAlreadyLoggedInError as e:
+            self._user_logout()
             return gettext('User already logged in.'), 403
+        except Exception as e:
+            # Something went wrong, logout user
+            self._user_logout()
+            raise e
+        else:
+            # Everything went well, return response
+            self._send_login_success_message()
+            return response, 200
 
-        current_user.update_last_online()
-        user_token = current_user.get_token(token_key)
 
-        # Return reply as json object
-        reply = {"user_uuid": session['_user_id'],
-                 "user_token": user_token}
-        if websocket_url:
-            reply["websocket_url"] = websocket_url
 
-        # Verify client version (optional for now)
-        # And add info to reply
-        if 'X-Client-Name' in request.headers and 'X-Client-Version' in request.headers:
-            try:
-                # Extract information
-                client_name = request.headers['X-Client-Name']
-                client_version = request.headers['X-Client-Version']
 
-                client_version_parts = client_version.split('.')
-
-                # Load known version from database.
-                from opentera.utils.TeraVersions import TeraVersions
-                versions = TeraVersions()
-                versions.load_from_db()
-
-                # Verify if we have client information in DB
-                client_info = versions.get_client_version_with_name(client_name)
-                if client_info:
-                    # We have something stored for this client, let's verify version numbers
-                    # For now, we still allow login even when version mismatch
-                    # Reply full version information
-                    reply['version_latest'] = client_info.to_dict()
-                    if client_info.version != client_version:
-                        reply['version_error'] = gettext('Client version mismatch')
-                        # If major version mismatch, kill client, first part of the version
-                        stored_client_version_parts = client_info.version.split('.')
-                        if len(stored_client_version_parts) and len(client_version_parts):
-                            if stored_client_version_parts[0] != client_version_parts[0]:
-                                # return 426 = upgrade required
-                                self.module.logger.send_login_event(sender=self.module.module_name,
-                                                                    level=messages.LogEvent.LOGLEVEL_ERROR,
-                                                                    login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                                                    login_status=
-                                                                    messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
-                                                                    client_name=login_infos['client_name'],
-                                                                    client_version=login_infos['client_version'],
-                                                                    client_ip=login_infos['client_ip'],
-                                                                    os_name=login_infos['os_name'],
-                                                                    os_version=login_infos['os_version'],
-                                                                    user_uuid=current_user.user_uuid,
-                                                                    server_endpoint=login_infos['server_endpoint'],
-                                                                    message=gettext('Client version mismatch'))
-
-                                return gettext('Client major version too old, not accepting login'), 426
-                # else:
-                #     return gettext('Invalid client name :') + client_name, 403
-            except BaseException as e:
-                self.module.logger.log_error(self.module.module_name,
-                                             UserLogin.__name__,
-                                             'get', 500, 'Invalid client version handler', str(e))
-                return gettext('Invalid client version handler') + str(e), 500
-
-        self.module.logger.send_login_event(sender=self.module.module_name,
-                                            level=messages.LogEvent.LOGLEVEL_INFO,
-                                            login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                            login_status=messages.LoginEvent.LOGIN_STATUS_SUCCESS,
-                                            client_name=login_infos['client_name'],
-                                            client_version=login_infos['client_version'],
-                                            client_ip=login_infos['client_ip'],
-                                            os_name=login_infos['os_name'],
-                                            os_version=login_infos['os_version'],
-                                            user_uuid=current_user.user_uuid,
-                                            server_endpoint=login_infos['server_endpoint'])
-
-        return reply

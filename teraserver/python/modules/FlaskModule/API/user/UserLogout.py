@@ -20,7 +20,6 @@ class UserLogout(Resource):
     @user_multi_auth.login_required
     def get(self):
         if current_user:
-            print('logout user')
             logout_user()
             session.clear()
             self.module.send_user_disconnect_module_message(current_user.user_uuid)
