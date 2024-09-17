@@ -2,9 +2,11 @@ from flask.views import MethodView
 from flask import render_template, request, redirect, url_for, session
 from opentera.utils.TeraVersions import TeraVersions
 from modules.LoginModule.LoginModule import current_user, LoginModule
+from opentera.db.models.TeraUser import TeraUser
+from flask_babel import gettext
 
 
-class Login2FAView(MethodView):
+class LoginValidate2FAView(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
@@ -33,12 +35,26 @@ class Login2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
-        return render_template('login_2fa.html', hostname=hostname, port=port,
+        return render_template('login_validate_2fa.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
                                openteraplus_version=versions.get_client_version_with_name('OpenTeraPlus'))
 
+    @LoginModule.user_session_required
     def post(self):
-        pass
+        # Verify the form
+        if '2fa_code' not in request.form:
+            return gettext('Missing 2FA code'), 400
+
+        # Get the user's 2FA code from the form
+        code = request.form['2fa_code']
+
+        # TODO Should use LoginModule instead of TeraUser directly ?
+        # Check the user's 2FA code
+        if not current_user.verify_2fa(code):
+            return gettext('Invalid 2FA code'), 401
+
+        # 2FA code is valid, return user information to client
+        return current_user.to_json()
 
 
 

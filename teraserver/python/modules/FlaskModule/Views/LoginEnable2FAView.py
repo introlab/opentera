@@ -2,8 +2,10 @@ from flask.views import MethodView
 from flask import render_template, request, redirect, url_for, session
 from opentera.utils.TeraVersions import TeraVersions
 from modules.LoginModule.LoginModule import current_user, LoginModule
+from opentera.db.models.TeraUser import TeraUser
 import pyotp
 import pyqrcode
+from flask_babel import gettext
 
 
 class LoginEnable2FAView(MethodView):
@@ -36,18 +38,14 @@ class LoginEnable2FAView(MethodView):
         versions.load_from_db()
 
         # Generate a new secret for the user
-        current_user.user_2fa_enabled = False
-        current_user.user_2fa_enabled = False
-        current_user.user_2fa_otp_enabled = True
-        current_user.user_2fa_email_enabled = False
-        current_user.user_2fa_otp_secret = pyotp.random_base32()
-        # TODO Save user to db
+        secret = pyotp.random_base32()
 
         # Generate OTP URI for QR Code
-        totp = pyotp.TOTP(current_user.user_2fa_otp_secret)
+        totp = pyotp.TOTP(secret)
 
-        # TODO issuer_name should be configurable for each server
-        otp_uri = totp.provisioning_uri(current_user.user_email, issuer_name='OpenTera')
+        # Get the server name in the config
+        server_name = self.flaskModule.config.server_config['name']
+        otp_uri = totp.provisioning_uri(current_user.user_username, issuer_name=f'OpenTera-{server_name}')
 
         # Generate QR Code with otp_uri
         qr_code = pyqrcode.create(otp_uri)
@@ -58,11 +56,31 @@ class LoginEnable2FAView(MethodView):
         return render_template('login_enable_2fa.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
                                qr_code=qr_code_base64,
-                               openteraplus_version=versions.get_client_version_with_name('OpenTeraPlus'))
+                               otp_secret=secret)
 
     @LoginModule.user_session_required
     def post(self):
-        pass
+        # Verify if user is authenticated, should be stored in session
+        if not current_user:
+            return redirect(url_for('login'))
+
+        if 'enable_2fa' in request.form and request.form['enable_2fa'] == 'on' and 'otp_secret' in request.form:
+            # Enable 2FA
+            current_user.user_2fa_enabled = True
+            current_user.user_2fa_otp_enabled = True
+            current_user.user_2fa_email_enabled = False
+            # Save user to db
+            # TODO enable email 2FA
+            TeraUser.update(current_user.id_user, {'user_2fa_enabled': True,
+                                                   'user_2fa_otp_enabled': True,
+                                                   'user_2fa_otp_secret': request.form['otp_secret'],
+                                                   'user_2fa_email_enabled': False})
+
+            # Redirect to 2FA validation page
+            return redirect(url_for('login_2fa'))
+
+        # Redirect to login page
+        return redirect(url_for('login'))
 
 
 

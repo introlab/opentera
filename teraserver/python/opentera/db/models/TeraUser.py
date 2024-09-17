@@ -139,6 +139,17 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         self.user_2fa_otp_secret = pyotp.random_base32()
         return True
 
+    def verify_2fa(self, code: str) -> bool:
+        if not self.user_2fa_enabled:
+            return False
+
+        if self.user_2fa_otp_enabled:
+            # Default is 6 digits with interval of 30 seconds
+            totp = pyotp.TOTP(self.user_2fa_otp_secret)
+            return totp.verify(code)
+
+        return False
+
     def get_service_access_dict(self):
         service_access = {}
 

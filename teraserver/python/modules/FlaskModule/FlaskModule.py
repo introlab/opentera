@@ -355,7 +355,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
         from modules.FlaskModule.Views.LoginView import LoginView
         from modules.FlaskModule.Views.LoginEnable2FAView import LoginEnable2FAView
-        from modules.FlaskModule.Views.Login2FAView import Login2FAView
+        from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
 
         # Default arguments
         args = []
@@ -368,8 +368,8 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/login', view_func=LoginView.as_view('login', *args, **kwargs))
         flask_app.add_url_rule('/login_enable_2fa', view_func=LoginEnable2FAView.as_view(
             'login_enable_2fa', *args, **kwargs))
-        flask_app.add_url_rule('/login_2fa', view_func=Login2FAView.as_view(
-            'login_2fa', *args, **kwargs))
+        flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(
+            'login_validate_2fa', *args, **kwargs))
 
         if not self.config.server_config['enable_docs']:
             # Disabled docs view

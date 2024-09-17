@@ -31,6 +31,8 @@
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
+                            <!-- Add otp_secret to the form, not shown to the user -->
+                            <input type="hidden" name="otp_secret" value="{{ otp_secret }}">
                         </form>
                     </div>
                 </div>
