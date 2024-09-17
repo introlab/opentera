@@ -11,6 +11,7 @@ class LoginView(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     def get(self):
         hostname = self.flaskModule.config.server_config['hostname']

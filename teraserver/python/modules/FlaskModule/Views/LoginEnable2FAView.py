@@ -12,6 +12,7 @@ class LoginEnable2FAView(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     @LoginModule.user_session_required
     def get(self):
