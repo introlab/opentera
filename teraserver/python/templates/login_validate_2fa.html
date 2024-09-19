@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="./static/css/main_style.css" />
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script type="text/javascript">
+        var qtObject;
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            qtObject = channel.objects.qtObject;
+        });
+
+        function sendTokenToQt(token) {
+            qtObject.handleToken(token);
+        }
+    </script>
 </head>
 <body>
     <!-- Create a form to enter the 2FA code -->

@@ -78,7 +78,7 @@ class LoginEnable2FAView(MethodView):
                                                    'user_2fa_email_enabled': False})
 
             # Redirect to 2FA validation page
-            return redirect(url_for('login_2fa'))
+            return redirect(url_for('login_validate_2fa'))
 
         # Redirect to login page
         return redirect(url_for('login'))
