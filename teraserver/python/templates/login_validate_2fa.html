@@ -20,6 +20,48 @@
             qtObject.handleToken(token);
         }
     </script>
+
+    <!-- call function when document is loaded -->
+    <script>
+        $(document).ready(function() {
+            qtObject.debugPrint("Document is ready");
+        });
+    </script>
+
+    <script>
+        function post_form_data_and_validate_login() {
+            const otp_code = document.getElementById("2fa_code").value;
+            qtObject.debugPrint("2FA code validation");
+
+            // Send the OTP code to the backend with a post request
+            // Use the login API for this purpose
+            $.ajax({
+                type: "POST",
+                url: "/api/user/login_2fa",
+                data: {
+                    otp_code: otp_code,
+                    with_websocket: true
+                },
+                success: function(data, textStatus, jqXHR) {
+                    qtObject.debugPrint("2FA code validation, success called");
+                    if (jqXHR.status === 200) {
+                        // If the status is 200, the 2FA code is valid
+                        // Send the token to the Qt application
+                        // Answer will contain,user_uuid, user_token, websocket_url
+                        qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
+                    } else {
+                        alert("Error validating 2FA code");
+                    }
+                },
+                error: function() {
+                    alert("Error validating 2FA code");
+                }
+            });
+
+        }
+
+    </script>
+
 </head>
 <body>
     <!-- Create a form to enter the 2FA code -->
@@ -29,6 +71,9 @@
                 <div class="card">
                     <div class="card-header">2FA</div>
                     <div class="card-body">
+
+                        <!-- This should be enabled for web only logins -->
+                        <!-- Form based, will post data to /login_validate_2fa
                         <form action="/login_validate_2fa" method="post">
                             <div class="form-group row">
                                 <label for="2fa_code" class="col-md-4 col-form-label text-md-right">2FA Code</label>
@@ -40,6 +85,28 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
+                        -->
+
+                        <!-- This should be enabled for desktop only login, users enter code and then we call
+                             the post_form_data_and_validate_login with the validate button -->
+                        <form id="login_form">
+                            <div class="form-group
+                            row">
+                                <label for="2fa_code" class="col-md-4 col-form-label text-md-right">2FA Code</label>
+                                <div class="col-md-6">
+                                    <input type="text" id="2fa_code" class="form-control" name="2fa_code" required autofocus>
+                                </div>
+
+                                <!-- Validation button -->
+                                <div class="col-md-6 offset-md-4">
+                                    <button type="button" class="btn btn-primary" onclick="post_form_data_and_validate_login()">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+
+
+
+
                     </div>
                 </div>
             </div>

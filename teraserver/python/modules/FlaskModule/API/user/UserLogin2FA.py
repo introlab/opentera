@@ -17,13 +17,21 @@ from opentera.redis.RedisVars import RedisVars
 import pyotp
 from opentera.db.models.TeraUser import TeraUser
 
+# Get parser
 get_parser = api.parser()
+get_parser.add_argument('otp_code', type=str, required=True, help='2FA otp code')
 get_parser.add_argument('with_websocket', type=inputs.boolean,
                         help='If set, requires that a websocket url is returned.'
                              'If not possible to do so, return a 403 error.',
                         default=False)
 
-get_parser.add_argument('otp_code', type=str, required=True, help='2FA otp code')
+# Post parser
+post_parser = api.parser()
+post_parser.add_argument('otp_code', type=str, required=True, help='2FA otp code')
+post_parser.add_argument('with_websocket', type=inputs.boolean,
+                         help='If set, requires that a websocket url is returned.'
+                              'If not possible to do so, return a 403 error.',
+                         default=False)
 
 
 class UserLogin2FA(UserLoginBase):
@@ -31,14 +39,13 @@ class UserLogin2FA(UserLoginBase):
     def __init__(self, _api, *args, **kwargs):
         UserLoginBase.__init__(self, _api, *args, **kwargs)
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
-    @api.expect(get_parser, validate=True)
-    @user_http_auth.login_required
-    def get(self):
+    # TODO Move this to UserLoginBase ?
+    def _common_2fa_login_response(self, parser):
         try:
-            args = get_parser.parse_args(strict=True)
+            # Validate args
+            args = parser.parse_args(strict=True)
 
-            # Current user is logged in with HTTPAuth
+            # Current user is logged in with HTTPAuth, or session
             # Let's verify if 2FA is enabled and if OTP is valid
             if not current_user.user_2fa_enabled:
                 self._user_logout()
@@ -77,9 +84,9 @@ class UserLogin2FA(UserLoginBase):
                 'current_version': e.current_version,
                 'version_error': e.version_error,
                 'message': gettext('Client major version too old, not accepting login')}, 426
-#        except InvalidClientVersionError as e:
-#            # Invalid client version, will not be handled for now
-#            pass
+            #        except InvalidClientVersionError as e:
+            #            # Invalid client version, will not be handled for now
+            #            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
             return gettext('User already logged in.'), 403
@@ -92,6 +99,15 @@ class UserLogin2FA(UserLoginBase):
             self._send_login_success_message()
             return response, 200
 
+    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
+    @api.expect(get_parser, validate=True)
+    @user_http_auth.login_required
+    def get(self):
+        return self._common_2fa_login_response(get_parser)
 
-
+    @api.doc(description='Login to the server using HTTP Basic Authentication (session auth) and 2FA')
+    @api.expect(post_parser, validate=True)
+    @LoginModule.user_session_required
+    def post(self):
+        return self._common_2fa_login_response(post_parser)
 

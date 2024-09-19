@@ -144,8 +144,8 @@ class UserLoginBase(Resource):
         return reply
 
     def _generate_websocket_url(self) -> str:
-        websocket_url = f"wss://{self.servername}:{str(self.port)}/wss/user?id=\"{session['_id']}\""
-        # The key is set with an expiration of 60s, will be verify when the websocket is opened in the TwistedModule
+        websocket_url = f"wss://{self.servername}:{str(self.port)}/wss/user?id={session['_id']}"
+        # The key is set with an expiration of 60s, will be verified when the websocket is opened in the TwistedModule
         self.module.redisSet(session['_id'], session['_user_id'], ex=60)
         return websocket_url
 
