@@ -354,6 +354,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.Views.About import About
         from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
         from modules.FlaskModule.Views.LoginView import LoginView
+        from modules.FlaskModule.Views.LoginChangePasswordView import LoginChangePasswordView
         from modules.FlaskModule.Views.LoginEnable2FAView import LoginEnable2FAView
         from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
 
@@ -366,6 +367,8 @@ class FlaskModule(BaseModule):
 
         # Login
         flask_app.add_url_rule('/login', view_func=LoginView.as_view('login', *args, **kwargs))
+        flask_app.add_url_rule('/login_change_password', view_func=LoginChangePasswordView.as_view(
+            'login_change_password', *args, **kwargs))
         flask_app.add_url_rule('/login_enable_2fa', view_func=LoginEnable2FAView.as_view(
             'login_enable_2fa', *args, **kwargs))
         flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(

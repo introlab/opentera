@@ -46,11 +46,19 @@ class LoginView(MethodView):
 
         login_user(user, remember=False)
 
+        # Test for password change first
+        if user.user_force_password_change:
+            return redirect(url_for('login_change_password'))
+
         # Check if the user has 2FA enabled
         # We may want to change the behavior here according to a configuration flag
-        if not user.user_2fa_enabled:
+        if user.user_2fa_enabled and user.user_2fa_secret is None:
             # Redirect to enable 2FA page
             return redirect(url_for('login_enable_2fa'))
-
-        # Redirect to 2FA validation page
-        return redirect(url_for('login_validate_2fa'))
+        elif user.user_2fa_enabled:
+            # Redirect to 2FA validation page
+            return redirect(url_for('login_validate_2fa'))
+        else:
+            # TODO Make standard user log in properly
+            # Should be logged in as a standard user
+            return redirect(url_for('login'))

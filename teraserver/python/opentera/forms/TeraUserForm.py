@@ -18,7 +18,19 @@ class TeraUserForm:
         section.add_item(TeraFormItem("user_uuid", gettext("User UUID"), "hidden"))
         section.add_item(TeraFormItem("user_name", gettext("User Full Name"), "hidden"))
         section.add_item(TeraFormItem("user_username", gettext("Username"), "text", True))
-        section.add_item(TeraFormItem("user_enabled", gettext("User Enabled"), "boolean", True, item_default=True))
+        section.add_item(TeraFormItem("user_enabled", gettext("User Enabled"), "boolean",
+                                      True, item_default=True))
+        section.add_item(TeraFormItem("user_force_password_change", gettext("Force password change"),
+                                      "boolean", False, item_default=False))
+        section.add_item(TeraFormItem("user_2fa_enabled", gettext("2FA Enabled"), "boolean",
+                                      False, item_default=False))
+
+        section.add_item(TeraFormItem("user_2fa_otp_enabled", gettext("2FA OTP Enabled"), "boolean",
+                                      False, item_default=False))
+        section.add_item(TeraFormItem("user_2fa_email_enabled", gettext("2FA Email Enabled"), "boolean",
+                                      False, item_default=False))
+
+        # section.add_item(TeraFormItem("user_2fa_otp_secret", gettext("OTP Secret"), "hidden"))
         section.add_item(TeraFormItem("user_firstname", gettext("First Name"), "text", True))
         section.add_item(TeraFormItem("user_lastname", gettext("Last Name"), "text", True))
         section.add_item(TeraFormItem("user_email", gettext("Email"), "text"))

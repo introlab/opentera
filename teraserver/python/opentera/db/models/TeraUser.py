@@ -75,11 +75,11 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups',
-                              'user_sessions', 'user_2fa_enabled', 'user_2fa_otp_enabled',
-                              'user_2fa_email_enabled', 'user_2fa_otp_secret', 'user_force_password_change'])
+                              'user_sessions', 'user_2fa_otp_secret'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
-                                  'user_superadmin'])
+                                  'user_superadmin' 'user_2fa_enabled', 'user_2fa_otp_enabled',
+                                  'user_2fa_email_enabled', 'user_force_password_change'])
         rval = super().to_json(ignore_fields=ignore_fields)
         rval['user_name'] = self.get_fullname()
         return rval
