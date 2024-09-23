@@ -15,10 +15,6 @@
         new QWebChannel(qt.webChannelTransport, function(channel) {
             qtObject = channel.objects.qtObject;
         });
-
-        function sendTokenToQt(token) {
-            qtObject.handleToken(token);
-        }
     </script>
 
     <!-- call function when document is loaded -->
@@ -51,10 +47,12 @@
                         qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
                     } else {
                         alert("Error validating 2FA code");
+                        qtObject.sendLoginFailure("Error validating 2FA code");
                     }
                 },
                 error: function() {
                     alert("Error validating 2FA code");
+                    qtObject.sendLoginFailure("Error validating 2FA code");
                 }
             });
 

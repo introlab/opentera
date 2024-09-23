@@ -52,7 +52,7 @@ class LoginView(MethodView):
 
         # Check if the user has 2FA enabled
         # We may want to change the behavior here according to a configuration flag
-        if user.user_2fa_enabled and user.user_2fa_secret is None:
+        if user.user_2fa_enabled and user.user_2fa_otp_secret is None:
             # Redirect to enable 2FA page
             return redirect(url_for('login_enable_2fa'))
         elif user.user_2fa_enabled:
