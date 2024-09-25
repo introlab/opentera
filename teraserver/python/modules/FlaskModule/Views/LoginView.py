@@ -23,11 +23,13 @@ class LoginView(MethodView):
         if 'X_EXTERNALPORT' in request.headers:
             port = request.headers['X_EXTERNALPORT']
 
+        show_logo = 'no_logo' not in request.args
+
         versions = TeraVersions()
         versions.load_from_db()
 
         return render_template('login.html', hostname=hostname, port=port,
-                               server_version=versions.version_string)
+                               server_version=versions.version_string, show_logo=show_logo)
 
     def post(self):
         # Verify the form

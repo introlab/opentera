@@ -13,7 +13,7 @@
 
 <body>
 
-<div class="jumbotron ml-2 mr-2 mb-0 mt-0 text-center">
+<div class="jumbotron ms-2 me-2 mb-0 mt-0 text-center">
     <a href="https://www.telereadaptation.com" target="_blank"><img src="./static/img/logos/Estrad.png" class="img-fluid img-logo" /></a>
     <a href="https://introlab.3it.usherbrooke.ca" target="_blank"><img src="./static/img/logos/IntRoLab.png" class="img-fluid img-logo" /></a>
     <a href="https://regroupementinter.com" target="_blank"><img src="./static/img/logos/INTER.png" class="img-fluid img-logo" /></a>
@@ -22,44 +22,45 @@
     <a href="https://www.cdrv.ca" target="_blank"><img src="./static/img/logos/logo_CDRV.png" class="img-fluid img-logo" /></a>
 </div>
 
-<div class="jumbotron ml-2 mr-2 mb-0">
+<div class="jumbotron ms-2 me-2 mb-0">
     <h1>{% trans %}Versions{% endtrans%}</h1>
     <a href="https://github.com/introlab/opentera"> Project OpenTera on GitHub</a><br>
     Server URL : https://{{hostname}}:{{port}} <br>
     Version: {{server_version}} <br>
 </div>
 
-<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+<div class="jumbotron ms-2 me-2 mb-0 mt-0">
     <h1>{% trans %}Downloads{% endtrans%}</h1>
-    <div class="row">
-        <div class="card col-4 text-center mt-2" style="width: 18rem;">
-            <img src="./static/img/logos/Windows-icon.png" class="card-img-top img-logo-download m-auto" alt="Windows logo">
+    <div class="row m-2 gap-2">
+        <div class="card col text-center">
+            <img src="./static/img/logos/Windows-icon.png" class="card-img-top img-logo-download mt-2 m-auto" alt="Windows logo">
             <div class="card-body">
                 <h5 class="card-title">Windows</h5>
                 <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
                 <a href="{{openteraplus_version.client_windows_download_url}}" class="btn btn-primary">Download</a>
             </div>
         </div>
-        <div class="card col-4 text-center mt-2" style="width: 18rem;">
-            <img src="./static/img/logos/Mac-icon.png" class="card-img-top img-logo-download m-auto" alt="Mac logo">
+        <div class="card col text-center">
+            <img src="./static/img/logos/Mac-icon.png" class="card-img-top img-logo-download mt-2 m-auto" alt="Mac logo">
             <div class="card-body">
                 <h5 class="card-title">Mac</h5>
                 <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
                 <a href="{{openteraplus_version.client_mac_download_url}}" class="btn btn-primary align-center">Download</a>
             </div>
         </div>
-        <div class="card col-4 text-center mt-2" style="width: 18rem;">
-            <img src="./static/img/logos/Linux-icon.png" class="card-img-top img-logo-download m-auto" alt="Linux logo">
+        <div class="card col text-center">
+            <img src="./static/img/logos/Linux-icon.png" class="card-img-top img-logo-download mt-2 m-auto" alt="Linux logo">
             <div class="card-body">
                 <h5 class="card-title">Linux</h5>
-                <p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
-                <a href="{{openteraplus_version.client_linux_download_url}}" class="btn btn-primary">Download</a>
+                <!--<p class="card-text">{% trans %}Latest version: {% endtrans%}{{openteraplus_version.client_version}}</p>
+                <a href="{{openteraplus_version.client_linux_download_url}}" class="btn btn-primary">Download</a>-->
+                Not yet available
             </div>
         </div>
     </div>
 </div>
 
-<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+<div class="jumbotron ms-2 me-2 mb-0 mt-0">
     <h1>{% trans %}License{% endtrans%}</h1>
     <p class="lead">
         OpenTera is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0.</a>
@@ -73,7 +74,7 @@
 
 
 
-<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+<div class="jumbotron ms-2 me-2 mb-0 mt-0">
     <h1>{% trans %}Authors{% endtrans%}</h1>
     <ul class="list-group">
         <li class="list-group-item">Simon Brière, ing., M.Sc.A. (Simon.Briere@USherbrooke.ca)</li>
@@ -83,7 +84,7 @@
     </ul>
 </div>
 
-<div class="jumbotron ml-2 mr-2 mb-0 mt-0">
+<div class="jumbotron ms-2 me-2 mb-0 mt-0">
     <h1>{% trans %}Contributors{% endtrans%}</h1>
     <ul class="list-group">
         <li class="list-group-item">Philippe Arsenault</li>
