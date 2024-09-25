@@ -6,7 +6,7 @@
     <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
     <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./static/css/main_style.css" />
+    <link rel="stylesheet" href="./static/css/login_style.css" />
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
@@ -63,33 +63,44 @@
                     }
                 });
             });
+            $("input").change(function(){
+                $('#error_message').hide();
+            });
         });
+
     </script>
 </head>
 <body>
     <!-- Create a login form using bootstrap -->
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col col-md-6">
+                {% if show_logo %}
+                <div class="w-100 d-flex">
+                    <img src="./static/img/logos/LogoOpenTera.png" class="img-logo ms-auto me-auto">
+                </div>
+                {% endif %}
                 <div class="card">
-                    <div class="card-header">Login</div>
+                    <div class="card-header"></div>
                     <div class="card-body">
                         <form id="loginForm" action="/api/user/login" method="post">
-                            <div class="form-group  row">
-                                <label for="username" class="col-md-4 col-form-label text-md-right">Username</label>
-                                <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="username" class="col-4 col-form-label text-md-right">Username</label>
+                                <div class="col-8 col-md-6">
                                     <input type="text" id="username" class="form-control" name="username" required autofocus>
                                 </div>
                             </div>
-                            <div class="form-group
-                            row">
-                                <label for="password" class="col-md-4 col-form-label text-md-right">Password</label>
-                                <div class="col-md-6">
+                            <div class="form-group row mt-2">
+                                <label for="password" class="col-4 col-form-label text-md-right">Password</label>
+                                <div class="col-8 col-md-6">
                                     <input type="password" id="password" class="form-control" name="password" required>
                                 </div>
                             </div>
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">Login</button>
+                            <div class="row mt-2">
+                                <div class="col-4"></div>
+                                <div class="col-8 col-md-6">
+                                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                                </div>
                             </div>
                         </form>
                     </div>
