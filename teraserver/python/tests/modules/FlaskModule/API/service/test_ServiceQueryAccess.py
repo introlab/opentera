@@ -1,4 +1,4 @@
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraUser import TeraUser
@@ -214,4 +214,3 @@ class ServiceQueryAccessTest(BaseServiceAPITest):
 
                     # TODO complete tests with devices
                     access = DBManagerTeraDeviceAccess(device)
-

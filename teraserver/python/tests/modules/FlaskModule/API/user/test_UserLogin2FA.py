@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraUser import TeraUser
 import pyotp
 
@@ -171,5 +171,3 @@ class UserLogin2FATest(BaseUserAPITest):
         user.enable_2fa_otp()
         TeraUser.insert(user)
         return user
-
-

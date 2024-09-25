@@ -1,6 +1,6 @@
 from typing import List
 
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType

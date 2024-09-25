@@ -1,5 +1,5 @@
 from typing import List
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject

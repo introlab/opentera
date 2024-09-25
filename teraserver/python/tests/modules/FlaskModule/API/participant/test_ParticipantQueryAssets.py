@@ -1,5 +1,5 @@
 from typing import List
-from BaseParticipantAPITest import BaseParticipantAPITest
+from tests.modules.FlaskModule.API.participant.BaseParticipantAPITest import BaseParticipantAPITest
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraSession import TeraSession

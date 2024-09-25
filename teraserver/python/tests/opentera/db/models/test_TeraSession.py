@@ -67,7 +67,7 @@ class TeraSessionTest(BaseModelsTest):
             id_session = ses.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_device=1)
@@ -115,14 +115,14 @@ class TeraSessionTest(BaseModelsTest):
             id_session = ses.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_device=1)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_participant=1)
             id_test = test.id_test
 
@@ -149,19 +149,19 @@ class TeraSessionTest(BaseModelsTest):
             id_session = ses.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_device=1)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_participant=1)
             id_test = test.id_test
 
             # ... and event
-            from test_TeraSessionEvent import TeraSessionEventTest
+            from tests.opentera.db.models.test_TeraSessionEvent import TeraSessionEventTest
             event = TeraSessionEventTest.new_test_session_event(id_session=id_session, id_event_type=1)
             id_event = event.id_session_event
 

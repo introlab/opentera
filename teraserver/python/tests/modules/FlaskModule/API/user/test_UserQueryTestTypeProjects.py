@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraSession import TeraSession
@@ -165,21 +165,21 @@ class UserQueryTestTypeProjectTest(BaseUserAPITest):
     def test_query_project_as_user(self):
         with self._flask_app.app_context():
             params = {'id_project': 10}
-            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', 
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
             params = {'id_project': 1}
-            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4', 
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
             params = {'id_project': 1}
-            response = self._get_with_user_http_auth(self.test_client, username='user', password='user', 
+            response = self._get_with_user_http_auth(self.test_client, username='user', password='user',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)

@@ -98,7 +98,7 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign user to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -106,14 +106,14 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
@@ -152,12 +152,12 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign to user group
-            from test_TeraUserUserGroup import TeraUserUserGroupTest
+            from tests.opentera.db.models.test_TeraUserUserGroup import TeraUserUserGroupTest
             uug = TeraUserUserGroupTest.new_test_user_usergroup(id_user=id_user, id_user_group=1)
             id_user_user_group = uug.id_user_user_group
 
             # Assign user to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -165,19 +165,19 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
             # ... and service config
-            from test_TeraServiceConfig import TeraServiceConfigTest
+            from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
             service_conf = TeraServiceConfigTest.new_test_service_config(id_service=1, id_user=id_user)
             id_service_conf = service_conf.id_service_config
 

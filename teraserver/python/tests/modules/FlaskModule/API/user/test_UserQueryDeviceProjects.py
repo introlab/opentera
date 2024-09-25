@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 

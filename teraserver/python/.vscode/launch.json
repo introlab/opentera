@@ -1,0 +1,33 @@
+{
+      // Utilisez IntelliSense pour en savoir plus sur les attributs possibles.
+      // Pointez pour afficher la description des attributs existants.
+      // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+      "version": "0.2.0",
+      "configurations": [
+            {
+                  "name": "Python: OpenTera Server TeraServer.py",
+                  "type": "debugpy",
+                  "request": "launch",
+                  "program": "${workspaceFolder}/TeraServer.py",
+                  "console": "integratedTerminal",
+                  "env": {
+                        "PYTHONPATH": "${workspaceFolder}"
+                  }
+            },
+            {
+                  "name": "Python Debugger: Attach",
+                  "type": "debugpy",
+                  "request": "attach",
+                  "connect": {
+                        "host": "localhost",
+                        "port": 5688
+                  },
+                  "pathMappings": [
+                        {
+                              "localRoot": "${workspaceFolder}", // Maps C:\Users\user1\project1
+                              "remoteRoot": "/root/opentera/teraserver/python" // To current working directory ~/project1
+                        }
+                  ]
+            }
+      ]
+}

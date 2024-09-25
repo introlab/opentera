@@ -38,7 +38,7 @@ class TeraSessionTypeTest(BaseModelsTest):
             id_session_type = ses_type.id_session_type
 
             # Create a new session of that session type
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             ses = TeraSessionTest.new_test_session(id_session_type=id_session_type, id_creator_service=1)
             id_session = ses.id_session
 
@@ -62,7 +62,7 @@ class TeraSessionTypeTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create new service
-            from test_TeraService import TeraServiceTest
+            from tests.opentera.db.models.test_TeraService import TeraServiceTest
             service = TeraServiceTest.new_test_service('SessionTypeService')
             id_service = service.id_service
 
@@ -71,17 +71,17 @@ class TeraSessionTypeTest(BaseModelsTest):
             id_session_type = ses_type.id_session_type
 
             # Create a new session of that session type
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             ses = TeraSessionTest.new_test_session(id_session_type=id_session_type, id_creator_service=1)
             id_session = ses.id_session
 
             # Associate session type to site
-            from test_TeraSessionTypeSite import TeraSessionTypeSiteTest
+            from tests.opentera.db.models.test_TeraSessionTypeSite import TeraSessionTypeSiteTest
             ses_site = TeraSessionTypeSiteTest.new_test_session_type_site(id_site=1, id_session_type=id_session_type)
             id_session_type_site = ses_site.id_session_type_site
 
             # ... and project
-            from test_TeraSessionTypeProject import TeraSessionTypeProjectTest
+            from tests.opentera.db.models.test_TeraSessionTypeProject import TeraSessionTypeProjectTest
             ses_proj = TeraSessionTypeProjectTest.new_test_session_type_project(id_project=1,
                                                                                 id_session_type=id_session_type)
             id_session_type_project = ses_proj.id_session_type_project
