@@ -73,7 +73,7 @@ class UserLoginBase(Resource):
                                                                     + current_user.user_name))
                 raise UserAlreadyLoggedInError(gettext('User already logged in.'))
 
-    def _verify_client_version(self) -> dict or None:
+    def _verify_client_version(self) -> dict | None:
         reply = {}
 
         # Extract login information
@@ -152,6 +152,12 @@ class UserLoginBase(Resource):
     def _generate_user_token(self) -> str:
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
         return current_user.get_token(token_key)
+
+    def _generate_2fa_verification_url(self) -> str:
+        return "/login_validate_2fa"
+
+    def _generate_2fa_setup_url(self) -> str:
+        return "/login_enable_2fa"
 
     def _user_logout(self):
         logout_user()

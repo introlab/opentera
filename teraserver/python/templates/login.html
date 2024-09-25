@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="./static/css/main_style.css" />
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script type="text/javascript">
+        var qtObject;
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            qtObject = channel.objects.qtObject;
+        });
+    </script>
     <script>
         $(document).ready(function() {
             // Handle form submission
@@ -18,23 +25,41 @@
 
                 var form = $(this);
                 var url = form.attr('action');
-                var formData = form.serialize();
+
+                // Basic auth encode the username and password
+                var base64 = btoa($('#username').val() + ":" + $('#password').val());
+                var headers = {
+                    Authorization: "Basic " + base64,
+                    "X-Client-Name":  "OpenTera-Web-Client",
+                    "X-Client-Version": "{{ server_version }}"
+                };
+
+                var data = {
+                    with_websocket: true
+                };
 
                 // Send the form data to the backend with a post request
                 // If the login is successful, if 2fa is enabled, the user will be redirected to the 2fa page
                 // If the login is successful, the user will be redirected to the main page
                 $.ajax({
-                    type: "POST",
+                    type: "GET",
                     url: url,
-                    data: formData,
+                    headers: headers,
+                    data: data,
                     success: function(response) {
                         console.log("Login success");
-                        window.location.href = "/login_validate_2fa";
+                        if (response.redirect_url) {
+                            window.location.href = response.redirect_url;
+                        }
+                        else {
+                            qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
+                        }
                     },
                     error: function(response) {
                         console.log("Login error", response);
                         $('#error_message').text(response.responseText);
                         $('#error_message').show();
+                        qtObject.sendLoginFailure(response.responseText);
                     }
                 });
             });
@@ -49,7 +74,7 @@
                 <div class="card">
                     <div class="card-header">Login</div>
                     <div class="card-body">
-                        <form id="loginForm" action="/login" method="post">
+                        <form id="loginForm" action="/api/user/login" method="post">
                             <div class="form-group  row">
                                 <label for="username" class="col-md-4 col-form-label text-md-right">Username</label>
                                 <div class="col-md-6">

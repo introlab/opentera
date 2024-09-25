@@ -44,6 +44,7 @@ class UserLogin2FA(UserLoginBase):
         try:
             # Validate args
             args = parser.parse_args(strict=True)
+            response = {}
 
             # Current user is logged in with HTTPAuth, or session
             # Let's verify if 2FA is enabled and if OTP is valid
@@ -61,9 +62,9 @@ class UserLogin2FA(UserLoginBase):
                 return gettext('Invalid OTP code'), 403
 
             # OTP validation completed, proceed with standard login
-            response = {}
-
             version_info = self._verify_client_version()
+            if version_info:
+                response.update(version_info)
 
             if args['with_websocket']:
                 self._verify_user_already_logged_in()
@@ -73,9 +74,6 @@ class UserLogin2FA(UserLoginBase):
             response['user_uuid'] = current_user.user_uuid
             response['user_token'] = self._generate_user_token()
 
-            if version_info:
-                response.update(version_info)
-
         except OutdatedClientVersionError as e:
             self._user_logout()
 
@@ -84,12 +82,12 @@ class UserLogin2FA(UserLoginBase):
                 'current_version': e.current_version,
                 'version_error': e.version_error,
                 'message': gettext('Client major version too old, not accepting login')}, 426
-            #        except InvalidClientVersionError as e:
-            #            # Invalid client version, will not be handled for now
-            #            pass
+#        except InvalidClientVersionError as e:
+#            # Invalid client version, will not be handled for now
+#            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
-            return gettext('User already logged in.'), 403
+            return gettext('User already logged in.') + str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()
@@ -101,7 +99,7 @@ class UserLogin2FA(UserLoginBase):
 
     @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
     @api.expect(get_parser, validate=True)
-    @user_http_auth.login_required
+    @LoginModule.user_session_required
     def get(self):
         return self._common_2fa_login_response(get_parser)
 
@@ -110,4 +108,3 @@ class UserLogin2FA(UserLoginBase):
     @LoginModule.user_session_required
     def post(self):
         return self._common_2fa_login_response(post_parser)
-

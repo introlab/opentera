@@ -28,37 +28,3 @@ class LoginView(MethodView):
 
         return render_template('login.html', hostname=hostname, port=port,
                                server_version=versions.version_string)
-
-    def post(self):
-        # Verify the form
-        if 'username' not in request.form or 'password' not in request.form:
-            return gettext('Missing username or password'), 400
-
-        # Get the user's name and password from the form
-        username = request.form['username']
-        password = request.form['password']
-
-        # TODO Should use LoginModule instead of TeraUser directly
-        # Check the user's credentials
-        user = TeraUser.verify_password(username, password)
-        if user is None:
-            return gettext('Invalid username or password'), 401
-
-        login_user(user, remember=False)
-
-        # Test for password change first
-        if user.user_force_password_change:
-            return redirect(url_for('login_change_password'))
-
-        # Check if the user has 2FA enabled
-        # We may want to change the behavior here according to a configuration flag
-        if user.user_2fa_enabled and user.user_2fa_otp_secret is None:
-            # Redirect to enable 2FA page
-            return redirect(url_for('login_enable_2fa'))
-        elif user.user_2fa_enabled:
-            # Redirect to 2FA validation page
-            return redirect(url_for('login_validate_2fa'))
-        else:
-            # TODO Make standard user log in properly
-            # Should be logged in as a standard user
-            return redirect(url_for('login'))
