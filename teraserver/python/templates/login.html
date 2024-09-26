@@ -20,9 +20,18 @@
 
     </script>
     <script>
+        $(document).ajaxSend(function(event, request, settings) {
+            $('#loading').removeClass("d-none").addClass("d-flex");
+        });
+
+        $(document).ajaxComplete(function(event, request, settings) {
+            $('#loading').removeClass("d-flex").addClass("d-none");
+        });
         $(document).ready(function() {
             // Handle form submission
             $('#loginForm').submit(function(event) {
+                $('#error_message').hide();
+
                 // Prevent the default form submission
                 event.preventDefault();
 
@@ -61,10 +70,11 @@
                     },
                     error: function(response) {
                         console.log("Login error", response);
-                        $('#error_message').text(response.responseText);
+                        //$('#error_message').text(response.responseText);
+                        $('#error_message').text("Invalid username or password");
                         $('#error_message').show();
                         if (qtObject)
-                            qtObject.sendLoginFailure(response.responseText);
+                            qtObject.sendLoginFailure("Invalid username or password");
                     }
                 });
             });
@@ -87,16 +97,20 @@
                 {% endif %}
                 <div class="card">
                     <div class="card-header"></div>
-                    <div class="card-body">
-                        <form id="loginForm" action="/api/user/login" method="post">
+                    <div class="card-body mb-0 p-0">
+                        <div id="loading" class="h-100 w-100 z-1 bg-black position-absolute opacity-75 d-none">
+                            <img src="./static/img/loading.gif" class="m-auto">
+                        </div>
+
+                        <form id="loginForm" class="m-3" action="/api/user/login" method="post">
                             <div class="form-group row">
-                                <label for="username" class="col-4 col-form-label text-md-right">Username</label>
+                                <label for="username" class="col-4 col-form-label text-end">Username</label>
                                 <div class="col-8 col-md-6">
                                     <input type="text" id="username" class="form-control" name="username" required autofocus>
                                 </div>
                             </div>
                             <div class="form-group row mt-2">
-                                <label for="password" class="col-4 col-form-label text-md-right">Password</label>
+                                <label for="password" class="col-4 col-form-label text-end">Password</label>
                                 <div class="col-8 col-md-6">
                                     <input type="password" id="password" class="form-control" name="password" required>
                                 </div>
@@ -107,12 +121,15 @@
                                     <button type="submit" class="btn btn-primary w-100">Login</button>
                                 </div>
                             </div>
+                            <div class="row ms-3 me-3 mt-2">
+                                <div class="text-danger p-1 m-0 text-center fw-bold" id="error_message" role="alert" style="display: none;"></div>
+                            </div>
                         </form>
                     </div>
                     <!-- Error message placeholder -->
-                    <div class="card-footer">
-                        <div class="alert alert-danger" id="error_message" role="alert" style="display: none;"></div>
-                    </div>
+<!--                    <div class="card-footer">-->
+
+<!--                    </div>-->
                 </div>
             </div>
         </div>
