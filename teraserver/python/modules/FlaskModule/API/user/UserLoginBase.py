@@ -157,7 +157,7 @@ class UserLoginBase(Resource):
         return "/login_validate_2fa"
 
     def _generate_2fa_setup_url(self) -> str:
-        return "/login_enable_2fa"
+        return "/login_setup_2fa"
 
     def _user_logout(self):
         logout_user()
