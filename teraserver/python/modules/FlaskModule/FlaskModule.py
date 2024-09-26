@@ -37,9 +37,8 @@ babel = Babel(flask_app, locale_selector=get_locale, timezone_selector=get_timez
 
 # API
 authorizations = {
-    'HTTPAuth': {
-        'type': 'basic',
-        'in': 'header'
+    'basicAuth': {
+        'type': 'basic'
     },
     'Token Authentication': {
         'type': 'apiKey',
@@ -66,7 +65,7 @@ class CustomAPI(Api):
 # if doc is set to False, documentation is disabled
 api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
-                authorizations=authorizations)
+                authorizations=authorizations, security='basicAuth')
 
 # Namespaces
 user_api_ns = api.namespace('user', description='API for user calls')
@@ -382,11 +381,15 @@ class FlaskModule(BaseModule):
 
 
 @flask_app.after_request
-def apply_caching(response):
+def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
+
+    # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up
+    if response.status_code == 401 and 'WWW-Authenticate' in response.headers:
+        del response.headers['WWW-Authenticate']
 
     # Request processing time
     import time

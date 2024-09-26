@@ -92,7 +92,7 @@ class LoginModule(BaseModule):
         LoginModule.__user_disabled_token_storage.remove_all_expired_tokens(
             self.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
         )
-        # Remove expired tokens from participant tokens disabled storage
+        # Remove expired tokens from participant tokens disabled storagef
         LoginModule.__participant_disabled_token_storage.remove_all_expired_tokens(
             self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey)
         )
