@@ -7,14 +7,17 @@
     <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./static/css/login_style.css" />
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script type="text/javascript">
-        var qtObject;
-        new QWebChannel(qt.webChannelTransport, function(channel) {
-            qtObject = channel.objects.qtObject;
-        });
+        var qtObject = undefined;
+        if (typeof QWebChannel !== "undefined"){
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+                qtObject = channel.objects.qtObject;
+            });
+        };
+
     </script>
     <script>
         $(document).ready(function() {
@@ -52,14 +55,16 @@
                             window.location.href = response.redirect_url;
                         }
                         else {
-                            qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
+                            if (qtObject)
+                                qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
                         }
                     },
                     error: function(response) {
                         console.log("Login error", response);
                         $('#error_message').text(response.responseText);
                         $('#error_message').show();
-                        qtObject.sendLoginFailure(response.responseText);
+                        if (qtObject)
+                            qtObject.sendLoginFailure(response.responseText);
                     }
                 });
             });
