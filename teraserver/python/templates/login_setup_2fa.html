@@ -46,10 +46,11 @@
                     success: function(response) {
                         console.log("2FA setup success");
                         // Redirect to the main page
-                        window.location.href = "/main";
+                        window.location.href = response.redirect_url
                     },
                     error: function(response) {
                         console.log("Error setting up 2FA");
+                        window.location.href = '/login';
                     }
                 });
             });

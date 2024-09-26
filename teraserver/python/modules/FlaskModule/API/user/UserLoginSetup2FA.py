@@ -101,5 +101,49 @@ class UserLoginSetup2FA(UserLoginBase):
     @api.expect(post_parser, validate=True)
     @LoginModule.user_session_required
     def post(self):
-        args = post_parser.parse_args(strict=True)
-        return gettext('Not implemented'), 501
+        try:
+            args = post_parser.parse_args(strict=True)
+            response = {}
+
+            # Current user is logged in with HTTPAuth, or session
+            # Let's verify if 2FA is enabled and if OTP is valid
+            if not current_user.user_2fa_enabled:
+                self._user_logout()
+                return gettext('User does not have 2FA enabled'), 403
+
+            if current_user.user_2fa_otp_secret:
+                self._user_logout()
+                return gettext('User already has 2FA OTP secret set'), 403
+
+            data = {'user_2fa_enabled': True,
+                    'user_2fa_otp_enabled': True,
+                    'user_2fa_otp_secret': args['otp_secret'],
+                    'user_2fa_email_enabled': args['with_email_enabled']}
+
+            # Save user to db
+            TeraUser.update(current_user.id_user, data)
+
+            # Redirect to 2FA validation page
+            response['message'] = gettext('2FA enabled for this user.')
+            response['redirect_url'] = self._generate_2fa_verification_url()
+
+        except OutdatedClientVersionError as e:
+            self._user_logout()
+            return {
+                'version_latest': e.version_latest,
+                'current_version': e.current_version,
+                'version_error': e.version_error,
+                'message': gettext('Client major version too old, not accepting login')}, 426
+#        except InvalidClientVersionError as e:
+#            # Invalid client version, will not be handled for now
+#            pass
+        except UserAlreadyLoggedInError as e:
+            self._user_logout()
+            return gettext('User already logged in.') + str(e), 403
+        except Exception as e:
+            # Something went wrong, logout user
+            self._user_logout()
+            raise e
+        else:
+            # Everything went well, return response
+            return response, 200

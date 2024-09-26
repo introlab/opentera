@@ -40,27 +40,3 @@ class LoginSetup2FAView(MethodView):
 
         return render_template('login_setup_2fa.html', hostname=hostname, port=port,
                                server_version=versions.version_string)
-
-    @LoginModule.user_session_required
-    def post(self):
-        # Verify if user is authenticated, should be stored in session
-        if not current_user:
-            return redirect(url_for('login'))
-
-        if 'enable_2fa' in request.form and request.form['enable_2fa'] == 'on' and 'otp_secret' in request.form:
-            # Enable 2FA
-            current_user.user_2fa_enabled = True
-            current_user.user_2fa_otp_enabled = True
-            current_user.user_2fa_email_enabled = False
-            # Save user to db
-            # TODO enable email 2FA
-            TeraUser.update(current_user.id_user, {'user_2fa_enabled': True,
-                                                   'user_2fa_otp_enabled': True,
-                                                   'user_2fa_otp_secret': request.form['otp_secret'],
-                                                   'user_2fa_email_enabled': False})
-
-            # Redirect to 2FA validation page
-            return redirect(url_for('login_validate_2fa'))
-
-        # Redirect to login page
-        return redirect(url_for('login'))
