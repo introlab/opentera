@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenTera Setup 2FA</title>
+    <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./static/css/main_style.css" />
+    <script src="./static/js/jquery-3.7.1.min.js"></script>
+    <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <script>
+        $(document).ready(function() {
+
+            // Get the QR Code from the server
+            $.ajax({
+                type: "GET",
+                url: "/api/user/login_setup_2fa",
+                success: function(response) {
+                    console.log("QR Code received");
+                    // Display the QR Code
+                    $('#qr_code').attr('src', 'data:image/png;base64,' + response.qr_code);
+                    $('#qr_code').show();
+                    // Add the otp_secret to the form
+                    $('#otp_secret').val(response.otp_secret);
+                },
+                error: function(response) {
+                    console.log("Error getting QR Code");
+                }
+            });
+
+            // Handle form submission
+            $('#setup_2fa_form').submit(function(event) {
+                // Prevent the default form submission
+                event.preventDefault();
+
+                var form = $(this);
+
+                // Send the form data to the backend with a post request
+                $.ajax({
+                    type: "POST",
+                    url: "/api/user/login_setup_2fa",
+                    data: form.serialize(),
+                    success: function(response) {
+                        console.log("2FA setup success");
+                        // Redirect to the main page
+                        window.location.href = "/main";
+                    },
+                    error: function(response) {
+                        console.log("Error setting up 2FA");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Create a form to enable 2FA, will display QR Code to setup Authenticator App -->
+
+    <!-- First ask the user if they want to enable 2FA -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Enable 2FA</div>
+                    <div class="card-body">
+                        <img id="qr_code" src="" alt="QR Code" style="display:none" class="text-center">
+                        <form action="/login_enable_2fa" method="post" id="setup_2fa_form">
+                            <div class="form-group  row">
+                                <label for="enable_2fa" class="col-md-4 col-form-label text-md-right">Enable Email</label>
+                                <div class="col-md-6">
+                                    <input type="checkbox" id="with_email_enabled" class="form-control" name="with_email_enabled" required autofocus>
+                                </div>
+                            </div>
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                            <!-- Add otp_secret to the form, not shown to the user -->
+                            <input type="hidden" name="otp_secret" id="otp_secret" value="invalid">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

@@ -8,7 +8,7 @@ import pyqrcode
 from flask_babel import gettext
 
 
-class LoginEnable2FAView(MethodView):
+class LoginSetup2FAView(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
@@ -38,26 +38,8 @@ class LoginEnable2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
-        # Generate a new secret for the user
-        secret = pyotp.random_base32()
-
-        # Generate OTP URI for QR Code
-        totp = pyotp.TOTP(secret)
-
-        # Get the server name in the config
-        server_name = self.flaskModule.config.server_config['name']
-        otp_uri = totp.provisioning_uri(current_user.user_username, issuer_name=f'OpenTera-{server_name}')
-
-        # Generate QR Code with otp_uri
-        qr_code = pyqrcode.create(otp_uri)
-
-        # Generate image as base64
-        qr_code_base64 = qr_code.png_as_base64_str(scale=5)
-
-        return render_template('login_enable_2fa.html', hostname=hostname, port=port,
-                               server_version=versions.version_string,
-                               qr_code=qr_code_base64,
-                               otp_secret=secret)
+        return render_template('login_setup_2fa.html', hostname=hostname, port=port,
+                               server_version=versions.version_string)
 
     @LoginModule.user_session_required
     def post(self):
@@ -82,6 +64,3 @@ class LoginEnable2FAView(MethodView):
 
         # Redirect to login page
         return redirect(url_for('login'))
-
-
-
