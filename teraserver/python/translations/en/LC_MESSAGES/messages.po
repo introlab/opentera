@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-05-13 11:02-0400\n"
+"POT-Creation-Date: 2024-09-27 09:23-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.15.0\n"
+"Generated-By: Babel 2.16.0\n"
 
 #: modules/FlaskModule/API/device/DeviceLogin.py:88
 msgid "Unable to get online devices."
@@ -35,6 +35,7 @@ msgid "Device not logged in"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQueryAssets.py:39
+#: modules/FlaskModule/API/participant/ParticipantQueryAssets.py:46
 msgid "No access to session"
 msgstr ""
 
@@ -47,6 +48,7 @@ msgid "Missing config"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQueryDevices.py:82
+#: modules/FlaskModule/API/participant/ParticipantQueryAssets.py:42
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:49
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:55
 #: modules/FlaskModule/API/service/ServiceQueryDisconnect.py:62
@@ -194,6 +196,7 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:74
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:89
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:157
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:183
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:233
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:247
 #: modules/FlaskModule/API/service/ServiceQueryAssets.py:284
@@ -375,45 +378,56 @@ msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:61
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:137
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:164
 #: modules/LoginModule/LoginModule.py:584
 #: modules/LoginModule/LoginModule.py:684
 #: modules/LoginModule/LoginModule.py:750
 #: modules/LoginModule/LoginModule.py:777
 #: modules/LoginModule/LoginModule.py:796
+#: modules/LoginModule/LoginModule.py:815
+#: modules/LoginModule/LoginModule.py:817
 msgid "Unauthorized"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:87
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:115
 #: modules/FlaskModule/API/service/ServiceQuerySessions.py:136
 #: modules/FlaskModule/API/user/UserQuerySessions.py:120
 msgid "Missing session"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:95
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:123
 msgid "Missing id_session value"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:99
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:127
 msgid "Missing id_session_type value"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:104
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:132
 msgid "Missing session participants and/or users and/or devices"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:114
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:141
 msgid "No access to session type"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:119
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:146
 msgid "Missing argument 'session name'"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:121
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:148
 msgid "Missing argument 'session_start_datetime'"
 msgstr ""
 
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:170
+#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:196
 #: modules/FlaskModule/API/service/ServiceQueryAccess.py:130
 msgid "Invalid participant uuid"
 msgstr ""
@@ -435,11 +449,11 @@ msgstr ""
 msgid "Invalid CSR signature"
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:92
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:93
 msgid "Participant already logged in."
 msgstr ""
 
-#: modules/FlaskModule/API/participant/ParticipantLogin.py:126
+#: modules/FlaskModule/API/participant/ParticipantLogin.py:135
 msgid "Missing current_participant"
 msgstr ""
 
@@ -452,7 +466,6 @@ msgid "Participant not logged in"
 msgstr ""
 
 #: modules/FlaskModule/API/participant/ParticipantQueryParticipants.py:55
-#: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:73
 msgid "Not implemented"
 msgstr ""
 
@@ -930,28 +943,74 @@ msgstr ""
 msgid "No answer from service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:82
-msgid "User already logged in."
+#: modules/FlaskModule/API/user/UserLogin.py:48
+msgid "2FA required for this user."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:116
-#: modules/FlaskModule/API/user/UserLogin.py:134
-msgid "Client version mismatch"
+#: modules/FlaskModule/API/user/UserLogin.py:51
+msgid "2FA enabled but OTP not set for this user. Please setup 2FA."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:136
+#: modules/FlaskModule/API/user/UserLogin.py:70
+#: modules/FlaskModule/API/user/UserLogin2FA.py:84
+#: modules/FlaskModule/API/user/UserLoginBase.py:124
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:84
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:136
 msgid "Client major version too old, not accepting login"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:143
-msgid "Invalid client version handler"
+#: modules/FlaskModule/API/user/UserLogin.py:76
+#: modules/FlaskModule/API/user/UserLogin2FA.py:90
+#: modules/FlaskModule/API/user/UserLoginBase.py:74
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:90
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:142
+msgid "User already logged in."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogout.py:34
+#: modules/FlaskModule/API/user/UserLogin2FA.py:53
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:52
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:112
+msgid "User does not have 2FA enabled"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLogin2FA.py:56
+msgid "User does not have 2FA OTP enabled or secret set"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLogin2FA.py:62
+msgid "Invalid OTP code"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:72
+msgid "User already logged in :"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:104
+msgid "Client major version mismatch"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:121
+msgid "Client version mismatch"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:141
+msgid "Unknown client name :"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:56
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:116
+msgid "User already has 2FA OTP secret set"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:127
+msgid "2FA enabled for this user."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLogout.py:33
 msgid "User logged out."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogout.py:36
+#: modules/FlaskModule/API/user/UserLogout.py:35
 msgid "User not logged in"
 msgstr ""
 
@@ -1765,6 +1824,18 @@ msgstr ""
 msgid "Invalid reply code"
 msgstr ""
 
+#: modules/FlaskModule/Views/LoginChangePasswordView.py:39
+msgid "Missing information"
+msgstr ""
+
+#: modules/FlaskModule/Views/LoginChangePasswordView.py:49
+msgid "New password and confirm password do not match"
+msgstr ""
+
+#: modules/FlaskModule/Views/LoginChangePasswordView.py:54
+msgid "Invalid old password"
+msgstr ""
+
 #: modules/LoginModule/LoginModule.py:619
 #: modules/LoginModule/LoginModule.py:652
 msgid "Disabled device"
@@ -1845,7 +1916,7 @@ msgid "Device Onlineable?"
 msgstr ""
 
 #: opentera/forms/TeraDeviceForm.py:44 opentera/forms/TeraParticipantForm.py:50
-#: opentera/forms/TeraUserForm.py:30
+#: opentera/forms/TeraUserForm.py:42
 msgid "Last Connection"
 msgstr ""
 
@@ -1876,7 +1947,7 @@ msgid "Device Configuration"
 msgstr ""
 
 #: opentera/forms/TeraDeviceForm.py:55 opentera/forms/TeraDeviceForm.py:57
-#: opentera/forms/TeraUserForm.py:28
+#: opentera/forms/TeraUserForm.py:40
 msgid "Notes"
 msgstr ""
 
@@ -2045,10 +2116,12 @@ msgid "Port"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:71 opentera/forms/TeraUserForm.py:20
+#: templates/login.html:110
 msgid "Username"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:74 opentera/forms/TeraUserForm.py:26
+#: opentera/forms/TeraServiceConfigForm.py:74 opentera/forms/TeraUserForm.py:38
+#: templates/login.html:116
 msgid "Password"
 msgstr ""
 
@@ -2268,23 +2341,39 @@ msgstr ""
 msgid "User Enabled"
 msgstr ""
 
-#: opentera/forms/TeraUserForm.py:22
+#: opentera/forms/TeraUserForm.py:23
+msgid "Force password change"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:25
+msgid "2FA Enabled"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:28
+msgid "2FA OTP Enabled"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:30
+msgid "2FA Email Enabled"
+msgstr ""
+
+#: opentera/forms/TeraUserForm.py:34
 msgid "First Name"
 msgstr ""
 
-#: opentera/forms/TeraUserForm.py:23
+#: opentera/forms/TeraUserForm.py:35
 msgid "Last Name"
 msgstr ""
 
-#: opentera/forms/TeraUserForm.py:24
+#: opentera/forms/TeraUserForm.py:36
 msgid "Email"
 msgstr ""
 
-#: opentera/forms/TeraUserForm.py:27
+#: opentera/forms/TeraUserForm.py:39
 msgid "User Is Super Administrator"
 msgstr ""
 
-#: opentera/forms/TeraUserForm.py:29
+#: opentera/forms/TeraUserForm.py:41
 msgid "Profile"
 msgstr ""
 
@@ -2313,7 +2402,6 @@ msgid "OpenTeraServer patch version number"
 msgstr ""
 
 #: opentera/forms/TeraVersionsForm.py:43 templates/about.html:26
-#: templates/disabled_doc.html:26
 msgid "Versions"
 msgstr ""
 
@@ -2433,20 +2521,32 @@ msgstr ""
 msgid "Latest version: "
 msgstr ""
 
-#: templates/about.html:63 templates/disabled_doc.html:35
+#: templates/about.html:64
 msgid "License"
 msgstr ""
 
-#: templates/about.html:77 templates/disabled_doc.html:53
+#: templates/about.html:78
 msgid "Authors"
 msgstr ""
 
-#: templates/about.html:87 templates/disabled_doc.html:63
+#: templates/about.html:88
 msgid "Contributors"
 msgstr ""
 
-#: templates/disabled_doc.html:48
+#: templates/disabled_doc.html:27
 msgid "Documentation is disabled!"
+msgstr ""
+
+#: templates/login.html:5
+msgid "OpenTera Login Page"
+msgstr ""
+
+#: templates/login.html:76
+msgid "Invalid username or password"
+msgstr ""
+
+#: templates/login.html:124
+msgid "Login"
 msgstr ""
 
 #~ msgid "Can't delete participant: please delete all sessions before deleting."
@@ -2474,5 +2574,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Invalid client name :"
+#~ msgstr ""
+
+#~ msgid "Invalid client version handler"
 #~ msgstr ""
 
