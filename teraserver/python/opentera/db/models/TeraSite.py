@@ -1,14 +1,14 @@
-from opentera.db.Base import BaseModel
-from opentera.db.SoftDeleteMixin import SoftDeleteMixin
-from sqlalchemy import Column, Integer, String, Sequence
+from sqlalchemy import Column, Integer, Boolean, String, Sequence
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
-
+from opentera.db.Base import BaseModel
+from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 
 class TeraSite(BaseModel, SoftDeleteMixin):
     __tablename__ = 't_sites'
     id_site = Column(Integer, Sequence('id_site_sequence'), primary_key=True, autoincrement=True)
     site_name = Column(String, nullable=False)
+    site_2fa_required =  Column(Boolean, nullable=False, default=False)
 
     site_devices = relationship("TeraDevice", secondary="t_devices_sites", back_populates="device_sites")
     site_projects = relationship("TeraProject", cascade="delete", passive_deletes=True,
@@ -21,6 +21,8 @@ class TeraSite(BaseModel, SoftDeleteMixin):
     site_sessions_types = relationship("TeraSessionType", secondary="t_sessions_types_sites", viewonly=True)
 
     site_tests_types = relationship("TeraTestType", secondary="t_tests_types_sites", viewonly=True)
+
+
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
