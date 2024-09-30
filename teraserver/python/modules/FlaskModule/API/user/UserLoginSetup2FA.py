@@ -121,6 +121,9 @@ class UserLoginSetup2FA(UserLoginBase):
                 self._user_logout()
                 return gettext('User already has 2FA OTP secret set'), 403
 
+            # Verify if user has tried too many times to login with 2FA
+            self._verify_2fa_login_attempts(current_user.user_uuid)
+
             data = {'user_2fa_enabled': True,
                     'user_2fa_otp_enabled': True,
                     'user_2fa_otp_secret': args['otp_secret'],
@@ -145,10 +148,10 @@ class UserLoginSetup2FA(UserLoginBase):
 #            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
-            return gettext('User already logged in.') + str(e), 403
+            return str(e), 403
         except TooMany2FALoginAttemptsError as e:
             self._user_logout()
-            return gettext('Too many 2FA login attempts'), 403
+            return str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()
