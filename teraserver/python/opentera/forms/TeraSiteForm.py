@@ -15,6 +15,8 @@ class TeraSiteForm:
         # Items
         section.add_item(TeraFormItem("id_site", gettext("Site ID"), "hidden", True))
         section.add_item(TeraFormItem("site_name", gettext("Site Name"), "text", True))
+        section.add_item(TeraFormItem("site_2fa_required", gettext("Users Require 2FA"), "boolean",
+                                      False, item_default=False))
         section.add_item(TeraFormItem("site_role", gettext("Site Role"), "hidden", False))
 
         return form.to_dict()

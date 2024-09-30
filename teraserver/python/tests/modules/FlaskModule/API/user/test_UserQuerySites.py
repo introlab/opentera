@@ -216,6 +216,7 @@ class UserQuerySitesTest(BaseUserAPITest):
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
-        self.assertTrue(json_data.__contains__('id_site'))
-        self.assertTrue(json_data.__contains__('site_name'))
-        self.assertTrue(json_data.__contains__('site_role'))
+        self.assertTrue('id_site' in json_data)
+        self.assertTrue('site_name' in json_data)
+        self.assertTrue('site_role' in json_data)
+        self.assertTrue('site_2fa_required' in json_data)

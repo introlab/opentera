@@ -31,11 +31,29 @@ class TeraSiteTest(BaseModelsTest):
             self.db.session.add(same_site1)
             self.assertRaises(exc.IntegrityError, self.db.session.commit)
 
+    def test_site_2fa_required_default(self):
+        with self._flask_app.app_context():
+            new_site = TeraSite()
+            self.assertFalse(new_site.site_2fa_required)
+
+    def test_site_2fa_required_update(self):
+        with self._flask_app.app_context():
+            new_site = TeraSiteTest.new_test_site(name='Site With 2FA')
+            new_site.site_2fa_required = True
+            self.assertTrue(new_site.site_2fa_required)
+            self.db.session.add(new_site)
+            self.db.session.commit()
+            id_site = new_site.id_site
+            self.db.session.rollback()
+            same_site = TeraSite.get_site_by_id(id_site)
+            self.assertTrue(same_site.site_2fa_required)
+
     def test_to_json(self):
         with self._flask_app.app_context():
             new_site = TeraSiteTest.new_test_site(name='Site Name')
             new_site_json = new_site.to_json()
             new_site_json_minimal = new_site.to_json(minimal=True)
+            self.assertEqual(new_site_json['site_2fa_required'], False)
             self.assertEqual(new_site_json['site_name'], 'Site Name')
             self.assertGreaterEqual(new_site_json['id_site'], 1)
             self.assertEqual(new_site_json_minimal['site_name'], 'Site Name')
