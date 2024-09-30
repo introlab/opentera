@@ -49,9 +49,11 @@ class UserLogin(UserLoginBase):
 
                 if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
                     response['message'] = gettext('2FA required for this user.')
+                    response['reason'] = '2fa'
                     response['redirect_url'] = self._generate_2fa_verification_url()
                 else:
                     response['message'] = gettext('2FA enabled but OTP not set for this user. Please setup 2FA.')
+                    response['reason'] = '2fa_setup'
                     response['redirect_url'] = self._generate_2fa_setup_url()
             else:
                 # Standard Login without 2FA. Check if user is already logged in.

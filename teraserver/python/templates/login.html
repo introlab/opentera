@@ -63,6 +63,16 @@
                     success: function(response) {
                         //console.log("Login success");
                         if (response.redirect_url) {
+                            if (qtObject){
+                                if ("reason" in response){
+                                    if (response.reason === '2fa'){
+                                        qtObject.sendCheckInProgress();
+                                    }
+                                    if (response.reason === '2fa_setup'){
+                                        qtObject.sendSetupInProgress();
+                                    }
+                                }
+                            }
                             window.location.href = response.redirect_url;
                         }
                         else {
