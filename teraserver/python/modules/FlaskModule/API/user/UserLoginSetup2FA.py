@@ -1,22 +1,14 @@
-from flask import session, request
-from flask_login import logout_user
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current_user
-from modules.FlaskModule.FlaskModule import user_api_ns as api
-from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
-from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
-     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
-from werkzeug.exceptions import BadRequest
-from opentera.redis.RedisRPCClient import RedisRPCClient
-from opentera.modules.BaseModule import ModuleNames
-from opentera.utils.UserAgentParser import UserAgentParser
-
-import opentera.messages.python as messages
-from opentera.redis.RedisVars import RedisVars
 import pyotp
 import pyqrcode
+from modules.LoginModule.LoginModule import LoginModule, current_user
+from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
+from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
 from opentera.db.models.TeraUser import TeraUser
+
 
 # Get parser
 get_parser = api.parser()
@@ -29,6 +21,9 @@ post_parser.add_argument('with_email_enabled', type=inputs.boolean,
 
 
 class UserLoginSetup2FA(UserLoginBase):
+    """
+    UserLogin2FA endpoint resource.
+    """
 
     def __init__(self, _api, *args, **kwargs):
         UserLoginBase.__init__(self, _api, *args, **kwargs)
@@ -41,8 +36,8 @@ class UserLoginSetup2FA(UserLoginBase):
         Generate a new 2FA secret for the user. Will be enabled on post.
         """
         try:
-            # Validate args
-            args = get_parser.parse_args(strict=True)
+            # Validate args (should not have any)
+            get_parser.parse_args(strict=True)
             response = {}
 
             # Current user is logged in with HTTPAuth, or session
@@ -56,6 +51,7 @@ class UserLoginSetup2FA(UserLoginBase):
                 return gettext('User already has 2FA OTP secret set'), 403
 
             # Verify if user has tried too many times to login with 2FA
+            # This should not happen here, but just in case
             self._verify_2fa_login_attempts(current_user.user_uuid)
 
             # Generate new secret
@@ -107,6 +103,9 @@ class UserLoginSetup2FA(UserLoginBase):
     @api.expect(post_parser, validate=True)
     @LoginModule.user_session_required
     def post(self):
+        """
+        Enable 2FA for the user. Will use the OTP secret generated in the GET method.
+        """
         try:
             args = post_parser.parse_args(strict=True)
             response = {}
@@ -122,6 +121,7 @@ class UserLoginSetup2FA(UserLoginBase):
                 return gettext('User already has 2FA OTP secret set'), 403
 
             # Verify if user has tried too many times to login with 2FA
+            # This should not happen here, but just in case
             self._verify_2fa_login_attempts(current_user.user_uuid)
 
             data = {'user_2fa_enabled': True,

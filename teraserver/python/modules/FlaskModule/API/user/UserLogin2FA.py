@@ -1,21 +1,14 @@
-from flask import session, request
-from flask_login import logout_user
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current_user
+import pyotp
+from modules.LoginModule.LoginModule import LoginModule, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
-from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
+from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
      UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
-from werkzeug.exceptions import BadRequest
-from opentera.redis.RedisRPCClient import RedisRPCClient
-from opentera.modules.BaseModule import ModuleNames
-from opentera.utils.UserAgentParser import UserAgentParser
-
 import opentera.messages.python as messages
 from opentera.redis.RedisVars import RedisVars
-import pyotp
-from opentera.db.models.TeraUser import TeraUser
+
 
 # Get parser
 get_parser = api.parser()
@@ -35,6 +28,9 @@ post_parser.add_argument('with_websocket', type=inputs.boolean,
 
 
 class UserLogin2FA(UserLoginBase):
+    """
+    UserLogin2FA endpoint resource.
+    """
 
     def __init__(self, _api, *args, **kwargs):
         UserLoginBase.__init__(self, _api, *args, **kwargs)
@@ -121,14 +117,20 @@ class UserLogin2FA(UserLoginBase):
             self._send_login_success_message()
             return response, 200
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth) and 2FA')
+    @api.doc(description='Login to the server using Session Authentication and 2FA')
     @api.expect(get_parser, validate=True)
     @LoginModule.user_session_required
     def get(self):
+        """
+        Login to the server using Session Authentication and 2FA
+        """
         return self._common_2fa_login_response(get_parser)
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (session auth) and 2FA')
+    @api.doc(description='Login to the server using Session Authentication and 2FA')
     @api.expect(post_parser, validate=True)
     @LoginModule.user_session_required
     def post(self):
+        """
+        Login to the server using Session Authentication and 2FA
+        """
         return self._common_2fa_login_response(post_parser)
