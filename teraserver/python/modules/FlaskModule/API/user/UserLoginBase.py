@@ -61,7 +61,7 @@ class UserLoginBase(Resource):
                                                     level=messages.LogEvent.LOGLEVEL_ERROR,
                                                     login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
                                                     login_status=
-                                                    messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
+                                                    messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_ALREADY_LOGGED_IN,
                                                     client_name=user_agent_info['client_name'],
                                                     client_version=user_agent_info['client_version'],
                                                     client_ip=user_agent_info['client_ip'],
@@ -163,7 +163,7 @@ class UserLoginBase(Resource):
         logout_user()
         session.clear()
 
-    def _send_login_success_message(self):
+    def _send_login_success_message(self, message: str = ''):
         user_agent_info = UserAgentParser.parse_request_for_login_infos(request)
         self.module.logger.send_login_event(sender=self.module.module_name,
                                             level=messages.LogEvent.LOGLEVEL_INFO,
@@ -175,4 +175,20 @@ class UserLoginBase(Resource):
                                             os_name=user_agent_info['os_name'],
                                             os_version=user_agent_info['os_version'],
                                             user_uuid=current_user.user_uuid,
-                                            server_endpoint=user_agent_info['server_endpoint'])
+                                            server_endpoint=user_agent_info['server_endpoint'],
+                                            message=message)
+
+    def _send_login_failure_message(self, status: messages.LoginEvent.LoginStatus, message:str = ''):
+        user_agent_info = UserAgentParser.parse_request_for_login_infos(request)
+        self.module.logger.send_login_event(sender=self.module.module_name,
+                                            level=messages.LogEvent.LOGLEVEL_ERROR,
+                                            login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
+                                            login_status=status,
+                                            client_name=user_agent_info['client_name'],
+                                            client_version=user_agent_info['client_version'],
+                                            client_ip=user_agent_info['client_ip'],
+                                            os_name=user_agent_info['os_name'],
+                                            os_version=user_agent_info['os_version'],
+                                            user_uuid=current_user.user_uuid,
+                                            server_endpoint=user_agent_info['server_endpoint'],
+                                            message=message)

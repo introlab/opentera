@@ -25,6 +25,9 @@ class RedisVars:
     # User login attempt counter prefix
     RedisVar_UserLoginAttemptKey = "UserLoginAttempts."
 
+    # User 2FA attempt counter prefix
+    RedisVar_User2FALoginAttemptKey = "User2FALoginAttempts."
+
     # Participant login attempt counter prefix
     RedisVar_ParticipantLoginAttemptKey = "ParticipantLoginAttempts."
 

@@ -50,16 +50,43 @@ class UserLogin2FA(UserLoginBase):
             # Let's verify if 2FA is enabled and if OTP is valid
             if not current_user.user_2fa_enabled:
                 self._user_logout()
-                return gettext('User does not have 2FA enabled'), 403
+                message = gettext('User does not have 2FA enabled')
+                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
+                return message, 403
             if not current_user.user_2fa_otp_enabled or not current_user.user_2fa_otp_secret:
                 self._user_logout()
-                return gettext('User does not have 2FA OTP enabled or secret set'), 403
+                message = gettext('User does not have 2FA OTP enabled or secret set')
+                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
+                return message, 403
 
             # Verify OTP
+            attempts_key_2fa = RedisVars.RedisVar_User2FALoginAttemptKey + current_user.user_uuid
             totp = pyotp.TOTP(current_user.user_2fa_otp_secret)
+
+            # Increment attempts
+            attempts = self.module.redisGet(attempts_key_2fa)
+            if attempts:
+                attempts = int(attempts) + 1
+            else:
+                attempts = 1
+
+            # Store attempts in the last hour
+            self.module.redisSet(attempts_key_2fa, attempts, ex=3600)
+
             if not totp.verify(args['otp_code']):
+                if attempts < 5:
+                    message = gettext('Invalid OTP code')
+                    self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
+                    return message, 401
+
+                # Too many attempts, logout user
                 self._user_logout()
-                return gettext('Invalid OTP code'), 403
+                message = gettext('Too many 2FA attempts, please try again later')
+                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED, message)
+                return message, 403
+
+            # Clear attempts
+            self.module.redisDelete(attempts_key_2fa)
 
             # OTP validation completed, proceed with standard login
             version_info = self._verify_client_version()
