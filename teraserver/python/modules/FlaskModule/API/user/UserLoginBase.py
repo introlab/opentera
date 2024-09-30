@@ -32,6 +32,11 @@ class UserAlreadyLoggedInError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class TooMany2FALoginAttemptsError(Exception):
+    # Raised when the user has too many 2FA login attempts
+    def __init__(self, message):
+        super().__init__(message)
+
 
 class UserLoginBase(Resource):
 
@@ -72,6 +77,17 @@ class UserLoginBase(Resource):
                                                     message=gettext('User already logged in :'
                                                                     + current_user.user_name))
                 raise UserAlreadyLoggedInError(gettext('User already logged in.'))
+
+
+    def _verify_2fa_login_attempts(self, user_uuid: str) -> None:
+        attempts_key_2fa = RedisVars.RedisVar_User2FALoginAttemptKey + user_uuid
+        attempts = self.module.redisGet(attempts_key_2fa)
+        if attempts is not None:
+            attempts = int(attempts)
+            if attempts >= 5:
+                message = gettext('Too many 2FA attempts')
+                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED, message)
+                raise TooMany2FALoginAttemptsError(message)
 
     def _verify_client_version(self) -> dict | None:
         reply = {}

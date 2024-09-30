@@ -6,7 +6,7 @@ from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
-     UserAlreadyLoggedInError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
 from werkzeug.exceptions import BadRequest
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -55,6 +55,9 @@ class UserLoginSetup2FA(UserLoginBase):
                 self._user_logout()
                 return gettext('User already has 2FA OTP secret set'), 403
 
+            # Verify if user has tried too many times to login with 2FA
+            self._verify_2fa_login_attempts(current_user.user_uuid)
+
             # Generate new secret
             secret = pyotp.random_base32()
 
@@ -87,7 +90,10 @@ class UserLoginSetup2FA(UserLoginBase):
 #            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
-            return gettext('User already logged in.') + str(e), 403
+            return str(e), 403
+        except TooMany2FALoginAttemptsError as e:
+            self._user_logout()
+            return str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()
@@ -140,6 +146,9 @@ class UserLoginSetup2FA(UserLoginBase):
         except UserAlreadyLoggedInError as e:
             self._user_logout()
             return gettext('User already logged in.') + str(e), 403
+        except TooMany2FALoginAttemptsError as e:
+            self._user_logout()
+            return gettext('Too many 2FA login attempts'), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()

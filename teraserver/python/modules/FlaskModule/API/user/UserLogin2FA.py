@@ -6,7 +6,7 @@ from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
-     UserAlreadyLoggedInError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
 from werkzeug.exceptions import BadRequest
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -74,16 +74,10 @@ class UserLogin2FA(UserLoginBase):
             self.module.redisSet(attempts_key_2fa, attempts, ex=3600)
 
             if not totp.verify(args['otp_code']):
-                if attempts < 5:
-                    message = gettext('Invalid OTP code')
-                    self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
-                    return message, 401
-
-                # Too many attempts, logout user
-                self._user_logout()
-                message = gettext('Too many 2FA attempts, please try again later')
-                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED, message)
-                return message, 403
+                self._verify_2fa_login_attempts(current_user.user_uuid)
+                message = gettext('Invalid OTP code')
+                self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
+                return message, 401
 
             # Clear attempts
             self.module.redisDelete(attempts_key_2fa)
@@ -114,7 +108,10 @@ class UserLogin2FA(UserLoginBase):
 #            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
-            return gettext('User already logged in.') + str(e), 403
+            return str(e), 403
+        except TooMany2FALoginAttemptsError as e:
+            self._user_logout()
+            return str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()

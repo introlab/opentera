@@ -13,7 +13,7 @@ from opentera.redis.RedisVars import RedisVars
 
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
-     UserAlreadyLoggedInError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
 
 
 get_parser = api.parser()
@@ -44,6 +44,9 @@ class UserLogin(UserLoginBase):
 
             # 2FA enabled? Client will need to proceed to 2FA login step first
             if current_user.user_2fa_enabled:
+
+                self._verify_2fa_login_attempts(current_user.user_uuid)
+
                 if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
                     response['message'] = gettext('2FA required for this user.')
                     response['redirect_url'] = self._generate_2fa_verification_url()
@@ -73,7 +76,10 @@ class UserLogin(UserLoginBase):
 #            pass
         except UserAlreadyLoggedInError as e:
             self._user_logout()
-            return gettext('User already logged in.') + str(e), 403
+            return str(e), 403
+        except TooMany2FALoginAttemptsError as e:
+            self._user_logout()
+            return str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()
