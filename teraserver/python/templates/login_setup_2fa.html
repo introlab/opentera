@@ -14,6 +14,14 @@
 </head>
 <body>
     <script>
+        $(document).ajaxSend(function(event, request, settings) {
+            $('#loading').removeClass("d-none").addClass("d-flex");
+        });
+
+        $(document).ajaxComplete(function(event, request, settings) {
+            $('#loading').removeClass("d-flex").addClass("d-none");
+        });
+
         $(document).ready(function() {
 
             // Get the QR Code from the server
@@ -35,6 +43,7 @@
 
             // Handle form submission
             $('#setup_2fa_form').submit(function(event) {
+                $('#error_message').hide();
                 // Prevent the default form submission
                 event.preventDefault();
 
@@ -51,8 +60,10 @@
                         window.location.href = response.redirect_url
                     },
                     error: function(response) {
-                        console.log("Error setting up 2FA");
-                        window.location.href = '/login';
+                        console.log(response);
+                        $('#error_message').text(response.responseJSON);
+                        $('#error_message').show();
+                        //window.location.href = '/login';
                     }
                 });
             });
@@ -63,25 +74,54 @@
 
     <!-- First ask the user if they want to enable 2FA -->
     <div class="container-fluid">
-        <div class="m-3 text-warning">
-            {{ gettext('You need to setup multi-factor authentication before continuing.') }}
+        <div class="m-3 mt-1 text-warning text-center">
+            <h4>{{ gettext('You need to setup multi-factor authentication before continuing.') }}</h4>
         </div>
         <div class="row justify-content-center">
             <div class="col-12 col-md-10">
                 <div class="card">
-                    <div class="card-header">Enable 2FA</div>
+                    <div id="loading" class="h-100 w-100 z-1 bg-black position-absolute opacity-75 d-none">
+                        <img src="./static/img/loading.gif" class="m-auto">
+                    </div>
+                    <div class="card-header"></div>
                     <div class="card-body">
-                        <img id="qr_code" src="" alt="QR Code" style="display:none" class="text-center">
                         <form action="/login_enable_2fa" method="post" id="setup_2fa_form">
-                            <div class="form-group  row">
-                                <label for="enable_2fa" class="col-md-4 col-form-label text-md-right">Enable Email</label>
-                                <div class="col-md-6">
-                                    <input type="checkbox" id="with_email_enabled" class="form-control" name="with_email_enabled" required autofocus>
+                            <div class="form-group row">
+                                <label for="qr_code" class="col-md-2">{{ gettext('OTP configuration') }}</label>
+                                <div class="col">
+                                    <div class="d-flex">
+                                        <img id="qr_code" src="" alt="QR Code" style="display:none;" class="img-qr text-center">
+                                        <div class="d-flex flex-column">
+                                            <ol>
+                                                <li>{{ gettext('Scan the QR code with your authenticator app') }}</li>
+                                                <li class="mt-2">{{ gettext('Enter the generated code:') }}<br>
+
+                                                </li>
+                                            </ol>
+                                            <input type="text" id="otp_code" class="form-control w-50 ms-4 mt-0 m-2" name="otp_code"
+                                                           required autofocus maxlength="6">
+                                            <button type="submit" class="btn btn-primary ms-4 m-2">{{ gettext('Validate') }}</button>
+                                            <div class="text-danger ms-4 p-1 m-0 fw-bold" id="error_message" role="alert" style="display: none;"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <hr>
+                            <!--<div class="form-group row">
+                                <label for="with_email_enabled" class="col-md-2 col-form-label text-md-right">{{ gettext('Use email for authentication') }}</label>
+                                <div class="col">
+                                    {% if user_has_email %}
+                                    <input type="checkbox" id="with_email_enabled" class="col-1" name="with_email_enabled">
+                                    {% else %}
+                                    <div class="text-danger">{{ gettext('No email address configured. Please contact your administrator.') }}</div>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary">{{ gettext('Validate') }}</button>
                                 </div>
                             </div>
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
+                            <hr>-->
+
                             <!-- Add otp_secret to the form, not shown to the user -->
                             <input type="hidden" name="otp_secret" id="otp_secret" value="invalid">
                         </form>

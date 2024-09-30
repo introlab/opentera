@@ -20,3 +20,7 @@ body{
  .img-logo{
     max-height: 175px;
 }
+
+.img-qr{
+    width: 200px;
+}

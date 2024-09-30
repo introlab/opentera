@@ -39,4 +39,5 @@ class LoginSetup2FAView(MethodView):
         versions.load_from_db()
 
         return render_template('login_setup_2fa.html', hostname=hostname, port=port,
-                               server_version=versions.version_string)
+                               server_version=versions.version_string,
+                               user_has_email=current_user.user_email is not None and current_user.user_email != "")

@@ -88,7 +88,7 @@ class UserLoginBase(Resource):
                                         user_uuid=current_user.user_uuid,
                                         server_endpoint=user_agent_info['server_endpoint'],
                                         message=gettext('User already logged in :'
-                                                        + current_user.user_name))
+                                                        + current_user.user_username))
                 raise UserAlreadyLoggedInError(gettext('User already logged in.'))
 
 
@@ -189,6 +189,9 @@ class UserLoginBase(Resource):
 
     def _generate_2fa_setup_url(self) -> str:
         return "/login_setup_2fa"
+
+    def _generate_login_url(self) -> str:
+        return "/login"
 
     def _user_logout(self):
         logout_user()

@@ -11,23 +11,31 @@
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script type="text/javascript">
-        var qtObject;
-        new QWebChannel(qt.webChannelTransport, function(channel) {
-            qtObject = channel.objects.qtObject;
-        });
+        var qtObject = undefined;
+        if (typeof QWebChannel !== "undefined"){
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+                qtObject = channel.objects.qtObject;
+            });
+        };
     </script>
 
     <!-- call function when document is loaded -->
     <script>
         $(document).ready(function() {
-            qtObject.debugPrint("Document is ready");
+            //qtObject.debugPrint("Document is ready");
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('code')){
+                document.getElementById("2fa_code").value = urlParams.get('code');
+                post_form_data_and_validate_login();
+            }
         });
     </script>
 
     <script>
         function post_form_data_and_validate_login() {
             const otp_code = document.getElementById("2fa_code").value;
-            qtObject.debugPrint("2FA code validation");
+            if (qtObject)
+                qtObject.debugPrint("2FA code validation");
 
             // Send the OTP code to the backend with a post request
             // Use the login API for this purpose
@@ -39,20 +47,24 @@
                     with_websocket: true
                 },
                 success: function(data, textStatus, jqXHR) {
-                    qtObject.debugPrint("2FA code validation, success called");
+                    if(qtObject)
+                        qtObject.debugPrint("2FA code validation, success called");
                     if (jqXHR.status === 200) {
                         // If the status is 200, the 2FA code is valid
                         // Send the token to the Qt application
                         // Answer will contain,user_uuid, user_token, websocket_url
-                        qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
+                        if (qtObject)
+                            qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
                     } else {
                         alert("Error validating 2FA code");
-                        qtObject.sendLoginFailure("Error validating 2FA code");
+                        if (qtObject)
+                            qtObject.sendLoginFailure("Error validating 2FA code");
                     }
                 },
                 error: function() {
                     alert("Error validating 2FA code");
-                    qtObject.sendLoginFailure("Error validating 2FA code");
+                    if (qtObject)
+                        qtObject.sendLoginFailure("Error validating 2FA code");
                 }
             });
 

@@ -8,6 +8,7 @@ from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
      UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
 from opentera.db.models.TeraUser import TeraUser
+import opentera.messages.python as messages
 
 
 # Get parser
@@ -18,6 +19,7 @@ post_parser = api.parser()
 post_parser.add_argument('otp_secret', type=str, required=True, help='OTP Secret for the user.')
 post_parser.add_argument('with_email_enabled', type=inputs.boolean,
                         help='Enable email notifications for 2FA', default=False)
+post_parser.add_argument('otp_code', type=str, required=True, help='OTP code for validation on setup')
 
 
 class UserLoginSetup2FA(UserLoginBase):
@@ -124,6 +126,14 @@ class UserLoginSetup2FA(UserLoginBase):
             # This should not happen here, but just in case
             self._verify_2fa_login_attempts(current_user.user_uuid)
 
+            # Verify OTP code if present
+            if args['otp_code']:
+                totp = pyotp.TOTP(args['otp_secret'])
+                if not totp.verify(args['otp_code']):
+                    message = gettext('Invalid OTP code')
+                    self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
+                    return message, 401
+
             data = {'user_2fa_enabled': True,
                     'user_2fa_otp_enabled': True,
                     'user_2fa_otp_secret': args['otp_secret'],
@@ -134,7 +144,7 @@ class UserLoginSetup2FA(UserLoginBase):
 
             # Redirect to 2FA validation page
             response['message'] = gettext('2FA enabled for this user.')
-            response['redirect_url'] = self._generate_2fa_verification_url()
+            response['redirect_url'] =  self._generate_2fa_verification_url() + "?code=" + args['otp_code']
 
         except OutdatedClientVersionError as e:
             self._user_logout()
