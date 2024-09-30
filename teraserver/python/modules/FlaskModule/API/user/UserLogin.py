@@ -1,28 +1,22 @@
-from flask import session, request
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import inputs
 from flask_babel import gettext
-from flask_login import logout_user
-from modules.LoginModule.LoginModule import user_http_auth, LoginModule, current_user
+from modules.LoginModule.LoginModule import current_user, user_http_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.redis.RedisRPCClient import RedisRPCClient
-from opentera.modules.BaseModule import ModuleNames
-from opentera.utils.UserAgentParser import UserAgentParser
-
-import opentera.messages.python as messages
-from opentera.redis.RedisVars import RedisVars
-
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
-from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, InvalidClientVersionError, \
+from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
      UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
+
 
 
 get_parser = api.parser()
 get_parser.add_argument('with_websocket', type=inputs.boolean, default=False,
-                            help='If set, requires that a websocket url is returned. If not possible to do so, return a 403 error.')
+                            help='If set, requires that a websocket url is returned.'
+                            'If not possible to do so, return a 403 error.')
 
 post_parser = api.parser()
 post_parser.add_argument('with_websocket', type=inputs.boolean, default=False,
-                            help='If set, requires that a websocket url is returned. If not possible to do so, return a 403 error.')
+                            help='If set, requires that a websocket url is returned.'
+                            'If not possible to do so, return a 403 error.')
 
 class UserLogin(UserLoginBase):
     """
@@ -45,13 +39,15 @@ class UserLogin(UserLoginBase):
             # 2FA enabled? Client will need to proceed to 2FA login step first
             if current_user.user_2fa_enabled:
 
+                # If user had too many 2FA login failures, stop login process
                 self._verify_2fa_login_attempts(current_user.user_uuid)
 
                 if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
                     response['message'] = gettext('2FA required for this user.')
                     response['redirect_url'] = self._generate_2fa_verification_url()
                 else:
-                    response['message'] = gettext('2FA enabled but OTP not set for this user. Please setup 2FA.')
+                    response['message'] = gettext('2FA enabled but OTP not set for this user.'
+                                                  'Please setup 2FA.')
                     response['redirect_url'] = self._generate_2fa_setup_url()
             else:
                 # Standard Login without 2FA. Check if user is already logged in.
