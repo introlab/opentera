@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-09-27 09:23-0400\n"
+"POT-Creation-Date: 2024-10-01 15:00-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -154,9 +154,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:138
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:187
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:275
-#: modules/FlaskModule/API/user/UserQuerySites.py:124
 #: modules/FlaskModule/API/user/UserQuerySites.py:127
-#: modules/FlaskModule/API/user/UserQuerySites.py:176
+#: modules/FlaskModule/API/user/UserQuerySites.py:131
+#: modules/FlaskModule/API/user/UserQuerySites.py:180
 #: modules/FlaskModule/API/user/UserQueryStats.py:52
 #: modules/FlaskModule/API/user/UserQueryStats.py:57
 #: modules/FlaskModule/API/user/UserQueryStats.py:62
@@ -282,9 +282,9 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessions.py:272
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:246
 #: modules/FlaskModule/API/user/UserQuerySiteAccess.py:286
-#: modules/FlaskModule/API/user/UserQuerySites.py:140
-#: modules/FlaskModule/API/user/UserQuerySites.py:155
-#: modules/FlaskModule/API/user/UserQuerySites.py:194
+#: modules/FlaskModule/API/user/UserQuerySites.py:144
+#: modules/FlaskModule/API/user/UserQuerySites.py:159
+#: modules/FlaskModule/API/user/UserQuerySites.py:198
 #: modules/FlaskModule/API/user/UserQueryTestType.py:222
 #: modules/FlaskModule/API/user/UserQueryTestType.py:237
 #: modules/FlaskModule/API/user/UserQueryTestType.py:345
@@ -326,7 +326,7 @@ msgstr ""
 #: modules/FlaskModule/API/user/UserQuerySessionTypeSites.py:101
 #: modules/FlaskModule/API/user/UserQuerySessionTypes.py:79
 #: modules/FlaskModule/API/user/UserQuerySessions.py:103
-#: modules/FlaskModule/API/user/UserQuerySites.py:97
+#: modules/FlaskModule/API/user/UserQuerySites.py:100
 #: modules/FlaskModule/API/user/UserQueryTestType.py:112
 #: modules/FlaskModule/API/user/UserQueryTestTypeSites.py:99
 #: modules/FlaskModule/API/user/UserQueryUserPreferences.py:67
@@ -379,13 +379,13 @@ msgstr ""
 #: modules/FlaskModule/API/device/DeviceQuerySessionEvents.py:61
 #: modules/FlaskModule/API/device/DeviceQuerySessions.py:137
 #: modules/FlaskModule/API/participant/ParticipantQuerySessions.py:164
-#: modules/LoginModule/LoginModule.py:584
-#: modules/LoginModule/LoginModule.py:684
-#: modules/LoginModule/LoginModule.py:750
-#: modules/LoginModule/LoginModule.py:777
-#: modules/LoginModule/LoginModule.py:796
-#: modules/LoginModule/LoginModule.py:815
+#: modules/LoginModule/LoginModule.py:586
+#: modules/LoginModule/LoginModule.py:686
+#: modules/LoginModule/LoginModule.py:752
+#: modules/LoginModule/LoginModule.py:779
+#: modules/LoginModule/LoginModule.py:798
 #: modules/LoginModule/LoginModule.py:817
+#: modules/LoginModule/LoginModule.py:819
 msgid "Unauthorized"
 msgstr ""
 
@@ -943,66 +943,67 @@ msgstr ""
 msgid "No answer from service."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:48
+#: modules/FlaskModule/API/user/UserLogin.py:46
 msgid "2FA required for this user."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:51
-msgid "2FA enabled but OTP not set for this user. Please setup 2FA."
+#: modules/FlaskModule/API/user/UserLogin.py:50
+msgid "2FA enabled but OTP not set for this user.Please setup 2FA."
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:70
-#: modules/FlaskModule/API/user/UserLogin2FA.py:84
-#: modules/FlaskModule/API/user/UserLoginBase.py:124
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:84
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:136
+#: modules/FlaskModule/API/user/UserLogin.py:71
+#: modules/FlaskModule/API/user/UserLogin2FA.py:101
+#: modules/FlaskModule/API/user/UserLoginBase.py:154
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:85
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:155
 msgid "Client major version too old, not accepting login"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin.py:76
-#: modules/FlaskModule/API/user/UserLogin2FA.py:90
-#: modules/FlaskModule/API/user/UserLoginBase.py:74
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:90
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:142
-msgid "User already logged in."
-msgstr ""
-
-#: modules/FlaskModule/API/user/UserLogin2FA.py:53
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:52
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:112
+#: modules/FlaskModule/API/user/UserLogin2FA.py:49
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:49
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:119
 msgid "User does not have 2FA enabled"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin2FA.py:56
+#: modules/FlaskModule/API/user/UserLogin2FA.py:54
 msgid "User does not have 2FA OTP enabled or secret set"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLogin2FA.py:62
+#: modules/FlaskModule/API/user/UserLogin2FA.py:74
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:133
 msgid "Invalid OTP code"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginBase.py:72
+#: modules/FlaskModule/API/user/UserLoginBase.py:90
 msgid "User already logged in :"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginBase.py:104
+#: modules/FlaskModule/API/user/UserLoginBase.py:92
+msgid "User already logged in."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:101
+msgid "Too many 2FA attempts. Please wait and try again."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginBase.py:134
 msgid "Client major version mismatch"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginBase.py:121
+#: modules/FlaskModule/API/user/UserLoginBase.py:151
 msgid "Client version mismatch"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginBase.py:141
+#: modules/FlaskModule/API/user/UserLoginBase.py:171
 msgid "Unknown client name :"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:56
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:116
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:53
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:123
 msgid "User already has 2FA OTP secret set"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:127
+#: modules/FlaskModule/API/user/UserLoginSetup2FA.py:146
 msgid "2FA enabled for this user."
 msgstr ""
 
@@ -1614,15 +1615,15 @@ msgstr ""
 msgid "No site access to delete"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySites.py:112
+#: modules/FlaskModule/API/user/UserQuerySites.py:115
 msgid "Missing site"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySites.py:119
+#: modules/FlaskModule/API/user/UserQuerySites.py:122
 msgid "Missing id_site field"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserQuerySites.py:187
+#: modules/FlaskModule/API/user/UserQuerySites.py:191
 msgid ""
 "Can't delete site: please delete all participants with sessions before "
 "deleting."
@@ -1836,16 +1837,16 @@ msgstr ""
 msgid "Invalid old password"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:619
-#: modules/LoginModule/LoginModule.py:652
+#: modules/LoginModule/LoginModule.py:621
+#: modules/LoginModule/LoginModule.py:654
 msgid "Disabled device"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:629
+#: modules/LoginModule/LoginModule.py:631
 msgid "Invalid token"
 msgstr ""
 
-#: modules/LoginModule/LoginModule.py:729
+#: modules/LoginModule/LoginModule.py:731
 msgid "Invalid Token"
 msgstr ""
 
@@ -2116,12 +2117,12 @@ msgid "Port"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:71 opentera/forms/TeraUserForm.py:20
-#: templates/login.html:110
+#: templates/login.html:122
 msgid "Username"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:74 opentera/forms/TeraUserForm.py:38
-#: templates/login.html:116
+#: templates/login.html:128
 msgid "Password"
 msgstr ""
 
@@ -2298,6 +2299,10 @@ msgid "Site ID"
 msgstr ""
 
 #: opentera/forms/TeraSiteForm.py:18
+msgid "Users Require 2FA"
+msgstr ""
+
+#: opentera/forms/TeraSiteForm.py:20
 msgid "Site Role"
 msgstr ""
 
@@ -2541,12 +2546,69 @@ msgstr ""
 msgid "OpenTera Login Page"
 msgstr ""
 
-#: templates/login.html:76
+#: templates/login.html:86
 msgid "Invalid username or password"
 msgstr ""
 
-#: templates/login.html:124
+#: templates/login.html:136
 msgid "Login"
+msgstr ""
+
+#: templates/login_setup_2fa.html:107
+msgid "You need to setup multi-factor authentication before continuing."
+msgstr ""
+
+#: templates/login_setup_2fa.html:121
+msgid "OTP configuration"
+msgstr ""
+
+#: templates/login_setup_2fa.html:127
+msgid "Scan the QR code with your authenticator app"
+msgstr ""
+
+#: templates/login_setup_2fa.html:128
+msgid "Enter the generated code:"
+msgstr ""
+
+#: templates/login_setup_2fa.html:134 templates/login_setup_2fa.html:151
+#: templates/login_validate_2fa.html:162
+msgid "Validate"
+msgstr ""
+
+#: templates/login_setup_2fa.html:144
+msgid "Use email for authentication"
+msgstr ""
+
+#: templates/login_setup_2fa.html:149
+msgid "No email address configured. Please contact your administrator."
+msgstr ""
+
+#: templates/login_validate_2fa.html:32
+msgid "Code validation timeout. Redirecting to login."
+msgstr ""
+
+#: templates/login_validate_2fa.html:117
+msgid "Too many attempts - returning to login"
+msgstr ""
+
+#: templates/login_validate_2fa.html:120
+msgid "Invalid code"
+msgstr ""
+
+#: templates/login_validate_2fa.html:120
+msgid "attempts left"
+msgstr ""
+
+#: templates/login_validate_2fa.html:144
+msgid "Multi Factor Authentication"
+msgstr ""
+
+#: templates/login_validate_2fa.html:151
+msgid "Authentication code"
+msgstr ""
+
+#: templates/login_validate_2fa.html:171
+msgid "Successfully authenticated"
 msgstr ""
 
 #~ msgid "Can't delete participant: please delete all sessions before deleting."
@@ -2577,5 +2639,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Invalid client version handler"
+#~ msgstr ""
+
+#~ msgid "2FA enabled but OTP not set for this user. Please setup 2FA."
 #~ msgstr ""
 
