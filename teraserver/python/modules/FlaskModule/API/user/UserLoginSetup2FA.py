@@ -129,7 +129,7 @@ class UserLoginSetup2FA(UserLoginBase):
             # Verify OTP code if present
             if args['otp_code']:
                 totp = pyotp.TOTP(args['otp_secret'])
-                if not totp.verify(args['otp_code']):
+                if not totp.verify(args['otp_code'], valid_window=1):
                     message = gettext('Invalid OTP code')
                     self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)
                     return message, 401

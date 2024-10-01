@@ -6,9 +6,11 @@
     <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
     <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./static/css/main_style.css" />
+    <link rel="stylesheet" href="./static/css/login_style.css" />
+
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script type="text/javascript">
         var qtObject = undefined;
@@ -21,21 +23,68 @@
 
     <!-- call function when document is loaded -->
     <script>
+        let redirectTimerId = undefined;
+        let timeoutSeconds = 0;
+
+        function resetValidationTimeout(){
+            if (redirectTimerId)
+                clearTimeout(redirectTimerId);
+            redirectTimerId = setTimeout(redirectToLogin.bind(null, "{{ gettext('Code validation timeout. Redirecting to login.') }}"), 60000*5);
+            timeoutSeconds = 300;
+            updateTimeLeft();
+        }
+
+        function redirectToLogin(msg){
+            $('#redirectMsg').text(msg);
+            $('#dlgRedirect').removeClass("d-none").addClass("d-flex");
+            setTimeout(function() {
+                if (qtObject)
+                    qtObject.sendRedirectToLogin();
+                else
+                    window.location.href = '/login';
+             }, 5000);
+        }
+
+        function updateTimeLeft(){
+            let time_left = new Date(timeoutSeconds * 1000).toISOString().substr(14, 5);
+            $('#timeLeft').text(time_left);
+            if (timeoutSeconds-1 >= 0)
+                timeoutSeconds--;
+        }
+
         $(document).ready(function() {
             //qtObject.debugPrint("Document is ready");
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('code')){
-                document.getElementById("2fa_code").value = urlParams.get('code');
-                post_form_data_and_validate_login();
+                post_form_data_and_validate_login(urlParams.get('code'));
             }
-        });
-    </script>
+            resetValidationTimeout();
+            setInterval(updateTimeLeft, 1000);
 
-    <script>
-        function post_form_data_and_validate_login() {
-            const otp_code = document.getElementById("2fa_code").value;
-            if (qtObject)
-                qtObject.debugPrint("2FA code validation");
+            $("#2fa_code").keypress(function(event){
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    $("#btnValidate").click();
+                }
+
+            });
+
+        });
+
+        $(document).ajaxSend(function(event, request, settings) {
+            $('#loading').removeClass("d-none").addClass("d-flex");
+        });
+
+        $(document).ajaxComplete(function(event, request, settings) {
+            resetValidationTimeout();
+            $('#loading').removeClass("d-flex").addClass("d-none");
+        });
+
+        let attempt = 0;
+
+        function post_form_data_and_validate_login(otp_code) {
+            /*if (qtObject)
+                qtObject.debugPrint("2FA code validation");*/
 
             // Send the OTP code to the backend with a post request
             // Use the login API for this purpose
@@ -47,29 +96,35 @@
                     with_websocket: true
                 },
                 success: function(data, textStatus, jqXHR) {
+                    $('#error_message').hide();
+                    $('#auth_form').hide();
+                    $('#ok_message').show();
                     if(qtObject)
                         qtObject.debugPrint("2FA code validation, success called");
                     if (jqXHR.status === 200) {
+
                         // If the status is 200, the 2FA code is valid
                         // Send the token to the Qt application
                         // Answer will contain,user_uuid, user_token, websocket_url
                         if (qtObject)
                             qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
-                    } else {
-                        alert("Error validating 2FA code");
-                        if (qtObject)
-                            qtObject.sendLoginFailure("Error validating 2FA code");
+
                     }
                 },
                 error: function() {
-                    alert("Error validating 2FA code");
+                    attempt++;
+                    if (attempt >= 5){
+                        redirectToLogin("{{ gettext('Too many attempts - returning to login') }}");
+                        return;
+                    }
+                    let msg = "{{ gettext('Invalid code') }}" + " - " + (5-attempt).toString() + " " + "{{ gettext('attempts left') }}";
+                    $('#error_message').text(msg);
+                    $('#error_message').show();
                     if (qtObject)
                         qtObject.sendLoginFailure("Error validating 2FA code");
                 }
             });
-
         }
-
     </script>
 
 </head>
@@ -79,40 +134,44 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">2FA</div>
+                    <div id="dlgRedirect" class="h-100 w-100 d-none align-items-center z-1 bg-black position-absolute">
+                        <div id="redirectMsg" class="w-100 text-center text-warning "></div>
+                    </div>
+                    <div id="loading" class="h-100 w-100 z-1 bg-black position-absolute opacity-75 d-none">
+                        <img src="./static/img/loading.gif" class="m-auto">
+                    </div>
+                    <div class="card-header d-flex">
+                        <div>{{ gettext('Multi Factor Authentication') }}</div>
+                        <div id="timeLeft" class="ms-auto">5:00</div>
+                    </div>
                     <div class="card-body">
 
-                        <!-- This should be enabled for web only logins -->
-                        <!-- Form based, will post data to /login_validate_2fa
-                        <form action="/login_validate_2fa" method="post">
-                            <div class="form-group row">
-                                <label for="2fa_code" class="col-md-4 col-form-label text-md-right">2FA Code</label>
-                                <div class="col-md-6">
-                                    <input type="text" id="2fa_code" class="form-control" name="2fa_code" required autofocus>
-                                </div>
+                        <div class="form-group row" id="auth_form">
+                            <label for="2fa_code" class="col-6 col-form-label text-md-right">
+                                {{ gettext('Authentication code') }}
+                            </label>
+                            <div class="col-3">
+                                <input type="text" inputmode="numeric" id="2fa_code" pattern="\d\d\d\d\d\d"
+                                       name="2fa_code" maxlength="6" class="form-control text-center" required autofocus>
                             </div>
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
-                        </form>
-                        -->
 
-                        <!-- This should be enabled for desktop only login, users enter code and then we call
-                             the post_form_data_and_validate_login with the validate button -->
-                        <form id="login_form">
-                            <div class="form-group
-                            row">
-                                <label for="2fa_code" class="col-md-4 col-form-label text-md-right">2FA Code</label>
-                                <div class="col-md-6">
-                                    <input type="text" id="2fa_code" class="form-control" name="2fa_code" required autofocus>
-                                </div>
-
-                                <!-- Validation button -->
-                                <div class="col-md-6 offset-md-4">
-                                    <button type="button" class="btn btn-primary" onclick="post_form_data_and_validate_login()">Submit</button>
-                                </div>
+                            <!-- Validation button -->
+                            <div class="col-3">
+                                <button type="button" id="btnValidate" class="btn btn-primary w-100"
+                                        onclick="post_form_data_and_validate_login(document.getElementById('2fa_code').value)">
+                                    {{ gettext('Validate') }}
+                                </button>
                             </div>
-                        </form>
+                        </div>
+                        <div class="row ms-3 me-3 mt-2">
+                            <div class="text-danger p-1 m-0 text-center fw-bold" id="error_message" role="alert" style="display: none;"></div>
+                        </div>
+                        <div class="row ms-3 me-3 mt-2">
+                            <div class="text-success p-1 m-0 text-center fw-bold" id="ok_message" role="alert" style="display: none;">
+                                {{ gettext('Successfully authenticated') }}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -117,11 +117,13 @@ class LoginModule(BaseModule):
 
         # Cookie based configuration
         self.app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
-                                'REMEMBER_COOKIE_DURATION': 14,
+                                'REMEMBER_COOKIE_DURATION': datetime.timedelta(minutes=30),
                                 'REMEMBER_COOKIE_SECURE': True,
-                                'USE_PERMANENT_SESSION': True,
-                                'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
-                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+                                'REMEMBER_COOKIE_SAMESITE': 'Strict',
+                                # 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
+                                # 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5),
+                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True
+                                })
 
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
@@ -215,7 +217,7 @@ class LoginModule(BaseModule):
             # Clear attempts counter
             self.redisDelete(attempts_key)
 
-            login_user(current_user, remember=True)
+            login_user(current_user, remember=False)
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
@@ -321,7 +323,7 @@ class LoginModule(BaseModule):
             # TODO: Validate if user is also online?
             if current_user and current_user.is_active():
                 # current_user.update_last_online()
-                login_user(current_user, remember=True)
+                login_user(current_user, remember=False)
                 return True
 
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -391,7 +393,7 @@ class LoginModule(BaseModule):
             # print('participant_verify_password, found participant: ', current_participant)
             # current_participant.update_last_online()
 
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
 
             # Flag that participant has full API access
             g.current_participant.fullAccess = True
@@ -445,7 +447,7 @@ class LoginModule(BaseModule):
         if current_participant and current_participant.is_active():
             # current_participant.update_last_online()
             g.current_participant.fullAccess = False
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
             return True
 
         # Second attempt, validate dynamic token
@@ -534,7 +536,7 @@ class LoginModule(BaseModule):
             # Flag that participant has full API access
             g.current_participant.fullAccess = True
             # current_participant.update_last_online()
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
             return True
 
         login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -604,7 +606,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device:
                     if current_device.device_enabled:
-                        login_user(current_device, remember=True)
+                        login_user(current_device, remember=False)
                         return f(*args, **kwargs)
                     else:
                         login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -637,7 +639,7 @@ class LoginModule(BaseModule):
                     if current_device:
                         if current_device.device_enabled:
                             # Returns the function if authenticated with token
-                            login_user(current_device, remember=True)
+                            login_user(current_device, remember=False)
                             return f(*args, **kwargs)
                         else:
                             login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -664,7 +666,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
-                    login_user(current_device, remember=True)
+                    login_user(current_device, remember=False)
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.

@@ -146,7 +146,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         if self.user_2fa_otp_enabled:
             # Default is 6 digits with interval of 30 seconds
             totp = pyotp.TOTP(self.user_2fa_otp_secret)
-            return totp.verify(code)
+            return totp.verify(code, valid_window=1)
 
         return False
 

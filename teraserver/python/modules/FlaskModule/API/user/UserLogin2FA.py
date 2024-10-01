@@ -66,10 +66,10 @@ class UserLogin2FA(UserLoginBase):
             else:
                 attempts = 1
 
-            # Store attempts in the last hour
-            self.module.redisSet(attempts_key_2fa, attempts, ex=3600)
+            # Store attempts in the last 15 minutes
+            self.module.redisSet(attempts_key_2fa, attempts, ex=900)
 
-            if not totp.verify(args['otp_code']):
+            if not totp.verify(args['otp_code'], valid_window=1):
                 self._verify_2fa_login_attempts(current_user.user_uuid)
                 message = gettext('Invalid OTP code')
                 self._send_login_failure_message(messages.LoginEvent.LOGIN_STATUS_UNKNOWN, message)

@@ -66,7 +66,7 @@
                             if (qtObject){
                                 if ("reason" in response){
                                     if (response.reason === '2fa'){
-                                        //qtObject.sendCheckInProgress();
+                                        qtObject.sendCheckInProgress();
                                     }
                                     if (response.reason === '2fa_setup'){
                                         qtObject.sendSetupInProgress();
@@ -81,9 +81,11 @@
                         }
                     },
                     error: function(response) {
-                        //console.log("Login error", response);
-                        //$('#error_message').text(response.responseText);
-                        $('#error_message').text("{{ gettext('Invalid username or password') }}");
+                        console.log("Login error", response);
+                        if (response.status === 401)
+                            $('#error_message').text("{{ gettext('Invalid username or password') }}");
+                        else
+                            $('#error_message').text(response.responseJSON);
                         $('#error_message').show();
                         $("#username").focus();
                         if (qtObject)

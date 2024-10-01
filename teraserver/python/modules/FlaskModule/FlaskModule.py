@@ -7,6 +7,8 @@ from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.OpenTeraServerVersion import opentera_server_version_string
 import redis
+import datetime
+
 from modules.Globals import opentera_doc_url
 
 
@@ -96,7 +98,9 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_REDIS': redis_url})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        flask_app.config.update({'SESSION_COOKIE_SAMESITE': 'Strict'})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': flask_app.debug})
+        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5)})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -104,7 +108,7 @@ class FlaskModule(BaseModule):
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
-        self.session = Session(flask_app)
+        # self.session = Session(flask_app)
 
         # Init API
         FlaskModule.init_user_api(self, user_api_ns)

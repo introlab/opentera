@@ -1,10 +1,6 @@
 from flask.views import MethodView
-from flask import render_template, request, redirect, url_for
-from flask_login import login_user
+from flask import render_template, request
 from opentera.utils.TeraVersions import TeraVersions
-from opentera.db.models.TeraUser import TeraUser
-from modules.LoginModule.LoginModule import LoginModule
-from flask_babel import gettext
 
 
 class LoginView(MethodView):

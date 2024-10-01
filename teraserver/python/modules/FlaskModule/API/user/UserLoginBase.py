@@ -98,7 +98,7 @@ class UserLoginBase(Resource):
         if attempts is not None:
             attempts = int(attempts)
             if attempts >= 5:
-                message = gettext('Too many 2FA attempts')
+                message = gettext('Too many 2FA attempts. Please wait and try again.')
                 self._send_login_failure_message(
                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED, message)
                 raise TooMany2FALoginAttemptsError(message)
