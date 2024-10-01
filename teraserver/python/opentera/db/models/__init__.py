@@ -33,10 +33,10 @@ from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
 from .TeraUserUserGroup import TeraUserUserGroup
 from .TeraUserPreference import TeraUserPreference
-from .TeraUserUserGroup import TeraUserUserGroup
+
 
 """
-    A map containing the event name and class, useful for event filtering. 
+    A map containing the event name and class, useful for event filtering.
     Insert only useful events here.
 """
 EventNameClassMap = {

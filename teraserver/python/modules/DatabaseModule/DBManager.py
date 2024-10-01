@@ -133,8 +133,8 @@ class DBManager (BaseModule):
                 if role.id_site and role.service_role_site.site_2fa_required:
                     # Efficiently load all related users with joinedload
                     user_ids = set()
-                    for group in target.user_group_users:
-                        user_ids.add(group.id_user)
+                    for user in target.user_group_users:
+                        user_ids.add(user.id_user)
 
                     # Perform a bulk update for all users at once
                     if user_ids:
@@ -144,6 +144,18 @@ class DBManager (BaseModule):
                             .values(user_2fa_enabled=True)
                         )
 
+        @event.listens_for(TeraUserUserGroup, 'after_update')
+        @event.listens_for(TeraUserUserGroup, 'after_insert')
+        def user_user_group_updated_or_inserted(mapper, connection, target: TeraUserUserGroup):
+            # Check if 2FA is enabled for a related site
+            for role in target.user_user_group_user_group.user_group_services_roles:
+                if role.id_site and role.service_role_site.site_2fa_required:
+                    # Perform single update for user
+                    connection.execute(
+                        update(TeraUser)
+                        .where(TeraUser.id_user == target.user_user_group_user.id_user)
+                        .values(user_2fa_enabled=True)
+                    )
 
     def setup_events_for_class(self, cls, event_name):
         import json
