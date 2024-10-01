@@ -161,28 +161,6 @@ class UserQuerySites(Resource):
         # TODO: Publish update to everyone who is subscribed to sites update...
         update_site = TeraSite.get_site_by_id(json_site['id_site'])
 
-        try:
-            # Manage 2FA for site
-            if update_site.site_2fa_required:
-                # Enable 2FA for all users in this site
-                # Query service roles for this site
-                service_roles = TeraServiceRole.query.filter(TeraServiceRole.id_site == update_site.id_site).all()
-                for role in service_roles:
-                    # Get the user group for this role
-                    for group in role.service_role_user_groups:
-                        # Get all users in this group
-                        for user in group.user_group_users:
-                            # Enable 2FA for this user
-                            TeraUser.update(user.id_user, {'user_2fa_enabled': True})
-
-        except exc.SQLAlchemyError as e:
-                import sys
-                print(sys.exc_info())
-                self.module.logger.log_error(self.module.module_name,
-                                             UserQuerySites.__name__,
-                                             'post', 500, 'Database error', str(e))
-                return gettext('Database error'), 500
-
         return jsonify([update_site.to_json()])
 
     @api.doc(description='Delete a specific site',

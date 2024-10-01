@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import event, inspect
+from sqlalchemy.orm import joinedload
+from sqlalchemy import event, inspect, update
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
@@ -91,6 +92,58 @@ class DBManager (BaseModule):
 
         return task.deferLater(reactor, seconds_to_midnight, self.cleanup_database)
         # return task.deferLater(reactor, 5, self.cleanup_database)
+
+    def setup_events_for_2fa_sites(self):
+        """
+        We need to validate that 2FA is enabled for all users in the site when the flag is set.
+        This can occur on multiple occasion, when the site is created, updated and also when user
+        groups are modified.
+        """
+        @event.listens_for(TeraSite, 'after_update')
+        @event.listens_for(TeraSite, 'after_insert')
+        def site_updated_or_inserted(mapper, connection, target: TeraSite):
+            # Check if 2FA is enabled for this site
+            if target.site_2fa_required:
+                # Efficiently load all related users with joinedload
+                service_roles = TeraServiceRole.query.options(
+                    joinedload(TeraServiceRole.service_role_user_groups).joinedload(
+                        TeraUserGroup.user_group_users
+                    )
+                ).filter(TeraServiceRole.id_site == target.id_site).all()
+
+                # Get all users
+                user_ids = set()
+                for role in service_roles:
+                    for group in role.service_role_user_groups:
+                        for user in group.user_group_users:
+                            user_ids.add(user.id_user)
+
+                # Perform a bulk update for all users at once
+                if user_ids:
+                    connection.execute(
+                        update(TeraUser)
+                        .where(TeraUser.id_user.in_(user_ids))
+                        .values(user_2fa_enabled=True)
+                    )
+        @event.listens_for(TeraUserGroup, 'after_update')
+        @event.listens_for(TeraUserGroup, 'after_insert')
+        def user_group_updated_or_inserted(mapper, connection, target: TeraUserGroup):
+            # Check if 2FA is enabled for a related site
+            for role in target.user_group_services_roles:
+                if role.id_site and role.service_role_site.site_2fa_required:
+                    # Efficiently load all related users with joinedload
+                    user_ids = set()
+                    for group in target.user_group_users:
+                        user_ids.add(group.id_user)
+
+                    # Perform a bulk update for all users at once
+                    if user_ids:
+                        connection.execute(
+                            update(TeraUser)
+                            .where(TeraUser.id_user.in_(user_ids))
+                            .values(user_2fa_enabled=True)
+                        )
+
 
     def setup_events_for_class(self, cls, event_name):
         import json
@@ -281,6 +334,9 @@ class DBManager (BaseModule):
         from opentera.db.models import EventNameClassMap
         for name in EventNameClassMap:
             self.setup_events_for_class(EventNameClassMap[name], name)
+
+        # Setup events for 2FA sites
+        self.setup_events_for_2fa_sites()
 
     def open(self, echo=False):
 
@@ -522,9 +578,7 @@ if __name__ == '__main__':
         print(manager)
         manager.open_local(dict(), echo=True, ram=True)
         manager.create_defaults(config, test=True)
-        user = TeraUser()
-        user.query.all()
+        user_instance = TeraUser()
+        user_instance.query.all()
         test = TeraUser.query.all()
         print(test)
-
-
