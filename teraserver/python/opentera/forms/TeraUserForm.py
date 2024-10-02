@@ -26,9 +26,12 @@ class TeraUserForm:
                                       False, item_default=False))
 
         section.add_item(TeraFormItem("user_2fa_otp_enabled", gettext("2FA OTP Enabled"), "boolean",
-                                      False, item_default=False))
-        section.add_item(TeraFormItem("user_2fa_email_enabled", gettext("2FA Email Enabled"), "boolean",
-                                      False, item_default=False))
+                                      False, item_default=False,
+                                      item_condition=TeraFormItemCondition("user_2fa_enabled", "=", True)))
+        section.add_item(TeraFormItem("user_2fa_email_enabled", gettext("2FA Email Enabled"), "hidden",
+                                      False, item_default=False,
+                                      # item_condition = TeraFormItemCondition("user_2fa_enabled", "=", True)
+                                      ))
 
         # section.add_item(TeraFormItem("user_2fa_otp_secret", gettext("OTP Secret"), "hidden"))
         section.add_item(TeraFormItem("user_firstname", gettext("First Name"), "text", True))
@@ -37,9 +40,10 @@ class TeraUserForm:
         section.add_item(
             TeraFormItem("user_password", gettext("Password"), "password", item_options={"confirm": True}))
         section.add_item(TeraFormItem("user_superadmin", gettext("User Is Super Administrator"), "boolean", True))
-        section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
-        section.add_item(TeraFormItem("user_profile", gettext("Profile"), "hidden"))
         section.add_item(TeraFormItem("user_lastonline", gettext("Last Connection"), "datetime",
                                       item_options={"readonly": True}))
+        section.add_item(TeraFormItem("user_notes", gettext("Notes"), "longtext"))
+        section.add_item(TeraFormItem("user_profile", gettext("Profile"), "hidden"))
+
 
         return form.to_dict()

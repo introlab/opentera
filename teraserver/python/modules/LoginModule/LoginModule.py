@@ -212,7 +212,7 @@ class LoginModule(BaseModule):
             g.current_user = logged_user
 
             # print('user_verify_password, found user: ', current_user)
-            # current_user.update_last_online()
+            current_user.update_last_online()
 
             # Clear attempts counter
             self.redisDelete(attempts_key)

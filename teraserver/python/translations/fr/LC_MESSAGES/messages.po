@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2024-10-01 15:00-0400\n"
-"PO-Revision-Date: 2024-10-01 15:04-0400\n"
+"PO-Revision-Date: 2024-10-02 08:14-0400\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -2385,7 +2385,7 @@ msgstr "ID Site"
 
 #: opentera/forms/TeraSiteForm.py:18
 msgid "Users Require 2FA"
-msgstr "Exiger Authentification Multi-Facteurs (MFA)"
+msgstr "Authentification Multi-Facteurs (MFA) requise"
 
 #: opentera/forms/TeraSiteForm.py:20
 msgid "Site Role"
