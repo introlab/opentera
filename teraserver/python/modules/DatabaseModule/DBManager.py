@@ -157,6 +157,28 @@ class DBManager (BaseModule):
                         .values(user_2fa_enabled=True)
                     )
 
+        @event.listens_for(TeraUser, 'after_update')
+        @event.listens_for(TeraUser, 'after_insert')
+        def user_updated_or_inserted(mapper, connection, target: TeraUser):
+            # Check if 2FA is enabled for a related site
+            for group in target.user_user_groups:
+                for role in group.user_group_services_roles:
+                    if role.id_site and role.service_role_site.site_2fa_required:
+
+                        otp_enabled = target.user_2fa_otp_enabled
+
+                        # Do not allow to change 2FA status if user has 2FA enabled
+                        # and OTP set with secret
+                        if target.user_2fa_otp_secret:
+                            otp_enabled = True
+
+                        # Perform single update for user
+                        connection.execute(
+                            update(TeraUser)
+                            .where(TeraUser.id_user == target.id_user)
+                            .values(user_2fa_enabled=True, user_2fa_otp_enabled=otp_enabled)
+                        )
+
     def setup_events_for_class(self, cls, event_name):
         import json
 
