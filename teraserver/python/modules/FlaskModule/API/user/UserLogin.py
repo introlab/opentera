@@ -1,6 +1,6 @@
 from flask_restx import inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import current_user, user_http_auth
+from modules.LoginModule.LoginModule import current_user, user_http_login_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
@@ -88,21 +88,23 @@ class UserLogin(UserLoginBase):
             return response, 200
 
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)')
+    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
+             security='basicAuth')
     @api.expect(get_parser)
-    @user_http_auth.login_required
+    @user_http_login_auth.login_required
     def get(self):
         """
-        Login to the server using HTTP Basic Authentication (HTTPAuth)
+        Login to the server using HTTP Basic Authentication
         """
         return self._common_login_response(get_parser)
 
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)')
+    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
+             security='basicAuth')
     @api.expect(post_parser)
-    @user_http_auth.login_required
+    @user_http_login_auth.login_required
     def post(self):
         """
-        Login to the server using HTTP Basic Authentication (HTTPAuth)
+        Login to the server using HTTP Basic Authentication
         """
         return self._common_login_response(post_parser)

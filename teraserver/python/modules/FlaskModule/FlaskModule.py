@@ -42,12 +42,11 @@ authorizations = {
     'basicAuth': {
         'type': 'basic'
     },
-    'Token Authentication': {
+    'tokenAuth': {
         'type': 'apiKey',
         'in': 'header',
         'name': 'Authorization',
-        'default': 'OpenTera',
-        'bearerFormat': 'JWT'
+        'description': 'Enter token with the `OpenTera` prefix, e.g. "OpenTera 12345"'
     }
 }
 

@@ -1,14 +1,11 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth, current_user
+from modules.LoginModule.LoginModule import user_multi_auth, current_user, user_token_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
-from opentera.db.models.TeraUserGroup import TeraUserGroup
-from opentera.db.models.TeraServiceAccess import TeraServiceAccess
-from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
 from flask_babel import gettext
 
@@ -38,8 +35,7 @@ class UserQuerySites(Resource):
 
     @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sites',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
@@ -105,8 +101,7 @@ class UserQuerySites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified site',
                         400: 'Badly formed JSON or missing field(id_site) in the JSON body',
-                        500: 'Internal error when saving site'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving site'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
@@ -166,8 +161,7 @@ class UserQuerySites(Resource):
     @api.doc(description='Delete a specific site',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site (only super admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):

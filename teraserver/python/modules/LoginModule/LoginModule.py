@@ -16,11 +16,11 @@ from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
-from flask import request, g, session
+from flask import request, g, session, abort
 from flask_babel import gettext
 from werkzeug.local import LocalProxy
 from flask_restx import reqparse
-from functools import wraps
+from functools import wraps, partial
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth, Authorization
 
@@ -43,6 +43,7 @@ current_service = LocalProxy(lambda: g.setdefault('current_service', None))
 
 # Authentication schemes for users
 user_http_auth = HTTPBasicAuth(realm='user')
+user_http_login_auth = HTTPBasicAuth(realm='user')
 user_token_auth = HTTPTokenAuth("OpenTera")
 user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
 
@@ -129,9 +130,11 @@ class LoginModule(BaseModule):
         self.login_manager.user_loader(self.load_user)
 
         # Setup verify password function for users
-        user_http_auth.verify_password(self.user_verify_password)
+        user_http_auth.verify_password(partial(self.user_verify_password, verify_2fa=True))
+        user_http_login_auth.verify_password(partial(self.user_verify_password, verify_2fa=False))
         user_token_auth.verify_token(self.user_verify_token)
         user_http_auth.error_handler(self.auth_error)
+        user_http_login_auth.error_handler(self.auth_error)
         user_token_auth.error_handler(self.auth_error)
 
         # Setup verify password function for participants
@@ -164,7 +167,7 @@ class LoginModule(BaseModule):
 
         return None
 
-    def user_verify_password(self, username, password):
+    def user_verify_password(self, username, password, verify_2fa):
         # print('LoginModule - user_verify_password ', username)
         tentative_user = TeraUser.get_user_by_username(username)
         if not tentative_user:
@@ -209,6 +212,13 @@ class LoginModule(BaseModule):
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
 
         if logged_user and logged_user.is_active():
+
+            if verify_2fa:
+                # Prevent API access with username/password if 2FA is enabled
+                if logged_user.user_2fa_enabled:
+                    # return False
+                    abort(401, gettext('Unauthorized - 2FA is enabled, must login first and use token'))
+
             g.current_user = logged_user
 
             # print('user_verify_password, found user: ', current_user)
