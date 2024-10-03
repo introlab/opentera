@@ -130,8 +130,8 @@ class LoginModule(BaseModule):
         self.login_manager.user_loader(self.load_user)
 
         # Setup verify password function for users
-        user_http_auth.verify_password(partial(self.user_verify_password, verify_2fa=True))
-        user_http_login_auth.verify_password(partial(self.user_verify_password, verify_2fa=False))
+        user_http_auth.verify_password(partial(self.user_verify_password, is_login=False))
+        user_http_login_auth.verify_password(partial(self.user_verify_password, is_login=True))
         user_token_auth.verify_token(self.user_verify_token)
         user_http_auth.error_handler(self.auth_error)
         user_http_login_auth.error_handler(self.auth_error)
@@ -167,8 +167,8 @@ class LoginModule(BaseModule):
 
         return None
 
-    def user_verify_password(self, username, password, verify_2fa):
-        # print('LoginModule - user_verify_password ', username)
+    def user_verify_password(self, username, password, is_login):
+        # print('LoginModule - user_verify_password', username)
         tentative_user = TeraUser.get_user_by_username(username)
         if not tentative_user:
             # self.logger.log_warning(self.module_name, 'Invalid username', username)
@@ -213,15 +213,17 @@ class LoginModule(BaseModule):
 
         if logged_user and logged_user.is_active():
 
-            if verify_2fa:
-                # Prevent API access with username/password if 2FA is enabled
+            if not is_login:
+                if logged_user.user_force_password_change:
+                    # Prevent API access if password change was requested for that user
+                    abort(401, gettext('Unauthorized - User must login first to change password'))
                 if logged_user.user_2fa_enabled:
-                    # return False
+                    # Prevent API access with username/password if 2FA is enabled
                     abort(401, gettext('Unauthorized - 2FA is enabled, must login first and use token'))
 
             g.current_user = logged_user
 
-            # print('user_verify_password, found user: ', current_user)
+            # print('user_verify_password, found user:', current_user)
             current_user.update_last_online()
 
             # Clear attempts counter
@@ -353,7 +355,7 @@ class LoginModule(BaseModule):
         return False
 
     def participant_verify_password(self, username, password):
-        # print('LoginModule - participant_verify_password for ', username)
+        # print('LoginModule - participant_verify_password for', username)
 
         tentative_participant = TeraParticipant.get_participant_by_username(username)
         if not tentative_participant:
