@@ -1,12 +1,11 @@
-from flask import jsonify, request, session
-from flask_restx import Resource, reqparse
+from flask import request
+from flask_restx import Resource
 from flask_babel import gettext
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -24,10 +23,13 @@ class DeviceQuerySessionEvents(Resource):
 
     @api.doc(description='Get session events',
              responses={403: 'Forbidden for security reasons.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
+        """
+        Get events for a specific session
+        """
         return gettext('Forbidden for security reasons'), 403
 
     @api.doc(description='Update/Create session events',
@@ -36,10 +38,13 @@ class DeviceQuerySessionEvents(Resource):
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_parser)
     @LoginModule.device_token_or_certificate_required
     def post(self):
+        """
+        Create / update session events
+        """
         device_access = DBManager.deviceAccess(current_device)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -94,4 +99,7 @@ class DeviceQuerySessionEvents(Resource):
 
     @LoginModule.device_token_or_certificate_required
     def delete(self):
+        """
+        Delete session events
+        """
         return gettext('Forbidden for security reasons'), 403

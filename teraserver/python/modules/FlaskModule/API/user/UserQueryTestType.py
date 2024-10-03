@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -41,11 +41,13 @@ class UserQueryTestTypes(Resource):
 
     @api.doc(description='Get test type information. If no id_test_type specified, returns all available test types',
              responses={200: 'Success - returns list of test types',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test types
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -117,11 +119,13 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
-                        500: 'Internal error when saving test type'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving test type'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test types
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'test_type' not in request.json:
@@ -311,11 +315,13 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete test type (no admin access to project related to that type '
                              'or tests of that type exists in the system somewhere)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete test type
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

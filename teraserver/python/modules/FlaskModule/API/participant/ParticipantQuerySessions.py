@@ -75,9 +75,11 @@ class ParticipantQuerySessions(Resource):
                         400: 'Bad request',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
-                        403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'})
     def get(self):
+        """
+        Get participant sessions
+        """
         participant_access = DBManager.participantAccess(current_participant)
         args = get_parser.parse_args(strict=True)
 
@@ -105,10 +107,13 @@ class ParticipantQuerySessions(Resource):
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Logged participant doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(session_schema)
     @participant_multi_auth.login_required(role='limited')
     def post(self):
+        """
+        Create / update a session
+        """
         # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:

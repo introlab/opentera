@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource, inputs  # , reqparse
+from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -52,10 +52,13 @@ class ServiceQuerySessions(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get sessions
+        """
         args = get_parser.parse_args()
 
         service_access = DBManager.serviceAccess(current_service)
@@ -128,10 +131,13 @@ class ServiceQuerySessions(Resource):
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
                         500: 'Internal error when saving session'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update session
+        """
         if 'session' not in request.json:
             return gettext('Missing session'), 400
 

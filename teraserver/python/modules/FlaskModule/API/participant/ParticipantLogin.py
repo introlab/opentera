@@ -37,10 +37,13 @@ class ParticipantLogin(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required(role='limited')
     def get(self):
+        """
+        Login a participant with username / password
+        """
         if current_participant:
             args = get_parser.parse_args()
 

@@ -39,11 +39,13 @@ class UserQueryUserStats(Resource):
     @api.doc(description='Get stats for the specified item.',
              responses={200: 'Success',
                         400: 'Missing parameter - one id must be specified.',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get stats for the specified item
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
@@ -238,7 +240,6 @@ class UserQueryUserStats(Resource):
 
     @staticmethod
     def get_project_stats(user_access: DBManagerTeraUserAccess, item_id: int, with_parts: bool) -> dict:
-        from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
         from opentera.db.models.TeraProject import TeraProject
         project_users = user_access.query_users_for_project(project_id=item_id)
         project_users_enabled = user_access.query_users_for_project(project_id=item_id, enabled_only=True)

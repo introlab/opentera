@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -44,10 +44,13 @@ class ServiceQueryTests(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get tests
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
@@ -120,10 +123,13 @@ class ServiceQueryTests(Resource):
                         400: 'Bad request - wrong or missing parameters in query',
                         500: 'Required parameter is missing',
                         403: 'Service doesn\'t have permission to post that test'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_parser)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update test
+        """
         service_access = DBManager.serviceAccess(current_service)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -249,10 +255,13 @@ class ServiceQueryTests(Resource):
              responses={200: 'Success',
                         403: 'Service can\'t delete test',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete specific test
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         uuid_todel = args['uuid']

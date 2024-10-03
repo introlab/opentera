@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -35,11 +35,13 @@ class UserQueryUserUserGroups(Resource):
 
     @api.doc(description='Get user - user group information. At least one "id" field must be specified',
              responses={200: 'Success',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get user usergroups
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
@@ -78,11 +80,13 @@ class UserQueryUserUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
-                        500: 'Internal error when saving user group'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving user group'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update user's usergroups
+        """
         user_access = DBManager.userAccess(current_user)
 
         if not 'user_user_group' in request.json:
@@ -143,11 +147,13 @@ class UserQueryUserUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific user-usergroup assocation
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

@@ -45,11 +45,13 @@ class UserQuerySessionTypeSites(Resource):
                          ' at once.',
              responses={200: 'Success - returns list of session types - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occurred when loading devices for sites'},
-             params={'token': 'Secret token'})
+                        500: 'Error occurred when loading devices for sites'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get session types associated with a site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -104,11 +106,13 @@ class UserQuerySessionTypeSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
-                        500: 'Internal error occured when saving device association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving device association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update session types associated with a site
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Only super admins can change session type - site associations
@@ -248,11 +252,13 @@ class UserQuerySessionTypeSites(Resource):
     @api.doc(description='Delete a specific session type-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no admin access to site)',
-                        500: 'Session type - site association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Session type - site association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific session type - site association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

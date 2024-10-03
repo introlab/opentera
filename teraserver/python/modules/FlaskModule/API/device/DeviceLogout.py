@@ -1,4 +1,4 @@
-from flask import jsonify, session
+from flask import session
 from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_device
@@ -7,7 +7,7 @@ from flask_login import logout_user
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('token', type=str, help='Secret Token')
+get_parser.add_argument('token', type=str, help='Access Token')
 
 
 class DeviceLogout(Resource):
@@ -22,6 +22,9 @@ class DeviceLogout(Resource):
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
+        """
+        Device logout
+        """
         if current_device:
             logout_user()
             session.clear()

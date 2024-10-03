@@ -45,11 +45,13 @@ class UserQueryUsers(Resource):
 
     @api.doc(description='Get user information. If no id specified, returns all accessible users',
              responses={200: 'Success',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get users
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
@@ -147,14 +149,6 @@ class UserQueryUsers(Resource):
             return jsonify(users_list)
 
         return [], 200
-        # try:
-        #     users = TeraUser.query_data(my_args)
-        #     users_list = []
-        #     for user in users:
-        #         users_list.append(user.to_json())
-        #     return jsonify(users_list)
-        # except InvalidRequestError:
-        #     return '', 500
 
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
@@ -165,11 +159,13 @@ class UserQueryUsers(Resource):
                         400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '
                              'JSON body',
                         409: 'Username is already taken',
-                        500: 'Internal error when saving user'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving user'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update an user
+        """
         user_access = DBManager.userAccess(current_user)
 
         if 'user' not in request.json:
@@ -299,34 +295,18 @@ class UserQueryUsers(Resource):
 
                     update_user.commit()
 
-            # Check if there's some user groups for the updated user that we need to delete
-            # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
-            #     .difference(user_user_groups_ids)
-            #
-            # for id_to_del in id_groups_to_delete:
-            #     uug_to_del = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-            #                                                                              user_group_id=id_to_del)
-            #     TeraUserUserGroup.delete(id_todel=uug_to_del.id_user_user_group)
-            #
-            # # Update / insert user groups
-            # for user_group in user_user_groups:
-            #     if not TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-            #                                                                        user_group_id=
-            #                                                                        user_group['id_user_group']):
-            #         # Group not already associated - associates!
-            #         TeraUserUserGroup.insert_user_user_group(id_user_group=user_group['id_user_group'],
-            #                                                  id_user=update_user.id_user)
-
         return [update_user.to_json()]
 
     @api.doc(description='Delete a specific user',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user (only super admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete an user
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

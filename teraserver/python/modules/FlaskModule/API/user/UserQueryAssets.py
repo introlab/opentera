@@ -1,9 +1,8 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraService import TeraService
 
@@ -46,11 +45,13 @@ class UserQueryAssets(Resource):
     @api.doc(description='Get asset information. Only one of the ID parameter is supported at once',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
-                        403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get asset information
+        """
         user_access = DBManager.userAccess(current_user)
 
         args = get_parser.parse_args()
@@ -166,18 +167,22 @@ class UserQueryAssets(Resource):
         # else:
         return assets_list
 
-    @api.doc(description='Delete asset.',
-             responses={501: 'Unable to update asset information from here'},
-             params={'token': 'Secret token'})
+    @api.doc(description='Update asset information',
+             responses={501: 'Unable to update asset information from here'})
     @user_multi_auth.login_required
     def post(self):
+        """
+        Update asset information
+        """
         return gettext('Asset information update and creation must be done directly into a service (such as '
                        'Filetransfer service)'), 501
 
-    @api.doc(description='Delete asset.',
-             responses={501: 'Unable to delete asset information from here'},
-             params={'token': 'Secret token'})
+    @api.doc(description='Delete asset information',
+             responses={501: 'Unable to delete asset information from here'})
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete asset information
+        """
         return gettext('Asset information deletion must be done directly into a service (such as '
                        'Filetransfer service)'), 501

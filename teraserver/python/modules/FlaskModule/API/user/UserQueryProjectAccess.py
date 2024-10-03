@@ -1,10 +1,9 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from flask_babel import gettext
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraProject import TeraProject
@@ -67,11 +66,13 @@ class UserQueryProjectAccess(Resource):
     @api.doc(description='Get user roles for projects. Only one ID parameter required and supported at once.',
              responses={200: 'Success - returns list of users roles in projects',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading project roles'},
-             params={'token': 'Secret token'})
+                        500: 'Error occured when loading project roles'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get roles for users / user groupes in a project
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -173,15 +174,17 @@ class UserQueryProjectAccess(Resource):
         # No access, but still fine
         return [], 200
 
-    @api.doc(description='Create/update project access for an user.',
+    @api.doc(description='Create/update project access for an user / usergroup.',
              responses={200: 'Success',
                         403: 'Logged user can\'t modify this project or user access (project admin access required)',
                         400: 'Badly formed JSON or missing fields(id_user_group or id_project) in the JSON body',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update project roles for users / usergroups
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_projects = request.json['project_access']
@@ -256,11 +259,13 @@ class UserQueryProjectAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project access(only user who is admin in that project can '
                              'remove it)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete specific user / usergroup role in a project
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

@@ -42,10 +42,13 @@ class ServiceQueryTestTypeProjects(Resource):
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get test types associated with a project
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
@@ -102,10 +105,13 @@ class ServiceQueryTestTypeProjects(Resource):
                         403: 'Logged service can\'t modify association (not associated to project or test type)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update test types -> project association
+        """
         service_access = DBManager.serviceAccess(current_service)
 
         accessible_projects_ids = service_access.get_accessible_projects_ids(admin_only=True)
@@ -238,10 +244,13 @@ class ServiceQueryTestTypeProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged service can\'t delete association (no access to test-type or project)',
                         400: 'Association not found (invalid id?)'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a specific test type -> project association
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         id_todel = args['id']

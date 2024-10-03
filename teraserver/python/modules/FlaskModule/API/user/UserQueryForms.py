@@ -1,5 +1,4 @@
-from flask import jsonify, session
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
@@ -66,11 +65,13 @@ class UserQueryForms(Resource):
     @api.doc(description='Get json description of standard input form for the specified data type.',
              responses={200: 'Success',
                         400: 'Missing required parameter',
-                        500: 'Unknown or unsupported data type'},
-             params={'token': 'Secret token'})
+                        500: 'Unknown or unsupported data type'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get json description of form to display to edit a specific data type
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 

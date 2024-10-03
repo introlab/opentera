@@ -1,12 +1,10 @@
-from flask import session, request
+from flask import request
 from flask_babel import gettext
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from sqlalchemy.exc import InvalidRequestError
 
-from opentera.db.models import TeraDeviceType
 from opentera.db.models.TeraDeviceType import TeraDeviceType
-from opentera.db.models.TeraUser import TeraUser
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -40,11 +38,13 @@ class UserQueryDeviceTypes(Resource):
                         400: 'No parameters specified at least one id must be used',
                         403: 'Forbidden access to the device type specified. Please check that the user has access to a'
                              ' session type containing that device type.',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get devices types
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
         device_type = []
@@ -84,12 +84,14 @@ class UserQueryDeviceTypes(Resource):
                         403: 'Logged user can\'t create/update the specified device type',
                         400: 'Badly formed JSON or missing fields(id_device_name or id_device_type) in the JSON '
                              'body',
-                        500: 'Internal error occured when saving device type'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving device type'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
-        user_access = DBManager.userAccess(current_user)
+        """
+        Create / update devices types
+        """
+        # user_access = DBManager.userAccess(current_user)
 
         if 'device_type' not in request.json:
             return gettext('Missing device type'), 400
@@ -144,11 +146,13 @@ class UserQueryDeviceTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device type (can delete if site admin)',
                         500: 'Device type not found or database error.',
-                        501: 'Tried to delete with 2 parameters'},
-             params={'token': 'Secret token'})
+                        501: 'Tried to delete with 2 parameters'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific device type
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         # To accommodate the 'delete_with_http_auth' function which uses id as args, the id_device_type is rename as id

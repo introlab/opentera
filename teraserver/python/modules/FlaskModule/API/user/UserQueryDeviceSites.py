@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
@@ -47,11 +46,13 @@ class UserQueryDeviceSites(Resource):
                          ' at once.',
              responses={200: 'Success - returns list of devices - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occurred when loading devices for sites'},
-             params={'token': 'Secret token'})
+                        500: 'Error occurred when loading devices for sites'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get devices associated to a site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -112,11 +113,13 @@ class UserQueryDeviceSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify device association',
                         400: 'Badly formed JSON or missing fields(id_site or id_device) in the JSON body',
-                        500: 'Internal error occured when saving device association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving device association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create/update devices association with a site
+        """
         # Only super admins can change service - site associations
         if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
@@ -236,11 +239,13 @@ class UserQueryDeviceSites(Resource):
     @api.doc(description='Delete a specific device-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device association (no admin access to site)',
-                        500: 'Device-site association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Device-site association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific device-site association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
 

@@ -57,11 +57,13 @@ class UserQueryParticipants(Resource):
     @api.doc(description='Get participants information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
                         400: 'No parameters specified at least one id must be used',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get participants
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -208,11 +210,13 @@ class UserQueryParticipants(Resource):
                         403: 'Logged user can\'t create/update the specified participant',
                         400: 'Badly formed JSON or missing fields(id_participant or id_project/id_group [only one of '
                              'them]) in the JSON body, or mismatch between id_project and participant group project',
-                        500: 'Internal error when saving participant'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving participant'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update participant
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'participant' not in request.json:
@@ -345,11 +349,13 @@ class UserQueryParticipants(Resource):
     @api.doc(description='Delete a specific participant',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete participant (only project admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a participant
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']
