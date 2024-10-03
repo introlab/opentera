@@ -5,12 +5,6 @@ from opentera.db.models.TeraUser import TeraUser
 class UserLoginTest(BaseUserAPITest):
     test_endpoint = '/api/user/login'
 
-    def setUp(self):
-        super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
-
     def test_get_endpoint_no_auth(self):
         with self._flask_app.app_context():
             response = self.test_client.get(self.test_endpoint)
@@ -21,10 +15,12 @@ class UserLoginTest(BaseUserAPITest):
             response = self._get_with_user_token_auth(self.test_client, 'invalid')
             self.assertEqual(401, response.status_code)
 
-    def test_get_endpoint_login_admin_user_http_auth(self):
+    def test_get_endpoint_login_admin_user_http_auth_with_websocket(self):
         with self._flask_app.app_context():
             # Using default participant information
-            response = self._get_with_user_http_auth(self.test_client, 'admin', 'admin')
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     'admin', 'admin',
+                                                     {'with_websocket': True})
 
             self.assertEqual(200, response.status_code)
             self.assertEqual('application/json', response.headers['Content-Type'])
@@ -34,6 +30,20 @@ class UserLoginTest(BaseUserAPITest):
             self.assertTrue('websocket_url' in response.json)
             self.assertTrue('user_uuid' in response.json)
             self.assertTrue('user_token' in response.json)
+
+    def test_get_endpoint_login_admin_user_http_auth_no_websocket(self):
+        with self._flask_app.app_context():
+            # Using default participant information
+            response = self._get_with_user_http_auth(self.test_client, 'admin', 'admin')
+
+            self.assertEqual(200, response.status_code)
+            self.assertEqual('application/json', response.headers['Content-Type'])
+            self.assertGreater(len(response.json), 0)
+
+            # Validate fields in json response
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+            self.assertFalse('websocket_url' in response.json)
 
     def test_get_endpoint_login_admin_user_http_auth_then_token_auth(self):
         with self._flask_app.app_context():

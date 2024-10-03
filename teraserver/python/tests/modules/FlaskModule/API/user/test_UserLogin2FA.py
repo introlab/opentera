@@ -1,6 +1,6 @@
+import pyotp
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraUser import TeraUser
-import pyotp
 
 
 class UserLogin2FATest(BaseUserAPITest):
@@ -8,9 +8,46 @@ class UserLogin2FATest(BaseUserAPITest):
 
     def setUp(self):
         super().setUp()
+        # Create users with 2fa enabled
+        with self._flask_app.app_context():
+            self.user1: dict = self._create_2fa_enabled_user('test_user_2fa_1', 'password', set_secret=True)
+            self.user2: dict = self._create_2fa_enabled_user('test_user_2fa_2', 'password', set_secret=False)
 
     def tearDown(self):
+        # Delete users with 2fa enabled
+        with self._flask_app.app_context():
+            TeraUser.delete(self.user1['id_user'], hard_delete=True)
+            TeraUser.delete(self.user2['id_user'], hard_delete=True)
         super().tearDown()
+
+
+    def _create_2fa_enabled_user(self, username, password, set_secret:bool = True):
+        user = TeraUser()
+        user.id_user = 0 # New user
+        user.user_username = username
+        user.user_password = password
+        user.user_firstname = username
+        user.user_lastname = username
+        user.user_email = f"{username}@test.com"
+        user.user_enabled = True
+        user.user_profile = {}
+        if set_secret:
+            user.enable_2fa_otp()
+        else:
+            user.user_2fa_enabled = True
+            user.user_2fa_otp_enabled = False
+            user.user_2fa_otp_secret = None
+
+        TeraUser.insert(user)
+        return user.to_json(minimal=False)
+
+
+    def _login_user(self, username, password):
+        response = self._get_with_user_http_auth(self.test_client, username, password, endpoint='/api/user/login')
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('application/json', response.headers['Content-Type'])
+        self.assertGreater(len(response.json), 0)
+        return response
 
     def test_get_endpoint_no_auth(self):
         with self._flask_app.app_context():
@@ -22,152 +59,171 @@ class UserLogin2FATest(BaseUserAPITest):
             response = self._get_with_user_token_auth(self.test_client, 'invalid')
             self.assertEqual(401, response.status_code)
 
-    def test_get_endpoint_login_admin_user_http_auth_no_code(self):
+    def test_get_endpoint_with_no_session(self):
         with self._flask_app.app_context():
-            # Using default admin information
-            response = self._get_with_user_http_auth(self.test_client, 'admin', 'admin')
-            self.assertEqual(400, response.status_code)
+            response = self.test_client.get(self.test_endpoint)
+            self.assertEqual(401, response.status_code)
 
-    def test_get_endpoint_login_admin_user_http_auth_invalid_code(self):
+    def test_get_endpoint_with_admin_without_2fa_enabled(self):
         with self._flask_app.app_context():
-            # Using default admin information
-            # Admin account has no 2FA enabled by default
-            params = {'otp_code': 'invalid'}
+            user = TeraUser.get_user_by_username('admin')
+            self.assertIsNotNone(user)
+            self.assertFalse(user.user_2fa_enabled)
+            # Fist login
+            response = self._login_user('admin', 'admin')
+            self.assertEqual(200, response.status_code)
+
+            # Now try to login with 2fa
             response = self._get_with_user_http_auth(self.test_client, 'admin', 'admin',
-                                                     params=params)
+                                                     params={'otp_code': '123456'},
+                                                     endpoint=self.test_endpoint)
             self.assertEqual(403, response.status_code)
 
-    def test_get_endpoint_login_2fa_enabled_user_no_code(self):
+    def test_get_endpoint_login_user1_http_auth_no_code(self):
         with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
-            self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
-            response = self._get_with_user_http_auth(self.test_client, username, password)
+
+            # Fisrt login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+
+            # Using default admin information, http auth not used
+            response = self._get_with_user_http_auth(self.test_client)
             self.assertEqual(400, response.status_code)
 
-    def test_get_endpoint_login_2fa_enabled_user_wrong_code(self):
+    def test_get_endpoint_login_user1_http_auth_invalid_code(self):
         with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+
+            # Then try to login with invalid code
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': '123456'})
+            self.assertEqual(401, response.status_code)
+
+    def test_get_endpoint_login_user1_http_auth_valid_code(self):
+        with self._flask_app.app_context():
+            user = TeraUser.get_user_by_username('test_user_2fa_1')
             self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
-            params = {'otp_code': 'invalid'}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+            self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
+
+            # Then try to login with valid code
+            totp = pyotp.TOTP(user.user_2fa_otp_secret)
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': totp.now()})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+            self.assertFalse('websocket_url'in response.json)
+
+    def test_get_endpoint_login_user1_http_auth_valid_code_with_websocket(self):
+        with self._flask_app.app_context():
+            user = TeraUser.get_user_by_username('test_user_2fa_1')
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+            self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
+
+            # Then try to login with valid code
+            totp = pyotp.TOTP(user.user_2fa_otp_secret)
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': totp.now(),
+                                                             'with_websocket': True})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+            self.assertTrue('websocket_url'in response.json)
+
+    def test_get_endpoint_login_user2_http_auth_invalid_code(self):
+        with self._flask_app.app_context():
+            user = TeraUser.get_user_by_username('test_user_2fa_2')
+            self.assertIsNone(user.user_2fa_otp_secret)
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_2', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertFalse('login_validate_2fa' in response.json['redirect_url'])
+            self.assertTrue('login_setup_2fa' in response.json['redirect_url'])
+
+            # Then try to login with invalid code
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': '123456'})
             self.assertEqual(403, response.status_code)
 
-    def test_get_endpoint_login_2fa_enabled_user_valid_code(self):
+    def test_get_endpoint_login_user1_http_auth_valid_code_unknown_app_name(self):
         with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
+            user = TeraUser.get_user_by_username('test_user_2fa_1')
             self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
-            totp = pyotp.TOTP(user.user_2fa_otp_secret)
-            params = {'otp_code': totp.now()}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
-            self.assertEqual(200, response.status_code)
-            self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertGreater(len(response.json), 0)
-            self.assertTrue('user_uuid' in response.json)
-            self.assertTrue('user_token' in response.json)
 
-    def test_get_endpoint_login_2fa_enabled_user_valid_code_with_websockets(self):
-        with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
-            self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
-            totp = pyotp.TOTP(user.user_2fa_otp_secret)
-            params = {'otp_code': totp.now(), 'with_websocket': True}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params)
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
             self.assertEqual(200, response.status_code)
-            self.assertEqual('application/json', response.headers['Content-Type'])
-            self.assertGreater(len(response.json), 0)
-            self.assertTrue('user_uuid' in response.json)
-            self.assertTrue('user_token' in response.json)
-            self.assertTrue('websocket_url' in response.json)
-            self.assertIsNotNone(response.json['websocket_url'])
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+            self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
 
-    def test_get_endpoint_login_2fa_enabled_user_unknown_app_name_and_version(self):
-        with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
-            self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
+            # Then try to login with valid code
             totp = pyotp.TOTP(user.user_2fa_otp_secret)
-            params = {'otp_code': totp.now(), 'with_websocket': True}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params,
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': totp.now()},
                                                      opt_headers={'X-Client-Name': 'test', 'X-Client-Version': '0.0.0'})
             self.assertEqual(200, response.status_code)
+            self.assertTrue('user_uuid' in response.json)
+            self.assertTrue('user_token' in response.json)
+            self.assertFalse('websocket_url'in response.json)
 
-    def test_get_endpoint_login_2fa_enabled_user_outdated_app_version(self):
+    def test_get_endpoint_login_user1_http_auth_valid_code_outdated_app(self):
         with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
+            user = TeraUser.get_user_by_username('test_user_2fa_1')
             self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+            self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
+
+            # Then try to login with valid code
             totp = pyotp.TOTP(user.user_2fa_otp_secret)
-            params = {'otp_code': totp.now(), 'with_websocket': True}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params,
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': totp.now()},
                                                      opt_headers={'X-Client-Name': 'OpenTeraPlus',
                                                                   'X-Client-Version': '0.0.0'})
-            self.assertTrue('version_latest' in response.json)
-            self.assertTrue('version_error' in response.json)
             self.assertEqual(426, response.status_code)
 
-    def test_get_endpoint_login_2fa_enabled_user_valid_app_version(self):
+    def test_get_endpoint_login_user1_http_auth_valid_code_valid_app(self):
         with self._flask_app.app_context():
-            # Create user with 2FA enabled
-            username = f'test_{pyotp.random_base32(32)}'
-            password = pyotp.random_base32(32)
-            user = self.create_user_with_2fa_enabled(username, password)
+            user = TeraUser.get_user_by_username('test_user_2fa_1')
             self.assertIsNotNone(user.user_2fa_otp_secret)
-            self.assertTrue(user.user_2fa_enabled)
-            self.assertTrue(user.user_2fa_otp_enabled)
-            # Login with user
+
+            # First login to create session
+            response = self._login_user('test_user_2fa_1', 'password')
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('redirect_url' in response.json)
+            self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
+            self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
+
+            # Then try to login with valid code
             totp = pyotp.TOTP(user.user_2fa_otp_secret)
-            params = {'otp_code': totp.now(), 'with_websocket': True}
-            response = self._get_with_user_http_auth(self.test_client, username, password, params=params,
+            response = self._get_with_user_http_auth(self.test_client,
+                                                     params={'otp_code': totp.now()},
                                                      opt_headers={'X-Client-Name': 'OpenTeraPlus',
                                                                   'X-Client-Version': '1.0.0'})
-            self.assertTrue('version_latest' in response.json)
-            self.assertFalse('version_error' in response.json)
             self.assertEqual(200, response.status_code)
-
-    def create_user_with_2fa_enabled(self, username='test', password='test') -> TeraUser:
-        # Create user with 2FA enabled
-        user = TeraUser()
-        user.user_firstname = 'Test'
-        user.user_lastname = 'Test'
-        user.user_email = f'{username}@hotmail.com'
-        user.user_username = username
-        user.user_password = password  # Password will be hashed in insert
-        user.user_enabled = True
-        user.user_profile = {}
-        user.enable_2fa_otp()
-        TeraUser.insert(user)
-        return user
