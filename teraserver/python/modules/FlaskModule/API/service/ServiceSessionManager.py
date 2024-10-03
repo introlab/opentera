@@ -1,8 +1,7 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraSession import TeraSession
 from flask_babel import gettext
@@ -99,10 +98,13 @@ class ServiceSessionManager(Resource):
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Service doesn\'t have enough permission'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(session_manager_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Starts / stop a session related to a service
+        """
         args = post_parser.parse_args()
         service_access = DBManager.serviceAccess(current_service)
 

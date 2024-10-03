@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from flask_restx import Resource, reqparse
 from sqlalchemy import exc
-from modules.LoginModule.LoginModule import user_multi_auth, current_user, user_token_auth
+from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from opentera.db.models.TeraUser import TeraUser
@@ -39,6 +39,9 @@ class UserQuerySites(Resource):
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -105,6 +108,9 @@ class UserQuerySites(Resource):
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update site
+        """
         user_access = DBManager.userAccess(current_user)
         if 'site' not in request.json:
             return gettext('Missing site'), 400
@@ -165,6 +171,9 @@ class UserQuerySites(Resource):
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a site
+        """
         args = delete_parser.parse_args()
         id_todel = args['id']
 

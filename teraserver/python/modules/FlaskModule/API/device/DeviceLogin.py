@@ -3,7 +3,6 @@ from flask_restx import Resource
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraDevice import TeraDevice
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
 from opentera.utils.UserAgentParser import UserAgentParser
@@ -30,6 +29,9 @@ class DeviceLogin(Resource):
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
+        """
+        Device login
+        """
         # Redis key is handled in LoginModule
         server_name = self.module.config.server_config['hostname']
         port = self.module.config.server_config['port']

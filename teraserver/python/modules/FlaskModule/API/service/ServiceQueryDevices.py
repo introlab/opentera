@@ -4,11 +4,6 @@ from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from opentera.db.models.TeraDevice import TeraDevice
-from opentera.db.models.TeraDeviceType import TeraDeviceType
-from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
-
-import uuid
-from datetime import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -40,10 +35,13 @@ class ServiceQueryDevices(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Query device information
+        """
         args = get_parser.parse_args()
         # args['device_uuid'] Will be None if not specified in args
         if args['device_uuid']:
@@ -77,10 +75,13 @@ class ServiceQueryDevices(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(device_schema, validate=True)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update device
+        """
         # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'device' not in request.json:

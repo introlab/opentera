@@ -24,10 +24,13 @@ class ServiceQuerySiteProjectAccessRoles(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get access roles for a specific user and/or project/site
+        """
         args = get_parser.parse_args(strict=True)
         service_access = DBManager.serviceAccess(current_service)
 

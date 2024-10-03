@@ -49,11 +49,13 @@ class UserQueryServiceProjects(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of services - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get services associated with a project
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -128,11 +130,13 @@ class UserQueryServiceProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update service-project association
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -293,11 +297,13 @@ class UserQueryServiceProjects(Resource):
     @api.doc(description='Delete a specific service - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not site admin of the associated project)',
-                        500: 'Association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific service - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

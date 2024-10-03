@@ -8,7 +8,6 @@ from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager, DBManagerTeraServiceAccess
-import modules.Globals as Globals
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -34,10 +33,13 @@ class ServiceQueryUserGroups(Resource):
     @api.doc(description='Get user group information. If no id specified, returns all accessible users groups',
              responses={200: 'Success',
                         500: 'Database error'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get usergroups
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
         user_groups = []
@@ -71,10 +73,13 @@ class ServiceQueryUserGroups(Resource):
                         403: 'Logged service can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
                         500: 'Internal error when saving user group'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update usergroup
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 
         if 'user_group' not in request.json:
@@ -193,10 +198,13 @@ class ServiceQueryUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Service can\'t delete user group (no access to it)',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a specific usergroup
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         id_todel = args['id']

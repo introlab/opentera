@@ -35,10 +35,13 @@ class ServiceQueryProjects(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get projects
+        """
         args = get_parser.parse_args()
         service_access = DBManager.serviceAccess(current_service)
 
@@ -77,10 +80,13 @@ class ServiceQueryProjects(Resource):
                         403: 'Logged service can\'t create/update the specified project',
                         400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
                         500: 'Internal error occured when saving project'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update projects
+        """
         service_access = DBManager.serviceAccess(current_service)
         # Using request.json instead of parser, since parser messes up the json!
         if 'project' not in request.json:
@@ -145,10 +151,13 @@ class ServiceQueryProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged service can\'t delete project (service not associated to)',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete project
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         id_todel = args['id']

@@ -39,10 +39,13 @@ class ServiceQueryTestTypes(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get test types
+        """
         args = get_parser.parse_args(strict=True)
         service_access = DBManager.serviceAccess(current_service)
 
@@ -78,10 +81,13 @@ class ServiceQueryTestTypes(Resource):
                         403: 'Service can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
                         500: 'Internal error when saving test type'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update test types
+        """
         # Using request.json instead of parser, since parser messes up the json!
         if 'test_type' not in request.json:
             return gettext('Missing test_type'), 400
@@ -139,10 +145,13 @@ class ServiceQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Service can\'t delete test type',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a test type
+        """
         args = delete_parser.parse_args()
         uuid_todel = args['uuid']
 

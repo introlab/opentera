@@ -44,15 +44,17 @@ class UserQuerySessionTypeProjects(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Get devices types that are associated with a project. Only one "ID" parameter required and '
+    @api.doc(description='Get session types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
              responses={200: 'Success - returns list of devices-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get session types associated with a project
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -115,11 +117,13 @@ class UserQuerySessionTypeProjects(Resource):
                         403: 'Logged user can\'t modify association (session type must be accessible from project '
                              'access)',
                         400: 'Badly formed JSON or missing fields(id_project or id_session_type) in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update session types for a project
+        """
         user_access = DBManager.userAccess(current_user)
 
         accessible_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
@@ -255,11 +259,13 @@ class UserQuerySessionTypeProjects(Resource):
     @api.doc(description='Delete a specific session-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to session-type or project)',
-                        400: 'Association not found (invalid id?)'},
-             params={'token': 'Secret token'})
+                        400: 'Association not found (invalid id?)'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete specific session type - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

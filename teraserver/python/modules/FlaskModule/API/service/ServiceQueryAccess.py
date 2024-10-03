@@ -1,5 +1,4 @@
-from flask import request
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -41,10 +40,13 @@ class ServiceQueryAccess(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get current service access
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 

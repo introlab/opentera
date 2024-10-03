@@ -27,13 +27,15 @@ class UserQueryVersions(Resource):
     @api.doc(description='Get server versions',
              responses={200: 'Success - returns versions information',
                         400: 'Required parameter is missing',
-                        403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get server versions
+        """
         # As soon as we are authorized, we can output the server versions
-        args = get_parser.parse_args()
+        # args = get_parser.parse_args()
 
         current_settings = TeraServerSettings.get_server_setting_value(TeraServerSettings.ServerVersions)
         if not current_settings:
@@ -45,11 +47,13 @@ class UserQueryVersions(Resource):
              responses={200: 'Success - asset posted',
                         500: 'Database error occurred',
                         403: 'Logged user doesn\'t have permission to delete the requested asset (must be an user of'
-                             'the related project)'},
-             params={'token': 'Secret token'})
+                             'the related project)'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Update server versions
+        """
         # Only superuser can change the versions settings
         # Only some fields can be changed.
         if current_user.user_superadmin:

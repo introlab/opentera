@@ -35,10 +35,13 @@ class ServiceQueryParticipantGroups(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get participant groups
+        """
         # Get service access manager, that allows to check for access
         service_access = DBManager.serviceAccess(current_service)
 
@@ -80,10 +83,13 @@ class ServiceQueryParticipantGroups(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update participant group
+        """
         # Parse arguments
         args = post_parser.parse_args()
 
@@ -163,10 +169,13 @@ class ServiceQueryParticipantGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user doesn\'t have permission to access the requested data',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete participant group
+        """
         # Parse arguments
         args = delete_parser.parse_args()
         id_todel = args['id']

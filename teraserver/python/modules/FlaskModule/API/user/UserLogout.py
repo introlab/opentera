@@ -1,5 +1,5 @@
 from flask_login import logout_user
-from flask_restx import Resource, reqparse
+from flask_restx import Resource
 from flask_babel import gettext
 from flask import session, request
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -15,10 +15,13 @@ class UserLogout(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Logout from the server', params={'token': 'Secret token'})
+    @api.doc(description='Logout from the server')
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Logout the user
+        """
         if current_user:
             logout_user()
             session.clear()

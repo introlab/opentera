@@ -1,6 +1,5 @@
 from flask import session, request
-from flask_restx import Resource, reqparse, inputs
-from flask_babel import gettext
+from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import user_token_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import LoginModule
@@ -23,11 +22,13 @@ class UserRefreshToken(Resource):
 
     @api.doc(description='Refresh token, old token needs to be passed in request headers.',
              responses={200: 'Success',
-                        500: 'Server error'},
-             params={'token': 'Secret token'})
+                        500: 'Server error'})
     @api.expect(get_parser)
     @user_token_auth.login_required
     def get(self):
+        """
+        Refresh token for current user
+        """
         # If we have made it this far, token passed in headers was valid.
         # Get user token key from redis
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)

@@ -48,11 +48,13 @@ class UserQueryTestTypeProjects(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test types - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -113,11 +115,13 @@ class UserQueryTestTypeProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (project admin access required)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test-type -> project association
+        """
         user_access = DBManager.userAccess(current_user)
 
         accessible_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
@@ -256,11 +260,13 @@ class UserQueryTestTypeProjects(Resource):
     @api.doc(description='Delete a specific test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to test-type or project)',
-                        400: 'Association not found (invalid id?)'},
-             params={'token': 'Secret token'})
+                        400: 'Association not found (invalid id?)'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific test type - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

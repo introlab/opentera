@@ -58,10 +58,13 @@ class ServiceQueryParticipants(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get participant
+        """
         args = get_parser.parse_args()
 
         service_access = DBManager.serviceAccess(current_service)
@@ -108,10 +111,13 @@ class ServiceQueryParticipants(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(participant_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update a participant
+        """
         args = post_parser.parse_args()
 
         # Using request.json instead of parser, since parser messes up the json!

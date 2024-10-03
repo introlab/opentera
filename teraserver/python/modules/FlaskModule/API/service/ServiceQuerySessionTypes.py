@@ -27,10 +27,13 @@ class ServiceQuerySessionTypes(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get session types associated to that service
+        """
         args = get_parser.parse_args()
         service_access = DBManager.serviceAccess(current_service)
 
