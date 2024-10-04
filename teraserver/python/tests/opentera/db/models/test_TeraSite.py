@@ -249,15 +249,21 @@ class TeraSiteTest(BaseModelsTest):
 
     def test_enable_2fa_in_site_should_enable_in_users(self):
         with self._flask_app.app_context():
-            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=False)
             self.assertIsNotNone(site)
             group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
             self.assertIsNotNone(group)
             user = TeraSiteTest.new_test_user('test_user', 'password', group.id_user_group)
             self.assertIsNotNone(user)
 
+            # Enable 2fa in site
+            site.site_2fa_required = True
+            self.db.session.add(site)
+            self.db.session.commit()
+
             # User should be updated automatically with 2fa
             self.assertTrue(user.user_2fa_enabled)
+
 
 
 
