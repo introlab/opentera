@@ -36,8 +36,14 @@ class UserLogin(UserLoginBase):
             if version_info:
                 response.update(version_info)
 
+            # User needs to change password?
+            if current_user.user_force_password_change:
+                response['message'] = gettext('Password change required for this user.')
+                response['reason'] = 'password_change'
+                response['redirect_url'] = self._generate_password_change_url()
+
             # 2FA enabled? Client will need to proceed to 2FA login step first
-            if current_user.user_2fa_enabled:
+            if current_user.user_2fa_enabled and not current_user.user_force_password_change:
 
                 # If user had too many 2FA login failures, stop login process
                 self._verify_2fa_login_attempts(current_user.user_uuid)

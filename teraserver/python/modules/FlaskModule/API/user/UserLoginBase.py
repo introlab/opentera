@@ -193,6 +193,9 @@ class UserLoginBase(Resource):
     def _generate_login_url(self) -> str:
         return "/login"
 
+    def _generate_password_change_url(self) -> str:
+        return "/login_change_password"
+
     def _user_logout(self):
         logout_user()
         session.clear()

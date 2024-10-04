@@ -71,6 +71,9 @@
                                     if (response.reason === '2fa_setup'){
                                         qtObject.sendSetupInProgress();
                                     }
+                                    if (response.reason === 'password_change'){
+                                        qtObject.sendPasswordChangeInProgress();
+                                    }
                                 }
                             }
                             window.location.href = response.redirect_url;

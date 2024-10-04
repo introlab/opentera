@@ -3,12 +3,14 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+
+from modules.FlaskModule.FlaskUtils import FlaskUtils
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -42,6 +44,23 @@ class UserQueryUsers(Resource):
         Resource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
+
+    @staticmethod
+    def get_password_weaknesses_text(weaknesses: list) -> str:
+        text_list = []
+        for weakness in weaknesses:
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_SPECIAL:
+                text_list.append(gettext('Password missing special character'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_NUMERIC:
+                text_list.append(gettext('Password missing numeric character'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.BAD_LENGTH:
+                text_list.append(gettext('Password not long enough'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_LOWER_CASE:
+                text_list.append(gettext('Password missing lower case letter'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_UPPER_CASE:
+                text_list.append(gettext('Password missing upper case letter'))
+
+        return ",".join(text for text in text_list)
 
     @api.doc(description='Get user information. If no id specified, returns all accessible users',
              responses={200: 'Success',
@@ -234,6 +253,9 @@ class UserQueryUsers(Resource):
                                              UserQueryUsers.__name__,
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
+            except UserPasswordInsecure as e:
+                return (gettext('Password not strong enough') + ': ' +
+                        FlaskUtils.get_password_weaknesses_text(e.weaknesses), 400)
         else:
             # New user, check if password is set
             # if 'user_password' not in json_user:
@@ -266,6 +288,9 @@ class UserQueryUsers(Resource):
                                              UserQueryUsers.__name__,
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
+            except UserPasswordInsecure as e:
+                return (gettext('Password not strong enough') + ': ' +
+                        FlaskUtils.get_password_weaknesses_text(e.weaknesses), 400)
 
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
 

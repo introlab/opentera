@@ -10,8 +10,8 @@ class UserLogin2FATest(BaseUserAPITest):
         super().setUp()
         # Create users with 2fa enabled
         with self._flask_app.app_context():
-            self.user1: dict = self._create_2fa_enabled_user('test_user_2fa_1', 'password', set_secret=True)
-            self.user2: dict = self._create_2fa_enabled_user('test_user_2fa_2', 'password', set_secret=False)
+            self.user1: dict = self._create_2fa_enabled_user('test_user_2fa_1', 'Password12345!', set_secret=True)
+            self.user2: dict = self._create_2fa_enabled_user('test_user_2fa_2', 'Password12345!', set_secret=False)
 
     def tearDown(self):
         # Delete users with 2fa enabled
@@ -83,7 +83,7 @@ class UserLogin2FATest(BaseUserAPITest):
         with self._flask_app.app_context():
 
             # Fisrt login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -96,7 +96,7 @@ class UserLogin2FATest(BaseUserAPITest):
         with self._flask_app.app_context():
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -112,7 +112,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNotNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -133,7 +133,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNotNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -155,7 +155,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_2', 'password')
+            response = self._login_user('test_user_2fa_2', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertFalse('login_validate_2fa' in response.json['redirect_url'])
@@ -172,7 +172,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNotNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -194,7 +194,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNotNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])
@@ -214,7 +214,7 @@ class UserLogin2FATest(BaseUserAPITest):
             self.assertIsNotNone(user.user_2fa_otp_secret)
 
             # First login to create session
-            response = self._login_user('test_user_2fa_1', 'password')
+            response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_validate_2fa' in response.json['redirect_url'])

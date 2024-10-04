@@ -13,11 +13,13 @@ from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 from passlib.hash import bcrypt
+from enum import Enum, unique
 import uuid
 import datetime
 import json
 import time
 import jwt
+import re
 import pyotp
 
 
@@ -328,6 +330,11 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             if values['user_password'] == '':
                 del values['user_password']
             else:
+                # Check password strength
+                password_errors = TeraUser.validate_password_strength(str(values['user_password']))
+                if len(password_errors) > 0:
+                    raise UserPasswordInsecure("User password insufficient strength", password_errors)
+
                 # Forcing password to string
                 values['user_password'] = TeraUser.encrypt_password(str(values['user_password']))
 
@@ -344,8 +351,12 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
     @classmethod
     def insert(cls, user):
+        # Check password strength
+        password_errors = TeraUser.validate_password_strength(str(user.user_password))
+        if len(password_errors) > 0:
+            raise UserPasswordInsecure("User password insufficient strength", password_errors)
+
         # Encrypts password
-        # Forcing password to string
         user.user_password = TeraUser.encrypt_password(str(user.user_password))
 
         # Generate UUID
@@ -374,6 +385,27 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             return IntegrityError('User still has created tests', self.id_user, 't_tests')
 
         return None
+
+    @staticmethod
+    def validate_password_strength(password: str) -> list:
+        errors = []
+
+        if len(password) < 10:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.BAD_LENGTH)
+
+        if re.search(r"\d", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_NUMERIC)
+
+        if re.search(r"[A-Z]", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_UPPER_CASE)
+
+        if re.search(r"[a-z]", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_LOWER_CASE)
+
+        if re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]', password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_SPECIAL)
+
+        return errors
 
     @staticmethod
     def create_defaults(test=False):
@@ -459,3 +491,21 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
     def get_undelete_cascade_relations(self) -> list:
         return ['user_service_config']
+
+
+class UserPasswordInsecure(Exception):
+    """
+    Raised when the user password doesn't meet minimal requirements
+    """
+
+    @unique
+    class PasswordWeaknesses(Enum):
+        BAD_LENGTH = 1
+        NO_LOWER_CASE = 2
+        NO_UPPER_CASE = 3
+        NO_NUMERIC = 4
+        NO_SPECIAL = 5
+
+    def __init__(self, message, weaknesses: list):
+        super().__init__(message)
+        self.weaknesses = weaknesses
