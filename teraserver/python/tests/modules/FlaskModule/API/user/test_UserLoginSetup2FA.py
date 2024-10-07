@@ -4,7 +4,7 @@ from opentera.db.models.TeraUser import TeraUser
 
 
 class UserLoginSetup2FATest(BaseUserAPITest):
-    test_endpoint = '/api/user/login_setup_2fa'
+    test_endpoint = '/api/user/login/setup_2fa'
 
     def setUp(self):
         super().setUp()

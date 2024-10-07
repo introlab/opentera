@@ -412,10 +412,14 @@ class UserQueryUsersTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Password without numbers")
 
-            json_data['user']['user_password'] = 'Password12345!'
+            json_data['user']['user_password'] = 'Password12345!!'
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Password OK")
+
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password same as old")
 
             TeraUser.delete(current_id)
 

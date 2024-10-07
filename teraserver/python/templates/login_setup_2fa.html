@@ -56,7 +56,7 @@
             // Get the QR Code from the server
             $.ajax({
                 type: "GET",
-                url: "/api/user/login_setup_2fa",
+                url: "/api/user/login/setup_2fa",
                 success: function(response) {
                     console.log("QR Code received");
                     // Display the QR Code
@@ -81,7 +81,7 @@
                 // Send the form data to the backend with a post request
                 $.ajax({
                     type: "POST",
-                    url: "/api/user/login_setup_2fa",
+                    url: "/api/user/login/setup_2fa",
                     data: form.serialize(),
                     success: function(response) {
                         console.log("2FA setup success");
