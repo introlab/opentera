@@ -176,16 +176,29 @@ class DBManager (BaseModule):
                                                         .filter(TeraUserUserGroup.id_user == target.id_user) \
                                                         .with_entities(TeraSite).all()  # Return the site information only
 
-
-                for site in sites:
-                    if site.site_2fa_required:
-                        # Perform single update for user
+                if not sites:
+                    # User is not in any user group related to a 2FA site
+                    # If 2FA is disabled, make sure other 2FA fields are reset
+                    if not target.user_2fa_enabled:
                         connection.execute(
                             update(TeraUser)
                             .where(TeraUser.id_user == target.id_user)
-                            .values(user_2fa_enabled=True)
+                            .values(
+                                user_2fa_otp_enabled=False,
+                                user_2fa_otp_secret=None,
+                                user_2fa_email_enabled=False
+                            )
                         )
-                        break
+                else:
+                    for site in sites:
+                        if site.site_2fa_required:
+                            # Perform single update for user
+                            connection.execute(
+                                update(TeraUser)
+                                .where(TeraUser.id_user == target.id_user)
+                                .values(user_2fa_enabled=True)
+                            )
+                            break
 
 
     def setup_events_for_class(self, cls, event_name):
