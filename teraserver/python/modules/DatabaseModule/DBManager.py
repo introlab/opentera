@@ -113,13 +113,20 @@ class DBManager (BaseModule):
                     .filter(TeraSite.id_site == target.id_site) \
                     .with_entities(TeraUser).all()  # Return the user information only
 
-                # Enable 2FA for all users found
+                # Enable 2FA for all standard users found
                 for user in users:
                     connection.execute(
                         update(TeraUser)
                         .where(TeraUser.id_user == user.id_user)
                         .values(user_2fa_enabled=True)
                     )
+
+                # Enable 2FA for all superadmins
+                connection.execute(
+                    update(TeraUser)
+                    .where(TeraUser.user_superadmin == bool(True))
+                    .values(user_2fa_enabled=True)
+                )
 
         @event.listens_for(TeraUserGroup, 'after_update')
         @event.listens_for(TeraUserGroup, 'after_insert')
@@ -170,11 +177,17 @@ class DBManager (BaseModule):
         def user_updated_or_inserted(mapper, connection, target: TeraUser):
             # Check if 2FA is enabled for a related site through user groups
             if target:
-                sites = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
-                                                        .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
-                                                        .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
-                                                        .filter(TeraUserUserGroup.id_user == target.id_user) \
-                                                        .with_entities(TeraSite).all()  # Return the site information only
+                sites = []
+                if target.user_superadmin:
+                    # Superadmin has access to all sites, so we need to verify if any of them have 2FA enabled
+                    sites = TeraSite.query.filter(TeraSite.site_2fa_required == bool(True)).all()
+                else:
+                    # Standard user need to verify sites through user groups
+                    sites = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                            .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                            .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                            .filter(TeraUserUserGroup.id_user == target.id_user) \
+                                                            .with_entities(TeraSite).all()  # Return the site information only
 
                 if not sites:
                     # User is not in any user group related to a 2FA site
