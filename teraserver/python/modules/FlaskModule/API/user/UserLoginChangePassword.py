@@ -33,6 +33,9 @@ class UserLoginChangePassword(UserLoginBase):
             if new_password != confirm_password:
                 return gettext('New password and confirm password do not match'), 400
 
+            if not current_user.user_force_password_change:
+                return gettext('User not required to change password'), 400
+
             # Change password, will be encrypted
             # Will also reset force password change flag
             try:
@@ -43,7 +46,7 @@ class UserLoginChangePassword(UserLoginBase):
             except UserNewPasswordSameAsOld:
                 return gettext('New password same as old password'), 400
 
-            return redirect(self._generate_login_url())
+            return 200
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()

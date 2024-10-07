@@ -78,7 +78,7 @@ class UserLoginSetup2FATest(BaseUserAPITest):
     def test_get_endpoint_login_user1_2fa_already_setup(self):
         with self._flask_app.app_context():
 
-            # Fisrt login to create session
+            # First login to create session
             response = self._login_user('test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
