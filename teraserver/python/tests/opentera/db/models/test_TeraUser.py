@@ -22,7 +22,7 @@ from tests.opentera.db.models.test_TeraSession import TeraSessionTest
 from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
 from tests.opentera.db.models.test_TeraTest import TeraTestTest
 from tests.opentera.db.models.test_TeraUserUserGroup import TeraUserUserGroupTest
-
+from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
 
 class TeraUserTest(BaseModelsTest):
 
@@ -171,19 +171,16 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
             # ... and service config
-            from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
             service_conf = TeraServiceConfigTest.new_test_service_config(id_service=1, id_user=id_user)
             id_service_conf = service_conf.id_service_config
 
