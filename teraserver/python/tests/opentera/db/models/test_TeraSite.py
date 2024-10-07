@@ -1,4 +1,3 @@
-from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from sqlalchemy import exc
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
@@ -14,6 +13,17 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+
+from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
+from tests.opentera.db.models.test_TeraDevice import TeraDeviceTest
+from tests.opentera.db.models.test_TeraProject import TeraProjectTest
+from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
+from tests.opentera.db.models.test_TeraSession import TeraSessionTest
+from tests.opentera.db.models.test_TeraDeviceSite import TeraDeviceSiteTest
+from tests.opentera.db.models.test_TeraServiceSite import TeraServiceSiteTest
+from tests.opentera.db.models.test_TeraServiceRole import TeraServiceRoleTest
+from tests.opentera.db.models.test_TeraSessionTypeSite import TeraSessionTypeSiteTest
+from tests.opentera.db.models.test_TeraTestTypeSite import TeraTestTypeSiteTest
 
 class TeraSiteTest(BaseModelsTest):
 
@@ -139,17 +149,14 @@ class TeraSiteTest(BaseModelsTest):
             site = TeraSiteTest.new_test_site()
             id_site = site.id_site
 
-            from tests.opentera.db.models.test_TeraProject import TeraProjectTest
             project = TeraProjectTest.new_test_project(id_site=id_site)
             self.assertIsNotNone(project.id_project)
             id_project = project.id_project
 
-            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=id_project)
             self.assertIsNotNone(participant.id_participant)
             id_participant = participant.id_participant
 
-            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             ses = TeraSessionTest.new_test_session(id_session_type=1, id_creator_participant=1,
                                                    participants=[participant])
             id_session = ses.id_session
@@ -186,31 +193,25 @@ class TeraSiteTest(BaseModelsTest):
             id_site = site.id_site
 
             # Associate device
-            from tests.opentera.db.models.test_TeraDevice import TeraDeviceTest
             device = TeraDeviceTest.new_test_device()
             id_device = device.id_device
 
-            from tests.opentera.db.models.test_TeraDeviceSite import TeraDeviceSiteTest
             device = TeraDeviceSiteTest.new_test_device_site(id_device=id_device, id_site=id_site)
             id_device_site = device.id_device_site
 
             # ... and service
-            from tests.opentera.db.models.test_TeraServiceSite import TeraServiceSiteTest
             service_site = TeraServiceSiteTest.new_test_service_site(id_site=id_site, id_service=3)
             id_service_site = service_site.id_service_site
 
             # ... and roles
-            from tests.opentera.db.models.test_TeraServiceRole import TeraServiceRoleTest
             role = TeraServiceRoleTest.new_test_service_role(id_service=3, id_site=id_site, role_name='Test')
             id_role = role.id_service_role
 
             # ... and session type
-            from tests.opentera.db.models.test_TeraSessionTypeSite import TeraSessionTypeSiteTest
             ses_type = TeraSessionTypeSiteTest.new_test_session_type_site(id_site=id_site, id_session_type=1)
             id_session_type = ses_type.id_session_type_site
 
             # ... and test type
-            from tests.opentera.db.models.test_TeraTestTypeSite import TeraTestTypeSiteTest
             test_type = TeraTestTypeSiteTest.new_test_test_type_site(id_site=id_site, id_test_type=1)
             id_test_type = test_type.id_test_type_site
 
@@ -263,11 +264,6 @@ class TeraSiteTest(BaseModelsTest):
 
             # User should be updated automatically with 2fa
             self.assertTrue(user.user_2fa_enabled)
-
-
-
-
-
 
     @staticmethod
     def new_test_site(name: str = 'Test Site', site_2fa_required: bool = False) -> TeraSite:
