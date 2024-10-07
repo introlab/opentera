@@ -308,6 +308,40 @@ class TeraUserTest(BaseModelsTest):
             TeraUser.delete(user.id_user, hard_delete=True)
 
 
+    def test_change_superadmin_2fa_enabled_while_site_has_2fa_required_does_not_change_2fa_enabled(self):
+        with self._flask_app.app_context():
+            sites = TeraSite.query.all()
+            for site in sites:
+                site.site_2fa_required = True
+                self.db.session.add(site)
+            self.db.session.commit()
+
+            superadmins = TeraUser.query.filter_by(user_superadmin=True).all()
+            for superadmin in superadmins:
+                self.assertTrue(superadmin.user_2fa_enabled)
+                superadmin.user_2fa_enabled = False
+                self.db.session.add(superadmin)
+            self.db.session.commit()
+
+            # Reverify flag
+            for superadmin in superadmins:
+                self.assertTrue(superadmin.user_2fa_enabled)
+
+            # Reset site 2fa required
+            for site in sites:
+                site.site_2fa_required = False
+                self.db.session.add(site)
+            self.db.session.commit()
+
+            #Reset superadmin 2fa enabled
+            for superadmin in superadmins:
+                superadmin.user_2fa_enabled = False
+                self.db.session.add(superadmin)
+            self.db.session.commit()
+
+            for superadmin in superadmins:
+                self.assertFalse(superadmin.user_2fa_enabled)
+
     @staticmethod
     def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:
         user = TeraUser()

@@ -388,6 +388,16 @@ class TeraSiteTest(BaseModelsTest):
             TeraSiteTest.delete_user(user1.id_user)
             TeraSiteTest.delete_user_group(group.id_user_group)
 
+    def test_enable_2fa_for_site_needs_to_enable_2fa_for_all_superadmins(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            self.assertIsNotNone(site)
+
+            # Query all superadmins
+            superadmins = TeraUser.query.filter(TeraUser.user_superadmin == True).all()
+            for superadmin in superadmins:
+                self.assertTrue(superadmin.user_2fa_enabled)
+
 
     @staticmethod
     def new_test_site(name: str = 'Test Site', site_2fa_required: bool = False) -> TeraSite:
