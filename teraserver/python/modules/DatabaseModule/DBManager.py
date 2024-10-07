@@ -97,7 +97,7 @@ class DBManager (BaseModule):
     def setup_events_for_2fa_sites(self):
         """
         We need to validate that 2FA is enabled for all users in the site when the flag is set.
-        This can occur on multiple occasion, when the site is created, updated and also when user
+        This can occur on multiple occasions : when the site is created, updated and also when user
         groups are modified.
         """
         @event.listens_for(TeraSite, 'after_update')
