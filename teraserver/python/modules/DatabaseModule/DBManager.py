@@ -1,12 +1,12 @@
+from sqlite3 import Connection as SQLite3Connection
+import datetime
+import json
+
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import joinedload
-from sqlalchemy import event, inspect, update, select
+from sqlalchemy import event, inspect, update
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
-from sqlite3 import Connection as SQLite3Connection
-
 from twisted.internet import task, reactor
-import datetime
 import opentera.messages.python as messages
 
 # Must include all Database objects here to be properly initialized and created if needed
@@ -44,8 +44,10 @@ from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraTest import TeraTest
-from opentera.db.models.TeraSessionDevices import TeraSessionDevices
+# from opentera.db.models.TeraSessionDevices import TeraSessionDevices
 from opentera.db.Base import BaseModel
+from opentera.db.models import EventNameClassMap
+
 
 from opentera.config.ConfigManager import ConfigManager
 from modules.FlaskModule.FlaskModule import flask_app
@@ -55,7 +57,6 @@ from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAcce
 from modules.DatabaseModule.DBManagerTeraDeviceAccess import DBManagerTeraDeviceAccess
 from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
-
 # Alembic
 from alembic.config import Config
 from alembic import command
@@ -132,7 +133,7 @@ class DBManager (BaseModule):
                     .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
                     .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
                     .filter(TeraUserUserGroup.id_user_group == target.id_user_group) \
-                    .filter(TeraSite.site_2fa_required == True) \
+                    .filter(TeraSite.site_2fa_required == bool(True)) \
                     .with_entities(TeraUser).all()  # Return the user information only
 
                 # Enable 2FA for all users found
@@ -187,18 +188,17 @@ class DBManager (BaseModule):
                         break
 
 
-
     def setup_events_for_class(self, cls, event_name):
-        import json
+        """
+        Setup events for a specific class. This will allow to send events through redis when a specific
+        event occurs on a specific class. This is useful to trace changes in the database.
+        The list of classes that produce events is defined in the EventNameClassMap in opentera/db/models/__init__.py.
+        :param cls: Class to setup events for
+        :param event_name: Name of the event
+        """
 
         @event.listens_for(cls, 'after_update')
         def base_model_updated(mapper, connection, target):
-            # Handle soft deletion
-            # if getattr(target, 'soft_delete', None):
-            #     if target.deleted_at:
-            #         # Updated target with a deleted date - trigger the deleted handler instead
-            #         base_model_deleted(mapper, connection, target)
-            #         return
             json_update_event = target.to_json_update_event()
             if json_update_event:
                 database_event = messages.DatabaseEvent()
@@ -218,7 +218,6 @@ class DBManager (BaseModule):
         # Send the event before we delete, so we can trace it...
         @event.listens_for(cls, 'after_delete')
         def base_model_deleted(mapper, connection, target):
-            # print(mapper, connection, target, event_name)
             json_delete_event = target.to_json_delete_event()
             if json_delete_event:
                 database_event = messages.DatabaseEvent()
@@ -237,7 +236,6 @@ class DBManager (BaseModule):
 
         @event.listens_for(cls, 'after_insert')
         def base_model_inserted(mapper, connection, target):
-            # print(mapper, connection, target, event_name)
             json_create_event = target.to_json_create_event()
             if json_create_event:
                 database_event = messages.DatabaseEvent()
@@ -371,12 +369,11 @@ class DBManager (BaseModule):
                 TeraTest.create_defaults(test)
 
     def setup_events(self):
-        # TODO Add events that need to be sent through redis
-        # TODO Useful to specify event name, always get_model_name() ?
-
-        from opentera.db.models import EventNameClassMap
-        for name in EventNameClassMap:
-            self.setup_events_for_class(EventNameClassMap[name], name)
+        """
+        Called after the database is opened. This will setup events for all classes that need to be monitored.
+        """
+        for event_name, model_class in EventNameClassMap.items():
+            self.setup_events_for_class(model_class, event_name)
 
         # Setup events for 2FA sites
         self.setup_events_for_2fa_sites()
@@ -529,88 +526,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
-
-# @event.listens_for(db.session, 'after_flush')
-# def receive_after_flush(session, flush_context):
-#     from modules.Globals import db_man
-#     import json
-#
-#     if db_man:
-#         events = list()
-#         # Updated objects
-#         for obj in session.dirty:
-#             # json_update_event = obj.to_json_update_event()
-#             # if json_update_event:
-#             #     database_event = messages.DatabaseEvent()
-#             #     database_event.type = messages.DatabaseEvent.DB_UPDATE
-#             #     database_event.object_type = str(obj.get_model_name())
-#             #     database_event.object_value = json.dumps(json_update_event)
-#             #     events.append(database_event)
-#
-#             if isinstance(obj, TeraUser):
-#                 new_event = messages.UserEvent()
-#                 new_event.user_uuid = str(obj.user_uuid)
-#                 new_event.type = messages.UserEvent.USER_UPDATED
-#                 events.append(new_event)
-#
-#         # Inserted objects
-#         for obj in session.new:
-#             # database_event = messages.DatabaseEvent()
-#             # database_event.type = messages.DatabaseEvent.DB_CREATE
-#             # database_event.object_type = str(obj.get_model_name())
-#             # database_event.object_value = json.dumps(obj.to_json())
-#             # events.append(database_event)
-#
-#             if isinstance(obj, TeraUser):
-#                 new_event = messages.UserEvent()
-#                 new_event.user_uuid = str(obj.user_uuid)
-#                 new_event.type = messages.UserEvent.USER_ADDED
-#                 events.append(new_event)
-#
-#         # Deleted objects
-#         for obj in session.deleted:
-#             # database_event = messages.DatabaseEvent()
-#             # database_event.type = messages.DatabaseEvent.DB_DELETE
-#             # database_event.object_type = str(obj.get_model_name())
-#             # database_event.object_value = json.dumps(obj.to_json())
-#             # events.append(database_event)
-#
-#             if isinstance(obj, TeraUser):
-#                 new_event = messages.UserEvent()
-#                 new_event.user_uuid = str(obj.user_uuid)
-#                 new_event.type = messages.UserEvent.USER_DELETED
-#                 events.append(new_event)
-#
-#         # Create event message
-#         if len(events) > 0:
-#             tera_message = db_man.create_event_message(
-#                 create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
-#             any_events = list()
-#             for db_event in events:
-#                 any_message = messages.Any()
-#                 any_message.Pack(db_event)
-#                 tera_message.events.append(any_message)
-#
-#             db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
-#                            tera_message.SerializeToString())
-
-# @event.listens_for(TeraUser, 'after_update')
-# def user_updated(mapper, connection, target):
-#     from modules.Globals import db_man
-#     # Publish event message
-#     # Advertise that we have a new user
-#     tera_message = db_man.create_event_message(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME))
-#     user_event = messages.UserEvent()
-#     user_event.user_uuid = str(target.user_uuid)
-#     user_event.type = messages.UserEvent.USER_UPDATED
-#     # Need to use Any container
-#     any_message = messages.Any()
-#     any_message.Pack(user_event)
-#     tera_message.events.extend([any_message])
-#
-#     # Publish
-#     db_man.publish(create_module_event_topic_from_name(ModuleNames.DATABASE_MODULE_NAME),
-#                    tera_message.SerializeToString())
 
 
 if __name__ == '__main__':

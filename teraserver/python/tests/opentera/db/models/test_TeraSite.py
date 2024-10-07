@@ -253,7 +253,7 @@ class TeraSiteTest(BaseModelsTest):
             self.assertIsNotNone(site)
             group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
             self.assertIsNotNone(group)
-            user = TeraSiteTest.new_test_user('test_user', 'password', group.id_user_group)
+            user = TeraSiteTest.new_test_user('test_user', 'Password12345!', group.id_user_group)
             self.assertIsNotNone(user)
 
             # Enable 2fa in site

@@ -423,6 +423,8 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         admin.user_lastname = "Admin"
         admin.user_profile = ""
         admin.user_password = TeraUser.encrypt_password("admin")
+        # Force reset password for admin on first login
+        admin.user_force_password_change = not test
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
