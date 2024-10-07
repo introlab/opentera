@@ -10,7 +10,10 @@ from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraDevice import TeraDevice
-
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 
 class TeraSiteTest(BaseModelsTest):
 
@@ -233,9 +236,87 @@ class TeraSiteTest(BaseModelsTest):
             self.assertIsNotNone(TeraSessionTypeSite.get_session_type_site_by_id(id_session_type))
             self.assertIsNotNone(TeraTestTypeSite.get_test_type_site_by_id(id_test_type))
 
+    def test_2fa_required_site(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            self.assertTrue(site.site_2fa_required)
+            self.db.session.add(site)
+            self.db.session.commit()
+            id_site = site.id_site
+            self.db.session.rollback()
+            same_site = TeraSite.get_site_by_id(id_site)
+            self.assertTrue(same_site.site_2fa_required)
+
+    def test_enable_2fa_in_site_should_enable_in_users(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=False)
+            self.assertIsNotNone(site)
+            group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
+            self.assertIsNotNone(group)
+            user = TeraSiteTest.new_test_user('test_user', 'password', group.id_user_group)
+            self.assertIsNotNone(user)
+
+            # Enable 2fa in site
+            site.site_2fa_required = True
+            self.db.session.add(site)
+            self.db.session.commit()
+
+            # User should be updated automatically with 2fa
+            self.assertTrue(user.user_2fa_enabled)
+
+
+
+
+
+
     @staticmethod
-    def new_test_site(name: str = 'Test Site') -> TeraSite:
+    def new_test_site(name: str = 'Test Site', site_2fa_required: bool = False) -> TeraSite:
         site = TeraSite()
         site.site_name = name
+        site.site_2fa_required = site_2fa_required
         TeraSite.insert(site)
         return site
+
+    @staticmethod
+    def new_test_user_group(name: str, id_site: int ) -> TeraUserGroup:
+
+        # Create Service Role first
+        service_role = TeraServiceRole()
+        service_role.service_role_name = 'Test Site Role'
+        service_role.id_service = 1  # TeraServer by default
+        service_role.id_site = id_site
+        TeraServiceRole.insert(service_role)
+
+        # Create User Group
+        group: TeraUserGroup = TeraUserGroup()
+        group.user_group_name = name
+        TeraUserGroup.insert(group)
+
+        # Update Service Access
+        service_access = TeraServiceAccess()
+        service_access.id_service_role = service_role.id_service_role
+        service_access.id_user_group = group.id_user_group
+        TeraServiceAccess.insert(service_access)
+
+        return group
+
+
+    @staticmethod
+    def new_test_user(username: str, password: str, id_user_group: int) -> TeraUser:
+        user = TeraUser()
+        user.user_username = username
+        user.user_password = password
+        user.user_firstname = username
+        user.user_lastname = username
+        user.user_email = f"{username}@test.com"
+        user.user_enabled = True
+        user.user_profile = {}
+        TeraUser.insert(user)
+
+        # Update user group
+        user_user_group = TeraUserUserGroup()
+        user_user_group.id_user = user.id_user
+        user_user_group.id_user_group = id_user_group
+        TeraUserUserGroup.insert(user_user_group)
+
+        return user

@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import joinedload
-from sqlalchemy import event, inspect, update
+from sqlalchemy import event, inspect, update, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlite3 import Connection as SQLite3Connection
@@ -104,85 +104,89 @@ class DBManager (BaseModule):
         def site_updated_or_inserted(mapper, connection, target: TeraSite):
             # Check if 2FA is enabled for this site
             if target and target.site_2fa_required:
-                # Efficiently load all related users with joinedload
-                service_roles = TeraServiceRole.query.options(
-                    joinedload(TeraServiceRole.service_role_user_groups).joinedload(
-                        TeraUserGroup.user_group_users
-                    )
-                ).filter(TeraServiceRole.id_site == target.id_site).all()
+                # Get all users that have access to this site
+                users = TeraServiceAccess.query.join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                    .join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                    .join(TeraUser, TeraUserUserGroup.id_user == TeraUser.id_user) \
+                    .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                    .filter(TeraSite.id_site == target.id_site) \
+                    .with_entities(TeraUser).all()  # Return the user information only
 
-                # Get all users
-                user_ids = set()
-                for role in service_roles:
-                    if role.service_role_user_groups:
-                        for group in role.service_role_user_groups:
-                            for user in group.user_group_users:
-                                user_ids.add(user.id_user)
-
-                # Perform a bulk update for all users at once
-                if user_ids:
+                # Enable 2FA for all users found
+                for user in users:
                     connection.execute(
                         update(TeraUser)
-                        .where(TeraUser.id_user.in_(user_ids))
+                        .where(TeraUser.id_user == user.id_user)
                         .values(user_2fa_enabled=True)
                     )
+
         @event.listens_for(TeraUserGroup, 'after_update')
         @event.listens_for(TeraUserGroup, 'after_insert')
         def user_group_updated_or_inserted(mapper, connection, target: TeraUserGroup):
-            # Check if 2FA is enabled for a related site
-            if target and target.user_group_services_roles:
-                for role in target.user_group_services_roles:
-                    if role.id_site and role.service_role_site.site_2fa_required:
-                        # Efficiently load all related users with joinedload
-                        user_ids = set()
-                        for user in target.user_group_users:
-                            user_ids.add(user.id_user)
 
-                        # Perform a bulk update for all users at once
-                        if user_ids:
-                            connection.execute(
-                                update(TeraUser)
-                                .where(TeraUser.id_user.in_(user_ids))
-                                .values(user_2fa_enabled=True)
-                            )
+            # Check if 2FA is enabled for a related site in a single sql query
+            if target:
+                # Get users from the group that have access to a site with 2FA enabled
+                users = TeraUser.query.join(TeraUserUserGroup, TeraUser.id_user == TeraUserUserGroup.id_user) \
+                    .join(TeraServiceAccess, TeraUserUserGroup.id_user_group == TeraServiceAccess.id_user_group) \
+                    .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                    .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                    .filter(TeraUserUserGroup.id_user_group == target.id_user_group) \
+                    .filter(TeraSite.site_2fa_required == True) \
+                    .with_entities(TeraUser).all()  # Return the user information only
+
+                # Enable 2FA for all users found
+                for user in users:
+                    connection.execute(
+                        update(TeraUser)
+                        .where(TeraUser.id_user == user.id_user)
+                        .values(user_2fa_enabled=True)
+                    )
 
         @event.listens_for(TeraUserUserGroup, 'after_update')
         @event.listens_for(TeraUserUserGroup, 'after_insert')
         def user_user_group_updated_or_inserted(mapper, connection, target: TeraUserUserGroup):
-            # Check if 2FA is enabled for a related site
-            if target and target.user_user_group_user_group and target.user_user_group_user_group.user_group_services_roles:
-                for role in target.user_user_group_user_group.user_group_services_roles:
-                    if role.id_site and role.service_role_site.site_2fa_required:
+            # If the user in the usergroup has access to a site with 2FA enabled, enable 2FA for the user
+            if target:
+                sites = TeraServiceAccess.query.join(TeraServiceRole, TeraServiceAccess.id_service_role ==
+                                                     TeraServiceRole.id_service_role) \
+                                                        .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                        .filter(TeraServiceAccess.id_user_group == target.id_user_group) \
+                                                        .with_entities(TeraSite).all()  # Return the site information only
+
+                for site in sites:
+                    if site.site_2fa_required:
                         # Perform single update for user
                         connection.execute(
                             update(TeraUser)
-                            .where(TeraUser.id_user == target.user_user_group_user.id_user)
+                            .where(TeraUser.id_user == target.id_user)
                             .values(user_2fa_enabled=True)
-                    )
+                        )
+                        break
 
         @event.listens_for(TeraUser, 'after_update')
         @event.listens_for(TeraUser, 'after_insert')
         def user_updated_or_inserted(mapper, connection, target: TeraUser):
-            # Check if 2FA is enabled for a related site
-            if target and target.user_user_groups:
-                for group in target.user_user_groups:
-                    if group.user_group_services_roles:
-                        for role in group.user_group_services_roles:
-                            if role.id_site and role.service_role_site.site_2fa_required:
+            # Check if 2FA is enabled for a related site through user groups
+            if target:
+                sites = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                        .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                        .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                        .filter(TeraUserUserGroup.id_user == target.id_user) \
+                                                        .with_entities(TeraSite).all()  # Return the site information only
 
-                                otp_enabled = target.user_2fa_otp_enabled
 
-                                # Do not allow to change 2FA status if user has 2FA enabled
-                                # and OTP set with secret
-                                if target.user_2fa_otp_secret:
-                                    otp_enabled = True
+                for site in sites:
+                    if site.site_2fa_required:
+                        # Perform single update for user
+                        connection.execute(
+                            update(TeraUser)
+                            .where(TeraUser.id_user == target.id_user)
+                            .values(user_2fa_enabled=True)
+                        )
+                        break
 
-                                # Perform single update for user
-                                connection.execute(
-                                    update(TeraUser)
-                                    .where(TeraUser.id_user == target.id_user)
-                                    .values(user_2fa_enabled=True, user_2fa_otp_enabled=otp_enabled)
-                                )
+
 
     def setup_events_for_class(self, cls, event_name):
         import json
