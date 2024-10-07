@@ -67,6 +67,8 @@ class UserLogin(UserLoginBase):
                 response['user_uuid'] = current_user.user_uuid
                 response['user_token'] = self._generate_user_token()
 
+                self._send_login_success_message()
+
         except OutdatedClientVersionError as e:
             self._user_logout()
 
@@ -90,7 +92,6 @@ class UserLogin(UserLoginBase):
             raise e
         else:
             # Everything went well, return response
-            self._send_login_success_message()
             return response, 200
 
 
