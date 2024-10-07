@@ -3,7 +3,7 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure
+from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure, UserNewPasswordSameAsOld
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
@@ -256,6 +256,9 @@ class UserQueryUsers(Resource):
             except UserPasswordInsecure as e:
                 return (gettext('Password not strong enough') + ': ' +
                         FlaskUtils.get_password_weaknesses_text(e.weaknesses), 400)
+            except UserNewPasswordSameAsOld:
+                return gettext('New password same as old password'), 400
+
         else:
             # New user, check if password is set
             # if 'user_password' not in json_user:

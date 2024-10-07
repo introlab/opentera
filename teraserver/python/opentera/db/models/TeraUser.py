@@ -328,12 +328,19 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         # Remove the password field is present and if empty
         if 'user_password' in values:
             if values['user_password'] == '':
-                del values['user_password']
+                del values['user_password']  # Don't change password if empty
             else:
                 # Check password strength
                 password_errors = TeraUser.validate_password_strength(str(values['user_password']))
                 if len(password_errors) > 0:
                     raise UserPasswordInsecure("User password insufficient strength", password_errors)
+
+                # Check that old password != new password
+                current_user = TeraUser.get_user_by_id(id_user)
+                if current_user:
+                    if TeraUser.verify_password('', values['user_password'], current_user):
+                        # Same password as before
+                        raise UserNewPasswordSameAsOld("New password same as old")
 
                 # Forcing password to string
                 values['user_password'] = TeraUser.encrypt_password(str(values['user_password']))
@@ -509,3 +516,12 @@ class UserPasswordInsecure(Exception):
     def __init__(self, message, weaknesses: list):
         super().__init__(message)
         self.weaknesses = weaknesses
+
+
+class UserNewPasswordSameAsOld(Exception):
+    """
+    Raised when the new password is equal to the old one
+    """
+    def __init__(self, message):
+        super().__init__(message)
+
