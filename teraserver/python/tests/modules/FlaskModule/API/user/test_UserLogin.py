@@ -9,8 +9,8 @@ class UserLoginTest(BaseUserAPITest):
         super().setUp()
         # Create users with 2fa enabled
         with self._flask_app.app_context():
-            self.user1: dict = self._create_2fa_enabled_user('test_user_2fa_1', 'password', set_secret=True)
-            self.user2: dict = self._create_2fa_enabled_user('test_user_2fa_2', 'password', set_secret=False)
+            self.user1: dict = self._create_2fa_enabled_user('test_user_2fa_1', 'Password12345!', set_secret=True)
+            self.user2: dict = self._create_2fa_enabled_user('test_user_2fa_2', 'Password12345!', set_secret=False)
 
     def tearDown(self):
         # Delete users with 2fa enabled
@@ -102,7 +102,7 @@ class UserLoginTest(BaseUserAPITest):
         with self._flask_app.app_context():
 
             # Login should redirect to 2fa verification
-            response = self._get_with_user_http_auth(self.test_client, 'test_user_2fa_1', 'password')
+            response = self._get_with_user_http_auth(self.test_client, 'test_user_2fa_1', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertFalse('login_setup_2fa' in response.json['redirect_url'])
@@ -117,7 +117,7 @@ class UserLoginTest(BaseUserAPITest):
         with self._flask_app.app_context():
 
             # Login should redirect to 2fa verification
-            response = self._get_with_user_http_auth(self.test_client, 'test_user_2fa_2', 'password')
+            response = self._get_with_user_http_auth(self.test_client, 'test_user_2fa_2', 'Password12345!')
             self.assertEqual(200, response.status_code)
             self.assertTrue('redirect_url' in response.json)
             self.assertTrue('login_setup_2fa' in response.json['redirect_url'])
