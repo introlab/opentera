@@ -1,4 +1,9 @@
+import uuid
+import jwt
+
+
 from modules.DatabaseModule.DBManager import DBManager
+
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
@@ -8,9 +13,15 @@ from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-import uuid
-import jwt
+from tests.opentera.db.models.test_TeraSession import TeraSessionTest
+from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
+from tests.opentera.db.models.test_TeraTest import TeraTestTest
+from tests.opentera.db.models.test_TeraUserUserGroup import TeraUserUserGroupTest
 
 
 class TeraUserTest(BaseModelsTest):
@@ -98,7 +109,6 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign user to sessions
-            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -106,14 +116,12 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
@@ -152,12 +160,10 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign to user group
-            from tests.opentera.db.models.test_TeraUserUserGroup import TeraUserUserGroupTest
             uug = TeraUserUserGroupTest.new_test_user_usergroup(id_user=id_user, id_user_group=1)
             id_user_user_group = uug.id_user_user_group
 
             # Assign user to sessions
-            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -227,12 +233,6 @@ class TeraUserTest(BaseModelsTest):
             self.assertEqual(token_dict['service_access'], {})  # Should be empty
 
     def test_token_for_siteadmin_should_have_valid_service_access(self):
-        from opentera.db.models.TeraService import TeraService
-        from opentera.db.models.TeraServiceRole import TeraServiceRole
-        from opentera.db.models.TeraUserGroup import TeraUserGroup
-        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
-        from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
-
         with self._flask_app.app_context():
             user = TeraUser.get_user_by_username('siteadmin')
             self.assertIsNotNone(user)
