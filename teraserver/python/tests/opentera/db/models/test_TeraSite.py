@@ -13,6 +13,7 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraService import TeraService
 
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 from tests.opentera.db.models.test_TeraDevice import TeraDeviceTest
@@ -247,23 +248,146 @@ class TeraSiteTest(BaseModelsTest):
             self.db.session.rollback()
             same_site = TeraSite.get_site_by_id(id_site)
             self.assertTrue(same_site.site_2fa_required)
+            TeraSiteTest.delete_site(site.id_site)
 
-    def test_enable_2fa_in_site_should_enable_in_users(self):
+    def test_enable_2fa_in_site_should_enable_2fa_for_users(self):
         with self._flask_app.app_context():
             site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=False)
             self.assertIsNotNone(site)
             group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
             self.assertIsNotNone(group)
-            user = TeraSiteTest.new_test_user('test_user', 'Password12345!', group.id_user_group)
-            self.assertIsNotNone(user)
+            user1 = TeraSiteTest.new_test_user('test_user1', 'Password12345!', group.id_user_group)
+            self.assertIsNotNone(user1)
+
+            user2 = TeraSiteTest.new_test_user('test_user2', 'Password12345!', None)
+            self.assertIsNotNone(user2)
 
             # Enable 2fa in site
             site.site_2fa_required = True
             self.db.session.add(site)
             self.db.session.commit()
 
-            # User should be updated automatically with 2fa
-            self.assertTrue(user.user_2fa_enabled)
+            # User should be updated automatically with 2fa if group is associated with site
+            self.assertTrue(user1.user_2fa_enabled)
+            # Else user should not be updated
+            self.assertFalse(user2.user_2fa_enabled)
+            # Delete everything
+            TeraSiteTest.delete_site(site.id_site)
+            TeraSiteTest.delete_user(user1.id_user)
+            TeraSiteTest.delete_user(user2.id_user)
+            TeraSiteTest.delete_user_group(group.id_user_group)
+
+
+    def test_disable_2fa_in_site_should_not_disable_2fa_for_users(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            self.assertIsNotNone(site)
+            group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
+            self.assertIsNotNone(group)
+            user1 = TeraSiteTest.new_test_user('test_user1', 'Password12345!', group.id_user_group)
+            self.assertIsNotNone(user1)
+
+            user2 = TeraSiteTest.new_test_user('test_user2', 'Password12345!', None)
+            self.assertIsNotNone(user2)
+
+            # Site should have 2fa enabled
+            self.db.session.add(site)
+            self.db.session.commit()
+
+            # User should have 2fa enabled if group have access to site
+            self.assertTrue(user1.user_2fa_enabled)
+            # Else user should not be updated
+            self.assertFalse(user2.user_2fa_enabled)
+
+            # Disable 2fa in site
+            site.site_2fa_required = False
+            self.db.session.add(site)
+            self.db.session.commit()
+
+            # User should still have 2fa enabled (not changed)
+            self.assertTrue(user1.user_2fa_enabled)
+            # Else user should not be updated
+            self.assertFalse(user2.user_2fa_enabled)
+
+            # Delete everything
+            TeraSiteTest.delete_site(site.id_site)
+            TeraSiteTest.delete_user(user1.id_user)
+            TeraSiteTest.delete_user(user2.id_user)
+            TeraSiteTest.delete_user_group(group.id_user_group)
+
+    def test_add_group_to_2fa_enabled_site_should_enable_2fa_for_all_users(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            self.assertIsNotNone(site)
+
+            # No group associated to the user
+            user1 = TeraSiteTest.new_test_user('test_user1', 'Password12345!', None)
+            self.assertIsNotNone(user1)
+
+            user2 = TeraSiteTest.new_test_user('test_user2', 'Password12345!', None)
+            self.assertIsNotNone(user2)
+
+            # Site should have 2fa enabled
+            self.db.session.add(site)
+            self.db.session.commit()
+
+            # User should have 2fa enabled if group have access to site
+            self.assertFalse(user1.user_2fa_enabled)
+            self.assertFalse(user2.user_2fa_enabled)
+
+            # Add group to site
+            group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
+            self.assertIsNotNone(group)
+
+            # Add users to group
+            user_user_group = TeraUserUserGroup()
+            user_user_group.id_user = user1.id_user
+            user_user_group.id_user_group = group.id_user_group
+            TeraUserUserGroup.insert(user_user_group)
+
+            user_user_group = TeraUserUserGroup()
+            user_user_group.id_user = user2.id_user
+            user_user_group.id_user_group = group.id_user_group
+            TeraUserUserGroup.insert(user_user_group)
+
+            # User should have 2fa enabled if group have access to site
+            self.assertTrue(user1.user_2fa_enabled)
+            self.assertTrue(user2.user_2fa_enabled)
+
+            # Delete everything
+            TeraSiteTest.delete_site(site.id_site)
+            TeraSiteTest.delete_user(user1.id_user)
+            TeraSiteTest.delete_user(user2.id_user)
+            TeraSiteTest.delete_user_group(group.id_user_group)
+
+    def test_disable_2fa_for_user_in_a_2fa_site_should_not_change_2fa_enabled(self):
+        with self._flask_app.app_context():
+            site = TeraSiteTest.new_test_site(name='2FA Site', site_2fa_required=True)
+            self.assertIsNotNone(site)
+            group = TeraSiteTest.new_test_user_group('Test Group', site.id_site)
+            self.assertIsNotNone(group)
+            user1 = TeraSiteTest.new_test_user('test_user1', 'Password12345!', group.id_user_group)
+            self.assertIsNotNone(user1)
+
+            # Site should have 2fa enabled
+            self.db.session.add(site)
+            self.db.session.commit()
+
+            # User should have 2fa enabled if group have access to site
+            self.assertTrue(user1.user_2fa_enabled)
+
+            # Disable 2fa for user
+            user1.user_2fa_enabled = False
+            self.db.session.add(user1)
+            self.db.session.commit()
+
+            self.assertTrue(user1.user_2fa_enabled)
+
+            # Delete everything
+            TeraSiteTest.delete_site(site.id_site)
+            TeraSiteTest.delete_user(user1.id_user)
+            TeraSiteTest.delete_user_group(group.id_user_group)
+
 
     @staticmethod
     def new_test_site(name: str = 'Test Site', site_2fa_required: bool = False) -> TeraSite:
@@ -277,9 +401,11 @@ class TeraSiteTest(BaseModelsTest):
     def new_test_user_group(name: str, id_site: int ) -> TeraUserGroup:
 
         # Create Service Role first
+        tera_server_service = TeraService.get_openteraserver_service()
+
         service_role = TeraServiceRole()
         service_role.service_role_name = 'Test Site Role'
-        service_role.id_service = 1  # TeraServer by default
+        service_role.id_service = tera_server_service.id_service
         service_role.id_site = id_site
         TeraServiceRole.insert(service_role)
 
@@ -298,7 +424,7 @@ class TeraSiteTest(BaseModelsTest):
 
 
     @staticmethod
-    def new_test_user(username: str, password: str, id_user_group: int) -> TeraUser:
+    def new_test_user(username: str, password: str, id_user_group: int | None) -> TeraUser:
         user = TeraUser()
         user.user_username = username
         user.user_password = password
@@ -309,10 +435,24 @@ class TeraSiteTest(BaseModelsTest):
         user.user_profile = {}
         TeraUser.insert(user)
 
-        # Update user group
-        user_user_group = TeraUserUserGroup()
-        user_user_group.id_user = user.id_user
-        user_user_group.id_user_group = id_user_group
-        TeraUserUserGroup.insert(user_user_group)
+        # Update user group if not none
+        if id_user_group is not None:
+            user_user_group = TeraUserUserGroup()
+            user_user_group.id_user = user.id_user
+            user_user_group.id_user_group = id_user_group
+            TeraUserUserGroup.insert(user_user_group)
 
         return user
+
+
+    @staticmethod
+    def delete_site(id: int):
+        TeraSite.delete(id, hard_delete=True)
+
+    @staticmethod
+    def delete_user_group(id: int):
+        TeraUserGroup.delete(id, hard_delete=True)
+
+    @staticmethod
+    def delete_user(id: int):
+        TeraUser.delete(id, hard_delete=True)

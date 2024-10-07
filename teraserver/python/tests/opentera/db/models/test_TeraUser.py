@@ -282,6 +282,32 @@ class TeraUserTest(BaseModelsTest):
             # TeraServiceAccess.delete(service_access.id_service_access)
             # TeraServiceRole.delete(role.id_service_role)
 
+    def test_disable_2fa_on_2fa_enabled_user_should_reset_secret_email_and_otp_states(self):
+        with self._flask_app.app_context():
+            user: TeraUser = TeraUserTest.new_test_user(user_name="user_2fa", user_groups=None)
+            self.assertIsNotNone(user)
+            self.assertFalse(user.user_2fa_enabled)
+            # Setup 2FA
+            user.enable_2fa_otp()
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_otp_enabled)
+            # Commit user
+            self.db.session.add(user)
+            self.db.session.commit()
+            # Disable 2FA
+            user.user_2fa_enabled = False
+            self.db.session.add(user)
+            self.db.session.commit()
+            # Check
+            self.assertFalse(user.user_2fa_enabled)
+            self.assertIsNone(user.user_2fa_otp_secret)
+            self.assertFalse(user.user_2fa_otp_enabled)
+            self.assertFalse(user.user_2fa_email_enabled)
+            # Delete user
+            TeraUser.delete(user.id_user, hard_delete=True)
+
+
     @staticmethod
     def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:
         user = TeraUser()
