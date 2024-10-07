@@ -20,7 +20,6 @@ class UserLogin2FATest(BaseUserAPITest):
             TeraUser.delete(self.user2['id_user'], hard_delete=True)
         super().tearDown()
 
-
     def _create_2fa_enabled_user(self, username, password, set_secret:bool = True):
         user = TeraUser()
         user.id_user = 0 # New user
@@ -40,7 +39,6 @@ class UserLogin2FATest(BaseUserAPITest):
 
         TeraUser.insert(user)
         return user.to_json(minimal=False)
-
 
     def _login_user(self, username, password):
         response = self._get_with_user_http_auth(self.test_client, username, password, endpoint='/api/user/login')
