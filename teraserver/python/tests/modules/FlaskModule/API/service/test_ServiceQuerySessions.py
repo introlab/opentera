@@ -1,4 +1,4 @@
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from modules.FlaskModule.FlaskModule import flask_app
 from datetime import datetime, timedelta
 from opentera.db.models.TeraSession import TeraSession

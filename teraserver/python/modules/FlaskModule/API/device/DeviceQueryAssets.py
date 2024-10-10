@@ -15,7 +15,6 @@ get_parser.add_argument('id_session', type=int, help='Session ID to query assets
 get_parser.add_argument('with_urls', type=inputs.boolean, help='Also include assets infos and download-upload url')
 get_parser.add_argument('with_only_token', type=inputs.boolean, help='Only includes the access token. '
                                                                      'Will ignore with_urls if specified.')
-get_parser.add_argument('token', type=str, help='Secret Token')
 
 
 class DeviceQueryAssets(Resource):
@@ -27,10 +26,14 @@ class DeviceQueryAssets(Resource):
 
     @api.doc(description='Get device assets based specified session or asset ID or, if no parameters, get all assets',
              responses={200: 'Success',
-                        403: 'Device doesn\'t have access to the specified asset'})
+                        403: 'Device doesn\'t have access to the specified asset'},
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
+        """
+        Get device assets
+        """
         args = get_parser.parse_args()
         device_access = DBManager.deviceAccess(current_device)
 

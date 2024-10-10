@@ -30,6 +30,9 @@ class ServiceQueryServices(Resource):
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get service information
+        """
         args = get_parser.parse_args()
 
         services = []

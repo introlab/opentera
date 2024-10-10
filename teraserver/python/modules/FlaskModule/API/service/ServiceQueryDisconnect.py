@@ -1,5 +1,4 @@
-from flask import request
-from flask_restx import Resource, inputs
+from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
@@ -33,10 +32,13 @@ class ServiceQueryDisconnect(Resource):
                         403: 'Forbidden access. Please check that the service has access to'
                              ' the requested id/uuid.',
                         500: 'Database error'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Forcefully disconnect a user, participant or device
+        """
         args = get_parser.parse_args()
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 

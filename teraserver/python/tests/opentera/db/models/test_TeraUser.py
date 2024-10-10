@@ -1,4 +1,9 @@
+import uuid
+import jwt
+
+
 from modules.DatabaseModule.DBManager import DBManager
+
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
@@ -8,10 +13,16 @@ from opentera.db.models.TeraTest import TeraTest
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
-from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-import uuid
-import jwt
+from opentera.db.models.TeraServiceRole import TeraServiceRole
+from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 
+from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
+from tests.opentera.db.models.test_TeraSession import TeraSessionTest
+from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
+from tests.opentera.db.models.test_TeraTest import TeraTestTest
+from tests.opentera.db.models.test_TeraUserUserGroup import TeraUserUserGroupTest
+from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
 
 class TeraUserTest(BaseModelsTest):
 
@@ -98,7 +109,6 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign user to sessions
-            from test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -106,14 +116,12 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
@@ -152,12 +160,10 @@ class TeraUserTest(BaseModelsTest):
             id_user = user.id_user
 
             # Assign to user group
-            from test_TeraUserUserGroup import TeraUserUserGroupTest
             uug = TeraUserUserGroupTest.new_test_user_usergroup(id_user=id_user, id_user_group=1)
             id_user_user_group = uug.id_user_user_group
 
             # Assign user to sessions
-            from test_TeraSession import TeraSessionTest
             user_session = TeraSessionTest.new_test_session(id_creator_user=id_user)
             id_session = user_session.id_session
 
@@ -165,19 +171,16 @@ class TeraUserTest(BaseModelsTest):
             id_session_invitee = user_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_user=id_user)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_user=id_user)
             id_test = test.id_test
 
             # ... and service config
-            from test_TeraServiceConfig import TeraServiceConfigTest
             service_conf = TeraServiceConfigTest.new_test_service_config(id_service=1, id_user=id_user)
             id_service_conf = service_conf.id_service_config
 
@@ -227,12 +230,6 @@ class TeraUserTest(BaseModelsTest):
             self.assertEqual(token_dict['service_access'], {})  # Should be empty
 
     def test_token_for_siteadmin_should_have_valid_service_access(self):
-        from opentera.db.models.TeraService import TeraService
-        from opentera.db.models.TeraServiceRole import TeraServiceRole
-        from opentera.db.models.TeraUserGroup import TeraUserGroup
-        from opentera.db.models.TeraServiceAccess import TeraServiceAccess
-        from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
-
         with self._flask_app.app_context():
             user = TeraUser.get_user_by_username('siteadmin')
             self.assertIsNotNone(user)
@@ -281,6 +278,66 @@ class TeraUserTest(BaseModelsTest):
             TeraUserGroup.delete(user_group.id_user_group)
             # TeraServiceAccess.delete(service_access.id_service_access)
             # TeraServiceRole.delete(role.id_service_role)
+
+    def test_disable_2fa_on_2fa_enabled_user_should_reset_secret_email_and_otp_states(self):
+        with self._flask_app.app_context():
+            user: TeraUser = TeraUserTest.new_test_user(user_name="user_2fa", user_groups=None)
+            self.assertIsNotNone(user)
+            self.assertFalse(user.user_2fa_enabled)
+            # Setup 2FA
+            user.enable_2fa_otp()
+            self.assertTrue(user.user_2fa_enabled)
+            self.assertIsNotNone(user.user_2fa_otp_secret)
+            self.assertTrue(user.user_2fa_otp_enabled)
+            # Commit user
+            self.db.session.add(user)
+            self.db.session.commit()
+            # Disable 2FA
+            user.user_2fa_enabled = False
+            self.db.session.add(user)
+            self.db.session.commit()
+            # Check
+            self.assertFalse(user.user_2fa_enabled)
+            self.assertIsNone(user.user_2fa_otp_secret)
+            self.assertFalse(user.user_2fa_otp_enabled)
+            self.assertFalse(user.user_2fa_email_enabled)
+            # Delete user
+            TeraUser.delete(user.id_user, hard_delete=True)
+
+
+    def test_change_superadmin_2fa_enabled_while_site_has_2fa_required_does_not_change_2fa_enabled(self):
+        with self._flask_app.app_context():
+            sites = TeraSite.query.all()
+            for site in sites:
+                site.site_2fa_required = True
+                self.db.session.add(site)
+            self.db.session.commit()
+
+            superadmins = TeraUser.query.filter_by(user_superadmin=True).all()
+            for superadmin in superadmins:
+                self.assertTrue(superadmin.user_2fa_enabled)
+                superadmin.user_2fa_enabled = False
+                self.db.session.add(superadmin)
+            self.db.session.commit()
+
+            # Reverify flag
+            for superadmin in superadmins:
+                self.assertTrue(superadmin.user_2fa_enabled)
+
+            # Reset site 2fa required
+            for site in sites:
+                site.site_2fa_required = False
+                self.db.session.add(site)
+            self.db.session.commit()
+
+            #Reset superadmin 2fa enabled
+            for superadmin in superadmins:
+                superadmin.user_2fa_enabled = False
+                self.db.session.add(superadmin)
+            self.db.session.commit()
+
+            for superadmin in superadmins:
+                self.assertFalse(superadmin.user_2fa_enabled)
 
     @staticmethod
     def new_test_user(user_name: str, user_groups: list | None = None) -> TeraUser:

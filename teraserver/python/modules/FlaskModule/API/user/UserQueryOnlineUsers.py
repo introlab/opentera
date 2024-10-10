@@ -1,4 +1,3 @@
-from flask import session
 from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -24,7 +23,10 @@ class UserQueryOnlineUsers(Resource):
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
-        args = get_parser.parse_args()
+        """
+        Get online users
+        """
+        # args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         try:

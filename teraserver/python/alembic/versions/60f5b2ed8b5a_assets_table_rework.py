@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     # Change t_assets column asset_type to string - integers values should be converted directly in Postgresql
-    op.alter_column(table_name='t_assets', column_name='asset_type', type_=sa.String)
+    op.alter_column(table_name='t_assets', column_name='asset_type', type=sa.String)
 
     # Change all current values to "application/octet-stream" since that is what we have right now
     op.execute("UPDATE t_assets SET asset_type=\'application/octet-stream\'")

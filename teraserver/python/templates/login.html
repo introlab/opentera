@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ gettext('OpenTera Login Page') }}</title>
+    <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./static/css/login_style.css" />
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./static/js/jquery-3.7.1.min.js"></script>
+    <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        var qtObject = undefined;
+        if (typeof QWebChannel !== "undefined"){
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+                qtObject = channel.objects.qtObject;
+            });
+        };
+
+    </script>
+    <script>
+        $(document).ajaxSend(function(event, request, settings) {
+            $('#loading').removeClass("d-none").addClass("d-flex");
+        });
+
+        $(document).ajaxComplete(function(event, request, settings) {
+            $('#loading').removeClass("d-flex").addClass("d-none");
+        });
+        $(document).ready(function() {
+            $("#username").focus();
+
+            // Handle form submission
+            $('#loginForm').submit(function(event) {
+                $('#error_message').hide();
+
+                // Prevent the default form submission
+                event.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+
+                // Basic auth encode the username and password
+                var base64 = btoa($('#username').val() + ":" + $('#password').val());
+                var headers = {
+                    Authorization: "Basic " + base64,
+                    "X-Client-Name":  "OpenTera-Web-Client",
+                    "X-Client-Version": "{{ server_version }}"
+                };
+
+                var data = {
+                    with_websocket: true
+                };
+
+                // Send the form data to the backend with a post request
+                // If the login is successful, if 2fa is enabled, the user will be redirected to the 2fa page
+                // If the login is successful, the user will be redirected to the main page
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    headers: headers,
+                    data: data,
+                    success: function(response) {
+                        //console.log("Login success");
+                        if (response.redirect_url) {
+                            if (qtObject){
+                                if ("reason" in response){
+                                    if (response.reason === '2fa'){
+                                        qtObject.sendCheckInProgress();
+                                    }
+                                    if (response.reason === '2fa_setup'){
+                                        qtObject.sendSetupInProgress();
+                                    }
+                                    if (response.reason === 'password_change'){
+                                        qtObject.sendPasswordChangeInProgress();
+                                    }
+                                }
+                            }
+                            window.location.href = response.redirect_url;
+                        }
+                        else {
+                            if (qtObject)
+                                qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
+                        }
+                    },
+                    error: function(response) {
+                        console.log("Login error", response);
+                        if (response.status === 401)
+                            $('#error_message').text("{{ gettext('Invalid username or password') }}");
+                        else
+                            $('#error_message').text(response.responseJSON);
+                        $('#error_message').show();
+                        $("#username").focus();
+                        if (qtObject)
+                            qtObject.sendLoginFailure("Invalid username or password");
+                    }
+                });
+            });
+            $("input").change(function(){
+                $('#error_message').hide();
+            });
+        });
+
+    </script>
+</head>
+<body>
+    <!-- Create a login form using bootstrap -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col col-md-6">
+                {% if show_logo %}
+                <div class="w-100 d-flex">
+                    <img src="./static/img/logos/LogoOpenTera.png" class="img-logo ms-auto me-auto">
+                </div>
+                {% endif %}
+                <div class="card">
+                    <div class="card-header"></div>
+                    <div class="card-body mb-0 p-0">
+                        <div id="loading" class="h-100 w-100 z-1 bg-black position-absolute opacity-75 d-none">
+                            <img src="./static/img/loading.gif" class="m-auto">
+                        </div>
+
+                        <form id="loginForm" class="m-3" action="/api/user/login" method="post">
+                            <div class="form-group row">
+                                <label for="username" class="col-4 col-form-label text-end">{{ gettext('Username') }}</label>
+                                <div class="col-8 col-md-6">
+                                    <input type="text" id="username" class="form-control" name="username" required autofocus>
+                                </div>
+                            </div>
+                            <div class="form-group row mt-2">
+                                <label for="password" class="col-4 col-form-label text-end">{{ gettext('Password') }}</label>
+                                <div class="col-8 col-md-6">
+                                    <input type="password" id="password" class="form-control" name="password" required>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-4"></div>
+                                <div class="col-8 col-md-6">
+                                    <button type="submit" class="btn btn-primary w-100">{{ gettext('Login') }}</button>
+                                </div>
+                            </div>
+                            <div class="row ms-3 me-3 mt-2">
+                                <div class="text-danger p-1 m-0 text-center fw-bold" id="error_message" role="alert" style="display: none;"></div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Error message placeholder -->
+<!--                    <div class="card-footer">-->
+
+<!--                    </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

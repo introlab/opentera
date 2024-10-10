@@ -1,10 +1,9 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.DatabaseModule.DBManager import DBManager
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraAsset import TeraAsset
 
 from opentera.redis.RedisVars import RedisVars
@@ -29,10 +28,13 @@ class ParticipantQueryAssets(Resource):
     @api.doc(description='Get participant assets based on the ID or, if no parameters, get all assets',
              responses={200: 'Success',
                         403: 'Participant doesn\'t have access to the specified asset'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required(role='limited')
     def get(self):
+        """
+        Get participant assets
+        """
         args = get_parser.parse_args()
         participant_access = DBManager.participantAccess(current_participant)
 

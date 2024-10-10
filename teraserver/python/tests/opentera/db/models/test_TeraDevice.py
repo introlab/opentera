@@ -115,23 +115,23 @@ class TeraDeviceTest(BaseModelsTest):
             id_device = device.id_device
 
             # Assign device to site
-            from test_TeraDeviceSite import TeraDeviceSiteTest
+            from tests.opentera.db.models.test_TeraDeviceSite import TeraDeviceSiteTest
             device_site = TeraDeviceSiteTest.new_test_device_site(id_device=id_device, id_site=1)
             id_device_site = device_site.id_device_site
 
             # Assign device to project
-            from test_TeraDeviceProject import TeraDeviceProjectTest
+            from tests.opentera.db.models.test_TeraDeviceProject import TeraDeviceProjectTest
             device_project = TeraDeviceProjectTest.new_test_device_project(id_device=id_device, id_project=1)
             id_device_project = device_project.id_device_project
 
             # Assign device to participants
-            from test_TeraDeviceParticipant import TeraDeviceParticipantTest
+            from tests.opentera.db.models.test_TeraDeviceParticipant import TeraDeviceParticipantTest
             device_participant = TeraDeviceParticipantTest.new_test_device_participant(id_device=id_device,
                                                                                        id_participant=1)
             id_device_participant = device_participant.id_device_participant
 
             # Assign device to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             device_session = TeraSessionTest.new_test_session(id_creator_device=id_device)
             id_session = device_session.id_session
 
@@ -139,19 +139,19 @@ class TeraDeviceTest(BaseModelsTest):
             id_session_invitee = device_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_device=id_device)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_device=id_device)
             id_test = test.id_test
 
             # Create service config for device
-            from test_TeraServiceConfig import TeraServiceConfigTest
+            from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
             device_service_config = TeraServiceConfigTest.new_test_service_config(id_device=id_device, id_service=2)
             id_service_config = device_service_config.id_service_config
 
@@ -203,23 +203,23 @@ class TeraDeviceTest(BaseModelsTest):
             id_device = device.id_device
 
             # Assign device to site
-            from test_TeraDeviceSite import TeraDeviceSiteTest
+            from tests.opentera.db.models.test_TeraDeviceSite import TeraDeviceSiteTest
             device_site = TeraDeviceSiteTest.new_test_device_site(id_device=id_device, id_site=1)
             id_device_site = device_site.id_device_site
 
             # Assign device to project
-            from test_TeraDeviceProject import TeraDeviceProjectTest
+            from tests.opentera.db.models.test_TeraDeviceProject import TeraDeviceProjectTest
             device_project = TeraDeviceProjectTest.new_test_device_project(id_device=id_device, id_project=1)
             id_device_project = device_project.id_device_project
 
             # Assign device to participants
-            from test_TeraDeviceParticipant import TeraDeviceParticipantTest
+            from tests.opentera.db.models.test_TeraDeviceParticipant import TeraDeviceParticipantTest
             device_participant = TeraDeviceParticipantTest.new_test_device_participant(id_device=id_device,
                                                                                        id_participant=1)
             id_device_participant = device_participant.id_device_participant
 
             # Assign device to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             device_session = TeraSessionTest.new_test_session(id_creator_device=id_device)
             id_session = device_session.id_session
 
@@ -227,19 +227,19 @@ class TeraDeviceTest(BaseModelsTest):
             id_session_invitee = device_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_device=id_device)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_device=id_device)
             id_test = test.id_test
 
             # Create service config for device
-            from test_TeraServiceConfig import TeraServiceConfigTest
+            from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
             device_service_config = TeraServiceConfigTest.new_test_service_config(id_device=id_device, id_service=2)
             id_service_config = device_service_config.id_service_config
 

@@ -253,7 +253,7 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertIsNotNone(ug.id_user_group)
             id_user_group = ug.id_user_group
 
-            from test_TeraUser import TeraUserTest
+            from tests.opentera.db.models.test_TeraUser import TeraUserTest
             user = TeraUserTest.new_test_user(user_name="user_ug_harddelete", user_groups=[ug])
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
@@ -286,13 +286,13 @@ class TeraUserGroupTest(BaseModelsTest):
             self.assertIsNotNone(ug.id_user_group)
             id_user_group = ug.id_user_group
 
-            from test_TeraUser import TeraUserTest
+            from tests.opentera.db.models.test_TeraUser import TeraUserTest
             user = TeraUserTest.new_test_user(user_name="user_ug_undelete", user_groups=[ug])
             self.assertIsNotNone(user.id_user)
             id_user = user.id_user
 
             # Add service access
-            from test_TeraServiceAccess import TeraServiceAccessTest
+            from tests.opentera.db.models.test_TeraServiceAccess import TeraServiceAccessTest
             access = TeraServiceAccessTest.new_test_service_access(id_service_role=1, id_user_group=id_user_group)
             id_access = access.id_service_access
 

@@ -19,11 +19,13 @@ class UserQueryServerSettings(Resource):
 
     @api.doc(description='Get server setting key',
              responses={200: 'Success - returns setting value',
-                        401: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+                        401: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get server settings
+        """
         # As soon as we are authorized, we can output the server versions
         args = get_parser.parse_args()
 

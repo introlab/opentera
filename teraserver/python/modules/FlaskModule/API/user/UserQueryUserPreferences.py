@@ -1,9 +1,8 @@
-from flask import session, request
-from flask_restx import Resource, reqparse, inputs
+from flask import request
+from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserPreference import TeraUserPreference
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
@@ -31,11 +30,13 @@ class UserQueryUserPreferences(Resource):
              responses={200: 'Success - returns list of user preferences',
                         400: 'Missing parameter or bad app_tag',
                         403: 'Forbidden access to that user.',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get user preferences (for a specific app)
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -72,11 +73,13 @@ class UserQueryUserPreferences(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the user linked to that preference',
                         400: 'Badly formed JSON or missing fields(app_tag) in the JSON body',
-                        500: 'Internal error occurred when saving user preference'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving user preference'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update user preferences
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         json_user_pref = request.json['user_preference']

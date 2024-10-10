@@ -42,15 +42,17 @@ class UserQueryTestTypeSites(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @api.doc(description='Get session types that are related to a site. Only one "ID" parameter required and supported'
+    @api.doc(description='Get test types that are related to a site. Only one "ID" parameter required and supported'
                          ' at once.',
              responses={200: 'Success - returns list of session types - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occured when loading devices for sites'},
-             params={'token': 'Secret token'})
+                        500: 'Error occured when loading devices for sites'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test types associated to a site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -102,11 +104,13 @@ class UserQueryTestTypeSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association',
                         400: 'Badly formed JSON or missing fields(id_site or id_test_type) in the JSON body',
-                        500: 'Internal error occurred when saving device association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving device association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test types associated to a site
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Only super admins can change session type - site associations
@@ -237,11 +241,13 @@ class UserQueryTestTypeSites(Resource):
     @api.doc(description='Delete a specific test type-site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no admin access to site)',
-                        500: 'Session type - site association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Session type - site association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete specific test type - site association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

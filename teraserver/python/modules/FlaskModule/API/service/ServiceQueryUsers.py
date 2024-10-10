@@ -23,10 +23,13 @@ class ServiceQueryUsers(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get specific user information
+        """
         args = get_parser.parse_args()
 
         # args['user_id'] Will be None if not specified in args

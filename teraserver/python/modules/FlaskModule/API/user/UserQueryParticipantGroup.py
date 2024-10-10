@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
@@ -36,11 +35,13 @@ class UserQueryParticipantGroup(Resource):
     @api.doc(description='Get participant groups information. Only one of the ID parameter is supported at once. '
                          'If no ID is specified, returns all accessible groups for the logged user',
              responses={200: 'Success - returns list of participant groups',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get participant groups
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -82,11 +83,13 @@ class UserQueryParticipantGroup(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_participant_group or id_project) in the JSON body',
-                        500: 'Internal error occurred when saving device'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving device'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update participant groups
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'group' not in request.json and 'participant_group' not in request.json:
@@ -141,11 +144,13 @@ class UserQueryParticipantGroup(Resource):
     @api.doc(description='Delete a specific participant group',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete participant group (only project admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a participant group
+        """
         user_access = DBManager.userAccess(current_user)
 
         args = delete_parser.parse_args()

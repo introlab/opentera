@@ -1,7 +1,7 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraSession import TeraSession
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 from enum import Enum, unique

@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -37,11 +37,13 @@ class UserQuerySessionTypes(Resource):
     @api.doc(description='Get session type information. If no id_session_type specified, returns all available '
                          'session types',
              responses={200: 'Success - returns list of session types',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get session type
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -84,11 +86,13 @@ class UserQuerySessionTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified session type',
                         400: 'Badly formed JSON or missing field(id_session_type) in the JSON body',
-                        500: 'Internal error when saving session type'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving session type'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update session type
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_type' not in request.json:
@@ -302,6 +306,9 @@ class UserQuerySessionTypes(Resource):
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete session type
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

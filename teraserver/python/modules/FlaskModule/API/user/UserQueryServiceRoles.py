@@ -33,11 +33,13 @@ class UserQueryServiceRole(Resource):
 
     @api.doc(description='Get service roles for either a specific service or for all available services.',
              responses={200: 'Success - returns list of service roles',
-                        500: 'Error when getting roles'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting roles'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get service roles
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -70,11 +72,13 @@ class UserQueryServiceRole(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify service role (only super admin)',
                         400: 'Badly formed JSON or missing fields(id_service or id_service_role) in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update service roles
+        """
         if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
@@ -123,11 +127,13 @@ class UserQueryServiceRole(Resource):
     @api.doc(description='Delete a specific service role.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete role (not super admin)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete service role
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

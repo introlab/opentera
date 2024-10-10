@@ -7,6 +7,8 @@ from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.OpenTeraServerVersion import opentera_server_version_string
 import redis
+import datetime
+
 from modules.Globals import opentera_doc_url
 
 
@@ -37,16 +39,14 @@ babel = Babel(flask_app, locale_selector=get_locale, timezone_selector=get_timez
 
 # API
 authorizations = {
-    'HTTPAuth': {
-        'type': 'basic',
-        'in': 'header'
+    'basicAuth': {
+        'type': 'basic'
     },
-    'Token Authentication': {
+    'tokenAuth': {
         'type': 'apiKey',
         'in': 'header',
         'name': 'Authorization',
-        'default': 'OpenTera',
-        'bearerFormat': 'JWT'
+        'description': 'Enter token with the `OpenTera` prefix, e.g. "OpenTera 12345"'
     }
 }
 
@@ -66,7 +66,7 @@ class CustomAPI(Api):
 # if doc is set to False, documentation is disabled
 api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
-                authorizations=authorizations)
+                authorizations=authorizations, security='basicAuth')
 
 # Namespaces
 user_api_ns = api.namespace('user', description='API for user calls')
@@ -97,7 +97,9 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_REDIS': redis_url})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        flask_app.config.update({'SESSION_COOKIE_SAMESITE': 'Strict'})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': flask_app.debug})
+        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5)})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -105,7 +107,7 @@ class FlaskModule(BaseModule):
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
-        self.session = Session(flask_app)
+        # self.session = Session(flask_app)
 
         # Init API
         FlaskModule.init_user_api(self, user_api_ns)
@@ -138,6 +140,9 @@ class FlaskModule(BaseModule):
 
         # Users...
         from modules.FlaskModule.API.user.UserLogin import UserLogin
+        from modules.FlaskModule.API.user.UserLogin2FA import UserLogin2FA
+        from modules.FlaskModule.API.user.UserLoginSetup2FA import UserLoginSetup2FA
+        from modules.FlaskModule.API.user.UserLoginChangePassword import UserLoginChangePassword
         from modules.FlaskModule.API.user.UserLogout import UserLogout
         from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
         from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
@@ -200,6 +205,9 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQueryForms,                '/forms', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipantGroup,     '/groups', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogin,                     '/login', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLogin2FA,                  '/login/2fa', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginSetup2FA,             '/login/setup_2fa', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginChangePassword,       '/login/change_password', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
@@ -351,6 +359,10 @@ class FlaskModule(BaseModule):
     def init_views(self):
         from modules.FlaskModule.Views.About import About
         from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
+        from modules.FlaskModule.Views.LoginView import LoginView
+        from modules.FlaskModule.Views.LoginChangePasswordView import LoginChangePasswordView
+        from modules.FlaskModule.Views.LoginSetup2FAView import LoginSetup2FAView
+        from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
 
         # Default arguments
         args = []
@@ -359,17 +371,30 @@ class FlaskModule(BaseModule):
         # About
         flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
 
+        # Login
+        flask_app.add_url_rule('/login', view_func=LoginView.as_view('login', *args, **kwargs))
+        flask_app.add_url_rule('/login_change_password', view_func=LoginChangePasswordView.as_view(
+            'login_change_password', *args, **kwargs))
+        flask_app.add_url_rule('/login_setup_2fa', view_func=LoginSetup2FAView.as_view(
+            'login_setup_2fa', *args, **kwargs))
+        flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(
+            'login_validate_2fa', *args, **kwargs))
+
         if not self.config.server_config['enable_docs']:
             # Disabled docs view
             flask_app.add_url_rule('/doc', view_func=DisabledDoc.as_view('doc', *args, **kwargs))
 
 
 @flask_app.after_request
-def apply_caching(response):
+def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
+
+    # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up
+    if response.status_code == 401 and 'WWW-Authenticate' in response.headers:
+        del response.headers['WWW-Authenticate']
 
     # Request processing time
     import time

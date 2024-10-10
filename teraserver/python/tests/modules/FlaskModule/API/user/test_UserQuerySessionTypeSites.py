@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
@@ -81,14 +81,14 @@ class UserQuerySessionTypeSitesTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(len(response.json), 0)
-    
+
             params = {'id_site': 2}
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(len(response.json), 1)
-    
+
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
 

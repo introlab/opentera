@@ -1,4 +1,4 @@
-from BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
+from tests.services.LoggingService.BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
 from services.LoggingService.libloggingservice.db.models.LogEntry import LogEntry
 from datetime import datetime, timedelta
 
@@ -28,7 +28,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             token = self._generate_fake_user_token(name='FakeUser', superadmin=True, expiration=3600)
 
             all_entries = []
-            for i in range(50):
+            for _ in range(50):
                 current_time = datetime.now()
                 entry = self._create_log_entry(current_time, 1, 'test', 'test_message')
                 self.assertIsNotNone(entry)
@@ -52,14 +52,14 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             current_time = datetime.now() + timedelta(hours=1)
             tomorrow = current_time + timedelta(days=1)
 
-            for i in range(50):
+            for _ in range(50):
                 entry = self._create_log_entry(current_time, 1, 'test', 'test_message')
                 self.assertIsNotNone(entry)
                 LogEntry.insert(entry)
                 self.assertIsNotNone(entry.id_log_entry)
                 all_entries.append(entry)
 
-            for i in range(50):
+            for _ in range(50):
                 entry = self._create_log_entry(tomorrow, 1, 'test', 'test_message')
                 self.assertIsNotNone(entry)
                 LogEntry.insert(entry)
@@ -91,7 +91,7 @@ class LoggingServiceQueryLogEntriesTest(BaseLoggingServiceAPITest):
             all_entries = []
             current_time = datetime.now()
 
-            for i in range(50):
+            for _ in range(50):
                 entry = self._create_log_entry(current_time, 1, 'test', 'test_message')
                 self.assertIsNotNone(entry)
                 LogEntry.insert(entry)

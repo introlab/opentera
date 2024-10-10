@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -35,11 +35,13 @@ class UserQuerySites(Resource):
 
     @api.doc(description='Get site information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sites',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -102,11 +104,13 @@ class UserQuerySites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified site',
                         400: 'Badly formed JSON or missing field(id_site) in the JSON body',
-                        500: 'Internal error when saving site'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving site'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update site
+        """
         user_access = DBManager.userAccess(current_user)
         if 'site' not in request.json:
             return gettext('Missing site'), 400
@@ -123,6 +127,7 @@ class UserQuerySites(Resource):
                 json_site['id_site'] > 0:
             return gettext('Forbidden'), 403
 
+        # Only superuser can create a site
         if json_site['id_site'] == 0 and not current_user.user_superadmin:
             return gettext('Forbidden'), 403
 
@@ -162,11 +167,13 @@ class UserQuerySites(Resource):
     @api.doc(description='Delete a specific site',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete site (only super admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a site
+        """
         args = delete_parser.parse_args()
         id_todel = args['id']
 

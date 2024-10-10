@@ -6,7 +6,7 @@ from flask.testing import FlaskClient
 import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
-from FakeLoggingService import FakeLoggingService
+from tests.services.LoggingService.FakeLoggingService import FakeLoggingService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from requests.auth import _basic_auth_str
 

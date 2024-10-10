@@ -1,4 +1,4 @@
-from BaseDeviceAPITest import BaseDeviceAPITest
+from tests.modules.FlaskModule.API.device.BaseDeviceAPITest import BaseDeviceAPITest
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceType import TeraDeviceType

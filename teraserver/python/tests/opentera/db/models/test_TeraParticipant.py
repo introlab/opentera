@@ -68,7 +68,7 @@ class TeraParticipantTest(BaseModelsTest):
             id_participant = participant.id_participant
 
             # Assign participant to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             part_session = TeraSessionTest.new_test_session(id_creator_participant=id_participant)
             id_session = part_session.id_session
 
@@ -76,14 +76,14 @@ class TeraParticipantTest(BaseModelsTest):
             id_session_invitee = part_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_participant=id_participant)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_participant=id_participant)
             id_test = test.id_test
 
@@ -117,7 +117,7 @@ class TeraParticipantTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create a new project
-            from test_TeraProject import TeraProjectTest
+            from tests.opentera.db.models.test_TeraProject import TeraProjectTest
             project = TeraProjectTest.new_test_project()
             id_project = project.id_project
 
@@ -127,7 +127,7 @@ class TeraParticipantTest(BaseModelsTest):
             id_participant = participant.id_participant
 
             # Assign participant to sessions
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             part_session = TeraSessionTest.new_test_session(id_creator_participant=id_participant)
             id_session = part_session.id_session
 
@@ -135,19 +135,19 @@ class TeraParticipantTest(BaseModelsTest):
             id_session_invitee = part_session.id_session
 
             # Attach asset
-            from test_TeraAsset import TeraAssetTest
+            from tests.opentera.db.models.test_TeraAsset import TeraAssetTest
             asset = TeraAssetTest.new_test_asset(id_session=id_session,
                                                  service_uuid=TeraService.get_openteraserver_service().service_uuid,
                                                  id_participant=id_participant)
             id_asset = asset.id_asset
 
             # ... and test
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=id_session, id_participant=id_participant)
             id_test = test.id_test
 
             # ... and service config
-            from test_TeraServiceConfig import TeraServiceConfigTest
+            from tests.opentera.db.models.test_TeraServiceConfig import TeraServiceConfigTest
             device_service_config = TeraServiceConfigTest.new_test_service_config(id_participant=id_participant,
                                                                                   id_service=2)
             id_service_config = device_service_config.id_service_config
@@ -177,7 +177,7 @@ class TeraParticipantTest(BaseModelsTest):
             TeraParticipant.undelete(id_participant)
 
             # Create and associate participant group
-            from test_TeraParticipantGroup import TeraParticipantGroupTest
+            from tests.opentera.db.models.test_TeraParticipantGroup import TeraParticipantGroupTest
             group = TeraParticipantGroupTest.new_test_group(id_project)
             id_group = group.id_participant_group
 

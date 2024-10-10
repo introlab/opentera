@@ -1,5 +1,5 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse
+from flask import request
+from flask_restx import Resource
 from flask_babel import gettext
 from sqlalchemy import exc
 
@@ -25,11 +25,14 @@ class DeviceQueryDevices(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
-        args = get_parser.parse_args()
+        """
+        Get connected device information
+        """
+        # args = get_parser.parse_args()
 
         # Reply device information
         response = {'device_info': current_device.to_json(minimal=True)}
@@ -62,9 +65,12 @@ class DeviceQueryDevices(Resource):
                         403: 'Logged device can\'t update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
                         500: 'Internal error occurred when saving device'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @LoginModule.device_token_or_certificate_required
     def post(self):
+        """
+        Update current device information
+        """
         if 'device' not in request.json:
             return gettext('Missing device schema'), 400
 

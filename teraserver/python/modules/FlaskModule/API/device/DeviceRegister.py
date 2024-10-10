@@ -66,6 +66,9 @@ class DeviceRegister(Resource):
                        401: 'Unauthorized - provided registration key is invalid'})
     @api.expect(api_parser)
     def get(self):
+        """
+        Register a new device in the server (token based)
+        """
         args = api_parser.parse_args(strict=True)
 
         # Check if provided registration key is ok
@@ -92,6 +95,9 @@ class DeviceRegister(Resource):
                         400: 'Missing or invalid parameter',
                         401: 'Unauthorized - provided registration key is invalid'})
     def post(self):
+        """
+        Register a new device in the server (certificate based)
+        """
         args = api_parser.parse_args(strict=True)
 
         # Check if provided registration key is ok

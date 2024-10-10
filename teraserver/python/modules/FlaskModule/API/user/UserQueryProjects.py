@@ -43,11 +43,13 @@ class UserQueryProjects(Resource):
 
     @api.doc(description='Get projects information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of participants',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get projects
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -121,11 +123,13 @@ class UserQueryProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified project',
                         400: 'Badly formed JSON or missing fields(id_site or id_project) in the JSON body',
-                        500: 'Internal error occured when saving project'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving project'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update project
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'project' not in request.json:
@@ -247,11 +251,13 @@ class UserQueryProjects(Resource):
     @api.doc(description='Delete a specific project',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete project (only site admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete project
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

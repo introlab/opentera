@@ -1,9 +1,8 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse
+from flask import request
+from flask_restx import Resource
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from flask_babel import gettext
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraDevice import TeraDevice
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
 import json
@@ -38,10 +37,13 @@ class DeviceQueryStatus(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(status_schema)
     @LoginModule.device_token_or_certificate_required
     def post(self):
+        """
+        Update current device status
+        """
         # status_schema.validate(request.json)
         # This should not be required since schema should be validated first.
         if 'status' not in request.json or 'timestamp' not in request.json:

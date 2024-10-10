@@ -35,7 +35,7 @@ class TeraTestTypeTest(BaseModelsTest):
             test_type = TeraTestTypeTest.new_test_test_type()
             id_test_type = test_type.id_test_type
 
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=1, id_participant=1, id_test_type=id_test_type)
             self.assertIsNotNone(test.id_test)
             id_test = test.id_test
@@ -63,18 +63,18 @@ class TeraTestTypeTest(BaseModelsTest):
             test_type = TeraTestTypeTest.new_test_test_type()
             id_test_type = test_type.id_test_type
 
-            from test_TeraTest import TeraTestTest
+            from tests.opentera.db.models.test_TeraTest import TeraTestTest
             test = TeraTestTest.new_test_test(id_session=1, id_participant=1, id_test_type=id_test_type)
             self.assertIsNotNone(test.id_test)
             id_test = test.id_test
 
             # Associate with site
-            from test_TeraTestTypeSite import TeraTestTypeSiteTest
+            from tests.opentera.db.models.test_TeraTestTypeSite import TeraTestTypeSiteTest
             tt_site = TeraTestTypeSiteTest.new_test_test_type_site(id_site=1, id_test_type=id_test_type)
             id_test_type_site = tt_site.id_test_type_site
 
             # ... and project
-            from test_TeraTestTypeProject import TeraTestTypeProjectTest
+            from tests.opentera.db.models.test_TeraTestTypeProject import TeraTestTypeProjectTest
             tt_project = TeraTestTypeProjectTest.new_test_test_type_project(id_project=1, id_test_type=id_test_type)
             id_test_type_project = tt_project.id_test_type_project
 

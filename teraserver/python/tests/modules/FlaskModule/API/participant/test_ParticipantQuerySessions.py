@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from BaseParticipantAPITest import BaseParticipantAPITest
+from tests.modules.FlaskModule.API.participant.BaseParticipantAPITest import BaseParticipantAPITest
 from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraSession import TeraSession

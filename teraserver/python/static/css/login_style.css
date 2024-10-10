@@ -1,0 +1,26 @@
+body{
+    background-color: #2c3338;
+}
+
+ .card-header, .card-footer{
+    background-color: #4c5861;
+    color: white;
+ }
+
+ .card-body{
+    background-color: black;
+    color: white;
+ }
+
+ .card{
+    border: none;
+    box-shadow: 5px 5px 4px #424242;
+ }
+
+ .img-logo{
+    max-height: 175px;
+}
+
+.img-qr{
+    width: 200px;
+}

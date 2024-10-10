@@ -1,10 +1,8 @@
-from flask import session
 from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -20,12 +18,14 @@ class UserQueryOnlineDevices(Resource):
         self.test = kwargs.get('test', False)
 
     @api.doc(description='Get online devices uuids.',
-             responses={200: 'Success'},
-             params={'token': 'Secret token'})
+             responses={200: 'Success'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
-        args = get_parser.parse_args()
+        """
+        Get online devices
+        """
+        # args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
         try:

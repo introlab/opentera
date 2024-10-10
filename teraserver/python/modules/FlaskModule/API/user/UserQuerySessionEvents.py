@@ -1,9 +1,8 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
@@ -32,11 +31,13 @@ class UserQuerySessionEvents(Resource):
     @api.doc(description='Get events for a specific session',
              responses={200: 'Success - returns list of events',
                         400: 'Required parameter is missing (id_session)',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get events for a session
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -66,11 +67,13 @@ class UserQuerySessionEvents(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
-                        500: 'Internal error when saving device'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving device'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update session events
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
@@ -126,11 +129,13 @@ class UserQuerySessionEvents(Resource):
     @api.doc(description='Delete a specific session event',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete event (no access to that session)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a session event
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

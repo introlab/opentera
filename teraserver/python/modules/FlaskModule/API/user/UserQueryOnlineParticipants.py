@@ -1,10 +1,8 @@
-from flask import session
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -27,6 +25,9 @@ class UserQueryOnlineParticipants(Resource):
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get online participants
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 

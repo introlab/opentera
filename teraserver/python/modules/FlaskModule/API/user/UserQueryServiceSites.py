@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -46,11 +46,13 @@ class UserQueryServiceSites(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of services - sites association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get services associated with a site
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -117,12 +119,14 @@ class UserQueryServiceSites(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only super admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
-        user_access = DBManager.userAccess(current_user)
+        """
+        Create / update service-site association
+        """
+        # user_access = DBManager.userAccess(current_user)
 
         # Only super admins can change service - site associations
         if not current_user.user_superadmin:
@@ -248,12 +252,14 @@ class UserQueryServiceSites(Resource):
     @api.doc(description='Delete a specific service - site association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (only super admins can)',
-                        500: 'Association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
-        user_access = DBManager.userAccess(current_user)
+        """
+        Delete service-site association
+        """
+        # user_access = DBManager.userAccess(current_user)
 
         if not current_user.user_superadmin:
             return gettext('Forbidden'), 403
