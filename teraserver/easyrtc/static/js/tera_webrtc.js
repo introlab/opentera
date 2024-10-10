@@ -1286,9 +1286,11 @@ async function shareScreen(local, start, sound_only = false){
             localStreams.push({"peerid": local_peerid, "streamname": streamName, "stream":screenStream});
 
         } catch(err) {
-            showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
-                + "<br/><br/>" + translator.translateForKey("errors.error-msg", currentLang) +
-                ": <br/>" + err, true, false);
+            if (!teraConnected){
+                showError("shareScreen", translator.translateForKey("errors.no-sharescreen-access", currentLang)
+                    + "<br/><br/>" + translator.translateForKey("errors.error-msg", currentLang) +
+                    ": <br/>" + err, true, false);
+            }
             return Promise.Reject(err)
         }
 
