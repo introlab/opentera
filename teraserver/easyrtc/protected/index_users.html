@@ -17,6 +17,8 @@
     <script src="easyrtc/easyrtc.js"></script>
     <script src="js/bowser/bowser.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+
     <script src="js/tera_layout.js"></script>
     <script src="js/tera_main.js"></script>
     <script src="js/tera_ui.js"></script>
@@ -27,6 +29,7 @@
     <script src="js/tera_medias.js"></script>
     <script src="js/tera_tools.js"></script>
     <script src="js/tera_screen_control.js"></script>
+    <script src="js/tera_processing.js"></script>
 
     <!-- Streams recorders -->
     <script src="js/recordrtc/RecordRTC.js"></script>
@@ -79,6 +82,10 @@
                 <div class="form-group">
                     <label for="videoSelect" class="form-label" data-i18n="configDialog.video1">Source vidéo principale: </label>
                     <select id="videoSelect" class="form-control"></select>
+                </div>
+                <div class="form-group" id="blurGroup">
+                    <input type="checkbox" id="blurCheck" name="blurCheck" value="Blur" class="">
+                    <label for="blurCheck" class="form-label ml-1" data-i18n="configDialog.blur">Flouter l'arrière-plan</label>
                 </div>
                 <div class="form-group">
                     <label for="audioSelect" class="form-label" data-i18n="configDialog.audio1">Source audio principale: </label>

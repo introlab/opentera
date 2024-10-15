@@ -94,8 +94,8 @@ if (args.local_ssl == false){
 }else{
     var webServer = https.createServer(
         {
-            key:  fs.readFileSync("../python/certificates/site_key.pem"),
-            cert: fs.readFileSync("../python/certificates/site_cert.pem")
+            key:  fs.readFileSync("../python/config/certificates/site_key.pem"),
+            cert: fs.readFileSync("../python/config/certificates/site_cert.pem")
         },
         httpApp).listen(args.port);
 }

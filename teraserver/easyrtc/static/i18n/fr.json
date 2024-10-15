@@ -12,7 +12,8 @@
 		"audio2": "Source Audio Secondaire",
 		"mirror": "Image Miroir",
 		"none": "Aucune",
-		"screenaudio": "Partager audio écran"
+		"screenaudio": "Partager audio écran",
+		"blur": "Flouter l'arrière-plan"
 	},
 	"chronosDialog": {
 		"title": "Chronomètres",
