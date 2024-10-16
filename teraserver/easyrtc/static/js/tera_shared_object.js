@@ -47,6 +47,8 @@ function setupSharedObjectCallbacks(channel){
     channel.objects.SharedObject.newDataForward.connect(forwardData);
     channel.objects.SharedObject.newSecondSources.connect(selectSecondarySources);
     channel.objects.SharedObject.setLocalMirrorSignal.connect(setLocalMirror);
+    if (channel.objects.SharedObject.setLocalBlurSignal !== undefined)
+        channel.objects.SharedObject.setLocalBlurSignal.connect(setLocalBlur);
 
     if (channel.objects.SharedObject.videoSourceRemoved !== undefined)
         channel.objects.SharedObject.videoSourceRemoved.connect(removeVideoSource);
@@ -65,6 +67,7 @@ function setupSharedObjectCallbacks(channel){
         selectAudioSource(settings.audio);
         selectVideoSource(settings.video);
         setLocalMirror(settings.mirror);
+        setLocalBlur(settings.blur);
         selectSecondarySources(settings.secondAudioVideo);
         ptz = JSON.parse(settings.ptz);
         setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
@@ -92,6 +95,11 @@ function updateContact(contact)
 
 function setLocalMirror(mirror){
     setMirror(mirror, true, 1);
+}
+
+function setLocalBlur(blur_value){
+    console.log("setLocalBlur = " + blur_value);
+    currentConfig["video1Blur"] = blur_value;
 }
 
 function startRecordingRequest(){

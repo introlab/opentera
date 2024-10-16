@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-10-07 15:05-0400\n"
+"POT-Creation-Date: 2024-10-16 10:11-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -2147,45 +2147,49 @@ msgstr ""
 msgid "Mirrored image"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:54
+#: opentera/forms/TeraServiceConfigForm.py:53
+msgid "Blurred background"
+msgstr ""
+
+#: opentera/forms/TeraServiceConfigForm.py:55
 msgid "URL"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:58
+#: opentera/forms/TeraServiceConfigForm.py:59
 msgid "Pan-Tilt-Zoom Camera"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:59
+#: opentera/forms/TeraServiceConfigForm.py:60
 msgid "Control Type"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:60
+#: opentera/forms/TeraServiceConfigForm.py:61
 msgid "Vivotek"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:65
+#: opentera/forms/TeraServiceConfigForm.py:66
 msgid "Network Address"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:68
+#: opentera/forms/TeraServiceConfigForm.py:69
 msgid "Port"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:71 opentera/forms/TeraUserForm.py:21
+#: opentera/forms/TeraServiceConfigForm.py:72 opentera/forms/TeraUserForm.py:21
 #: templates/login.html:125
 msgid "Username"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:74 opentera/forms/TeraUserForm.py:44
+#: opentera/forms/TeraServiceConfigForm.py:75 opentera/forms/TeraUserForm.py:44
 #: templates/login.html:131
 msgid "Password"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:78
+#: opentera/forms/TeraServiceConfigForm.py:79
 msgid "Microphone"
 msgstr ""
 
-#: opentera/forms/TeraServiceConfigForm.py:79
+#: opentera/forms/TeraServiceConfigForm.py:80
 msgid "Secondary Camera"
 msgstr ""
 

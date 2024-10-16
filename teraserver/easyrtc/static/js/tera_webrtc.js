@@ -437,7 +437,6 @@ function localVideoStreamSuccess(stream){
                     });
                 }
             }
-
         }
         easyrtc.setVideoObjectSrc(getVideoWidget(true, local_index+1)[0], stream);
 
@@ -445,6 +444,10 @@ function localVideoStreamSuccess(stream){
         easyrtc.enableMicrophone(!localContact.status.microMuted)
         updateStatusIconState(!localContact.status.microMuted, true, local_index+1, 'Mic');
         updateStatusIconState(true, true, local_index+1, 'Video');
+        if (local_index === 0){
+            unblurredTrack = undefined;
+            blur(currentConfig.video1Blur, false);
+        }
 
     }else{
         console.log("Got local stream - waiting for it to become active...");

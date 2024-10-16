@@ -1,9 +1,9 @@
 let unblurredTrack = undefined;
 
 // Blur local video. Only first local stream is supported for now.
-function blur(enable = true) {
+function blur(enable = true, refresh_stream = false) {
     if ( (enable && unblurredTrack !== undefined) || (!enable && unblurredTrack === undefined)) {
-        console.error("Blur: Can't unblur or blur a stream that's already blurred or unblurred.")
+        //console.error("Blur: Can't unblur or blur a stream that's already blurred or unblurred.")
         return;
     }
 
@@ -54,7 +54,7 @@ function blur(enable = true) {
 
             // Only overwrite missing pixels.
             ctx.globalCompositeOperation = "destination-atop";
-            ctx.filter = `blur(16px)`;
+            ctx.filter = `blur(10px)`;
             ctx.drawImage(
                 results.image,
                 0,
@@ -89,5 +89,6 @@ function blur(enable = true) {
         processedStream.removeTrack(unblurredTrack);
         processedStream.addTrack(trackGenerator);
     }
-    localVideoStreamSuccess(localStreams[0].stream);
+    if (refresh_stream)
+        localVideoStreamSuccess(localStreams[0].stream);
 }
