@@ -1,7 +1,7 @@
-from services.LoggingService.FlaskModule import flask_app
-import services.LoggingService.Globals as Globals
+from services.EmailService.FlaskModule import flask_app
+import services.EmailService.Globals as Globals
 from opentera.redis.RedisClient import RedisClient
-from services.LoggingService.ConfigManager import ConfigManager
+from services.EmailService.ConfigManager import ConfigManager
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.redis.RedisVars import RedisVars
 from google.protobuf.json_format import ParseError
@@ -18,7 +18,7 @@ from sqlalchemy.exc import OperationalError
 from services.LoggingService.FlaskModule import FlaskModule
 
 
-class LoggingService(ServiceOpenTera):
+class EmailService(ServiceOpenTera):
     def __init__(self, config_man: ConfigManager, this_service_info):
         ServiceOpenTera.__init__(self, config_man, this_service_info)
 
@@ -27,12 +27,6 @@ class LoggingService(ServiceOpenTera):
 
         # Create twisted service
         self.flaskModuleService = self.flaskModule.create_service()
-
-        # self.application = service.Application(self.config['name'])
-
-        # TODO update log level according to configuration
-        # TODO will log everything for now
-        self.loglevel = messages.LogEvent.LOGLEVEL_TRACE
 
     def notify_service_messages(self, pattern, channel, message):
         pass
@@ -59,73 +53,41 @@ class LoggingService(ServiceOpenTera):
     @defer.inlineCallbacks
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
-        ret1 = yield self.subscribe_pattern_with_callback('log.*', self.log_event_received)
+        yield None
+        # ret1 = yield self.subscribe_pattern_with_callback('log.*', self.log_event_received)
         # print(ret1)
+        #
+        # log_levels = ['log.trace', 'log.debug', 'log.info', 'log.warning', 'log.critical', 'log.error', 'log.fatal']
+        #
+        # for level in log_levels:
+        #     loop = task.LoopingCall(self.read_queues, level)
+        #
+        #     # Start looping every 1 second.
+        #     d = loop.start(1.0)
+        #
+        #     # Add callbacks for stop and failure.
+        #     d.addCallback(self.cbLoopDone)
+        #     d.addErrback(self.ebLoopFailed)
 
-        log_levels = ['log.trace', 'log.debug', 'log.info', 'log.warning', 'log.critical', 'log.error', 'log.fatal']
-
-        for level in log_levels:
-            loop = task.LoopingCall(self.read_queues, level)
-
-            # Start looping every 1 second.
-            d = loop.start(1.0)
-
-            # Add callbacks for stop and failure.
-            d.addCallback(self.cbLoopDone)
-            d.addErrback(self.ebLoopFailed)
-
-    def log_event_received(self, pattern, channel, message):
-        # print('LoggingService - user_manager_event_received', pattern, channel, message)
-        try:
-            tera_event = messages.TeraEvent()
-            if isinstance(message, str):
-                ret = tera_event.ParseFromString(message.encode('utf-8'))
-            elif isinstance(message, bytes):
-                ret = tera_event.ParseFromString(message)
-
-            log_event = messages.LogEvent()
-            login_event = messages.LoginEvent()
-
-            # Look for UserEvent, ParticipantEvent, DeviceEvent
-            for any_msg in tera_event.events:
-                if any_msg.Unpack(log_event):
-                    # Check current log level, store db if lower than current log level
-                    if log_event.level <= self.loglevel:
-                        Globals.db_man.store_log_event(log_event)
-                    else:
-                        print(log_event)
-                if any_msg.Unpack(login_event):
-                    if login_event.log_header.level <= self.loglevel:
-                        Globals.db_man.store_login_event(login_event)
-
-        except DecodeError as d:
-            print('LoggingService - DecodeError ', pattern, channel, message, d)
-        except ParseError as e:
-            print('LoggingService - Failure in redisMessageReceived', e)
 
     def setup_rpc_interface(self):
         # TODO Update rpc interface
-        self.rpc_api['set_loglevel'] = {'args': ['str:loglevel'],
-                                          'returns': 'dict',
-                                          'callback': self.set_loglevel}
-
-    def set_loglevel(self, loglevel):
         pass
+        # self.rpc_api['set_loglevel'] = {'args': ['str:loglevel'],
+        #                                   'returns': 'dict',
+        #                                   'callback': self.set_loglevel}
 
 
 if __name__ == '__main__':
 
-    # Very first thing, log to stdout
-    log.startLogging(sys.stdout)
-
     # Load configuration
-    if not Globals.config_man.load_config('LoggingService.json'):
+    if not Globals.config_man.load_config('EmailService.json'):
         print('Invalid config')
         exit(1)
 
     import argparse
 
-    parser = argparse.ArgumentParser(description='Logging Service')
+    parser = argparse.ArgumentParser(description='Email Service')
     parser.add_argument('--enable_tests', help='Test mode for service.', default=False)
     args = parser.parse_args()
 
@@ -192,7 +154,7 @@ if __name__ == '__main__':
     # In test mode, db manager will not save anything into a database
 
     # Create the Service
-    Globals.service = LoggingService(Globals.config_man, service_info)
+    Globals.service = EmailService(Globals.config_man, service_info)
 
     # Start App / reactor events
     reactor.run()

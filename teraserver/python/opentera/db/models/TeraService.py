@@ -170,6 +170,18 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_service.service_system = True
         TeraService.db().session.add(new_service)
 
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'EmailService'
+        new_service.service_name = 'Email Service'
+        new_service.service_hostname = '127.0.0.1'
+        new_service.service_port = 4043
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/mail'
+        new_service.service_enabled = True
+        new_service.service_system = True
+        TeraService.db().session.add(new_service)
+
         if test:
             new_service = TeraService()
             new_service.service_uuid = str(uuid.uuid4())
