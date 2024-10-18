@@ -15,7 +15,7 @@ import sys
 
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from sqlalchemy.exc import OperationalError
-from services.LoggingService.FlaskModule import FlaskModule
+from services.EmailService.FlaskModule import FlaskModule
 
 
 class EmailService(ServiceOpenTera):

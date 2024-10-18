@@ -9,9 +9,6 @@ from flask_babel import gettext
 
 # Parser definition(s)
 get_parser = api.parser()
-
-# Parser definition(s)
-get_parser = api.parser()
 get_parser.add_argument('limit', type=int, help='Maximum number of results to return', default=None)
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index',
                         default=None)

@@ -3,9 +3,12 @@ from flask import Flask, request, g, url_for
 from flask_restx import Api, Namespace
 from flask_babel import Babel
 
+# Flask mail
+from flask_mail import Mail
+
 # OpenTera
 from opentera.modules.BaseModule import BaseModule
-from services.LoggingService.ConfigManager import ConfigManager
+from services.EmailService.ConfigManager import ConfigManager
 
 # WebSockets
 from autobahn.twisted.resource import WSGIRootResource
@@ -19,6 +22,9 @@ import os
 
 # Flask application
 flask_app = Flask("EmailService")
+
+# Mailman
+mail_man = Mail()
 
 
 def get_locale():
@@ -85,11 +91,7 @@ class CustomAPI(Api):
 
 
 # API
-# TODO - Fix auth
 authorizations = {
-    'basicAuth': {
-        'type': 'basic'
-    },
     'tokenAuth': {
         'type': 'apiKey',
         'in': 'header',
@@ -101,7 +103,7 @@ authorizations = {
 # API
 api = CustomAPI(flask_app, version='1.0.0', title='EmailService API',
                 description='EmailService API Documentation', doc='/doc', prefix='/api',
-                authorizations=authorizations)
+                authorizations=authorizations, security='tokenAuth')
 
 # Namespaces
 email_api_ns = api.namespace('email', description='EmailService API')
@@ -132,6 +134,19 @@ class FlaskModule(BaseModule):
 
         # Init Views
         self.init_views()
+
+        # Init mailer
+        flask_app.config.update({"MAIL_SERVER": config.email_config['hostname']})
+        flask_app.config.update({"MAIL_PORT": config.email_config['port']})
+        flask_app.config.update({"MAIL_USE_TLS": config.email_config['tls']})
+        flask_app.config.update({"MAIL_USE_SSL": config.email_config['ssl']})
+        flask_app.config.update({"MAIL_USERNAME": config.email_config['username']})
+        flask_app.config.update({"MAIL_PASSWORD": config.email_config['password']})
+        flask_app.config.update({"MAIL_DEFAULT_SENDER": config.email_config['default_sender']})
+        flask_app.config.update({"MAIL_MAX_EMAILS": config.email_config['max_emails']})
+
+        mail_man.init_app(flask_app)
+
 
     def create_service(self):
         # create a Twisted Web WSGI resource for our Flask server
@@ -172,7 +187,7 @@ class FlaskModule(BaseModule):
         """
         We have received a published message from redis
         """
-        print('LoggingService.FlaskModule - Received message ', pattern, channel, message)
+        print('EmailService.FlaskModule - Received message ', pattern, channel, message)
         pass
 
     @staticmethod
@@ -180,6 +195,9 @@ class FlaskModule(BaseModule):
         # Default arguments
         kwargs = {'flaskModule': module}
         kwargs |= additional_args
+
+        from services.EmailService.API.QuerySendEmail import QuerySendEmail
+        namespace.add_resource(QuerySendEmail, '/send', resource_class_kwargs=kwargs)
 
 
     def init_views(self):
