@@ -106,7 +106,7 @@ api = CustomAPI(flask_app, version='1.0.0', title='EmailService API',
                 authorizations=authorizations, security='tokenAuth')
 
 # Namespaces
-email_api_ns = api.namespace('email', description='EmailService API')
+email_api_ns = api.namespace('', description='EmailService API')
 
 
 class FlaskModule(BaseModule):

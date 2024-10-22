@@ -53,7 +53,7 @@ class QuerySendEmail(Resource):
                         400: 'Invalid format',
                         401: 'Unauthorized login type',
                         403: 'No access to target senders'})
-    @api.expect(post_schema, validate=True)
+    @api.expect(post_schema)
     @ServiceAccessManager.token_required()
     def post(self):
         if current_login_type != LoginType.USER_LOGIN:
@@ -67,10 +67,17 @@ class QuerySendEmail(Resource):
 
         if 'user_uuid' in json_email:
             user_uuids = json_email['user_uuid']
+            if not isinstance(user_uuids, list):
+                user_uuids = [user_uuids]
             # Validate access to uuids
             for user_uuid in user_uuids:
                 # Do query as user to check if it has access to that user or not
-                response = current_user_client.do_get_request_to_backend('/api/user/users?user_uuid=' + user_uuid)
+                if self.test:
+                    response = Globals.service.get_from_opentera('/api/user/users',
+                                                                 params={'user_uuid': user_uuid},
+                                                                 token=current_user_client.user_token)
+                else:
+                    response = current_user_client.do_get_request_to_backend('/api/user/users?user_uuid=' + user_uuid)
                 response_json = response.json()
                 if response.status_code != 200 or not response_json:
                     return gettext('At least one user is not accessible'), 403
@@ -81,11 +88,18 @@ class QuerySendEmail(Resource):
 
         if 'participant_uuid' in json_email:
             participant_uuids = json_email['participant_uuid']
+            if not isinstance(participant_uuids, list):
+                participant_uuids = [participant_uuids]
             # Validate access to uuids
             for participant_uuid in participant_uuids:
                 # Do query as user to check if it has access to that participant or not
-                response = current_user_client.do_get_request_to_backend('/api/user/participants?participant_uuid=' +
-                                                                         participant_uuid)
+                if self.test:
+                    response = Globals.service.get_from_opentera('/api/user/participants',
+                                                                 params={'participant_uuid': participant_uuid},
+                                                                 token=current_user_client.user_token)
+                else:
+                    response = current_user_client.do_get_request_to_backend('/api/user/participants?participant_uuid=' +
+                                                                             participant_uuid)
                 response_json = response.json()
 
                 if response.status_code != 200 or not response_json == 0:
