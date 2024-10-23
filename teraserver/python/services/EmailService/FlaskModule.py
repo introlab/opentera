@@ -23,9 +23,6 @@ import os
 # Flask application
 flask_app = Flask("EmailService")
 
-# Mailman
-mail_man = Mail()
-
 
 def get_locale():
     # if a user is logged in, use the locale from the user settings
@@ -132,6 +129,9 @@ class FlaskModule(BaseModule):
         # Init API
         FlaskModule.init_api(self, email_api_ns)
 
+        # Mailman
+        self.mail_man = Mail(flask_app)
+
         # Init Views
         self.init_views()
 
@@ -145,7 +145,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({"MAIL_DEFAULT_SENDER": config.email_config['default_sender']})
         flask_app.config.update({"MAIL_MAX_EMAILS": config.email_config['max_emails']})
 
-        mail_man.init_app(flask_app)
+        self.mail_man.init_app(flask_app)
 
 
     def create_service(self):

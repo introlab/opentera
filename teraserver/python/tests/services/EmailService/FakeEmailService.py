@@ -1,15 +1,21 @@
-from services.EmailService.FlaskModule import CustomAPI, authorizations
-from requests import Response
 from modules.DatabaseModule.DBManager import DBManager
-from services.EmailService.ConfigManager import ConfigManager
+from modules.LoginModule.LoginModule import LoginModule
 from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from opentera.redis.RedisVars import RedisVars
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from modules.LoginModule.LoginModule import LoginModule
+from services.EmailService.ConfigManager import ConfigManager
+from services.EmailService.FlaskModule import CustomAPI, authorizations
+
 from flask import Flask
 from flask import Response as FlaskResponse
 from flask_babel import Babel
+
+# Flask mail
+from flask_mail import Mail
+
+from requests import Response
+
 import redis
 import uuid
 from io import BytesIO
@@ -41,6 +47,20 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         self.flask_app.config.update({'UPLOAD_FOLDER': '.'})
+
+        # Init mailer
+        self.flask_app.config.update({"MAIL_SERVER": '127.0.0.1'})
+        self.flask_app.config.update({"MAIL_PORT": 25})
+        self.flask_app.config.update({"MAIL_USE_TLS": False})
+        self.flask_app.config.update({"MAIL_USE_SSL": False})
+        self.flask_app.config.update({"MAIL_USERNAME": ''})
+        self.flask_app.config.update({"MAIL_PASSWORD": ''})
+        self.flask_app.config.update({"MAIL_DEFAULT_SENDER": 'test@opentera.org'})
+        self.flask_app.config.update({"MAIL_MAX_EMAILS": 25})
+
+        self.mail_man = Mail(flask_app)
+        self.mail_man.init_app(self.flask_app)
+
         self.email_api_namespace = self.api.namespace('', description='EmailService API')
         self.service_api_namespace = self.api.namespace('service', description='Fake EmailService service API')
         self.user_api_namespace = self.api.namespace('user', description='Fake EmailService user API')

@@ -428,6 +428,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
+        admin.user_email = "admin@opentera.org"
         TeraUser.db().session.add(admin)
 
         if test:

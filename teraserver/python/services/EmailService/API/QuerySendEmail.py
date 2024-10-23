@@ -1,7 +1,7 @@
 from flask_restx import Resource, inputs
 from flask import request
 from flask_mail import Message
-from services.EmailService.FlaskModule import email_api_ns as api, mail_man
+from services.EmailService.FlaskModule import email_api_ns as api
 from opentera.services.ServiceAccessManager import (ServiceAccessManager, current_user_client, current_login_type,
                                                     LoginType)
 from flask_babel import gettext
@@ -102,8 +102,9 @@ class QuerySendEmail(Resource):
                                                                              participant_uuid)
                 response_json = response.json()
 
-                if response.status_code != 200 or not response_json == 0:
-                    return gettext('At least one participant is not accessible'), response.status_code
+                if response.status_code != 200 or not response_json:
+                    return gettext('At least one participant is not accessible'), 403
+
                 if 'participant_email' in response_json[0] and response_json[0]['participant_email']:
                     participant_emails.append(response_json[0]['participant_email'])
 
@@ -121,26 +122,38 @@ class QuerySendEmail(Resource):
         elif 'body' in json_email:
             email_body = json_email['body']
         else:
-            return gettext('Missing template ID or body text')
+            return gettext('Missing template ID or body text'), 400
 
-        email_subject = gettext('No subject')
+        email_subject = gettext('(No subject)')
         if 'subject' in json_email:
             email_subject = json_email['subject']
 
         if 'body_variables' in json_email:
             # Replace variables in body text
             template = Template(email_body)
-            template.substitute(json_email['body_variables'])
+            email_body = template.safe_substitute(json_email['body_variables'])
 
         # Send email!
-        sender_email = (current_user_client.user_fullname, current_user_client.get_user_info()['user_email'])
+        sender_email = None
+        if self.test:
+            response = Globals.service.get_from_opentera('/api/user/users',
+                                                         params={'user_uuid': current_user_client.user_uuid},
+                                                         token=current_user_client.user_token)
+            if response.status_code == 200:
+                response_json = response.json()
+                if response_json:
+                    sender_email = (current_user_client.user_fullname, response_json[0]['user_email'])
+        else:
+            sender_email = (current_user_client.user_fullname, current_user_client.get_user_info()['user_email'])
         if not sender_email:
             return gettext('User doesn\'t have any email address set'), 400
 
-        email = Message(subject=email_subject, html=email_body, recipients=[user_emails, participant_emails],
+        email = Message(subject=email_subject, html=email_body, recipients=user_emails + participant_emails,
                         sender=sender_email, reply_to=sender_email)
         try:
-            mail_man.send(email)
+            self.module.mail_man.send(email)
+        except ConnectionRefusedError:
+            return gettext('Can\'t connect to SMTP server'), 503
         except Exception as e:
             return str(e), 500
 

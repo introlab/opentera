@@ -295,6 +295,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             participant1.participant_participant_group = \
                 TeraParticipantGroup.get_participant_group_by_group_name('Default Participant Group A')
             participant1.participant_project = project1
+            participant1.participant_email = "x@opentera.org"
 
             # participant1.create_token()
             participant1.participant_username = 'participant1'
