@@ -1,6 +1,4 @@
-from .LogEntry import LogEntry
-from .LoginEntry import LoginEntry
+from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
 
 # All exported symbols
-__all__ = ['LogEntry',
-           'LoginEntry']
+__all__ = ['EmailTemplate']

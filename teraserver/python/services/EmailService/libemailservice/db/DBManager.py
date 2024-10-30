@@ -8,6 +8,7 @@ from sqlite3 import Connection as SQLite3Connection
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
+from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
 
 from services.EmailService.ConfigManager import ConfigManager
 from services.EmailService.FlaskModule import flask_app
@@ -37,7 +38,33 @@ class DBManager:
 
     def create_defaults(self, config: ConfigManager, test: bool = False):
         with self.app.app_context():
-            pass
+            if test:
+                # Create test default values
+                template = EmailTemplate()
+                template.email_template_key = 'GENERAL_TEST_EMAIL'
+                template.email_template = 'This is a GLOBAL general test email, using $variable .'
+                EmailTemplate.db().session.add(template)
+
+                template = EmailTemplate()
+                template.email_template_key = 'PROJECT_EMAIL'
+                template.email_template = 'This is a PROJECT test email, using $variable .'
+                template.id_project = 1
+                EmailTemplate.db().session.add(template)
+
+                template = EmailTemplate()
+                template.email_template_key = 'SITE_EMAIL'
+                template.email_template = 'This is a SITE test email, using $variable .'
+                template.id_site = 2
+                EmailTemplate.db().session.add(template)
+
+                template = EmailTemplate()
+                template.email_template_key = 'GENERAL_TEST_EMAIL'
+                template.email_template = 'This is a PROJECT test email overriding GLOBAL, using $variable .'
+                template.id_project = 1
+                EmailTemplate.db().session.add(template)
+
+                EmailTemplate.db().session.commit()
+
 
     def open(self, db_infos, echo=False):
         self.db_uri = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % db_infos

@@ -1,9 +1,11 @@
 from flask_restx import Resource, inputs
 from flask import request
 from flask_mail import Message
+
 from services.EmailService.FlaskModule import email_api_ns as api
 from opentera.services.ServiceAccessManager import (ServiceAccessManager, current_user_client, current_login_type,
                                                     LoginType)
+from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
 from flask_babel import gettext
 from string import Template
 
@@ -114,11 +116,51 @@ class QuerySendEmail(Resource):
         if 'id_template' in json_email and 'body' in json_email:
             return gettext('Can\'t specify both a template and an email body'), 400
 
-        email_body = ''
         if 'id_template' in json_email:
-            # TODO: Load template from db
-            # TODO: Validate access to template
-            pass
+            # Load template from db
+            template = EmailTemplate.get_template_by_id(json_email['id_template'])
+            if not template:
+                return gettext('Forbidden'), 403
+
+            # Validate access to template
+            if template.id_site:
+                has_access = False
+                if self.test:
+                    response = Globals.service.get_from_opentera('/api/user/sites',
+                                                                 params={'id_site': template.id_site},
+                                                                 token=current_user_client.user_token)
+                    if response.status_code == 200 and response.json() != []:
+                        has_access = True
+                else:
+                    if current_user_client.get_role_for_site(template.id_site) != 'Undefined':
+                        has_access = True
+
+                if not has_access:
+                    return gettext('Forbidden'), 403
+
+
+            if template.id_project:
+                has_access = False
+                if self.test:
+                    response = Globals.service.get_from_opentera('/api/user/projects',
+                                                                 params={'id_project': template.id_project},
+                                                                 token=current_user_client.user_token)
+                    if response.status_code == 200 and response.json() != []:
+                        has_access = True
+                else:
+                    if current_user_client.get_role_for_project(template.id_project) != 'Undefined':
+                        has_access = True
+
+                if not has_access:
+                    return gettext('Forbidden'), 403
+
+            if not template.id_site and not template.id_project:
+                # Global template - only allowed for super admins
+                if not current_user_client.user_superadmin:
+                    return gettext('Forbidden'), 403
+            # All good - set email body to template body
+            email_body = template.email_template
+
         elif 'body' in json_email:
             email_body = json_email['body']
         else:

@@ -1,3 +1,4 @@
+from services.EmailService.libemailservice.db.models import EmailTemplate
 from tests.services.EmailService.BaseEmailServiceAPITest import BaseEmailServiceAPITest
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
@@ -123,8 +124,58 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_user3_token, json=json_data)
             self.assertEqual(response.status_code, 400)
 
-    def test_no_access_to_template(self):
-        pass
+    def test_invalid_template(self):
+        with self.app_context():
+            part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
+            self.assertIsNotNone(part_uuid)
+            json_data = {'participant_uuid': part_uuid, 'id_template': 0}
+            response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_no_access_to_template_site(self):
+        with self.app_context():
+            user_uuid = TeraUser.get_user_by_username('user4').user_uuid
+            self.assertIsNotNone(user_uuid)
+            template = EmailTemplate.get_template_by_key('SITE_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'user_uuid': user_uuid, 'id_template': template.id_email_template}
+            response = self._post_with_token_auth(self.test_client, token=self.user_user4_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_no_access_to_template_project(self):
+        with self.app_context():
+            user_uuid = TeraUser.get_user_by_username('user4').user_uuid
+            self.assertIsNotNone(user_uuid)
+            template = EmailTemplate.get_template_by_key('PROJECT_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'user_uuid': user_uuid, 'id_template': template.id_email_template}
+            response = self._post_with_token_auth(self.test_client, token=self.user_user4_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_no_access_to_global_template(self):
+        with self.app_context():
+            part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
+            self.assertIsNotNone(part_uuid)
+            template = EmailTemplate.get_template_by_key('GENERAL_TEST_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'participant_uuid': part_uuid, 'id_template': template.id_email_template}
+            response = self._post_with_token_auth(self.test_client, token=self.user_user3_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_send_success_with_template(self):
+        with self.app_context():
+            part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
+            self.assertIsNotNone(part_uuid)
+            template = EmailTemplate.get_template_by_key('GENERAL_TEST_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'participant_uuid': part_uuid, 'id_template': template.id_email_template,
+                         'body_variables': {'variable': 'V1Test'}}
+            with Globals.service.flask_module.mail_man.record_messages() as outbox:
+                response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(outbox), 1)
+                self.assertTrue('GLOBAL' in outbox[0].html)
+                self.assertTrue('V1Test' in outbox[0].html)
 
     def test_send_success(self):
         with self.app_context():

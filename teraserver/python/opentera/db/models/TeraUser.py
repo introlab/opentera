@@ -493,6 +493,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             user.user_password = TeraUser.encrypt_password("user4")
             user.user_superadmin = False
             user.user_username = "user4"
+            user.user_email = "noaccess@opentera.org"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
             TeraUser.db().session.add(user)
