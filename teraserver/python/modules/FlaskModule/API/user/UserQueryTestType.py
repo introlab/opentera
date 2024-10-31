@@ -16,6 +16,7 @@ from opentera.redis.RedisVars import RedisVars
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query')
+get_parser.add_argument('test_type_uuid', type=str, help='UUID of the test type to query')
 get_parser.add_argument('test_type_key', type=str, help='Key of the test type to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get test types for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get test types for')
@@ -52,11 +53,23 @@ class UserQueryTestTypes(Resource):
         args = get_parser.parse_args()
 
         if args['id_test_type']:
-            test_types = [user_access.query_test_type(args['id_test_type'])]
+            test_type = user_access.query_test_type(args['id_test_type'])
+            if not test_type:
+                return gettext('Test type not found'), 404
+            test_types = [test_type]
         elif args['test_type_key']:
             test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
+            if not test_type:
+                return gettext('Test type not found'), 404
             test_types = [user_access.query_test_type(test_type.id_test_type)]  # Call to filter access if needed
+        elif args['test_type_uuid']:
+            test_type = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
+            if not test_type:
+                return gettext('Test type not found'), 404
+            test_types = [user_access.query_test_type(test_type.id_test_type)]
         elif args['id_project']:
+            if args['id_project'] not in user_access.get_accessible_projects_ids():
+                return gettext('Forbidden'), 403
             test_types_projects = user_access.query_test_types_for_project(args['id_project'])
             test_types = [ttp.test_type_project_test_type for ttp in test_types_projects]
         elif args['id_site']:

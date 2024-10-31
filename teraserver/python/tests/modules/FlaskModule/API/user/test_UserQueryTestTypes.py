@@ -1,5 +1,6 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraTestType import TeraTestType
 import datetime
 
 
@@ -75,7 +76,7 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             for data_item in response.json:
                 self._checkJson(json_data=data_item, minimal=True)
 
-    def test_query_specific_as_admin(self):
+    def test_query_specific_as_admin_with_id(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params={'id_test_type': 1})
@@ -86,9 +87,48 @@ class UserQueryTestTypesTest(BaseUserAPITest):
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
 
+    def test_query_specific_as_admin_with_uuid(self):
+        with self._flask_app.app_context():
+            test_type = TeraTestType.get_test_type_by_id(1)
+            self.assertIsNotNone(test_type)
+
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'test_type_uuid': test_type.test_type_uuid})
+            self.assertEqual(200, response.status_code)
+            self.assertTrue(response.is_json)
+            self.assertEqual(1, len(response.json))
+
+            for data_item in response.json:
+                self._checkJson(json_data=data_item)
+
+    def test_query_specific_as_admin_with_invalid_id(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_test_type': 1000})
+            self.assertEqual(404, response.status_code)
+
+    def test_query_specific_as_admin_with_invalid_uuid(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'test_type_uuid': 'invalid'})
+            self.assertEqual(404, response.status_code)
+
+    def test_query_specific_as_admin_with_invalid_key(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'test_type_key': 'invalid'})
+            self.assertEqual(404, response.status_code)
+
+    def test_query_as_admin_with_invalid_project(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1000})
+            self.assertEqual(403, response.status_code)
+
+
     def test_query_specific_project_as_admin(self):
         with self._flask_app.app_context():
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', 
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params={'id_project': 2})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
