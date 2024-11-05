@@ -11,6 +11,7 @@ from string import digits, ascii_lowercase, ascii_uppercase
 from tests.services.EmailService.FakeEmailService import FakeEmailService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraUser import TeraUser
 from modules.LoginModule.LoginModule import LoginModule
 from requests.auth import _basic_auth_str
 
@@ -85,6 +86,25 @@ class BaseEmailServiceAPITest(unittest.TestCase):
         with self.app_context():
             service = TeraService.get_service_by_key('EmailService')
             Globals.service.service_info = service.to_json(minimal=False)
+
+            user: TeraUser = TeraUser.get_user_by_username('admin')
+            self.assertIsNotNone(user)
+            self.assertIsNotNone(service)
+            self.user_admin_token = user.get_token(ServiceAccessManager.api_user_token_key)
+            self.assertIsNotNone(self.user_admin_token)
+            self.assertGreater(len(self.user_admin_token), 0)
+
+            user: TeraUser = TeraUser.get_user_by_username('user3')
+            self.assertIsNotNone(user)
+            self.user_user3_token = user.get_token(ServiceAccessManager.api_user_token_key)
+            self.assertIsNotNone(self.user_user3_token)
+            self.assertGreater(len(self.user_user3_token), 0)
+
+            user: TeraUser = TeraUser.get_user_by_username('user4')
+            self.assertIsNotNone(user)
+            self.user_user4_token = user.get_token(ServiceAccessManager.api_user_token_key)
+            self.assertIsNotNone(self.user_user4_token)
+            self.assertGreater(len(self.user_user4_token), 0)
 
     def tearDown(self):
         with self.app_context():

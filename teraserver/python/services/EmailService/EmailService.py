@@ -151,10 +151,10 @@ if __name__ == '__main__':
         with flask_app.app_context():
             Globals.db_man.create_defaults(Globals.config_man)
 
-    # In test mode, db manager will not save anything into a database
-
     # Create the Service
-    Globals.service = EmailService(Globals.config_man, service_info)
+    with flask_app.app_context():
+        # Create the Service
+        Globals.service = EmailService(Globals.config_man, service_info)
 
-    # Start App / reactor events
-    reactor.run()
+        # Start App / reactor events
+        reactor.run()

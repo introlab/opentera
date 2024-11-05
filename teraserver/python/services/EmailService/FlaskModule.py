@@ -197,7 +197,9 @@ class FlaskModule(BaseModule):
         kwargs |= additional_args
 
         from services.EmailService.API.QuerySendEmail import QuerySendEmail
+        from services.EmailService.API.QueryEmailTemplate import QueryEmailTemplate
         namespace.add_resource(QuerySendEmail, '/send', resource_class_kwargs=kwargs)
+        namespace.add_resource(QueryEmailTemplate, '/templates', resource_class_kwargs=kwargs)
 
 
     def init_views(self):

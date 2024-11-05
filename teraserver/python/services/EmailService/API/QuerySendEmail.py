@@ -1,4 +1,4 @@
-from flask_restx import Resource, inputs
+from services.EmailService.API.EmailResource import EmailResource
 from flask import request
 from flask_mail import Message
 
@@ -8,8 +8,6 @@ from opentera.services.ServiceAccessManager import (ServiceAccessManager, curren
 from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
 from flask_babel import gettext
 from string import Template
-
-import services.EmailService.Globals as Globals
 
 # Parser definition(s)
 post_parser = api.parser()
@@ -43,10 +41,10 @@ post_schema = api.schema_model('email', {'properties':
                                          'type': 'object', 'location': 'json'})
 
 
-class QuerySendEmail(Resource):
+class QuerySendEmail(EmailResource):
 
     def __init__(self, _api, *args, **kwargs):
-        Resource.__init__(self, _api, *args, **kwargs)
+        EmailResource.__init__(self, _api, *args, **kwargs)
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
@@ -74,18 +72,12 @@ class QuerySendEmail(Resource):
             # Validate access to uuids
             for user_uuid in user_uuids:
                 # Do query as user to check if it has access to that user or not
-                if self.test:
-                    response = Globals.service.get_from_opentera('/api/user/users',
-                                                                 params={'user_uuid': user_uuid},
-                                                                 token=current_user_client.user_token)
-                else:
-                    response = current_user_client.do_get_request_to_backend('/api/user/users?user_uuid=' + user_uuid)
-                response_json = response.json()
-                if response.status_code != 200 or not response_json:
+                user_json = self._get_user_infos(user_uuid)
+                if not user_json:
                     return gettext('At least one user is not accessible'), 403
 
-                if 'user_email' in response_json[0] and response_json[0]['user_email']:
-                    user_emails.append(response_json[0]['user_email'])
+                if 'user_email' in user_json and user_json['user_email']:
+                    user_emails.append(user_json['user_email'])
 
 
         if 'participant_uuid' in json_email:
@@ -95,20 +87,12 @@ class QuerySendEmail(Resource):
             # Validate access to uuids
             for participant_uuid in participant_uuids:
                 # Do query as user to check if it has access to that participant or not
-                if self.test:
-                    response = Globals.service.get_from_opentera('/api/user/participants',
-                                                                 params={'participant_uuid': participant_uuid},
-                                                                 token=current_user_client.user_token)
-                else:
-                    response = current_user_client.do_get_request_to_backend('/api/user/participants?participant_uuid=' +
-                                                                             participant_uuid)
-                response_json = response.json()
-
-                if response.status_code != 200 or not response_json:
+                participant_json = self._get_participant_infos(participant_uuid)
+                if not participant_json:
                     return gettext('At least one participant is not accessible'), 403
 
-                if 'participant_email' in response_json[0] and response_json[0]['participant_email']:
-                    participant_emails.append(response_json[0]['participant_email'])
+                if 'participant_email' in participant_json and participant_json['participant_email']:
+                    participant_emails.append(participant_json['participant_email'])
 
         if not user_emails and not participant_emails:
             return gettext('Missing user and/or participant_uuid'), 400
@@ -124,33 +108,14 @@ class QuerySendEmail(Resource):
 
             # Validate access to template
             if template.id_site:
-                has_access = False
-                if self.test:
-                    response = Globals.service.get_from_opentera('/api/user/sites',
-                                                                 params={'id_site': template.id_site},
-                                                                 token=current_user_client.user_token)
-                    if response.status_code == 200 and response.json() != []:
-                        has_access = True
-                else:
-                    if current_user_client.get_role_for_site(template.id_site) != 'Undefined':
-                        has_access = True
+                has_access = self._verify_site_access(template.id_site)
 
                 if not has_access:
                     return gettext('Forbidden'), 403
 
 
             if template.id_project:
-                has_access = False
-                if self.test:
-                    response = Globals.service.get_from_opentera('/api/user/projects',
-                                                                 params={'id_project': template.id_project},
-                                                                 token=current_user_client.user_token)
-                    if response.status_code == 200 and response.json() != []:
-                        has_access = True
-                else:
-                    if current_user_client.get_role_for_project(template.id_project) != 'Undefined':
-                        has_access = True
-
+                has_access = self._verify_site_access(template.id_project)
                 if not has_access:
                     return gettext('Forbidden'), 403
 
@@ -178,13 +143,9 @@ class QuerySendEmail(Resource):
         # Send email!
         sender_email = None
         if self.test:
-            response = Globals.service.get_from_opentera('/api/user/users',
-                                                         params={'user_uuid': current_user_client.user_uuid},
-                                                         token=current_user_client.user_token)
-            if response.status_code == 200:
-                response_json = response.json()
-                if response_json:
-                    sender_email = (current_user_client.user_fullname, response_json[0]['user_email'])
+            user_json = self._get_user_infos(current_user_client.user_uuid)
+            if user_json:
+                sender_email = (current_user_client.user_fullname, user_json['user_email'])
         else:
             sender_email = (current_user_client.user_fullname, current_user_client.get_user_info()['user_email'])
         if not sender_email:

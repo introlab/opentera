@@ -13,26 +13,6 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
 
     def setUp(self):
         super().setUp()
-        with self.app_context():
-            user: TeraUser = TeraUser.get_user_by_username('admin')
-            service = TeraService.get_service_by_key('FileTransferService')
-            self.assertIsNotNone(user)
-            self.assertIsNotNone(service)
-            self.user_admin_token = user.get_token(ServiceAccessManager.api_user_token_key)
-            self.assertIsNotNone(self.user_admin_token)
-            self.assertGreater(len(self.user_admin_token), 0)
-
-            user: TeraUser = TeraUser.get_user_by_username('user3')
-            self.assertIsNotNone(user)
-            self.user_user3_token = user.get_token(ServiceAccessManager.api_user_token_key)
-            self.assertIsNotNone(self.user_user3_token)
-            self.assertGreater(len(self.user_user3_token), 0)
-
-            user: TeraUser = TeraUser.get_user_by_username('user4')
-            self.assertIsNotNone(user)
-            self.user_user4_token = user.get_token(ServiceAccessManager.api_user_token_key)
-            self.assertIsNotNone(self.user_user4_token)
-            self.assertGreater(len(self.user_user4_token), 0)
 
     def tearDown(self):
         super().tearDown()
