@@ -313,7 +313,10 @@ class ServiceAccessManager:
                 return False
 
             # User token is valid and not disabled
-            g.current_user_client = TeraUserClient(token_dict, token, ServiceAccessManager.service.config_man)
+            g.current_user_client = TeraUserClient(token_dict, token,
+                                                   ServiceAccessManager.service.config_man,
+                                                   ServiceAccessManager.service)
+
             g.current_login_type = LoginType.USER_LOGIN
             return True
 
@@ -327,7 +330,10 @@ class ServiceAccessManager:
                 pass
             else:
                 # Device token
-                g.current_device_client = TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
+                g.current_device_client = TeraDeviceClient(token_dict, token,
+                                                           ServiceAccessManager.service.config_man,
+                                                           ServiceAccessManager.service)
+
                 g.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
@@ -339,7 +345,10 @@ class ServiceAccessManager:
                 pass
             else:
                 # Device token
-                g.current_device_client = TeraDeviceClient(token_dict, token, ServiceAccessManager.service.config_man)
+                g.current_device_client = TeraDeviceClient(token_dict, token,
+                                                           ServiceAccessManager.service.config_man,
+                                                           ServiceAccessManager.service)
+
                 g.current_login_type = LoginType.DEVICE_LOGIN
                 return True
 
@@ -360,7 +369,10 @@ class ServiceAccessManager:
 
                 # Participant token is not disabled, everything is ok
                 g.current_participant_client = \
-                    TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
+                    TeraParticipantClient(token_dict, token,
+                                          ServiceAccessManager.service.config_man,
+                                          ServiceAccessManager.service)
+
                 g.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
@@ -374,7 +386,10 @@ class ServiceAccessManager:
             else:
                 # Participant token
                 g.current_participant_client = \
-                    TeraParticipantClient(token_dict, token, ServiceAccessManager.service.config_man)
+                    TeraParticipantClient(token_dict, token,
+                                          ServiceAccessManager.service.config_man,
+                                          ServiceAccessManager.service)
+
                 g.current_login_type = LoginType.PARTICIPANT_LOGIN
                 return True
 
@@ -389,7 +404,10 @@ class ServiceAccessManager:
             pass
         else:
             # Service token
-            g.current_service_client = TeraServiceClient(token_dict, token, ServiceAccessManager.service.config_man)
+            g.current_service_client = TeraServiceClient(token_dict, token,
+                                                         ServiceAccessManager.service.config_man,
+                                                         ServiceAccessManager.service)
+
             g.current_login_type = LoginType.SERVICE_LOGIN
             return True
 
@@ -467,4 +485,3 @@ class ServiceAccessManager:
     def service_user_roles_required(roles: List[str]):
         # For compatibility with old code
         return ServiceAccessManager.service_user_roles_all_required(roles)
-

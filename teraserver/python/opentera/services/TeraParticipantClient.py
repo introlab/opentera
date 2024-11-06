@@ -7,17 +7,11 @@ from opentera.redis.RedisRPCClient import RedisRPCClient
 
 class TeraParticipantClient:
 
-    def __init__(self, token_dict: dict, token: str, config_man):
+    def __init__(self, token_dict: dict, token: str, config_man, service):
         self.__participant_uuid = token_dict['participant_uuid']
         self.__id_participant = token_dict['id_participant']
         self.__participant_token = token
-
-        backend_hostname = config_man.backend_config["hostname"]
-        backend_port = str(config_man.backend_config["port"])
-
-        self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
-        self.__config_man = config_man
-        self.__rpc_client = RedisRPCClient(config_man.redis_config)
+        self.__service = service
 
     @property
     def participant_uuid(self):
@@ -44,22 +38,20 @@ class TeraParticipantClient:
         self.__participant_token = token
 
     def get_participant_infos(self) -> dict:
-        # Get information from service rpc function since participant has no rights from the participants api
-        #participant_info = self.__rpc_client.call_service(self.__config_man.service_config['name'],
-        #                                                  'participant_info', self.__participant_uuid)
-        #return participant_info
-
         response = self.do_get_request_to_backend('/api/participant/participants')
         if response.status_code == 200:
             return response.json()
         return {}
 
-    def do_get_request_to_backend(self, path: str) -> Response:
-        from requests import get
-        request_headers = {'Authorization': 'OpenTera ' + self.__participant_token}
-        # TODO: remove verify=False and check certificate
-        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
-        return backend_response
+    def do_get_request_to_backend(self, path: str, params: dict=None) -> Response:
+        """
+        Now using service function:
+        def get_from_opentera_with_token(self, token: str, api_url: str, params: dict = {},
+                                     additional_headers: dict = {}) -> Response:
+        """
+        if params is None:
+            params = {}
+        return self.__service.get_from_opentera_with_token(self.__participant_token, api_url=path, params=params)
 
     def __repr__(self):
         return '<TeraParticipantClient - UUID: ' + self.__participant_uuid \
