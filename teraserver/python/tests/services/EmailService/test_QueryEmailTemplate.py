@@ -107,7 +107,8 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
         with self.app_context():
             params = {'key': 'INVALID'}
             response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
 
     def test_get_endpoint_forbidden_template_key(self):
         with self.app_context():
@@ -136,6 +137,84 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
             params = {'key': 'SITE_EMAIL'}
             response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
             self.assertEqual(response.status_code, 200)
+            self._checkJson(response.json[0])
+
+    def test_get_endpoint_invalid_site(self):
+        with self.app_context():
+            params = {'id_site': 100}
+            response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_forbidden_site(self):
+        with self.app_context():
+            params = {'id_site': 2}
+            response = self._get_with_token_auth(self.test_client, token=self.user_user3_token, params=params)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_valid_site(self):
+        with self.app_context():
+            params = {'id_site': 2}
+            response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            templates = EmailTemplate.get_templates_for_site(2)
+            self.assertEqual(len(response.json), len(templates))
+            for template in response.json:
+                self._checkJson(template)
+
+    def test_get_endpoint_invalid_project(self):
+        with self.app_context():
+            params = {'id_project': 100}
+            response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_forbidden_project(self):
+        with self.app_context():
+            params = {'id_project': 3}
+            response = self._get_with_token_auth(self.test_client, token=self.user_user3_token, params=params)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_valid_project(self):
+        with self.app_context():
+            params = {'id_project': 1}
+            response = self._get_with_token_auth(self.test_client, token=self.user_user3_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            templates = EmailTemplate.get_templates_for_project(1)
+            self.assertEqual(len(response.json), len(templates))
+            for template in response.json:
+                self._checkJson(template)
+
+    def test_get_endpoint_key_and_project_no_match(self):
+        with self.app_context():
+            params = {'id_project': 1, 'key': 'INVALID KEY'}
+            response = self._get_with_token_auth(self.test_client, token=self.user_user3_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+    def test_get_endpoint_key_and_project_match(self):
+        with self.app_context():
+            params = {'id_project': 1, 'key': 'PROJECT_EMAIL'}
+            response = self._get_with_token_auth(self.test_client, token=self.user_user3_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            templates = EmailTemplate.get_template_by_key('PROJECT_EMAIL', project_id=1)
+            self.assertEqual(len(response.json), 1)
+            self.assertEqual(response.json[0]["id_email_template"], templates.id_email_template)
+            self._checkJson(response.json[0])
+
+    def test_get_endpoint_key_and_site_no_match(self):
+        with self.app_context():
+            params = {'id_site': 1, 'key': 'SITE_EMAIL'}
+            response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+    def test_get_endpoint_key_and_site_match(self):
+        with self.app_context():
+            params = {'id_site': 2, 'key': 'SITE_EMAIL'}
+            response = self._get_with_token_auth(self.test_client, token=self.user_admin_token, params=params)
+            self.assertEqual(response.status_code, 200)
+            templates = EmailTemplate.get_template_by_key('SITE_EMAIL', site_id=2)
+            self.assertEqual(len(response.json), 1)
+            self.assertEqual(response.json[0]["id_email_template"], templates.id_email_template)
             self._checkJson(response.json[0])
 
     def _checkJson(self, json_data):

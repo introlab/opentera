@@ -1,4 +1,5 @@
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
+from opentera.db.models.TeraService import TeraService
 
 
 class UserQueryServiceConfigsTest(BaseUserAPITest):
@@ -232,41 +233,43 @@ class UserQueryServiceConfigsTest(BaseUserAPITest):
 
     def test_query_specific_as_admin(self):
         with self._flask_app.app_context():
+            service : TeraService = TeraService.get_service_by_key('OpenTeraServer')
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'id_service': 1, 'id_user': 1})
+                                                     params={'id_service': service.id_service, 'id_user': 1})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(1, len(response.json))
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
                 self.assertEqual(data_item['id_user'], 1)
-                self.assertEqual(data_item['id_service'], 1)
+                self.assertEqual(data_item['id_service'], service.id_service)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'id_service': 1, 'id_user': 2})
+                                                     params={'id_service': service.id_service, 'id_user': 2})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'id_service': 5, 'id_participant': 1})
+                                                     params={'id_service': service.id_service, 'id_participant': 1})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(1, len(response.json))
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
                 self.assertEqual(data_item['id_participant'], 1)
-                self.assertEqual(data_item['id_service'], 5)
+                self.assertEqual(data_item['id_service'], service.id_service)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'id_service': 5, 'id_device': 1})
+                                                     params={'id_service': service.id_service, 'id_device': 1})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(1, len(response.json))
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
                 self.assertEqual(data_item['id_device'], 1)
-                self.assertEqual(data_item['id_service'], 5)
+                self.assertEqual(data_item['id_service'], service.id_service)
 
     def test_post_and_delete(self):
         with self._flask_app.app_context():

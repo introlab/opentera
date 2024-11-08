@@ -68,16 +68,18 @@ class QueryEmailTemplate(EmailResource):
                     return gettext('Forbidden'), 403
                 templates = [template.to_json()]
             else:
-                return gettext('Forbidden'), 403
+                return []
 
         elif args['id_site']:
             if not self._verify_site_access(args['id_site']):
                 return gettext('Forbidden'), 403
-            templates = EmailTemplate.get_templates_for_site(args['id_site'], lang=args['lang'])
+            templates = [template.to_json()
+                         for template in EmailTemplate.get_templates_for_site(args['id_site'], lang=args['lang'])]
         elif args['id_project']:
             if not self._verify_project_access(args['id_project']):
                 return gettext('Forbidden'), 403
-            templates = EmailTemplate.get_templates_for_project(args['id_project'], lang=args['lang'])
+            templates = [template.to_json()
+                         for template in EmailTemplate.get_templates_for_project(args['id_project'], lang=args['lang'])]
         else:
             return gettext('Missing identifying parameter'), 400
 
