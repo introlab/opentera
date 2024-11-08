@@ -33,7 +33,8 @@ class EmailTemplate(BaseModel):
 
         if not template and (site_id or project_id):
             # Try to fall back to global template, if available
-            template = EmailTemplate.query.filter_by(email_template_key=key, email_template_language=lang).first()
+            template = EmailTemplate.query.filter_by(email_template_key=key, email_template_language=lang,
+                                                     id_site=None, id_project=None).first()
 
         return template
 
