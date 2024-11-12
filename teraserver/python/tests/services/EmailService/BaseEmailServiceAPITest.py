@@ -106,6 +106,12 @@ class BaseEmailServiceAPITest(unittest.TestCase):
             self.assertIsNotNone(self.user_user4_token)
             self.assertGreater(len(self.user_user4_token), 0)
 
+            user: TeraUser = TeraUser.get_user_by_username('siteadmin')
+            self.assertIsNotNone(user)
+            self.user_siteadmin_token = user.get_token(ServiceAccessManager.api_user_token_key)
+            self.assertIsNotNone(self.user_siteadmin_token)
+            self.assertGreater(len(self.user_siteadmin_token), 0)
+
     def tearDown(self):
         with self.app_context():
             # Make sure pending queries are rollbacked.
