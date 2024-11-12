@@ -4,6 +4,10 @@ from opentera.redis.RedisClient import RedisClient
 from services.EmailService.ConfigManager import ConfigManager
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.redis.RedisVars import RedisVars
+from flask_mail import Message
+from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
+from string import Template
+
 from google.protobuf.json_format import ParseError
 from google.protobuf.message import DecodeError
 
@@ -30,13 +34,6 @@ class EmailService(ServiceOpenTera):
 
     def notify_service_messages(self, pattern, channel, message):
         pass
-
-    def read_queues(self, queue_name: str):
-        # print('read_queues', queue_name)
-        # Reading queue
-        while self.redis.llen(queue_name) > 0:
-            message = self.redis.lpop(queue_name)
-            self.log_event_received(queue_name, queue_name, message)
 
     def cbLoopDone(self, result):
         """
@@ -71,11 +68,52 @@ class EmailService(ServiceOpenTera):
 
 
     def setup_rpc_interface(self):
-        # TODO Update rpc interface
-        pass
-        # self.rpc_api['set_loglevel'] = {'args': ['str:loglevel'],
-        #                                   'returns': 'dict',
-        #                                   'callback': self.set_loglevel}
+        super().setup_rpc_interface()
+
+        self.rpc_api['send_email'] = {'args': ['str:email_subject', 'str:email_body', 'str:email_recipients',
+                                               'str:sender_email'],
+                                          'returns': 'bool',
+                                          'callback': self.rpc_send_email}
+        self.rpc_api['send_email_template'] = {'args': ['str:email_subject', 'str:email_template_key',
+                                                        'str:email_variables', 'str:email_recipients',
+                                                        'str:sender_email', 'int:id_site', 'int:id_project',
+                                                        'str:language'],
+                                      'returns': 'dict',
+                                      'callback': self.rpc_send_email_template}
+
+    def rpc_send_email(self, email_subject: str, email_body: str, email_recipients: str, sender_email: str):
+        email = Message(subject=email_subject, html=email_body, recipients=email_recipients,
+                        sender=sender_email, reply_to=sender_email)
+        try:
+            self.flaskModule.mail_man.send(email)
+            return True
+        except Exception as exc:
+            print('EmailService.rpc_send_email - ' + str(exc))
+            return False
+
+    def rpc_send_email_template(self, email_subject: str, email_template_key: str, sender_email: str, language: str,
+                                email_recipients: str, id_site: int | None = None, id_project: int | None = None,
+                                email_variables: str = '[{}]'):
+        template: EmailTemplate = EmailTemplate.get_template_by_key(email_template_key, site_id=id_site,
+                                                                    project_id=id_project, lang=language)
+        if not template:
+            return False
+
+        email_body = template.email_template
+        try:
+            variables = json.loads(email_variables)
+        except json.JSONDecodeError:
+            return False
+
+        email_body = template.safe_substitute(variables)
+        email = Message(subject=email_subject, html=email_body, recipients=email_recipients,
+                        sender=sender_email, reply_to=sender_email)
+        try:
+            self.flaskModule.mail_man.send(email)
+            return True
+        except Exception as exc:
+            print('EmailService.rpc_send_email - ' + str(exc))
+            return False
 
 
 if __name__ == '__main__':
