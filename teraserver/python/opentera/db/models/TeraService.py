@@ -171,6 +171,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
         new_service.service_system = True
+        new_service.service_has_assets = True
         TeraService.db().session.add(new_service)
 
         new_service = TeraService()
@@ -224,6 +225,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
             new_service.service_endpoint = '/'
             new_service.service_clientendpoint = '/robot'
             new_service.service_enabled = True
+            new_service.service_has_tests = True
             TeraService.db().session.add(new_service)
             TeraService.db().session.commit()
 
