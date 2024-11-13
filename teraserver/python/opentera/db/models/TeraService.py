@@ -25,6 +25,9 @@ class TeraService(BaseModel, SoftDeleteMixin):
     service_system = Column(Boolean, nullable=False, default=False)
     service_editable_config = Column(Boolean, nullable=False, default=False)
     service_default_config = Column(String, nullable=True, default='{}')
+    # Added in 80f6eb28aea5_add_service_assets_and_tests_flags.py
+    service_has_assets = Column(Boolean, nullable=False, default=False)
+    service_has_tests = Column(Boolean, nullable=False, default=False)
 
     service_roles = relationship('TeraServiceRole', cascade='delete')
     service_projects = relationship('TeraServiceProject', cascade='delete')
