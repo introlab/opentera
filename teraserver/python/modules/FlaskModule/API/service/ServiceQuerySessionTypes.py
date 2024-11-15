@@ -12,6 +12,7 @@ from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraProject import TeraProject
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -109,9 +110,6 @@ class ServiceQuerySessionTypes(Resource):
         """
         Manage session types associated to that service with sites, projects, participants.
         """
-        # Create session from db
-        db_session = TeraSessionType.db().session
-
         try:
             # Validate schema first
             post_schema.validate(request.json)
@@ -149,8 +147,8 @@ class ServiceQuerySessionTypes(Resource):
                 session_type.id_session_type = None
                 # Make sure id_service is set to the current service
                 session_type.id_service = current_service.id_service
-                # Add object to be commited
-                db_session.add(session_type)
+                # Commit
+                TeraSessionType.insert(session_type)
             else:
                 if session_type_info['id_session_type'] not in service_access.get_accessible_sessions_types_ids():
                     return gettext('Service doesn\'t have access to this session type'), 403
@@ -166,21 +164,32 @@ class ServiceQuerySessionTypes(Resource):
                 for id_site in service_session_type_info['id_sites']:
                     # Adding new relation session_type - site
                     session_type_site = TeraSessionTypeSite()
-                    session_type_site.session_type_site_session_type = session_type
+                    session_type_site.id_session_type = session_type.id_session_type
                     session_type_site.id_site = id_site
-                    # Add object to be commited
-                    db_session.add(session_type_site)
+                    # Commit
+                    TeraSessionTypeSite.insert(session_type_site)
 
             # STEP 4) Handle projects
             if 'id_projects' in service_session_type_info and \
                     isinstance(service_session_type_info['id_projects'], list):
                 # Permissions already verified at step 1
                 for id_project in service_session_type_info['id_projects']:
+                    # Get Project
+                    project = TeraProject.get_project_by_id(id_project)
+
+                    # Create relation session_type - site first
+                    session_type_site = TeraSessionTypeSite()
+                    session_type_site.id_session_type = session_type.id_session_type
+                    session_type_site.id_site = project.id_site
+                    # Commit
+                    TeraSessionTypeSite.insert(session_type_site)
+
+                    # Then create relation session_type - project
                     session_type_project = TeraSessionTypeProject()
-                    session_type_project.session_type_project_session_type = session_type
+                    session_type_project.id_session_type = session_type.id_session_type
                     session_type_project.id_project = id_project
-                    # Add object to be commited
-                    db_session.add(session_type_project)
+                    # Commit
+                    TeraSessionTypeProject.insert(session_type_project)
 
             # STEP 5) Handle participants
             if 'id_participants' in service_session_type_info and \
@@ -188,14 +197,20 @@ class ServiceQuerySessionTypes(Resource):
                 # Permissions already verified at step 1
                 for id_participant in service_session_type_info['id_participants']:
                     participant = TeraParticipant.get_participant_by_id(id_participant)
-                    session_type_project = TeraSessionTypeProject()
-                    session_type_project.session_type_project_session_type = session_type
-                    session_type_project.id_project = participant.id_project
-                    # Add object to be commited
-                    db_session.add(session_type_project)
 
-            # We are done, commit change
-            db_session.commit()
+                    # Create relation session_type - site first
+                    session_type_site = TeraSessionTypeSite()
+                    session_type_site.id_session_type = session_type.id_session_type
+                    session_type_site.id_site = participant.participant_project.id_site
+                    # Commit
+                    TeraSessionTypeSite.insert(session_type_site)
+
+                    # Then create relation session_type - project
+                    session_type_project = TeraSessionTypeProject()
+                    session_type_project.id_session_type = session_type.id_session_type
+                    session_type_project.id_project = participant.id_project
+                    # Commit
+                    TeraSessionTypeProject.insert(session_type_project)
 
         except KeyError as e:
             return gettext('Missing arguments'), 400
@@ -209,11 +224,8 @@ class ServiceQuerySessionTypes(Resource):
         except BadRequest as e:
             return gettext('Bad Request'), 400
         except exc.IntegrityError as e:
-            db_session.rollback()
             return gettext('Integrity error'), 400
         except exc.SQLAlchemyError as e:
-            # rollback
-            db_session.rollback()
             return gettext('Database error'), 500
 
         # Return created session type
