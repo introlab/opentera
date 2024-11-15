@@ -232,3 +232,79 @@ class ServiceQuerySessionTypesTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                           json=json_data, params=None, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code)
+            self.assertTrue('id_session_type' in response.json)
+            id_session_type = response.json['id_session_type']
+
+            # Check if session type was created
+            session_type = TeraSessionType.get_session_type_by_id(id_session_type)
+            self.assertIsNotNone(session_type)
+
+            # Check if session type was linked to site
+            sites = TeraSessionTypeSite.get_sites_for_session_type(id_session_type)
+            self.assertIsNotNone(sites)
+            self.assertEqual(1, len(sites))
+            self.assertEqual(sites[0].id_site, 1)
+
+
+    def test_post_endpoint_with_valid_schema_new_session_and_valid_projects(self):
+        with self._flask_app.app_context():
+
+            json_data = {'service_session_type': {
+                        'id_projects': [1],
+                        'session_type': {
+                            'id_session_type': 0,
+                            'session_type_name': 'Test Session Type',
+                            'session_type_online': True,
+                            'session_type_config': '',
+                            'session_type_color': '#FF0000',
+                            'session_type_category': 1,  #Service
+                    }
+                }
+            }
+            response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                          json=json_data, params=None, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('id_session_type' in response.json)
+            id_session_type = response.json['id_session_type']
+
+            # Check if session type was created
+            session_type = TeraSessionType.get_session_type_by_id(id_session_type)
+            self.assertIsNotNone(session_type)
+
+            # Check if session type was linked to project
+            projects = TeraSessionTypeProject.get_projects_for_session_type(id_session_type)
+            self.assertIsNotNone(projects)
+            self.assertEqual(1, len(projects))
+            self.assertEqual(projects[0].id_project, 1)
+
+    def test_post_endpoint_with_valid_schema_new_session_and_valid_participants(self):
+        with self._flask_app.app_context():
+
+            json_data = {'service_session_type': {
+                        'id_participants': [1],
+                        'session_type': {
+                            'id_session_type': 0,
+                            'session_type_name': 'Test Session Type',
+                            'session_type_online': True,
+                            'session_type_config': '',
+                            'session_type_color': '#FF0000',
+                            'session_type_category': 1,  #Service
+                    }
+                }
+            }
+            response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                          json=json_data, params=None, endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertTrue('id_session_type' in response.json)
+            id_session_type = response.json['id_session_type']
+
+            # Check if session type was created
+            session_type = TeraSessionType.get_session_type_by_id(id_session_type)
+            self.assertIsNotNone(session_type)
+
+            # Check if session type was linked to project
+            participant = TeraParticipant.get_participant_by_id(1)
+            projects = TeraSessionTypeProject.get_projects_for_session_type(participant.id_project)
+            self.assertIsNotNone(projects)
+            self.assertEqual(1, len(projects))
+            self.assertEqual(projects[0].id_project, participant.id_project)

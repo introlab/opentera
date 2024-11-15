@@ -16,8 +16,8 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
                                                                     ondelete='cascade'), nullable=False)
     id_site = Column('id_site', Integer, ForeignKey('t_sites.id_site', ondelete='cascade'), nullable=False)
 
-    session_type_site_session_type = relationship("TeraSessionType", viewonly=True)
-    session_type_site_site = relationship("TeraSite", viewonly=True)
+    session_type_site_session_type = relationship("TeraSessionType")
+    session_type_site_site = relationship("TeraSite")
 
     def to_json(self, ignore_fields=[], minimal=False):
         ignore_fields.extend(['session_type_site_session_type', 'session_type_site_site'])

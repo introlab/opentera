@@ -21,14 +21,7 @@ get_parser.add_argument('id_participant', type=int, help='ID of the participant 
 get_parser.add_argument('id_session_type', type=int, help='ID of the session type to query')
 
 post_parser = api.parser()
-'''
-    id_service = Column(Integer, ForeignKey('t_services.id_service', ondelete='cascade'), nullable=True)
-    session_type_name = Column(String, nullable=False, unique=False)
-    session_type_online = Column(Boolean, nullable=False)
-    session_type_config = Column(String, nullable=True)
-    session_type_color = Column(String(7), nullable=False)
-    session_type_category = Column(Integer, nullable=False)
-'''
+
 post_schema = api.schema_model(name='service_session_type_schema', schema={
         'properties' : {
             'service_session_type' : {
@@ -129,20 +122,20 @@ class ServiceQuerySessionTypes(Resource):
             session_type_info = service_session_type_info['session_type']
 
             # STEP 1) Verify access before doing anything
-            if ('id_sites' in service_session_type_info
-                    and type(service_session_type_info['id_sites']) is list):
+            if 'id_sites' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_sites'], list):
                 accessible_sites = service_access.get_accessibles_sites_ids()
                 for id_site in service_session_type_info['id_sites']:
                     if id_site not in accessible_sites:
                         return gettext('Service doesn\'t have access to all listed sites'), 403
-            if ('id_projects' in service_session_type_info
-                    and type(service_session_type_info['id_projects']) is list):
+            if 'id_projects' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_projects'], list):
                 accessible_projects = service_access.get_accessible_projects_ids()
                 for id_project in service_session_type_info['id_projects']:
                     if id_project not in accessible_projects:
                         return gettext('Service doesn\'t have access to all listed projects'), 403
-            if ('id_participants' in service_session_type_info
-                    and type(service_session_type_info['id_participants']) is list):
+            if 'id_participants' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_participants'], list):
                 accessible_participants = service_access.get_accessible_participants_ids()
                 for id_participant in service_session_type_info['id_participants']:
                     if id_participant not in accessible_participants:
@@ -167,7 +160,8 @@ class ServiceQuerySessionTypes(Resource):
                     return gettext('Session type not found'), 404
 
             # STEP 3) Handle sites
-            if 'id_sites' in service_session_type_info and type(service_session_type_info['id_sites']) is list:
+            if 'id_sites' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_sites'], list):
                 # Permissions already verified at step 1
                 for id_site in service_session_type_info['id_sites']:
                     # Adding new relation session_type - site
@@ -178,7 +172,8 @@ class ServiceQuerySessionTypes(Resource):
                     db_session.add(session_type_site)
 
             # STEP 4) Handle projects
-            if 'id_projects' in service_session_type_info and type(service_session_type_info['id_projects']) is list:
+            if 'id_projects' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_projects'], list):
                 # Permissions already verified at step 1
                 for id_project in service_session_type_info['id_projects']:
                     session_type_project = TeraSessionTypeProject()
@@ -188,7 +183,8 @@ class ServiceQuerySessionTypes(Resource):
                     db_session.add(session_type_project)
 
             # STEP 5) Handle participants
-            if 'id_participants' in service_session_type_info and type(service_session_type_info['id_participants']) is list:
+            if 'id_participants' in service_session_type_info and \
+                    isinstance(service_session_type_info['id_participants'],list):
                 # Permissions already verified at step 1
                 for id_participant in service_session_type_info['id_participants']:
                     participant = TeraParticipant.get_participant_by_id(id_participant)
@@ -219,7 +215,6 @@ class ServiceQuerySessionTypes(Resource):
             # rollback
             db_session.rollback()
             return gettext('Database error'), 500
-
 
         # Return created session type
         return session_type.to_json(), 200
