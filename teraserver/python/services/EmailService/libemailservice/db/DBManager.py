@@ -64,6 +64,29 @@ class DBManager:
                 EmailTemplate.db().session.add(template)
 
                 EmailTemplate.db().session.commit()
+            else:
+                if EmailTemplate.get_count() == 0:
+                    # Create basic templates
+                    template = EmailTemplate()
+                    template.email_template_key = 'INVITE_EMAIL'
+                    template.email_template = ('Hello,<br><br>'
+                                               'You\'ve been invited to join sessions on the OpenTera platform.<br><br>'
+                                               'To connect to sessions, please click on this link: $joinlink.<br><br>'
+                                               'You can also add this link to your browser\'s bookmarks.<br><br>'
+                                               'Enjoy your sessions!<br><br>$fullname')
+                    EmailTemplate.db().session.add(template)
+
+                    template = EmailTemplate()
+                    template.email_template_key = 'INVITE_EMAIL'
+                    template.email_template_language = 'fr'
+                    template.email_template = ('Bonjour,<br><br>'
+                                               'Vous êtes invité à participer à des séances via la plateforme OpenTera.<br><br>'
+                                               'Pour rejoindre vos séances, veuillez cliquer sur ce lien: $joinlink.<br><br>'
+                                               'Vous pouvez également ajouter ce lien dans les favoris de votre '
+                                               'navigateur<br><br>Bonnes séances!<br><br>$fullname')
+                    EmailTemplate.db().session.add(template)
+
+                    EmailTemplate.db().session.commit()
 
 
     def open(self, db_infos, echo=False):
