@@ -179,23 +179,22 @@ if __name__ == '__main__':
 
     Globals.db_man.test = args.enable_tests
 
-    if not args.enable_tests:
-        try:
-            if args.enable_tests:
-                db_infos = {'filename': ''}
-                Globals.db_man.open_local(db_infos, echo=True, ram=True)
+    try:
+        if args.enable_tests:
+            db_infos = {'filename': ''}
+            Globals.db_man.open_local(db_infos, echo=True, ram=True)
 
-                # Create default values, if required
-                Globals.db_man.create_defaults(config=Globals.config_man, test=True)
-            else:
-                Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
+            # Create default values, if required
+            Globals.db_man.create_defaults(config=Globals.config_man, test=True)
+        else:
+            Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
 
-        except OperationalError as e:
-            print("Unable to connect to database - please check settings in config file!", e)
-            quit()
+    except OperationalError as e:
+        print("Unable to connect to database - please check settings in config file!", e)
+        quit()
 
-        with flask_app.app_context():
-            Globals.db_man.create_defaults(Globals.config_man)
+    with flask_app.app_context():
+        Globals.db_man.create_defaults(Globals.config_man, test=args.enable_tests)
 
     # In test mode, db manager will not save anything into a database
 
