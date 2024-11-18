@@ -170,6 +170,9 @@ if __name__ == '__main__':
     try:
         if args.enable_tests:
             Globals.db_man.open_local(echo=True)
+
+            # Create default values, if required
+            Globals.db_man.create_defaults(config=Globals.config_man, test=True)
         else:
             Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
     except OperationalError as e:

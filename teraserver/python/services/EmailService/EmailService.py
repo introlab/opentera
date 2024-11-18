@@ -179,18 +179,23 @@ if __name__ == '__main__':
 
     Globals.db_man.test = args.enable_tests
 
-    if not args.enable_tests:
-        try:
+    try:
+        if args.enable_tests:
+            db_infos = {'filename': ''}
+            Globals.db_man.open_local(db_infos, echo=True, ram=True)
+        else:
             Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
-        except OperationalError as e:
-            print("Unable to connect to database - please check settings in config file!", e)
-            quit()
 
-        with flask_app.app_context():
-            Globals.db_man.create_defaults(Globals.config_man)
+    except OperationalError as e:
+        print("Unable to connect to database - please check settings in config file!", e)
+        quit()
 
     # Create the Service
     with flask_app.app_context():
+
+        # Create defaults if required
+        Globals.db_man.create_defaults(Globals.config_man, test=args.enable_tests)
+
         # Create the Service
         Globals.service = EmailService(Globals.config_man, service_info)
 
