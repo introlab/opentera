@@ -10,6 +10,14 @@ class EmailTemplate(BaseModel):
     email_template = Column(String, nullable=False)
     email_template_language = Column(String, nullable=False, default='en')
 
+    inherited = False
+
+    def from_json(self, json, ignore_fields=None):
+        if ignore_fields is None:
+            ignore_fields = []
+        ignore_fields.append('inherited')
+        return super().from_json(json, ignore_fields)
+
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
             ignore_fields = []
@@ -35,6 +43,8 @@ class EmailTemplate(BaseModel):
             # Try to fall back to global template, if available
             template = EmailTemplate.query.filter_by(email_template_key=key, email_template_language=lang,
                                                      id_site=None, id_project=None).first()
+            if template:
+                template.inherited = True
 
         return template
 

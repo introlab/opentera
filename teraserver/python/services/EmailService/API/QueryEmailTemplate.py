@@ -71,6 +71,16 @@ class QueryEmailTemplate(EmailResource):
         elif args['key']:
             template = EmailTemplate.get_template_by_key(args['key'], project_id=args['id_project'],
                                                           site_id=args['id_site'], lang=args['lang'])
+
+            if template and template.inherited and args['id_project']:
+                # Try to load site template
+                response = self.service.get_from_opentera('/api/service/projects',
+                                                          params={'id_project': args['id_project']})
+                if response.status_code != 200 or len(response.json()) < 1:
+                    return gettext('Invalid project'), 400
+
+                template = EmailTemplate.get_template_by_key(args['key'], site_id=response.json()[0]['id_site'],
+                                                             lang=args['lang'])
             if template:
                 if not self._can_access_template(template, False):
                     return gettext('Forbidden'), 403
@@ -114,7 +124,8 @@ class QueryEmailTemplate(EmailResource):
             return gettext('Missing id_email_template'), 400
 
         if 'id_site' in json_template and 'id_project' in json_template:
-            return gettext('Can\'t specify both site and project for template'), 400
+            if json_template['id_site'] and json_template['id_project']:
+                return gettext('Can\'t specify both site and project for template'), 400
 
         if json_template['id_email_template'] > 0:  # Existing template
             # Check if have access to updatable template
@@ -135,18 +146,16 @@ class QueryEmailTemplate(EmailResource):
         else:  # New template
             try:
                 # Check if we have access or not to template
-                template = EmailTemplate()
-                template.from_json(json_template)
+                update_template = EmailTemplate()
+                update_template.from_json(json_template)
 
-                if not self._can_access_template(template, True):
+                if not self._can_access_template(update_template, True):
                     return gettext('Forbidden'), 403
 
                 missing_fields = EmailTemplate.validate_required_fields(json_data=json_template)
                 if missing_fields:
                     return gettext('Missing fields') + ': ' + str([field for field in missing_fields]), 400
 
-                update_template = EmailTemplate()
-                update_template.from_json(json_template)
                 EmailTemplate.insert(update_template)
                 # Update ID for further use
                 json_template['id_email_template'] = update_template.id_email_template
