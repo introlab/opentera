@@ -96,7 +96,7 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             .filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
-    def get_test_types_for_service(id_service: int, with_deleted: bool = False):
+    def get_tests_types_for_service(id_service: int, with_deleted: bool = False):
         return TeraTestType.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_service=id_service).all()
 

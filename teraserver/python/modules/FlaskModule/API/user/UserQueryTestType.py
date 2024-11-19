@@ -70,15 +70,15 @@ class UserQueryTestTypes(Resource):
         elif args['id_project']:
             if args['id_project'] not in user_access.get_accessible_projects_ids():
                 return gettext('Forbidden'), 403
-            test_types_projects = user_access.query_test_types_for_project(args['id_project'])
+            test_types_projects = user_access.query_tests_types_for_project(args['id_project'])
             test_types = [ttp.test_type_project_test_type for ttp in test_types_projects]
         elif args['id_site']:
             if args['id_site'] not in user_access.get_accessible_sites_ids():
                 return gettext('Forbidden'), 403
-            test_types_sites = user_access.query_test_types_sites_for_site(args['id_site'])
+            test_types_sites = user_access.query_tests_types_sites_for_site(args['id_site'])
             test_types = [tts.test_type_site_test_type for tts in test_types_sites]
         else:
-            test_types = user_access.get_accessible_test_types()
+            test_types = user_access.get_accessible_tests_types()
 
         try:
             test_types_list = []

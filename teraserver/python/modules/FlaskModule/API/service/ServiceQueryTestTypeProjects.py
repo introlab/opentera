@@ -1,5 +1,10 @@
 from flask import request
 from flask_restx import Resource, reqparse, inputs
+
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import exc, inspect
+from flask_babel import gettext
+
 from modules.LoginModule.LoginModule import current_service, LoginModule
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
@@ -7,9 +12,7 @@ from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
-from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy import exc, inspect
-from flask_babel import gettext
+
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -165,13 +168,13 @@ class ServiceQueryTestTypeProjects(Resource):
                 return gettext('Forbidden'), 403
 
             # Get all current association
-            current_test_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
-            current_test_types_ids = [tt.id_test_type for tt in current_test_types]
+            current_tests_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
+            current_tests_types_ids = [tt.id_test_type for tt in current_tests_types]
             received_tt_ids = [tt['id_test_type'] for tt in request.json['project']['testtypes']]
             # Difference - we must delete types not anymore in the list
-            todel_ids = set(current_test_types_ids).difference(received_tt_ids)
+            todel_ids = set(current_tests_types_ids).difference(received_tt_ids)
             # Also filter types already there
-            received_tt_ids = set(received_tt_ids).difference(current_test_types_ids)
+            received_tt_ids = set(received_tt_ids).difference(current_tests_types_ids)
             try:
                 for tt_id in todel_ids:
                     TeraTestTypeProject.delete_with_ids(test_type_id=tt_id, project_id=id_project, autocommit=False)

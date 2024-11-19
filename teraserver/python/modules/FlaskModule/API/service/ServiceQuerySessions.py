@@ -1,14 +1,16 @@
+from datetime import datetime
+
 from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
+
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import exc
+
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
-from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy import exc
-from datetime import datetime
-
 from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraUser import TeraUser
@@ -21,14 +23,19 @@ get_parser.add_argument('uuid_session', type=str, help='UUID of the session to q
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query')
 get_parser.add_argument('id_user', type=int, help='ID of the user to query')
 get_parser.add_argument('id_device', type=int, help='ID of the device to query')
-get_parser.add_argument('list', type=inputs.boolean, help='Flag that limits the returned data to minimal information')
+get_parser.add_argument('list', type=inputs.boolean,
+                        help='Flag that limits the returned data to minimal information')
 get_parser.add_argument('with_events', type=inputs.boolean, help='Also includes session events')
-get_parser.add_argument('with_session_type', type=inputs.boolean, help='Also includes session type information')
+get_parser.add_argument('with_session_type', type=inputs.boolean,
+                        help='Also includes session type information')
 get_parser.add_argument('status', type=int, help='Limit to specific session status')
 get_parser.add_argument('limit', type=int, help='Maximum number of results to return')
-get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index')
-get_parser.add_argument('start_date', type=inputs.date, help='Start date, sessions before that date will be ignored')
-get_parser.add_argument('end_date', type=inputs.date, help='End date, sessions after that date will be ignored')
+get_parser.add_argument('offset', type=int,
+                        help='Number of items to ignore in results, offset from 0-index')
+get_parser.add_argument('start_date', type=inputs.date,
+                        help='Start date, sessions before that date will be ignored')
+get_parser.add_argument('end_date', type=inputs.date,
+                        help='End date, sessions after that date will be ignored')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_session', {'properties': TeraSession.get_json_schema(),

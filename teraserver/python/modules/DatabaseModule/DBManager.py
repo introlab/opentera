@@ -94,7 +94,7 @@ class DBManager (BaseModule):
         return task.deferLater(reactor, seconds_to_midnight, self.cleanup_database)
         # return task.deferLater(reactor, 5, self.cleanup_database)
 
-    def setup_events_for_2fa_sites(self):
+    def setup_events_for_2fa_sites(self) -> None:
         """
         We need to validate that 2FA is enabled for all users in the site when the flag is set.
         This can occur on multiple occasions : when the site is created, updated and also when user
@@ -279,22 +279,22 @@ class DBManager (BaseModule):
                 self.publish(event_message.header.topic, event_message.SerializeToString())
 
     @staticmethod
-    def userAccess(user: TeraUser):
+    def userAccess(user: TeraUser) -> DBManagerTeraUserAccess:
         access = DBManagerTeraUserAccess(user=user)
         return access
 
     @staticmethod
-    def deviceAccess(device: TeraDevice):
+    def deviceAccess(device: TeraDevice) -> DBManagerTeraDeviceAccess:
         access = DBManagerTeraDeviceAccess(device=device)
         return access
 
     @staticmethod
-    def participantAccess(participant: TeraParticipant):
+    def participantAccess(participant: TeraParticipant) -> DBManagerTeraParticipantAccess:
         access = DBManagerTeraParticipantAccess(participant=participant)
         return access
 
     @staticmethod
-    def serviceAccess(service: TeraService):
+    def serviceAccess(service: TeraService) -> DBManagerTeraServiceAccess:
         access = DBManagerTeraServiceAccess(service=service)
         return access
 
