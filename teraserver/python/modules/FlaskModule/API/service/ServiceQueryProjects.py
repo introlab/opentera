@@ -56,7 +56,7 @@ class ServiceQueryProjects(Resource):
             projects = [TeraProject.get_project_by_id(args['id_project'])]
 
         if args['id_site']:
-            if args['id_site'] not in service_access.get_accessibles_sites_ids():
+            if args['id_site'] not in service_access.get_accessible_sites_ids():
                 return gettext('Forbidden'), 403
             projects = TeraSite.get_site_by_id(args['id_site']).site_projects
 
@@ -101,7 +101,7 @@ class ServiceQueryProjects(Resource):
         if json_project['id_project'] == 0 and 'id_site' not in json_project:
             return gettext('Missing id_site arguments'), 400
 
-        if 'id_site' in json_project and json_project['id_site'] not in service_access.get_accessibles_sites_ids():
+        if 'id_site' in json_project and json_project['id_site'] not in service_access.get_accessible_sites_ids():
             return gettext('Forbidden'), 403
 
         # Do the update!

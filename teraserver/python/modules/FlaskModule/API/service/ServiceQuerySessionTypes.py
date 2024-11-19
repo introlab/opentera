@@ -78,7 +78,7 @@ class ServiceQuerySessionTypes(Resource):
 
         session_types = []
         if args['id_site']:
-            if args['id_site'] in service_access.get_accessibles_sites_ids():
+            if args['id_site'] in service_access.get_accessible_sites_ids():
                 session_types = [st.session_type_site_session_type for st in
                                  TeraSessionTypeSite.get_sessions_types_for_site(args['id_site'])]
         elif args['id_project']:
@@ -122,7 +122,7 @@ class ServiceQuerySessionTypes(Resource):
             # STEP 1) Verify access before doing anything
             if 'id_sites' in service_session_type_info and \
                     isinstance(service_session_type_info['id_sites'], list):
-                accessible_sites = service_access.get_accessibles_sites_ids()
+                accessible_sites = service_access.get_accessible_sites_ids()
                 for id_site in service_session_type_info['id_sites']:
                     if id_site not in accessible_sites:
                         return gettext('Service doesn\'t have access to all listed sites'), 403

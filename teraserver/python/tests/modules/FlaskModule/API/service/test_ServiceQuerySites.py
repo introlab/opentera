@@ -29,7 +29,7 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
             service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
             from modules.DatabaseModule.DBManager import DBManager
             service_access = DBManager.serviceAccess(service)
-            accessible_sites = service_access.get_accessibles_sites_ids()
+            accessible_sites = service_access.get_accessible_sites_ids()
             for site_json in response.json:
                 id_site = site_json['id_site']
                 if id_site in accessible_sites:
@@ -50,7 +50,7 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
                 service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
                 from modules.DatabaseModule.DBManager import DBManager
                 service_access = DBManager.serviceAccess(service)
-                accessible_sites = service_access.get_accessibles_sites_ids()
+                accessible_sites = service_access.get_accessible_sites_ids()
 
                 params = {'id_site': site.id_site}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -72,7 +72,7 @@ class ServiceQuerySitesTest(BaseServiceAPITest):
                 service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
                 from modules.DatabaseModule.DBManager import DBManager
                 service_access = DBManager.serviceAccess(service)
-                accessible_sites = service_access.get_accessibles_sites_ids()
+                accessible_sites = service_access.get_accessible_sites_ids()
 
                 params = {'id_user': user.id_user}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,

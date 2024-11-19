@@ -113,7 +113,7 @@ class DBManagerTeraServiceAccess:
             site_list.append(service_site.service_site_site)
         return site_list
 
-    def get_accessibles_sites_ids(self) -> list[int]:
+    def get_accessible_sites_ids(self) -> list[int]:
         return [site.id_site for site in self.get_accessibles_sites()]
 
     def get_accessible_participants(self, admin_only=False) -> list[TeraParticipant]:
@@ -254,7 +254,7 @@ class DBManagerTeraServiceAccess:
         if user_id in self.get_accessible_users_ids():
 
             user = TeraUser.get_user_by_id(id_user=user_id)
-            acc_sites_ids = self.get_accessibles_sites_ids()
+            acc_sites_ids = self.get_accessible_sites_ids()
             if user.user_superadmin:
                 sites = TeraSite.query.order_by(TeraSite.site_name.asc()).all()
             else:

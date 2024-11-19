@@ -52,7 +52,7 @@ class ServiceQueryUserGroups(Resource):
                 return gettext('Forbidden'), 403
             user_groups = service_access.query_usergroups_for_project(args['id_project'])
         elif args['id_site']:
-            if args['id_site'] not in service_access.get_accessibles_sites_ids():
+            if args['id_site'] not in service_access.get_accessible_sites_ids():
                 return gettext('Forbidden'), 403
             user_groups = service_access.query_usergroups_for_site(args['id_site'])
         else:
@@ -97,7 +97,7 @@ class ServiceQueryUserGroups(Resource):
         if 'user_group_services_access' in json_user_group:
             json_access = json_user_group.pop('user_group_services_access')
             accessible_projects_ids = service_access.get_accessible_projects_ids()
-            accessible_sites_ids = service_access.get_accessibles_sites_ids()
+            accessible_sites_ids = service_access.get_accessible_sites_ids()
 
             # Check if access only are for the current service
             for access in json_access:
@@ -233,4 +233,3 @@ class ServiceQueryUserGroups(Resource):
             return gettext('Database error'), 500
 
         return '', 200
-

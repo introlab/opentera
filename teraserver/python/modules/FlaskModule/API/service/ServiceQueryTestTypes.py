@@ -51,7 +51,7 @@ class ServiceQueryTestTypes(Resource):
 
         test_types = []
         if args['id_site']:
-            if args['id_site'] in service_access.get_accessibles_sites_ids():
+            if args['id_site'] in service_access.get_accessible_sites_ids():
                 test_types = [tt.test_type_site_test_type for tt in
                               TeraTestTypeSite.get_tests_types_for_site(args['id_site'])]
         elif args['id_project']:

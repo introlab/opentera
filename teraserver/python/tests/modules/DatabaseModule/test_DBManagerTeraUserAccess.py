@@ -1,12 +1,9 @@
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraUser import TeraUser
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
-
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 
 class DBManagerTeraUserAccessTest(BaseModelsTest):
-
-    def setUp(self):
-        super().setUp()
 
     def test_admin_get_accessible_users_ids(self):
         with self._flask_app.app_context():
