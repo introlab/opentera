@@ -42,6 +42,7 @@ add_custom_target(
     DEPENDS videorehabservice-python-translations
     DEPENDS loggingservice-python-translations
     DEPENDS filetransferservice-python-translations
+    DEPENDS emailservice-python-translations
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )
@@ -59,6 +60,7 @@ add_custom_target(
     DEPENDS videorehabservice-python-translations-compile-only
     DEPENDS loggingservice-python-translations-compile-only
     DEPENDS filetransferservice-python-translations-compile-only
+    DEPENDS emailservice-python-translations-compile-only
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )

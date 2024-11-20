@@ -32,7 +32,7 @@ add_custom_target(
 
 
 # Build this target if you want to update translations too...
-add_custom_target(loggingservice-python-all-with-translations DEPENDS python-translations loggingservice-python-translations)
+# add_custom_target(loggingservice-python-all-with-translations DEPENDS loggingservice-python-translations)
 
 # Build this target if you want to compile translations only
-add_custom_target(loggingservice-python-all-with-translations-compile-only DEPENDS python-translations-compile-only loggingservice-python-translations-compile-only)
+# add_custom_target(loggingservice-python-all-with-translations-compile-only DEPENDS loggingservice-python-translations-compile-only)

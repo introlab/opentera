@@ -32,7 +32,7 @@ add_custom_target(
 
 
 # Build this target if you want to update translations too...
-add_custom_target(filetransferservice-python-all-with-translations DEPENDS python-translations filetransferservice-python-translations)
+# add_custom_target(filetransferservice-python-all-with-translations DEPENDS filetransferservice-python-translations)
 
 # Build this target if you want to compile translations only
-add_custom_target(filetransferservice-python-all-with-translations-compile-only DEPENDS python-translations-compile-only filetransferservice-python-translations-compile-only)
+# add_custom_target(filetransferservice-python-all-with-translations-compile-only DEPENDS filetransferservice-python-translations-compile-only)
