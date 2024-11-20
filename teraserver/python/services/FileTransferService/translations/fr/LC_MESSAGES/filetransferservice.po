@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-13 15:53-0500\n"
-"PO-Revision-Date: 2023-02-28 08:22-0500\n"
+"POT-Creation-Date: 2024-11-20 09:49-0500\n"
+"PO-Revision-Date: 2024-11-20 09:49-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -16,28 +16,25 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.16.0\n"
 
 #: API/QueryArchiveFile.py:53 API/QueryArchiveFile.py:109
 #: API/QueryArchiveFile.py:172 API/QueryArchiveFileInfos.py:64
 #: API/QueryArchiveFileInfos.py:131
-#, fuzzy
 msgid "No archive found"
-msgstr "Aucune ressource trouvée"
+msgstr "Aucune archive trouvée"
 
 #: API/QueryArchiveFile.py:57 API/QueryArchiveFile.py:175
-#, fuzzy
 msgid "Access denied to the requested archive"
-msgstr "Accès refusé pour au moins une ressource"
+msgstr "Accès refusé à l'archive demandé"
 
 #: API/QueryArchiveFile.py:87 API/QueryAssetFile.py:63
 msgid "Wrong content type"
 msgstr "Mauvais type de contenu"
 
 #: API/QueryArchiveFile.py:90
-#, fuzzy
 msgid "Missing archive information"
-msgstr "Informations manquantes sur le fichier de la ressource"
+msgstr "Informations sur l'archive manquantes"
 
 #: API/QueryArchiveFile.py:93 API/QueryAssetFile.py:69
 msgid "Missing uploaded file"
@@ -48,31 +45,29 @@ msgid "Missing filename"
 msgstr "Nom de fichier manquant"
 
 #: API/QueryArchiveFile.py:105
-#, fuzzy
 msgid "Missing archive ID"
-msgstr "L'UUID de la ressource est manquant"
+msgstr "ID de l'archive manquant"
 
 #: API/QueryArchiveFile.py:112
 msgid "Archive has already been uploaded."
-msgstr ""
+msgstr "L'archive a été téléversée."
 
 #: API/QueryArchiveFile.py:115
 msgid "Filename does not match the archive information"
-msgstr ""
+msgstr "Le nom du fichier ne correspond pas aux informations de l'archive"
 
 #: API/QueryArchiveFile.py:146
 msgid "Error parsing archive information : "
-msgstr ""
+msgstr "Erreur lors de l'analyse des informations de l'archive : "
 
 #: API/QueryArchiveFile.py:185
 msgid "Archive deleted"
-msgstr ""
+msgstr "Archive supprimée"
 
 #: API/QueryArchiveFileInfos.py:68 API/QueryArchiveFileInfos.py:72
 #: API/QueryArchiveFileInfos.py:76 API/QueryArchiveFileInfos.py:81
-#, fuzzy
 msgid "Access denied for that archive"
-msgstr "Accès refusé à cette ressource"
+msgstr "Accès refusé à cet archive"
 
 #: API/QueryArchiveFileInfos.py:91 API/QueryArchiveFileInfos.py:96
 #: API/QueryAssetFileInfos.py:69
@@ -80,24 +75,20 @@ msgid "Badly formatted request"
 msgstr "Requête mal formattée"
 
 #: API/QueryArchiveFileInfos.py:99
-#, fuzzy
 msgid "Missing original filename"
-msgstr "Nom de fichier manquant"
+msgstr "Nom de fichier original manquant"
 
 #: API/QueryArchiveFileInfos.py:102
-#, fuzzy
 msgid "Missing owner UUID"
-msgstr "L'UUID de la ressource est manquant"
+msgstr "Identifiant du propriétaire manquant"
 
 #: API/QueryArchiveFileInfos.py:119 API/QueryArchiveFileInfos.py:140
-#, fuzzy
 msgid "Error parsing archive information"
-msgstr "Informations manquantes sur le fichier de la ressource"
+msgstr "Erreur lors de l'analyse des informations de l'archive"
 
 #: API/QueryArchiveFileInfos.py:134
-#, fuzzy
 msgid "Missing archive status"
-msgstr "Jeton d'accès manquant"
+msgstr "État de l'archive manquant"
 
 #: API/QueryAssetFile.py:44 API/QueryAssetFile.py:242
 msgid "Access denied to asset"

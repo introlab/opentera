@@ -32,7 +32,7 @@ add_custom_target(
 
 
 # Build this target if you want to update translations too...
-add_custom_target(videorehabservice-python-all-with-translations DEPENDS python-translations videorehabservice-python-translations)
+# add_custom_target(videorehabservice-python-all-with-translations DEPENDS videorehabservice-python-translations)
 
 # Build this target if you want to compile translations only
-add_custom_target(videorehabservice-python-all-with-translations-compile-only DEPENDS python-translations-compile-only videorehabservice-python-translations-compile-only)
+# add_custom_target(videorehabservice-python-all-with-translations-compile-only DEPENDS videorehabservice-python-translations-compile-only)

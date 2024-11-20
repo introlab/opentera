@@ -30,9 +30,8 @@ add_custom_target(
     SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/babel.cfg
 )
 
-
 # Build this target if you want to update translations too...
-add_custom_target(emailservice-python-all-with-translations DEPENDS python-translations emailservice-python-translations)
+# add_custom_target(emailservice-python-all-with-translations DEPENDS emailservice-python-translations)
 
 # Build this target if you want to compile translations only
-add_custom_target(emailservice-python-all-with-translations-compile-only DEPENDS python-translations-compile-only emailservice-python-translations-compile-only)
+# add_custom_target(emailservice-python-all-with-translations-compile-only DEPENDS emailservice-python-translations-compile-only)

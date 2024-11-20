@@ -1,0 +1,99 @@
+# French translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-20 09:49-0500\n"
+"PO-Revision-Date: 2024-11-20 09:29-0500\n"
+"Last-Translator: \n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: API/QueryEmailTemplate.py:58 API/QueryEmailTemplate.py:116
+#: API/QueryEmailTemplate.py:177 API/QuerySendEmail.py:60
+msgid "Only users can use this API."
+msgstr "Seuls les utilisateurs peuvent accéder à cet API."
+
+#: API/QueryEmailTemplate.py:66 API/QueryEmailTemplate.py:69
+#: API/QueryEmailTemplate.py:86 API/QueryEmailTemplate.py:93
+#: API/QueryEmailTemplate.py:98 API/QueryEmailTemplate.py:134
+#: API/QueryEmailTemplate.py:137 API/QueryEmailTemplate.py:153
+#: API/QueryEmailTemplate.py:185 API/QueryEmailTemplate.py:188
+#: API/QuerySendEmail.py:107 API/QuerySendEmail.py:114
+#: API/QuerySendEmail.py:120 API/QuerySendEmail.py:125
+msgid "Forbidden"
+msgstr "Refusé"
+
+#: API/QueryEmailTemplate.py:80
+msgid "Invalid project"
+msgstr "Projet invalide"
+
+#: API/QueryEmailTemplate.py:102
+msgid "Missing identifying parameter"
+msgstr "Paramètre d'identification manquant"
+
+#: API/QueryEmailTemplate.py:119
+msgid "Missing template"
+msgstr "Gabarit manquant"
+
+#: API/QueryEmailTemplate.py:124
+msgid "Missing id_email_template"
+msgstr "id_email_template manquant"
+
+#: API/QueryEmailTemplate.py:128
+msgid "Can't specify both site and project for template"
+msgstr "Impossible de spécifier à la fois le site et le projet"
+
+#: API/QueryEmailTemplate.py:145
+msgid "Invalid or missing data"
+msgstr "Donnée invalide ou manquante"
+
+#: API/QueryEmailTemplate.py:157
+msgid "Missing fields"
+msgstr "Champs manquants"
+
+#: API/QueryEmailTemplate.py:165 API/QueryEmailTemplate.py:195
+msgid "Database error"
+msgstr "Erreur de base de données"
+
+#: API/QuerySendEmail.py:77
+msgid "At least one user is not accessible"
+msgstr "Au moins un utilisateur n'est pas accessible"
+
+#: API/QuerySendEmail.py:92
+msgid "At least one participant is not accessible"
+msgstr "Au moins un participant n'est pas accessible"
+
+#: API/QuerySendEmail.py:98
+msgid "Missing user and/or participant_uuid"
+msgstr "Identifiant unique de l'utilisateur et/ou du participant manquant"
+
+#: API/QuerySendEmail.py:101
+msgid "Can't specify both a template and an email body"
+msgstr "Impossible de spécifier à la fois un gabarit et un texte de courriel"
+
+#: API/QuerySendEmail.py:132
+msgid "Missing template ID or body text"
+msgstr "Identifiant du gabarit ou contenu du courriel manquant"
+
+#: API/QuerySendEmail.py:134
+msgid "(No subject)"
+msgstr "(Aucun sujet)"
+
+#: API/QuerySendEmail.py:152
+msgid "User doesn't have any email address set"
+msgstr "L'utilisateur n'a pas d'adresse courriel"
+
+#: API/QuerySendEmail.py:159
+msgid "Can't connect to SMTP server"
+msgstr "Impossible de se connecter au serveur SMTP"
+
