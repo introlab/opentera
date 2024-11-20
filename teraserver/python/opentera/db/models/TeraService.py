@@ -94,6 +94,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
         payload = {
             'iat': int(now),
             'exp': int(now) + expiration,
+            'jti': str(uuid.uuid4()),
             'iss': 'TeraServer',
             'service_uuid': self.service_uuid
         }

@@ -379,7 +379,7 @@ class ServiceAccessManager:
         if allow_static_tokens:  # Check for static participant token
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_participant_static_token_key,
-                                        algorithms='HS256')
+                                        algorithms='HS256', options={"verify_jti": False})
             except jwt.PyJWTError as e:
                 # Not a participant, or invalid token, will continue...
                 pass

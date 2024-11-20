@@ -24,15 +24,15 @@ import pyotp
 
 
 # Generator for jti
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(user_jti_generator) to get next sequence number
-user_jti_generator = infinite_jti_sequence()
+# def infinite_jti_sequence():
+#     num = 0
+#     while True:
+#         yield num
+#         num += 1
+#
+#
+# # Initialize generator, call next(user_jti_generator) to get next sequence number
+# user_jti_generator = infinite_jti_sequence()
 
 
 class TeraUser(BaseModel, SoftDeleteMixin):
@@ -121,7 +121,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
+            'jti': str(uuid.uuid4()),  # next(user_jti_generator),
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
             'user_fullname': self.get_fullname(),

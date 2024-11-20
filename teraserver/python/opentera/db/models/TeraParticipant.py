@@ -18,15 +18,15 @@ from passlib.hash import bcrypt
 
 
 # Generator for jti
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(participant_jti_generator) to get next sequence number
-participant_jti_generator = infinite_jti_sequence()
+# def infinite_jti_sequence():
+#     num = 0
+#     while True:
+#         yield num
+#         num += 1
+#
+#
+# # Initialize generator, call next(participant_jti_generator) to get next sequence number
+# participant_jti_generator = infinite_jti_sequence()
 
 
 class TeraParticipant(BaseModel, SoftDeleteMixin):
@@ -91,7 +91,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'jti': next(participant_jti_generator),
+            'jti': str(uuid.uuid4()),  # next(participant_jti_generator),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant,
             'user_fullname': self.participant_name
@@ -103,7 +103,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         # Creating token with user info
         payload = {
             'iss': 'TeraServer',
-            'jti': next(participant_jti_generator),
+            'jti': str(uuid.uuid4()),  # next(participant_jti_generator),
             'participant_uuid': self.participant_uuid,
             'id_participant': self.id_participant
         }
@@ -224,7 +224,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         if participant and participant.participant_enabled and participant.participant_token_enabled:
             # Validate token
             data = jwt.decode(token.encode('utf-8'), TeraServerSettings.get_server_setting_value(
-                TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256')
+                TeraServerSettings.ServerParticipantTokenKey), algorithms='HS256', options={"verify_jti": False})
 
             if data['participant_uuid'] == participant.participant_uuid:
                 participant.authenticated = True

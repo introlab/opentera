@@ -111,9 +111,10 @@ class TeraDevice(BaseModel, SoftDeleteMixin):
         return self.device_onlineable
 
     def create_token(self):
-        # Creating token with user info
+        # Creating token with device info
         payload = {
             'iss': 'TeraServer',
+            'jti': str(uuid.uuid4()),
             'device_uuid': self.device_uuid,
             'id_device': self.id_device
         }
