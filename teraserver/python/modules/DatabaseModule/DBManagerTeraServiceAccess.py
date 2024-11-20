@@ -67,8 +67,10 @@ class DBManagerTeraServiceAccess:
     def get_accessible_sessions(self, admin_only=False) -> list[TeraSession]:
         part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         user_ids = self.get_accessible_users_ids(admin_only=admin_only)
-        # Also includes super admins users in the list
-        user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
+
+        # DL 2024-11-20: Removed super admins from the list of users to get sessions from
+        # user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
+
         device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
         sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
                                                 TeraSession.id_creator_device.in_(device_ids),
@@ -105,7 +107,6 @@ class DBManagerTeraServiceAccess:
 
     def get_accessibles_sites(self) -> list[TeraSite]:
         # Build site list - get sites where that service is associated
-
         service_sites = TeraServiceSite.get_sites_for_service(self.service.id_service)
 
         site_list = []
@@ -119,10 +120,7 @@ class DBManagerTeraServiceAccess:
     def get_accessible_participants(self, admin_only=False) -> list[TeraParticipant]:
         project_id_list = self.get_accessible_projects_ids(admin_only=admin_only)
         participant_list = []
-
-
         participant_list.extend(TeraParticipant.query.filter(TeraParticipant.id_project.in_(project_id_list)))
-
         return participant_list
 
     def get_accessible_participants_ids(self, admin_only=False) -> list[int]:
@@ -143,8 +141,8 @@ class DBManagerTeraServiceAccess:
         projects = self.get_accessible_projects(admin_only=admin_only)
         users = []
         for project in projects:
-            # Always include super admins for services
-            project_users = project.get_users_in_project(include_superadmins=True, include_site_access=True)
+            # DL 2024-11-20: Removed super admins from the list of users
+            project_users = project.get_users_in_project(include_superadmins=False, include_site_access=True)
             users.extend([user for user in project_users if user not in users])
 
         # Sort by user first name
@@ -222,7 +220,6 @@ class DBManagerTeraServiceAccess:
 
     def get_accessible_tests_types_ids_for_device(self, id_device: int) -> list[int]:
         return [tt.id_test_type for tt in self.get_accessible_tests_types_for_device(id_device)]
-
 
     def get_accessible_tests_types_ids_for_user(self, id_user: int) -> list[int]:
         return [tt.id_test_type for tt in self.get_accessible_tests_types_for_user(id_user)]
