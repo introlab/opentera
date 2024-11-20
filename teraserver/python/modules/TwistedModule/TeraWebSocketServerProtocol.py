@@ -99,7 +99,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
                     tera_message.message.Pack(filtered_event_message)
 
                     # Test message to JSON string
-                    json = MessageToJson(tera_message, including_default_value_fields=True)
+                    json = MessageToJson(tera_message, always_print_fields_with_no_presence=True)
 
                     # Send to websocket (not in binary form)
                     self.sendMessage(json.encode('utf-8'), False)

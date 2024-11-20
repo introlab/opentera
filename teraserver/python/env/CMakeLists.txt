@@ -6,7 +6,7 @@ file(MAKE_DIRECTORY ${ENV_PATH})
 
 # Define packages to install
 set (conda_packages
-    protobuf==3.20.3
+    # protobuf==3.20.3
 )
 
 if(WIN32)
