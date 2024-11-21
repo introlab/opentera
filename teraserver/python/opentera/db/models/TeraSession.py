@@ -172,6 +172,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                     base_session.session_devices = [session_device]
                 if i == 1:
                     base_session.id_creator_participant = session_part.id_participant
+                    base_session.session_users = [base_session.session_creator_user, session_user2]
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
 
@@ -292,6 +293,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -313,6 +315,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -333,6 +336,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)

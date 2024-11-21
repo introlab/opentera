@@ -1,5 +1,6 @@
 from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
+from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraUser import TeraUser
 from datetime import datetime
 
 
@@ -131,13 +132,31 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
 
-    def test_get_endpoint_query_user_assets(self):
+    def test_get_endpoint_query_user_assets_forbidden(self):
         with self._flask_app.app_context():
             params = {'id_user': 1, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_query_user_assets(self):
+        with self._flask_app.app_context():
+            params = {'id_user': 2, 'with_urls': True}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(len(response.json), 4)
+            target_count = 0
+            id_sessions = []
+            user = TeraUser.get_user_by_id(2)
+            for session in user.user_sessions:
+                target_count += len(session.session_assets)
+                if session.id_session not in id_sessions:
+                    id_sessions.append(session.id_session)
+            # Also add assets created but not in session we are part of
+            for asset in user.user_assets:
+                if asset.id_session not in id_sessions:
+                    target_count += 1
+            self.assertEqual(len(response.json), target_count)
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
@@ -179,9 +198,16 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
 
-    def test_get_endpoint_query_assets_created_by_user(self):
+    def test_get_endpoint_query_assets_created_by_user_forbidden(self):
         with self._flask_app.app_context():
             params = {'id_creator_user': 1, 'with_urls': True}
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params=params, endpoint=self.test_endpoint)
+            self.assertEqual(response.status_code, 403)
+
+    def test_get_endpoint_query_assets_created_by_user(self):
+        with self._flask_app.app_context():
+            params = {'id_creator_user': 2, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 200)
