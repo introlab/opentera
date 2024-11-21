@@ -5,7 +5,6 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 with open("env/requirements.txt", "r", encoding="utf-8") as f:
     requirements = f.readlines()
-    requirements.append('protobuf==5.28.3')
 
 setuptools.setup(
     name="opentera",
