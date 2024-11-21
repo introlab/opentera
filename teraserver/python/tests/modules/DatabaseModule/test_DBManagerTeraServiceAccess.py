@@ -1,6 +1,5 @@
 from modules.DatabaseModule.DBManager import DBManager
 from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
-from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
@@ -15,8 +14,7 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
-from opentera.db.models.TeraServiceProject import TeraServiceProject
-from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraAsset import TeraAsset
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
@@ -525,3 +523,140 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                     queried_role_name = queried_role.service_role_name if queried_role else None
 
                     self.assertEqual(project_role, queried_role_name)
+
+    def test_service_get_user_with_uuid(self):
+        """
+        This will test get_user_with_uuid.
+        """
+        with self._flask_app.app_context():
+
+            all_users = TeraUser.query.all()
+            for user in all_users:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                my_user = service_access.get_user_with_uuid(uuid_user = user.user_uuid)
+                if (user.user_superadmin):
+                    self.assertIsNone(my_user)
+                else:
+                    if user.id_user in service_access.get_accessible_users_ids():
+                        self.assertEqual(my_user.id_user, user.id_user)
+                    else:
+                        self.assertIsNone(my_user)
+
+    def test_service_query_sites_for_user(self):
+        """
+        This will test query_sites_ids_for_user.
+        """
+        with self._flask_app.app_context():
+
+            all_users = TeraUser.query.all()
+            for user in all_users:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                sites = set(service_access.query_sites_for_user(user_id = user.id_user))
+
+                if user.user_superadmin:
+                    self.assertEqual(len(sites), 0)
+                else:
+                    teraserver_service = TeraService.get_openteraserver_service()
+                    queried_sites = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                            .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                            .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                            .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                            .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                            .with_entities(TeraSite).all()
+
+                    queried_projects = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                            .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                            .join(TeraProject, TeraServiceRole.id_project == TeraProject.id_project) \
+                                                            .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                            .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                            .with_entities(TeraProject).all()
+
+                    for project in queried_projects:
+                        queried_sites.extend([project.project_site])
+
+
+                    self.assertEqual(len(set(sites)), len(set(queried_sites)))
+
+    def test_service_query_asset(self):
+        """
+        This will test query_asset.
+        """
+        with self._flask_app.app_context():
+
+            all_assets = TeraAsset.query.all()
+            for asset in all_assets:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                my_assets = service_access.query_asset(asset_id = asset.id_asset)
+
+                # TODO Can only access assets produce by the service ?
+                # TODO Or all available assets in the project ?
+                # TODO Association to project is weak and depends on participants in the session
+
+    def test_service_query_session(self):
+        """
+        This will test query_session.
+        """
+        with self._flask_app.app_context():
+
+            all_sessions = TeraSession.query.all()
+            for session in all_sessions:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                my_sessions = service_access.query_session(session_id = session.id_session)
+
+                # TODO Can only access sessions produce by the service ?
+                # TODO Or all available sessions in the project ?
+                # TODO Association to project is weak and depends on participants in the session
+
+    def test_service_query_usergroups_for_site(self):
+        """
+        This will test query_usergroups_for_site.
+        """
+        with self._flask_app.app_context():
+
+            all_sites = TeraSite.query.all()
+            for site in all_sites:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                usergroups = set(service_access.query_usergroups_for_site(site_id = site.id_site))
+
+                # TODO
+                # queried_usergroups = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                #                                         .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                #                                         .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                #                                         .filter(TeraSite.id_site == site.id_site) \
+                #                                         .filter(TeraServiceRole.id_service == service.id_service) \
+                #                                         .with_entities(TeraUserGroup).all()
+
+                # self.assertEqual(len(usergroups), len(queried_usergroups))
+
+    def test_service_query_usergroups_for_project(self):
+        """
+        This will test query_usergroups_for_project.
+        """
+        with self._flask_app.app_context():
+
+            all_projects = TeraProject.query.all()
+            for project in all_projects:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                usergroups = set(service_access.query_usergroups_for_project(project_id = project.id_project))
+
+                # TODO
+                # queried_usergroups = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                #                                         .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                #                                         .join(TeraProject, TeraServiceRole.id_project == TeraProject.id_project) \
+                #                                         .filter(TeraProject.id_project == project.id_project) \
+                #                                         .filter(TeraServiceRole.id_service == service.id_service) \
+                #                                         .with_entities(TeraUserGroup).all()
+
+                # self.assertEqual(len(usergroups), len(queried_usergroups))
