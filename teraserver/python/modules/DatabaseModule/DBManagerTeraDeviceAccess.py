@@ -1,6 +1,7 @@
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraParticipant import TeraParticipant
@@ -107,8 +108,8 @@ class DBManagerTeraDeviceAccess:
 
     def get_accessible_tests_types(self) -> list[TeraTestType]:
         accessible_projects_ids = [proj.id_project for proj in self.device.device_projects]
-        query = TeraTestType.query.join(TeraServiceProject).filter(
-            TeraServiceProject.id_project.in_(accessible_projects_ids)).group_by(TeraTestType.id_test_type)
+        query = TeraTestType.query.join(TeraTestTypeProject).filter(
+            TeraTestTypeProject.id_project.in_(accessible_projects_ids)).group_by(TeraTestType.id_test_type)
         return query.all()
 
     def get_accessible_tests_types_ids(self) -> list[int]:

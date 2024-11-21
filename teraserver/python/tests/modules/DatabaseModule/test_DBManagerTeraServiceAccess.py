@@ -344,7 +344,7 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 self.assertIsNotNone(service)
                 service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
 
-                test_types_service_ids = service_access.get_accessible_tests_types()
+                test_types_service_ids = service_access.get_accessible_tests_types_ids()
                 test_types_ids = set(service_access.get_accessible_tests_types_ids_for_device(device.id_device))
 
                 for id in test_types_ids:
