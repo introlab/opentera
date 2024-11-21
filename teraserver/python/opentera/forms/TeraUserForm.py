@@ -31,10 +31,12 @@ class TeraUserForm:
             section.add_item(TeraFormItem("user_2fa_otp_enabled", gettext("2FA OTP Enabled"), "boolean",
                                           False, item_default=False,
                                           item_condition=TeraFormItemCondition("user_2fa_enabled", "=", True)))
-            section.add_item(TeraFormItem("user_2fa_email_enabled", gettext("2FA Email Enabled"), "hidden",
-                                          False, item_default=False,
-                                          # item_condition = TeraFormItemCondition("user_2fa_enabled", "=", True)
-                                          ))
+
+            # TODO - Add 2FA Email Enabled
+            #section.add_item(TeraFormItem("user_2fa_email_enabled", gettext("2FA Email Enabled"), "boolean",
+            #                              False, item_default=False,
+            #                              item_condition = TeraFormItemCondition("user_2fa_enabled", "=", True)
+            #                              ))
 
         # section.add_item(TeraFormItem("user_2fa_otp_secret", gettext("OTP Secret"), "hidden"))
         section.add_item(TeraFormItem("user_firstname", gettext("First Name"), "text", True))
