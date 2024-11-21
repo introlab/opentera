@@ -1,7 +1,9 @@
 from modules.DatabaseModule.DBManager import DBManager
 from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
+from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraUserGroup import TeraUserGroup
+from opentera.db.models.TeraUserUserGroup import TeraUserUserGroup
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraService import TeraService
@@ -11,6 +13,8 @@ from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraServiceProject import TeraServiceProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
@@ -347,11 +351,177 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 test_types_service_ids = service_access.get_accessible_tests_types_ids()
                 test_types_ids = set(service_access.get_accessible_tests_types_ids_for_device(device.id_device))
 
-                for id in test_types_ids:
-                    self.assertTrue(id in test_types_service_ids)
+                for id_test_type in test_types_ids:
+                    self.assertTrue(id_test_type in test_types_service_ids)
 
                 # Test with a service with no access
                 service = self._create_service_with_no_access()
                 self.assertIsNotNone(service)
                 service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
                 self.assertEqual(len(service_access.get_accessible_tests_types_ids_for_device(device.id_device)), 0)
+
+    def test_service_get_accessible_tests_types_ids_for_participant(self):
+        """
+        This will test at the same time get_accessible_tests_types_for_participant and get_accessible_tests_types_ids_for_participant.
+        """
+        with self._flask_app.app_context():
+
+            all_participants = TeraParticipant.query.all()
+            for participant in all_participants:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+
+                test_types_service_ids = service_access.get_accessible_tests_types_ids()
+                test_types_ids = set(service_access.get_accessible_tests_types_ids_for_participant(participant.id_participant))
+
+                for id_test_type in test_types_ids:
+                    self.assertTrue(id_test_type in test_types_service_ids)
+
+                # Test with a service with no access
+                service = self._create_service_with_no_access()
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                self.assertEqual(len(service_access.get_accessible_tests_types_ids_for_participant(participant.id_participant)), 0)
+
+    def test_service_get_accesible_tests_types_ids_for_user(self):
+        """
+        This will test at the same time get_accessible_tests_types_for_user and get_accessible_tests_types_ids_for_user.
+        """
+        with self._flask_app.app_context():
+
+            all_users = TeraUser.query.all()
+            for user in all_users:
+                service =  TeraService.get_service_by_key('VideoRehabService')
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+
+                test_types_service_ids = service_access.get_accessible_tests_types_ids()
+                test_types_ids = set(service_access.get_accessible_tests_types_ids_for_user(user.id_user))
+
+                for id_test_type in test_types_ids:
+                    self.assertTrue(id_test_type in test_types_service_ids)
+
+                # Test with a service with no access
+                service = self._create_service_with_no_access()
+                self.assertIsNotNone(service)
+                service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+                self.assertEqual(len(service_access.get_accessible_tests_types_ids_for_user(user.id_user)), 0)
+
+    def test_service_get_site_role(self):
+        """
+        This will test get_site_role.
+        """
+        with self._flask_app.app_context():
+
+            all_users = TeraUser.query.all()
+            all_sites = TeraSite.query.all()
+
+            for user in all_users:
+
+                for site in all_sites:
+                    service =  TeraService.get_service_by_key('VideoRehabService')
+                    self.assertIsNotNone(service)
+                    service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+
+                    site_role = service_access.get_site_role(site_id = site.id_site, uuid_user = user.user_uuid)
+
+                    if user.user_superadmin:
+                        self.assertIsNone(site_role)
+
+                    teraserver_service = TeraService.get_openteraserver_service()
+
+                    if site.id_site in service_access.get_accessible_sites_ids():
+
+                        queried_role = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                                .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                                .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                                .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                                .filter(TeraSite.id_site == site.id_site) \
+                                                                .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                                .with_entities(TeraServiceRole).first()
+
+
+                        # Query role for project if not found for site, if users have access to a project, they need to be automatically granted access to the site
+                        if not queried_role:
+                            queried_roles = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                                .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                                .join(TeraProject, TeraServiceRole.id_project == TeraProject.id_project) \
+                                                                .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                                .filter(TeraProject.id_site == site.id_site) \
+                                                                .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                                .with_entities(TeraServiceRole).all()
+
+                            if len(queried_roles) > 0:
+                                # Inherited has always the user role
+                                queried_role = TeraServiceRole()
+                                queried_role.id_service = teraserver_service.id_service
+                                queried_role.service_role_name='user'
+                    else:
+                        queried_role = None
+
+                    queried_role_name = queried_role.service_role_name if queried_role else None
+
+                    self.assertEqual(site_role, queried_role_name)
+
+    def test_service_get_project_role(self):
+        """
+        This will test get_project_role.
+        """
+        with self._flask_app.app_context():
+
+            all_users = TeraUser.query.all()
+            all_projects = TeraProject.query.all()
+
+            for user in all_users:
+                for project in all_projects:
+                    service =  TeraService.get_service_by_key('VideoRehabService')
+                    self.assertIsNotNone(service)
+                    service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+
+                    project_role = service_access.get_project_role(project_id = project.id_project, uuid_user = user.user_uuid)
+
+                    if user.user_superadmin:
+                        self.assertIsNone(project_role)
+
+                    teraserver_service = TeraService.get_openteraserver_service()
+                    queried_role = None
+                    if project.id_project in service_access.get_accessible_projects_ids():
+                        queried_roles = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                                .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                                .join(TeraProject, TeraServiceRole.id_project == TeraProject.id_project) \
+                                                                .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                                .filter(TeraProject.id_project == project.id_project) \
+                                                                .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                                .with_entities(TeraServiceRole).all()
+
+                        # Keep admin as priority
+                        for role in queried_roles:
+                            if role.service_role_name == 'admin':
+                                queried_role = role
+                                break
+                            elif not queried_role:
+                                queried_role = role
+
+                        # Query role for site might override project role
+                        queried_roles = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
+                                                            .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
+                                                            .join(TeraSite, TeraServiceRole.id_site == TeraSite.id_site) \
+                                                            .filter(TeraUserUserGroup.id_user == user.id_user) \
+                                                            .filter(TeraSite.id_site == project.id_site) \
+                                                            .filter(TeraServiceRole.id_service == teraserver_service.id_service) \
+                                                            .with_entities(TeraServiceRole).all()
+                        # Keep admin as priority
+                        for role in queried_roles:
+                            if role.service_role_name == 'admin' :
+                                queried_role = role
+                                break
+                            elif not queried_role:
+                                queried_role = role
+                    else:
+                        queried_role = None
+
+
+                    queried_role_name = queried_role.service_role_name if queried_role else None
+
+                    self.assertEqual(project_role, queried_role_name)

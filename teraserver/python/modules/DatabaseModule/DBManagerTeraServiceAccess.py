@@ -229,22 +229,27 @@ class DBManagerTeraServiceAccess:
 
     def get_site_role(self, site_id: int, uuid_user: str) -> str | None:
         user = self.get_user_with_uuid(uuid_user)
-        sites_roles = user.get_sites_roles()
-        role = [role for site, role in sites_roles.items() if site.id_site == int(site_id)]
-        if len(role) == 1:
-            return role[0]['site_role']
+        if user and site_id in self.get_accessible_sites_ids():
+            sites_roles = user.get_sites_roles()
+            role = [role for site, role in sites_roles.items() if site.id_site == int(site_id)]
+            if len(role) == 1:
+                return role[0]['site_role']
         return None
 
     def get_project_role(self, project_id: int, uuid_user: str) -> str | None:
         user = self.get_user_with_uuid(uuid_user)
-        projects_roles = user.get_projects_roles()
-        role = [role for project, role in projects_roles.items() if project.id_project == int(project_id)]
-        if len(role) == 1:
-            return role[0]['project_role']
+        if user and project_id in self.get_accessible_projects_ids():
+            projects_roles = user.get_projects_roles()
+            role = [role for project, role in projects_roles.items() if project.id_project == int(project_id)]
+            if len(role) == 1:
+                return role[0]['project_role']
         return None
 
-    def get_user_with_uuid(self, uuid_user) -> TeraUser:
-        return TeraUser.get_user_by_uuid(uuid_user)
+    def get_user_with_uuid(self, uuid_user) -> TeraUser | None:
+        user = TeraUser.get_user_by_uuid(uuid_user)
+        if user and user.id_user in self.get_accessible_users_ids():
+            return user
+        return None
 
     def query_sites_for_user(self, user_id: int, admin_only: bool = False) -> list[TeraSite]:
         sites = []
