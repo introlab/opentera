@@ -1,11 +1,14 @@
 from modules.DatabaseModule.DBManager import DBManager
 from modules.DatabaseModule.DBManagerTeraParticipantAccess import DBManagerTeraParticipantAccess
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraAsset import TeraAsset
-from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
+from opentera.db.models.TeraSessionType import TeraSessionType
+from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+# from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
 from tests.opentera.db.models.BaseModelsTest import BaseModelsTest
 
 
@@ -19,7 +22,7 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
 
             participants = TeraParticipant.query.all()
             for participant in participants:
-                participant_access = DBManager.participantAccess(participant)
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
                 devices = participant_access.query_device({})
 
                 # Make a query to get all devices for this participant
@@ -39,7 +42,7 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
 
             participants = TeraParticipant.query.all()
             for participant in participants:
-                participant_access = DBManager.participantAccess(participant)
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
                 assets = participant_access.get_accessible_assets()
 
                 # Verify valid filters
@@ -73,3 +76,64 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
                 # Make a query with a filter with invalid session id
                 queried_assets = participant_access.get_accessible_assets(session_id=1000)
                 self.assertEqual(len(queried_assets), 0)
+
+    def test_participant_get_accessible_services(self):
+        """
+        Get accessible services for a participant
+        """
+        with self._flask_app.app_context():
+
+            participants = TeraParticipant.query.all()
+            for participant in participants:
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
+                services = participant_access.get_accessible_services()
+
+                queried_services = TeraService.query.join(TeraServiceProject, TeraServiceProject.id_service == TeraService.id_service).\
+                    filter(TeraServiceProject.id_project == participant.id_project).all()
+
+                self.assertEqual(len(services), len(queried_services))
+
+    def test_participant_get_accessible_session_types_ids(self):
+        """
+        Get accessible session types for a participant, with ids, will also test get_accessible_session_types()
+        """
+        with self._flask_app.app_context():
+
+            participants = TeraParticipant.query.all()
+            for participant in participants:
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
+                session_types_ids = participant_access.get_accessible_session_types_ids()
+
+                queried_session_types = TeraSessionType.query.join(
+                    TeraSessionTypeProject, TeraSessionTypeProject.id_session_type == TeraSessionType.id_session_type).filter(
+                        TeraSessionTypeProject.id_project == participant.id_project).all()
+                queried_session_types_ids = [session_type.id_session_type for session_type in queried_session_types]
+                self.assertEqual(len(session_types_ids), len(queried_session_types_ids))
+                self.assertEqual(session_types_ids, queried_session_types_ids)
+
+
+    def test_participant_query_existing_sessions_ids(self):
+        """
+        Query existing session for a participant. Will also test get_accessible_sessions
+        """
+        with self._flask_app.app_context():
+
+            participants = TeraParticipant.query.all()
+            for participant in participants:
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
+
+                # TODO...
+
+
+    def test_participant_get_accessible_tests_types_ids(self):
+        """
+        Get accessible test types for a participant, with ids, will also test get_accessible_tests_types()
+        """
+        with self._flask_app.app_context():
+
+            participants = TeraParticipant.query.all()
+            for participant in participants:
+                participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
+                test_types = participant_access.get_accessible_tests_types()
+
+                # TODO...
