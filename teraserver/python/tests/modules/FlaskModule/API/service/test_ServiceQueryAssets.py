@@ -134,7 +134,8 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
 
     def test_get_endpoint_query_user_assets_forbidden(self):
         with self._flask_app.app_context():
-            params = {'id_user': 1, 'with_urls': True}
+            user = TeraUser.get_user_by_username('user4')
+            params = {'id_user': user.id_user, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)
@@ -200,7 +201,8 @@ class ServiceQueryAssetsTest(BaseServiceAPITest):
 
     def test_get_endpoint_query_assets_created_by_user_forbidden(self):
         with self._flask_app.app_context():
-            params = {'id_creator_user': 1, 'with_urls': True}
+            user = TeraUser.get_user_by_username('user4')
+            params = {'id_creator_user': user.id_user, 'with_urls': True}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(response.status_code, 403)

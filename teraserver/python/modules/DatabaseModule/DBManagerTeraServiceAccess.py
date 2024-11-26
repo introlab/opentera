@@ -65,35 +65,37 @@ class DBManagerTeraServiceAccess:
         return projects
 
     def get_accessible_sessions(self, admin_only=False) -> list[TeraSession]:
-        part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
-        user_ids = self.get_accessible_users_ids(admin_only=admin_only)
+        # SB - 2024-11-25 - Services only have access to the sessions they created
+        sessions = TeraSession.query.filter(TeraSession.id_creator_service == self.service.id_service).all()
 
-        # DL 2024-11-20: Removed super admins from the list of users to get sessions from
+        # part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
+        # user_ids = self.get_accessible_users_ids(admin_only=admin_only)
+        #
         # user_ids.extend([user.id_user for user in TeraUser.get_superadmins() if user.id_user not in user_ids])
-
-        device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
-        sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
-                                                TeraSession.id_creator_device.in_(device_ids),
-                                                TeraSession.id_creator_participant.in_(part_ids),
-                                                TeraSession.id_creator_service.in_([self.service.id_service]))).all()
-
-        # Also check for sessions which users we have access to were part
-        sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionUsers.query.filter(TeraSessionUsers.id_user.in_(user_ids)). \
-            filter(not_(TeraSessionUsers.id_session.in_(sessions_ids)))
-        sessions.extend(other_sessions)
-
-        # ... and sessions which participants we have access to were part
-        sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionParticipants.query.filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
-            filter(not_(TeraSessionParticipants.id_session.in_(sessions_ids)))
-        sessions.extend(other_sessions)
-
-        # ... and sessions which devices we have access to were part!
-        sessions_ids = [session.id_session for session in sessions]
-        other_sessions = TeraSessionDevices.query.filter(TeraSessionDevices.id_device.in_(device_ids)). \
-            filter(not_(TeraSessionDevices.id_session.in_(sessions_ids)))
-        sessions.extend(other_sessions)
+        #
+        # device_ids = self.get_accessible_devices_ids(admin_only=admin_only)
+        # sessions = TeraSession.query.filter(or_(TeraSession.id_creator_user.in_(user_ids),
+        #                                         TeraSession.id_creator_device.in_(device_ids),
+        #                                         TeraSession.id_creator_participant.in_(part_ids),
+        #                                         TeraSession.id_creator_service.in_([self.service.id_service]))).all()
+        #
+        # # Also check for sessions which users we have access to were part
+        # sessions_ids = [session.id_session for session in sessions]
+        # other_sessions = TeraSessionUsers.query.filter(TeraSessionUsers.id_user.in_(user_ids)). \
+        #     filter(not_(TeraSessionUsers.id_session.in_(sessions_ids)))
+        # sessions.extend(other_sessions)
+        #
+        # # ... and sessions which participants we have access to were part
+        # sessions_ids = [session.id_session for session in sessions]
+        # other_sessions = TeraSessionParticipants.query.filter(TeraSessionParticipants.id_participant.in_(part_ids)). \
+        #     filter(not_(TeraSessionParticipants.id_session.in_(sessions_ids)))
+        # sessions.extend(other_sessions)
+        #
+        # # ... and sessions which devices we have access to were part!
+        # sessions_ids = [session.id_session for session in sessions]
+        # other_sessions = TeraSessionDevices.query.filter(TeraSessionDevices.id_device.in_(device_ids)). \
+        #     filter(not_(TeraSessionDevices.id_session.in_(sessions_ids)))
+        # sessions.extend(other_sessions)
 
         return sessions
 
@@ -141,8 +143,7 @@ class DBManagerTeraServiceAccess:
         projects = self.get_accessible_projects(admin_only=admin_only)
         users = []
         for project in projects:
-            # DL 2024-11-20: Removed super admins from the list of users
-            project_users = project.get_users_in_project(include_superadmins=False, include_site_access=True)
+            project_users = project.get_users_in_project(include_superadmins=True, include_site_access=True)
             users.extend([user for user in project_users if user not in users])
 
         # Sort by user first name

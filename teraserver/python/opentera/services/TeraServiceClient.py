@@ -27,7 +27,7 @@ class TeraServiceClient:
     def service_token(self, token: str):
         self.__service_token = token
 
-    def do_get_request_to_backend(self, path: str, params: dict = None) -> Response:
+    def do_get_request_to_backend(self, path: str, params: dict = None, override_token: str | None = None) -> Response:
         """
         Now using service function:
         def get_from_opentera_with_token(self, token: str, api_url: str, params: dict = {},
@@ -36,7 +36,11 @@ class TeraServiceClient:
         if params is None:
             params = {}
 
-        return self.__service.get_from_opentera_with_token(self.__service_token, api_url=path, params=params)
+        token = self.__service_token
+        if override_token:
+            token = override_token
+
+        return self.__service.get_from_opentera_with_token(token, api_url=path, params=params)
 
     def get_service_infos(self) -> dict:
         params = {'uuid_service': self.__service_uuid}
