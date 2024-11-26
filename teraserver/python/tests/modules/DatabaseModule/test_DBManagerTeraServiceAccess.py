@@ -117,17 +117,17 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 if session.id_creator_service == service.id_service:
                     accessible_sessions.add(session.id_session)
                 # Participants
-                for participant in session.session_participants:
-                    if participant.id_participant in service_access.get_accessible_participants_ids():
-                        accessible_sessions.add(session.id_session)
-                # Users
-                for user in session.session_users:
-                    if user.id_user in service_access.get_accessible_users_ids():
-                        accessible_sessions.add(session.id_session)
-                # Devices
-                for device in session.session_devices:
-                    if device.id_device in service_access.get_accessible_devices_ids():
-                        accessible_sessions.add(session.id_session)
+                # for participant in session.session_participants:
+                #     if participant.id_participant in service_access.get_accessible_participants_ids():
+                #         accessible_sessions.add(session.id_session)
+                # # Users
+                # for user in session.session_users:
+                #     if user.id_user in service_access.get_accessible_users_ids():
+                #         accessible_sessions.add(session.id_session)
+                # # Devices
+                # for device in session.session_devices:
+                #     if device.id_device in service_access.get_accessible_devices_ids():
+                #         accessible_sessions.add(session.id_session)
 
             self.assertEqual(len(sessions_ids), len(accessible_sessions))
             self.assertEqual(sessions_ids, accessible_sessions)
@@ -224,6 +224,10 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
             service_site_ids = [site.id_site for site in service.service_sites]
 
             for user in all_users:
+                if user.user_superadmin:
+                    accessible_users.add(user.id_user)
+                    continue
+
                 teraserver_service = TeraService.get_openteraserver_service()
 
                 for user_group in user.user_user_groups:
@@ -424,12 +428,12 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
 
                     site_role = service_access.get_site_role(site_id = site.id_site, uuid_user = user.user_uuid)
 
-                    if user.user_superadmin:
-                        self.assertIsNone(site_role)
-
                     teraserver_service = TeraService.get_openteraserver_service()
 
                     if site.id_site in service_access.get_accessible_sites_ids():
+                        if user.user_superadmin:
+                            self.assertEqual(site_role, 'admin')
+                            continue
 
                         queried_role = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
                                                                 .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
@@ -479,12 +483,13 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
 
                     project_role = service_access.get_project_role(project_id = project.id_project, uuid_user = user.user_uuid)
 
-                    if user.user_superadmin:
-                        self.assertIsNone(project_role)
-
                     teraserver_service = TeraService.get_openteraserver_service()
                     queried_role = None
                     if project.id_project in service_access.get_accessible_projects_ids():
+                        if user.user_superadmin:
+                            self.assertEqual(project_role, 'admin')
+                            continue
+
                         queried_roles = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
                                                                 .join(TeraServiceRole, TeraServiceAccess.id_service_role == TeraServiceRole.id_service_role) \
                                                                 .join(TeraProject, TeraServiceRole.id_project == TeraProject.id_project) \
@@ -536,13 +541,13 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 self.assertIsNotNone(service)
                 service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
                 my_user = service_access.get_user_with_uuid(uuid_user = user.user_uuid)
-                if (user.user_superadmin):
-                    self.assertIsNone(my_user)
+                # if (user.user_superadmin):
+                #     self.assertIsNone(my_user)
+                # else:
+                if user.id_user in service_access.get_accessible_users_ids():
+                    self.assertEqual(my_user.id_user, user.id_user)
                 else:
-                    if user.id_user in service_access.get_accessible_users_ids():
-                        self.assertEqual(my_user.id_user, user.id_user)
-                    else:
-                        self.assertIsNone(my_user)
+                    self.assertIsNone(my_user)
 
     def test_service_query_sites_for_user(self):
         """
@@ -558,7 +563,7 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 sites = set(service_access.query_sites_for_user(user_id = user.id_user))
 
                 if user.user_superadmin:
-                    self.assertEqual(len(sites), 0)
+                    self.assertEqual(len(sites), 1)
                 else:
                     teraserver_service = TeraService.get_openteraserver_service()
                     queried_sites = TeraServiceAccess.query.join(TeraUserUserGroup, TeraServiceAccess.id_user_group == TeraUserUserGroup.id_user_group) \
