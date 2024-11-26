@@ -1,10 +1,18 @@
-# Using same base as TeraServer
-from opentera.db.Base import BaseModel
+
+import json
+import datetime
+from sqlite3 import Connection as SQLite3Connection
+import sys
+import os
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.reflection import Inspector
-from sqlite3 import Connection as SQLite3Connection
+
+# Alembic
+from alembic.config import Config
+from alembic import command
 
 # Must include all Database objects here to be properly initialized and created if needed
 # All at once to make sure all files are registered.
@@ -15,12 +23,9 @@ from services.LoggingService.ConfigManager import ConfigManager
 from services.LoggingService.FlaskModule import flask_app
 from opentera.messages.python import LogEvent
 from opentera.messages.python import LoginEvent
+# Using same base as TeraServer
+from opentera.db.Base import BaseModel
 
-import datetime
-
-# Alembic
-from alembic.config import Config
-from alembic import command
 
 
 class DBManager:
@@ -113,8 +118,6 @@ class DBManager:
                 self.upgrade_db()
 
     def init_alembic(self):
-        import sys
-        import os
         # determine if application is a script file or frozen exe
         if getattr(sys, 'frozen', False):
             # If the application is run as a bundle, the pyInstaller bootloader
@@ -168,11 +171,11 @@ class DBManager:
             entry.sender = event.sender
             entry.timestamp = datetime.datetime.fromtimestamp(event.timestamp)
             entry.message = event.message
-            if not self.test:
-                self.db.session.add(entry)
-                self.db.session.commit()
-            else:
-                import json
+            self.db.session.add(entry)
+            self.db.session.commit()
+
+            # Also print to console in test mode
+            if self.test:
                 print('Logging: ' + json.dumps(entry.to_json()))
 
     def store_login_event(self, event: LoginEvent):
@@ -194,11 +197,11 @@ class DBManager:
             entry.login_os_name = event.os_name
             entry.login_os_version = event.os_version
             entry.login_message = event.log_header.message
-            if not self.test:
-                self.db.session.add(entry)
-                self.db.session.commit()
-            else:
-                import json
+            self.db.session.add(entry)
+            self.db.session.commit()
+
+            # Also print to console in test mode
+            if self.test:
                 print('Logging - Login: ' + json.dumps(entry.to_json()))
 
 
@@ -218,4 +221,3 @@ if __name__ == '__main__':
     manager.open_local({}, echo=True, ram=True)
     manager.create_defaults(config, test=True)
     print('test')
-
