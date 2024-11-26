@@ -100,14 +100,19 @@ class ServiceQueryTestTypes(Resource):
         json_test_type = request.json['test_type']
 
         # Validate if we have an id
-        if 'id_test_type' not in json_test_type:
-            return gettext('Missing id_test_type'), 400
+        if 'id_test_type' not in json_test_type and 'test_type_uuid' not in json_test_type:
+            return gettext('Missing id_test_type or test_type_uuid'), 400
 
         if 'id_service' in json_test_type and json_test_type['id_service'] != current_service.id_service:
             return gettext('Forbidden'), 403
 
-        if json_test_type['id_test_type'] != 0:
-            test_type = TeraTestType.get_test_type_by_id(json_test_type['id_test_type'])
+        if (('id_test_type' in json_test_type and json_test_type['id_test_type'] != 0)
+                or 'test_type_uuid' in json_test_type):
+            if 'id_test_type' in json_test_type:
+                test_type = TeraTestType.get_test_type_by_id(json_test_type['id_test_type'])
+            else:
+                test_type = TeraTestType.get_test_type_by_uuid(json_test_type['test_type_uuid'])
+                json_test_type['id_test_type'] = test_type.id_test_type
             if not test_type or test_type.id_service != current_service.id_service:
                 return gettext('Forbidden'), 403
             # Updating

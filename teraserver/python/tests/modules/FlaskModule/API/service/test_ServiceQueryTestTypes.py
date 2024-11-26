@@ -231,6 +231,28 @@ class ServiceQueryTestTypesTest(BaseServiceAPITest):
                                                             params={'uuid': current_uuid})
             self.assertEqual(200, response.status_code, msg="Delete OK")
 
+    def test_post_with_uuid(self):
+        with self._flask_app.app_context():
+            json_data = {
+                'test_type': {
+                    'test_type_name': 'Test',
+                    'id_test_type': 0
+                }
+            }
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(200, response.status_code, msg="Created new test")
+
+            test_type_uuid = response.json['test_type_uuid']
+
+            json_data['test_type'].pop('id_test_type')
+            json_data['test_type']['test_type_uuid'] = test_type_uuid
+            json_data['test_type']['test_type_name'] = "Test 2"
+
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(200, response.status_code, msg="Updated test with uuid")
+
+            TeraTestType.delete(response.json['id_test_type'])
+
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)
         self.assertTrue(json_data.__contains__('id_test_type'))
