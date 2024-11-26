@@ -4,8 +4,11 @@ from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
 from opentera.db.models.TeraAsset import TeraAsset
+from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceProject import TeraServiceProject
 # from opentera.db.models.TeraSessionParticipants import TeraSessionParticipants
@@ -26,13 +29,14 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
                 devices = participant_access.query_device({})
 
                 # Make a query to get all devices for this participant
-                all_devices = TeraDeviceParticipant.query.filter_by(id_participant=participant.id_participant).all()
-                self.assertEqual(len(devices), len(all_devices))
+                queried_devices = TeraDeviceParticipant.query.filter_by(id_participant=participant.id_participant).all()
+                self.assertEqual(len(devices), len(queried_devices))
+                # self.assertEqual(devices, queried_devices)
 
 
                 # Make a query with a filter with invalid device id
-                devices = participant_access.query_device({'id_device': 0})
-                self.assertEqual(len(devices), 0)
+                queried_devices = participant_access.query_device({'id_device': 0})
+                self.assertEqual(len(queried_devices), 0)
 
     def test_participant_get_accessible_assets(self):
         """
@@ -64,6 +68,7 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
 
                 queried_assets = TeraAsset.query.filter(TeraAsset.id_participant == participant.id_participant).all()
                 self.assertEqual(len(assets), len(queried_assets))
+                self.assertEqual(assets, queried_assets)
 
                 # Make a query with a filter with invalid asset id
                 queried_assets = participant_access.get_accessible_assets(id_asset=1000)
@@ -92,6 +97,7 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
                     filter(TeraServiceProject.id_project == participant.id_project).all()
 
                 self.assertEqual(len(services), len(queried_services))
+                self.assertEqual(services, queried_services)
 
     def test_participant_get_accessible_session_types_ids(self):
         """
@@ -122,7 +128,12 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
             for participant in participants:
                 participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
 
-                # TODO...
+                sessions_ids = participant_access.get_accessible_sessions_ids()
+
+                queried_sessions = TeraSession.query.filter_by(id_creator_participant=participant.id_participant).all()
+                queried_sessions_ids = [session.id_session for session in queried_sessions]
+                self.assertEqual(len(sessions_ids), len(queried_sessions_ids))
+                self.assertEqual(sessions_ids, queried_sessions_ids)
 
 
     def test_participant_get_accessible_tests_types_ids(self):
@@ -134,6 +145,11 @@ class DBManagerTeraParticipantAccessTest(BaseModelsTest):
             participants = TeraParticipant.query.all()
             for participant in participants:
                 participant_access : DBManagerTeraParticipantAccess = DBManager.participantAccess(participant)
-                test_types = participant_access.get_accessible_tests_types()
+                test_types_ids = participant_access.get_accessible_tests_types_ids()
 
-                # TODO...
+                queried_test_types = TeraTestType.query.join(
+                    TeraTestTypeProject, TeraTestTypeProject.id_test_type == TeraTestType.id_test_type).filter(
+                        TeraTestTypeProject.id_project == participant.id_project).all()
+                queried_test_types_ids = [test_type.id_test_type for test_type in queried_test_types]
+                self.assertEqual(len(test_types_ids), len(queried_test_types_ids))
+                self.assertEqual(test_types_ids, queried_test_types_ids)
