@@ -38,7 +38,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
 
     def test_get_endpoint_query_list(self):
         with self._flask_app.app_context():
-            params = {'id_session': 1, 'list': 1}
+            params = {'id_session': 2, 'list': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
 
@@ -51,7 +51,7 @@ class ServiceQuerySessionsTest(BaseServiceAPITest):
 
     def test_get_endpoint_query_specific(self):
         with self._flask_app.app_context():
-            params = {'id_session': 1}
+            params = {'id_session': 2}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
 

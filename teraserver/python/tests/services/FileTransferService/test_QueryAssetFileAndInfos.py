@@ -7,6 +7,8 @@ from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraAsset import TeraAsset
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from services.FileTransferService.libfiletransferservice.db.models.AssetFileData import AssetFileData
 
@@ -24,7 +26,7 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
             self.participant_static_token = TeraParticipant.get_participant_by_id(1).participant_token
             self.participant_dynamic_token = TeraParticipant.get_participant_by_id(1).dynamic_token(
                 ServiceAccessManager.api_participant_token_key)
-            self.service_token = TeraService.get_service_by_key('VideoRehabService').get_token(
+            self.service_token = TeraService.get_service_by_key('FileTransferService').get_token(
                 ServiceAccessManager.api_service_token_key)
 
         # Create test file to stream
@@ -140,7 +142,10 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
                                                            endpoint=self.asset_endpoint)
                 self.assertEqual(403, response.status_code, 'Forbidden access to session')
 
-            file_asset['id_session'] = 1  # OK, OK... I'll do something right for once!
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            service_ses = TeraSession.query.filter(TeraSession.id_creator_service == service.id_service).first()
+            file_asset['id_session'] = service_ses.id_session
+
             with open('testfile', 'rb') as f:
                 files = {'file': (f, 'testfile'),
                          'file_asset': json.dumps(file_asset)}
@@ -581,7 +586,10 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
 
                 self.assertEqual(403, response.status_code, 'Forbidden access to session')
 
-            file_asset['id_session'] = 27
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            service_ses = TeraSession.query.filter(TeraSession.id_creator_service == service.id_service).first()
+            file_asset['id_session'] = service_ses.id_session
+
             with open('testfile', 'rb') as f:
                 files = {'file': (f, 'testfile'),
                          'file_asset': json.dumps(file_asset)}
@@ -731,7 +739,11 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
             for i in range(3):
                 f = io.BytesIO(os.urandom(1024 * 1))
 
-                file_asset = {'id_session': 5,
+                service: TeraService = TeraService.get_service_by_key('FileTransferService')
+                service_ses = TeraSession.query.filter(TeraSession.id_creator_service == service.id_service).first()
+                id_session = service_ses.id_session
+
+                file_asset = {'id_session': id_session,
                               'asset_name': 'Test Asset #' + str(i),
                               'asset_type': 'application/octet-stream'
                               }
@@ -745,11 +757,14 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
                 asset_uuids.append(response.json['asset_uuid'])
 
             # Get access token
-            params = {'id_session': 5, 'with_urls': True}
+            params = {'id_session': id_session, 'with_urls': True}
             response = self._get_with_token_auth(self.test_client, token=self.user_token, params=params,
                                                  endpoint='/api/user/assets')
             self.assertEqual(200, response.status_code)
-            self.assertEqual(len(response.json), 3)
+
+            target_count = len(TeraAsset.get_assets_for_session(id_session))
+
+            self.assertEqual(len(response.json), target_count)
             assets = []
             for asset in response.json:
                 assets.append({'asset_uuid': asset['asset_uuid'], 'access_token': asset['access_token']})
@@ -763,10 +778,15 @@ class FileTransferAssetFileAndInfosTest(BaseFileTransferServiceAPITest):
             json_data = {'assets': assets}
             response = self._post_with_token_auth(self.test_client, token=self.user_token, json=json_data)
             self.assertEqual(200, response.status_code, 'Asset query is fine')
-            self.assertEqual(len(response.json), 3)
+            service_assets = (AssetFileData.query.filter(AssetFileData.asset_uuid.in_(
+                [asset['asset_uuid'] for asset in assets])).all())
+            service_assets_uuid = [asset.asset_uuid for asset in service_assets]
+            self.assertEqual(len(response.json), len(service_assets))
 
             # Delete created assets
             for asset in assets:
+                if asset['asset_uuid'] not in service_assets_uuid:
+                    continue
                 params = {'uuid': asset['asset_uuid'], 'access_token': asset['access_token']}
                 response = self._delete_with_token_auth(self.test_client, token=self.user_token, params=params,
                                                         endpoint=self.asset_endpoint)

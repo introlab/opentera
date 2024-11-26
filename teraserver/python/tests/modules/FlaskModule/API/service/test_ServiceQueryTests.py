@@ -189,7 +189,7 @@ class ServiceQueryTestsTest(BaseServiceAPITest):
                                                           json=json_data, endpoint=self.test_endpoint)
             self.assertEqual(400, response.status_code, msg="Missing id_session")
 
-            json_data['test']['id_session'] = 1
+            json_data['test']['id_session'] = 2
             # response = self._post_with_service_token_auth(client=self.test_client, token=self.service_token,
             #                                               json=json_data, endpoint=self.test_endpoint)
             # self.assertEqual(403, response.status_code, msg="Test type not accessible to this service")

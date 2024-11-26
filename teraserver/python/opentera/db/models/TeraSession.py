@@ -142,6 +142,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             session_part = TeraParticipant.get_participant_by_name('Participant #1')
             session_part2 = TeraParticipant.get_participant_by_name('Participant #2')
             session_service = TeraService.get_service_by_key('VideoRehabService')
+            file_service = TeraService.get_service_by_key('FileTransferService')
             session_device = TeraDevice.get_device_by_id(2)
 
             default_status = [0, 0, 0, 1, 2, 2, 3, 4]
@@ -173,6 +174,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                 if i == 1:
                     base_session.id_creator_participant = session_part.id_participant
                     base_session.session_users = [base_session.session_creator_user, session_user2]
+                if i == 1:
+                    base_session.id_creator_service = session_service.id_service
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
 
@@ -192,6 +195,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
+                if i == 0:
+                    base_session.id_creator_service = file_service.id_service
                 base_session.session_devices = [base_session.session_creator_device]
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
