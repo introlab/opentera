@@ -114,6 +114,36 @@ class ServiceQueryTestTypesTest(BaseServiceAPITest):
             self.assertTrue(response.json[0]['id_test_type'] in accessible_types)
             self.assertEqual(response.json[0]['id_test_type'], 1)
 
+    def test_get_endpoint_with_token_auth_for_uuid(self):
+        with self._flask_app.app_context():
+
+            all_test_types = TeraTestType.query.all()
+            service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
+            for test_type in all_test_types:
+                response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                             params={'test_type_uuid': test_type.test_type_uuid},
+                                                             endpoint=self.test_endpoint)
+                self.assertEqual(200, response.status_code)
+
+                # Check if test type is accessible
+                from modules.DatabaseModule.DBManager import DBManager
+                service_access = DBManager.serviceAccess(service)
+                accessible_types = service_access.get_accessible_tests_types_ids()
+                if test_type.id_test_type in accessible_types:
+                    self.assertEqual(1, len(response.json))
+                    self.assertEqual(response.json[0]['id_test_type'], test_type.id_test_type)
+                    self.assertEqual(response.json[0]['test_type_uuid'], test_type.test_type_uuid)
+
+
+    def test_get_endpoint_with_token_auth_for_invalid_uuid(self):
+        with self._flask_app.app_context():
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params={'test_type_uuid': '0000000000000000'},
+                                                         endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+
     def test_get_endpoint_with_token_auth_for_key(self):
         with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,

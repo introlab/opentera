@@ -18,6 +18,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to query
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
 get_parser.add_argument('test_type_key', type=str, help='Test type key to query for')
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query for')
+get_parser.add_argument('test_type_uuid', type=str, help='UUID of the test type to query for')
 
 post_parser = api.parser()
 post_schema = api.schema_model('service_test_type', {'properties': TeraTestType.get_json_schema(), 'type': 'object',
@@ -66,6 +67,10 @@ class ServiceQueryTestTypes(Resource):
         elif args['id_test_type']:
             if args['id_test_type'] in service_access.get_accessible_tests_types_ids():
                 test_types = [TeraTestType.get_test_type_by_id(args['id_test_type'])]
+        elif args['test_type_uuid']:
+            test_type = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
+            if test_type and test_type.id_test_type in service_access.get_accessible_tests_types_ids():
+                test_types = [test_type]
         elif args['test_type_key']:
             test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
             if test_type and test_type.id_test_type in service_access.get_accessible_tests_types_ids():
