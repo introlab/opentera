@@ -263,7 +263,7 @@ class ServiceQueryTestTypeProjects(Resource):
         if not ttp:
             return gettext('Not found'), 400
 
-        if ttp.id_project not in service_access.get_accessible_tests_types_ids() or ttp.id_test_type \
+        if ttp.id_project not in service_access.get_accessible_projects_ids() or ttp.id_test_type \
                 not in service_access.get_accessible_tests_types_ids():
             return gettext('Forbidden'), 403
 
