@@ -13,6 +13,13 @@ class TeraTestTest(BaseModelsTest):
         with self._flask_app.app_context():
             pass
 
+    def test_db_events_not_none(self):
+        with self._flask_app.app_context():
+            test : TeraTest = TeraTestTest.new_test_test(id_session=1)
+            self.assertIsNotNone(test.to_json_create_event())
+            self.assertIsNotNone(test.to_json_update_event())
+            self.assertIsNotNone(test.to_json_delete_event())
+
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
