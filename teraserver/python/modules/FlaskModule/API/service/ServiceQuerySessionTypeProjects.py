@@ -68,7 +68,7 @@ class ServiceQuerySessionTypeProjects(Resource):
                 session_type_projects = TeraSessionTypeProject.get_sessions_types_for_project(args['id_project'])
         elif args['id_session_type']:
             if args['id_session_type'] in service_access.get_accessible_sessions_types_ids():
-                session_type_projects = TeraSessionTypeProject.get_sessions_types_for_project(args['id_session_type'])
+                session_type_projects = TeraSessionTypeProject.get_projects_for_session_type(args['id_session_type'])
         try:
             stp_list = []
             for stp in session_type_projects:
@@ -262,11 +262,11 @@ class ServiceQuerySessionTypeProjects(Resource):
         id_todel = args['id']
 
         # Check if current service can delete
-        tsp : TeraSessionTypeProject = TeraSessionTypeProject.get_session_type_project_by_id(id_todel)
-        if not tsp:
+        stp : TeraSessionTypeProject = TeraSessionTypeProject.get_session_type_project_by_id(id_todel)
+        if not stp:
             return gettext('Not found'), 400
 
-        if tsp.id_project not in service_access.get_accessible_projects_ids() or tsp.id_session_type \
+        if stp.id_project not in service_access.get_accessible_projects_ids() or stp.id_session_type \
                 not in service_access.get_accessible_sessions_types_ids():
             return gettext('Forbidden'), 403
 
