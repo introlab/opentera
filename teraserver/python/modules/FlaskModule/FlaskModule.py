@@ -1,14 +1,14 @@
+import time
+import datetime
 from flask import Flask, request, g, url_for
-from flask_session import Session
 from flask_restx import Api, Namespace
-from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
+import redis
+
+from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.OpenTeraServerVersion import opentera_server_version_string
-import redis
-import datetime
-
 from modules.Globals import opentera_doc_url
 
 
@@ -187,18 +187,15 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
         from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
         from modules.FlaskModule.API.user.UserQueryServerSettings import UserQueryServerSettings
-        from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
+        # from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
 
         # Resources
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryAssetsArchive,        '/assets/archive', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSites,          '/devices/sites', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceProjects,       '/devices/projects', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceParticipants,   '/devices/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
@@ -217,7 +214,6 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessions,             '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(UserSessionManager,            '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
@@ -314,6 +310,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
         from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
+        from modules.FlaskModule.API.service.ServiceQuerySessionTypeProjects import ServiceQuerySessionTypeProjects
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
         from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
         from modules.FlaskModule.API.service.ServiceQueryTestTypeProjects import ServiceQueryTestTypeProjects
@@ -339,6 +336,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQuerySessionEvents,           '/sessions/events', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceSessionManager,               '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySessionTypes,            '/sessiontypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionTypeProjects,     '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
@@ -397,12 +395,10 @@ def post_process_request(response):
         del response.headers['WWW-Authenticate']
 
     # Request processing time
-    import time
     print(f"Process time: {(time.time() - g.start_time)*1000} ms")
     return response
 
 
 @flask_app.before_request
 def compute_request_time():
-    import time
     g.start_time = time.time()
