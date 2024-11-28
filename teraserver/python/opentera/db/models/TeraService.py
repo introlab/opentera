@@ -44,6 +44,10 @@ class TeraService(BaseModel, SoftDeleteMixin):
 
     service_tests = relationship("TeraTest", cascade='delete', back_populates='test_service', passive_deletes=True)
 
+    service_sessions = relationship("TeraSession", secondary="t_sessions_services", back_populates="session_services",
+                                 passive_deletes=True, cascade='delete')
+
+
     def __init__(self):
         pass
 

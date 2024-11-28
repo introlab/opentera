@@ -42,6 +42,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                  lazy="selectin")
     session_devices = relationship("TeraDevice", secondary="t_sessions_devices", back_populates="device_sessions",
                                    lazy="selectin")
+    session_services = relationship("TeraService", secondary="t_sessions_services", back_populates="service_sessions",
+                                    lazy="selectin")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
@@ -59,7 +61,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
         ignore_fields.extend(['session_participants', 'session_creator_user', 'session_creator_device',
                               'session_creator_participant', 'session_creator_service', 'session_session_type',
-                              'session_events', 'session_users', 'session_devices', 'session_assets', 'session_tests'])
+                              'session_events', 'session_users', 'session_devices', 'session_assets', 'session_tests',
+                              'session_services'])
         if minimal:
             ignore_fields.extend(['session_comments', 'session_parameters'])
 
