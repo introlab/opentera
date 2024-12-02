@@ -3,6 +3,8 @@ import time
 import hashlib
 from datetime import datetime, timezone
 
+from sqlalchemy import event
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP
 from sqlalchemy.orm import relationship
 
@@ -139,3 +141,28 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
         # Make sure to generate a unique key
         test_invitation.test_invitation_key = TeraTestInvitation.generate_test_invitation_unique_key()
         super().insert(test_invitation)
+
+@event.listens_for(TeraTestInvitation, 'before_insert')
+def tera_test_invitation_before_flush(mapper, connection, target: TeraTestInvitation):
+    """
+    Event listener for TeraTestInvitation before flush event.
+    """
+    if target:
+        # Make sure to generate a unique key
+        if target.test_invitation_key is None:
+            target.test_invitation_key = TeraTestInvitation.generate_test_invitation_unique_key()
+        else:
+            # Make sure key is length 16 and contains hexadecimal characters only
+            if len(target.test_invitation_key) != 16 or not target.test_invitation_key.isalnum():
+                raise IntegrityError("test_invitation_key must be 16 hexadecimal characters",
+                                    params=None, orig=None)
+        # Make sure creation date is set
+        if target.test_invitation_creation_date is None:
+            target.test_invitation_creation_date = datetime.now(tz=timezone.utc)
+        # Make sure at least one of the 3 ids is set
+        ids = [target.id_user, target.id_participant, target.id_device]
+        if sum(x is not None for x in ids) != 1:
+            raise IntegrityError("Only one of id_user, id_participant, id_device must be set",
+                                    params=None, orig=None)
+        # Make sure count is set to 0
+        target.test_invitation_count = 0
