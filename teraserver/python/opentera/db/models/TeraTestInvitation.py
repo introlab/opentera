@@ -7,7 +7,7 @@ from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, TIMESTAMP
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm.attributes import get_history
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 
@@ -77,6 +77,25 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
 
         return json_value
 
+    @classmethod
+    def clean_values(cls, values: dict):
+        """
+        Clean values before inserting or update
+        """
+        clean_values = values.copy()
+
+        if 'test_invitation_test_type_uuid' in clean_values:
+            del clean_values['test_invitation_test_type_uuid']
+        if 'test_invitation_session_uuid' in clean_values:
+            del clean_values['test_invitation_session_uuid']
+        if 'test_invitation_user_uuid' in clean_values:
+            del clean_values['test_invitation_user_uuid']
+        if 'test_invitation_participant_uuid' in clean_values:
+            del clean_values['test_invitation_participant_uuid']
+        if 'test_invitation_device_uuid' in clean_values:
+            del clean_values['test_invitation_device_uuid']
+
+        return super().clean_values(clean_values)
 
     @staticmethod
     def create_defaults(test=False):
@@ -142,6 +161,7 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
         test_invitation.test_invitation_key = TeraTestInvitation.generate_test_invitation_unique_key()
         super().insert(test_invitation)
 
+
 @event.listens_for(TeraTestInvitation, 'before_insert')
 def tera_test_invitation_before_flush(mapper, connection, target: TeraTestInvitation):
     """
@@ -166,3 +186,25 @@ def tera_test_invitation_before_flush(mapper, connection, target: TeraTestInvita
                                     params=None, orig=None)
         # Make sure count is set to 0
         target.test_invitation_count = 0
+
+@event.listens_for(TeraTestInvitation, 'before_update')
+def tera_test_invitation_before_update(mapper, connection, target: TeraTestInvitation):
+    """
+    Event listener for TeraTestInvitation before update event.
+    """
+    if target:
+        # Make sure test_invitation_key is not changed
+        if get_history(target, 'test_invitation_key').has_changes():
+            raise IntegrityError("test_invitation_key cannot be changed",
+                                    params=None, orig=None)
+
+        # Make sure id_test_type is not changed
+        if get_history(target, 'id_test_type').has_changes():
+            raise IntegrityError("id_test_type cannot be changed",
+                                    params=None, orig=None)
+
+        # Make sure at least one of the 3 ids is set
+        ids = [target.id_user, target.id_participant, target.id_device]
+        if sum(x is not None for x in ids) != 1:
+            raise IntegrityError("Only one of id_user, id_participant, id_device must be set",
+                                    params=None, orig=None)

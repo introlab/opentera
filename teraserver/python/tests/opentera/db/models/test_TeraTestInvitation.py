@@ -116,6 +116,40 @@ class TeraTestInvitationTest(BaseModelsTest):
                 invitation.test_invitation_key = "Invalid key"
                 TeraTestInvitation.insert(invitation)
 
+    def test_create_1000_invitations_should_have_different_keys(self):
+        """
+        Test creating 1000 invitations should have different keys.
+        """
+        with self._flask_app.app_context():
+            keys = set()
+            for _ in range(1000):
+                invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+                self.assertNotIn(invitation.test_invitation_key, keys)
+                keys.add(invitation.test_invitation_key)
+
+
+    def test_update_test_type_should_raise_integrity_error(self):
+        """
+        Test updating the test type of an invitation will raise an IntegrityError.
+        """
+        with self._flask_app.app_context():
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            with self.assertRaises(IntegrityError):
+                invitation.id_test_type = 2
+                TeraTestInvitation.update(invitation.id_test_invitation,
+                                          TeraTestInvitation.clean_values(invitation.to_json()))
+
+    def test_update_invitation_key_should_raise_integrity_error(self):
+        """
+        Test updating the key of an invitation will raise an IntegrityError.
+        """
+        with self._flask_app.app_context():
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            with self.assertRaises(IntegrityError):
+                invitation.test_invitation_key = "New key"
+                TeraTestInvitation.update(invitation.id_test_invitation,
+                                          TeraTestInvitation.clean_values(invitation.to_json()))
+
     @staticmethod
     def new_test_invitation(id_test_type: int,
                        id_session: int = None,
