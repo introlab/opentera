@@ -185,6 +185,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
+        from modules.FlaskModule.API.user.UserQueryTestsInvitations import UserQueryTestsInvitations
         from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
         from modules.FlaskModule.API.user.UserQueryServerSettings import UserQueryServerSettings
         # from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
@@ -228,6 +229,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTests,                '/tests', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryTestsInvitations,     '/tests/invitations', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypes,            '/testtypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypeProjects,     '/testtypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypeSites,        '/testtypes/sites', resource_class_kwargs=kwargs)

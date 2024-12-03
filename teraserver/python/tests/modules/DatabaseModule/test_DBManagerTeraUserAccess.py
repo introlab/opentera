@@ -101,8 +101,6 @@ class DBManagerTeraUserAccessTest(BaseModelsTest):
                 TeraTestInvitation.insert(invitation)
                 return invitation
 
-
-
             user = TeraUser.get_user_by_username('admin')
 
             # Default, there is no invitation in the system
