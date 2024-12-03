@@ -56,46 +56,7 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
                               'test_invitation_device'])
 
         json_value =  super().to_json(ignore_fields=ignore_fields)
-
-        # Add uuids for convenience
-        json_value['test_invitation_test_type_uuid'] = None
-        json_value['test_invitation_session_uuid'] = None
-        json_value['test_invitation_user_uuid'] = None
-        json_value['test_invitation_participant_uuid'] = None
-        json_value['test_invitation_device_uuid'] = None
-
-        if self.test_invitation_test_type:
-            json_value['test_invitation_test_type_uuid'] = self.test_invitation_test_type.test_type_uuid
-        if self.test_invitation_session:
-            json_value['test_invitation_session_uuid'] = self.test_invitation_session.session_uuid
-        if self.test_invitation_user:
-            json_value['test_invitation_user_uuid'] = self.test_invitation_user.user_uuid
-        if self.test_invitation_participant:
-            json_value['test_invitation_participant_uuid'] = self.test_invitation_participant.participant_uuid
-        if self.test_invitation_device:
-            json_value['test_invitation_device_uuid'] = self.test_invitation_device.device_uuid
-
         return json_value
-
-    @classmethod
-    def clean_values(cls, values: dict):
-        """
-        Clean values before inserting or update
-        """
-        clean_values = values.copy()
-
-        if 'test_invitation_test_type_uuid' in clean_values:
-            del clean_values['test_invitation_test_type_uuid']
-        if 'test_invitation_session_uuid' in clean_values:
-            del clean_values['test_invitation_session_uuid']
-        if 'test_invitation_user_uuid' in clean_values:
-            del clean_values['test_invitation_user_uuid']
-        if 'test_invitation_participant_uuid' in clean_values:
-            del clean_values['test_invitation_participant_uuid']
-        if 'test_invitation_device_uuid' in clean_values:
-            del clean_values['test_invitation_device_uuid']
-
-        return super().clean_values(clean_values)
 
     @staticmethod
     def create_defaults(test=False):
