@@ -138,8 +138,9 @@ class TeraSessionTypeSite(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     def check_integrity(obj_to_check):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that site
-        if obj_to_check.session_type_site_session_type.session_type_category == \
-                TeraSessionType.SessionCategoryEnum.SERVICE.value:
+        if (obj_to_check.session_type_site_session_type.session_type_category ==
+                TeraSessionType.SessionCategoryEnum.SERVICE.value
+                and obj_to_check.session_type_site_session_type.id_service):
             service_sites = [site.id_site for site in
                              obj_to_check.session_type_site_session_type.session_type_service.service_sites]
             if obj_to_check.id_site not in service_sites:
