@@ -84,6 +84,12 @@ class TeraSessionTypeServices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             .filter_by(id_service=service_id).all()
 
     @staticmethod
+    def get_session_type_service_for_session_type_service(service_id: int, session_type_id: int,
+                                                          with_deleted: bool = False):
+        return TeraSessionTypeServices.query.execution_options(include_deleted=with_deleted) \
+            .filter_by(id_service=service_id, id_session_type=session_type_id).first()
+
+    @staticmethod
     def check_integrity(obj_to_check):
         # Make sure service is associated to sites of that session type
         session_type_sites = TeraSessionTypeSite.get_sites_for_session_type(obj_to_check.id_session_type)
