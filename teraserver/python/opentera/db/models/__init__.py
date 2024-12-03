@@ -20,7 +20,7 @@ from .TeraSession import TeraSession
 from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
-# from .TeraSessionServices import TeraSessionServices
+from .TeraSessionTypeServices import TeraSessionTypeServices
 from .TeraSessionType import TeraSessionType
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSessionTypeSite import TeraSessionTypeSite
@@ -55,6 +55,7 @@ EventNameClassMap = {
     TeraTest.get_model_name(): TeraTest,
     TeraService.get_model_name(): TeraService,
     TeraSessionTypeSite.get_model_name(): TeraSessionTypeSite,
+    TeraSessionTypeServices.get_model_name(): TeraSessionTypeServices,
     TeraSessionTypeProject.get_model_name(): TeraSessionTypeProject,
     TeraServerSettings.get_model_name(): TeraServerSettings
 }
@@ -82,7 +83,7 @@ __all__ = ['TeraAsset',
            'TeraSessionDevices',
            'TeraSessionEvent',
            'TeraSessionParticipants',
-#          'TeraSessionServices',
+           'TeraSessionTypeServices',
            'TeraSessionType',
            'TeraSessionTypeProject',
            'TeraSessionTypeSite',
