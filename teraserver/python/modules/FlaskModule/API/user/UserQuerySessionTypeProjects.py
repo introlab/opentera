@@ -32,7 +32,7 @@ post_schema = api.schema_model('user_session_type_project', {'properties': TeraS
                                                              'location': 'json'})
 
 delete_parser = reqparse.RequestParser()
-delete_parser.add_argument('id', type=int, help='Specific device-type - project association ID to delete. '
+delete_parser.add_argument('id', type=int, help='Specific session-type - project association ID to delete. '
                                                 'Be careful: this is not the session-type or project ID, but the ID'
                                                 ' of the association itself!', required=True)
 
@@ -46,7 +46,7 @@ class UserQuerySessionTypeProjects(Resource):
 
     @api.doc(description='Get session types that are associated with a project. Only one "ID" parameter required and '
                          'supported at once.',
-             responses={200: 'Success - returns list of devices-types - projects association',
+             responses={200: 'Success - returns list of session-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'})
     @api.expect(get_parser)

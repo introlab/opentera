@@ -29,6 +29,7 @@ from opentera.db.models.TeraServiceProject import TeraServiceProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionTypeServices import TeraSessionTypeServices
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
@@ -908,6 +909,28 @@ class DBManagerTeraUserAccess:
 
         # Sort by name
         return sorted(test_types, key=lambda s: s.test_type_project_test_type.test_type_name)
+
+    def query_secondary_services_for_session_type(self, session_type_id: int, include_other_services: bool = False) -> list[TeraSessionTypeServices]:
+        session_types_ids = self.get_accessible_session_types_ids()
+
+        session_types_services = (TeraSessionTypeServices.query.filter(TeraSessionTypeServices.id_session_type.
+                                                            in_(session_types_ids))
+                         .filter_by(id_session_type=session_type_id).all())
+
+        if include_other_services:
+            service_ids = self.get_accessible_services_ids()
+            st_service_ids = [st.id_service for st in session_types_services]
+            missing_service_ids = set(service_ids).difference(st_service_ids)
+            for missing_service_id in missing_service_ids:
+                st_service = TeraSessionTypeServices()
+                st_service.id_service = missing_service_id
+                st_service.id_session_type = None
+                st_service.session_type_service_service = TeraService.get_service_by_id(missing_service_id)
+                session_types_services.append(st_service)
+            return sorted(session_types_services, key=lambda s: s.session_type_service_service.service_name)
+
+        # Sort by name
+        return sorted(session_types_services, key=lambda s: s.session_type_service_session_type.session_type_name)
 
     def query_assets_associated_to_service(self, uuid_service: str) -> list[TeraAsset]:
 

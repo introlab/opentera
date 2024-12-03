@@ -164,6 +164,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQuerySessions import UserQuerySessions
         from modules.FlaskModule.API.user.UserQuerySessionTypes import UserQuerySessionTypes
         from modules.FlaskModule.API.user.UserQuerySessionEvents import UserQuerySessionEvents
+        from modules.FlaskModule.API.user.UserQuerySessionTypeServices import UserQuerySessionTypeServices
         from modules.FlaskModule.API.user.UserQuerySessionTypeSites import UserQuerySessionTypeSites
         from modules.FlaskModule.API.user.UserQuerySessionTypeProjects import UserQuerySessionTypeProjects
         from modules.FlaskModule.API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
@@ -216,6 +217,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQuerySessionTypeServices,  '/sessiontypes/services', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServerSettings,       '/server/settings', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServices,             '/services', resource_class_kwargs=kwargs)
