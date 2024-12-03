@@ -34,6 +34,7 @@ from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraTestInvitation import TeraTestInvitation
 
 import modules.Globals as Globals
 
@@ -1360,3 +1361,36 @@ class DBManagerTeraUserAccess:
             return None
 
         return test
+
+    def get_accessible_tests_invitations(self) -> list[TeraTestInvitation]:
+        """
+        Get all test invitations accessible by the current user
+        """
+        accessible_test_type_ids = self.get_accessible_tests_types_ids()
+        accessible_user_ids = self.get_accessible_users_ids()
+        accessible_participant_ids = self.get_accessible_participants_ids()
+        accessible_device_ids = self.get_accessible_devices_ids()
+        accessible_session_ids = self.get_accessible_sessions_ids()
+
+        test_invitations = TeraTestInvitation.query.filter(
+            TeraTestInvitation.id_test_type.in_(accessible_test_type_ids)
+        ).filter(
+            or_(
+                and_(TeraTestInvitation.id_user.isnot(None),
+                    TeraTestInvitation.id_user.in_(accessible_user_ids)),
+                and_(TeraTestInvitation.id_participant.isnot(None),
+                    TeraTestInvitation.id_participant.in_(accessible_participant_ids)),
+                and_(TeraTestInvitation.id_device.isnot(None),
+                    TeraTestInvitation.id_device.in_(accessible_device_ids)),
+                and_(TeraTestInvitation.id_session.isnot(None),
+                    TeraTestInvitation.id_session.in_(accessible_session_ids))
+            )
+        ).all()
+        return test_invitations
+
+    def get_accessible_tests_invitations_ids(self) -> list[int]:
+        """
+        Get all test invitations accessible by the current user
+        """
+        test_invitations = self.get_accessible_tests_invitations()
+        return [test_invitation.id_test_invitation for test_invitation in test_invitations]
