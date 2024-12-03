@@ -28,6 +28,7 @@ from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDeviceParticipant import TeraDeviceParticipant
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
+from opentera.db.models.TeraSessionTypeServices import TeraSessionTypeServices
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from opentera.db.models.TeraAsset import TeraAsset
@@ -368,6 +369,9 @@ class DBManager (BaseModule):
 
             if TeraSessionTypeSite.get_count() == 0:
                 TeraSessionTypeSite.create_defaults(test)
+
+            if TeraSessionTypeServices.get_count() == 0:
+                TeraSessionTypeServices.create_defaults(test)
 
             if TeraSession.get_count() == 0:
                 print('No session - creating defaults')

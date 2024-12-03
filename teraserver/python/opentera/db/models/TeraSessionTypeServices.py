@@ -5,6 +5,7 @@ from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
 from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraService import TeraService
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.SoftInsertMixin import SoftInsertMixin
 from sqlalchemy import Column, ForeignKey, Integer, Sequence
@@ -14,7 +15,7 @@ from sqlalchemy.exc import IntegrityError
 
 class TeraSessionTypeServices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     __tablename__ = 't_sessions_types_services'
-    id_session_type_project = Column(Integer, Sequence('id_session_type_service_sequence'), primary_key=True,
+    id_session_type_service = Column(Integer, Sequence('id_session_type_service_sequence'), primary_key=True,
                                      autoincrement=True)
     id_session_type = Column('id_session_type', Integer, ForeignKey('t_sessions_types.id_session_type',
                                                                     ondelete='cascade'), nullable=False)
@@ -57,44 +58,15 @@ class TeraSessionTypeServices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     def create_defaults(test=False):
         if test:
             from opentera.db.models.TeraSessionType import TeraSessionType
-            pass
-            # from opentera.db.models.TeraProject import TeraProject
-            #
-            # video_session = TeraSessionType.get_session_type_by_id(1)
-            # sensor_session = TeraSessionType.get_session_type_by_id(2)
-            # data_session = TeraSessionType.get_session_type_by_id(3)
-            # exerc_session = TeraSessionType.get_session_type_by_id(4)
-            # bureau_session = TeraSessionType.get_session_type_by_id(5)
-            #
-            # project = TeraProject.get_project_by_projectname('Default Project #1')
-            #
-            # stp = TeraSessionTypeProject()
-            # stp.id_session_type = video_session.id_session_type
-            # stp.id_project = project.id_project
-            # TeraSessionTypeProject.db().session.add(stp)
-            #
-            # stp = TeraSessionTypeProject()
-            # stp.id_session_type = sensor_session.id_session_type
-            # stp.id_project = project.id_project
-            # TeraSessionTypeProject.db().session.add(stp)
-            #
-            # stp = TeraSessionTypeProject()
-            # stp.id_session_type = data_session.id_session_type
-            # stp.id_project = project.id_project
-            # TeraSessionTypeProject.db().session.add(stp)
-            #
-            # stp = TeraSessionTypeProject()
-            # stp.id_session_type = exerc_session.id_session_type
-            # stp.id_project = project.id_project
-            # TeraSessionTypeProject.db().session.add(stp)
-            #
-            # project = TeraProject.get_project_by_projectname('Default Project #2')
-            # stp = TeraSessionTypeProject()
-            # stp.id_session_type = bureau_session.id_session_type
-            # stp.id_project = project.id_project
-            # TeraSessionTypeProject.db().session.add(stp)
-            #
-            # TeraSessionTypeProject.db().session.commit()
+            data_session = TeraSessionType.get_session_type_by_id(3)
+            secondary_service = TeraService.get_service_by_key("FileTransferService")
+
+            sts = TeraSessionTypeServices()
+            sts.id_session_type = data_session.id_session_type
+            sts.id_service = secondary_service.id_service
+            TeraSessionTypeServices.db().session.add(sts)
+
+            TeraSessionTypeServices.db().session.commit()
 
     @staticmethod
     def get_session_type_service_by_id(sts_id: int, with_deleted: bool = False):
@@ -148,6 +120,12 @@ class TeraSessionTypeServices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         if sessions_count > 0:
             return IntegrityError('Session type has sessions', self.id_session_type, 't_sessions')
         return None
+
+    @classmethod
+    def insert(cls, sts):
+        inserted_obj = super().insert(sts)
+        TeraSessionTypeServices.check_integrity(inserted_obj)
+        return inserted_obj
 
     @classmethod
     def update(cls, update_id: int, values: dict):
