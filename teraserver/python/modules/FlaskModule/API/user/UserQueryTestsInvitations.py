@@ -89,72 +89,91 @@ class UserQueryTestsInvitations(Resource):
     @user_multi_auth.login_required
     def get(self):
         """
-        Get tests invitations information
+        Get tests invitations information. Witout any parameters, this will return all accessible invitations.
+        Otherwise, you can filter by:
+        - id_test_invitation
+        - test_invitation_key
+        - id_user
+        - user_uuid
+        - id_participant
+        - participant_uuid
+        - id_device
+        - device_uuid
+        - id_session
+        - session_uuid
+        - id_test_type
+        - test_type_uuid
         """
         user_access : DBManagerTeraUserAccess = DBManager.userAccess(current_user)
         args = get_parser.parse_args(strict=True)
 
-        # At least one argument required
-        if not any(args.values()):
-            return gettext('No arguments specified'), 400
+        # Get all accessible invitations
+        accessible_invitations : list[TeraTestInvitation] = user_access.get_accessible_tests_invitations()
+        accessible_invitations_ids : list[int] = [invitation.id_test_invitation for invitation in accessible_invitations]
 
+        # Results will be stored here
         invitations : list[dict] = []
-        accessible_ids : list[int] = user_access.get_accessible_tests_invitations_ids()
+
+        # No arguments means we return all accessible invitations
+        if all(args[arg] is None for arg in args):
+            for invitation in accessible_invitations:
+                invitations.append(invitation.to_json())
+            return invitations
 
         # Go through all args and get the requested information
-        if args['id_test_invitation']:
+        if args['id_test_invitation'] is not None:
             for invitation in TeraTestInvitation.query.filter(
-                TeraTestInvitation.id_test_invitation.in_(accessible_ids)).filter_by(
+                TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids)).filter_by(
                 id_test_invitation=args['id_test_invitation']).all():
                 invitations.append(invitation.to_json())
-        if args['test_invitation_key']:
+        if args['test_invitation_key'] is not None:
             for invitation in TeraTestInvitation.query.filter(
-                TeraTestInvitation.id_test_invitation.in_(accessible_ids)).filter_by(
+                TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids)).filter_by(
                 test_invitation_key=args['test_invitation_key']).all():
                 invitations.append(invitation.to_json())
-        if args['user_uuid']:
+        if args['user_uuid'] is not None:
             user : TeraUser = TeraUser.get_user_by_uuid(args['user_uuid'])
             if user:
                 args['id_user'] = user.id_user
-        if args['id_user']:
+        if args['id_user'] is not None:
             for invitation in TeraTestInvitation.query.filter(and_(
-                    TeraTestInvitation.id_test_invitation.in_(accessible_ids),
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_user == args['id_user'])).all():
                 invitations.append(invitation.to_json())
-        if args['participant_uuid']:
+        if args['participant_uuid'] is not None:
             participant : TeraParticipant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
             if participant:
                 args['id_participant'] = participant.id_participant
-        if args['id_participant']:
+        if args['id_participant'] is not None:
             for invitation in TeraTestInvitation.query.filter(and_(
-                    TeraTestInvitation.id_test_invitation.in_(accessible_ids),
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_participant == args['id_participant'])).all():
                 invitations.append(invitation.to_json())
-        if args['device_uuid']:
+        if args['device_uuid'] is not None:
             device : TeraDevice = TeraDevice.get_device_by_uuid(args['device_uuid'])
             if device:
                 args['id_device'] = device.id_device
-        if args['id_device']:
+        if args['id_device'] is not None:
             for invitation in TeraTestInvitation.query.filter(and_(
-                    TeraTestInvitation.id_test_invitation.in_(accessible_ids),
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_device == args['id_device'])).all():
                 invitations.append(invitation.to_json())
-        if args['session_uuid']:
+        if args['session_uuid'] is not None:
             session : TeraSession = TeraSession.get_session_by_uuid(args['session_uuid'])
             if session:
                 args['id_session'] = session.id_session
-        if args['id_session']:
+        if args['id_session'] is not None:
             for invitation in TeraTestInvitation.query.filter(and_(
-                    TeraTestInvitation.id_test_invitation.in_(accessible_ids),
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_session == args['id_session'])).all():
                 invitations.append(invitation.to_json())
-        if args['test_type_uuid']:
+        if args['test_type_uuid'] is not None:
             test_type : TeraTestType = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
             if test_type:
                 args['id_test_type'] = test_type.id_test_type
-        if args['id_test_type']:
+        if args['id_test_type'] is not None:
             for invitation in TeraTestInvitation.query.filter(and_(
-                    TeraTestInvitation.id_test_invitation.in_(accessible_ids),
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_test_type == args['id_test_type'])).all():
                 invitations.append(invitation.to_json())
 
