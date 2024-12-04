@@ -72,7 +72,7 @@ get_parser.add_argument('test_type_uuid', type=str,
 
 post_parser = api.parser()
 
-# Post schema should require a liste of TestInvitations
+# Post schema should require a list of TestInvitations
 post_schema = api.schema_model('postSchema',
     {
         'type': 'object',
@@ -86,9 +86,6 @@ post_schema = api.schema_model('postSchema',
         'required': ['tests_invitations'],
         'additionalProperties': False
     })
-
-
-
 
 
 delete_parser = api.parser()
