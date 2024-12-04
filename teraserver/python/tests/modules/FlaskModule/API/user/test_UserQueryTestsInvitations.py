@@ -338,6 +338,212 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json))
 
+    def test_post_query_as_admin_with_invalid_schema(self):
+        """
+        Test that a post request with invalid schema returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json={})
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_empty_array(self):
+        """
+        Test that a post request with valid schema but empty array returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=[])
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_invalid_array_item_schema(self):
+        """
+        Test that a post request with invalid array item schema returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=[{'invalid': 'invalid'}])
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_empty_array_item(self):
+        """
+        Test that a post request with valid schema but empty array item returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json={'tests_invitations': []})
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_invalid_array_item(self):
+        """
+        Test that a post request with valid schema but empty array item returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json={'tests_invitations': [{'invalid': 'invalid'}]})
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_missing_id_user_id_participant_id_device(self):
+        """
+        Test that a post request with valid schema but missing id_user, id_participant, id_device returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1))
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_invalid_id_user_id_participant_(self):
+        """
+        Test that a post request with valid schema but invalid id_user, id_participant, id_device returns 403
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1, id_user=0))
+            self.assertEqual(403, response.status_code)
+
+            response = self._post_with_user_http_auth(self.test_client,
+                                            username='admin',
+                                            password='admin',
+                                            json=self._create_tests_invitations_json(id_test_type=1, id_participant=0))
+            self.assertEqual(403, response.status_code)
+
+
+            response = self._post_with_user_http_auth(self.test_client,
+                                            username='admin',
+                                            password='admin',
+                                            json=self._create_tests_invitations_json(id_test_type=1, id_device=0))
+            self.assertEqual(403, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_with_multiple_user_participant_device(self):
+        """
+        Test that a post request with valid schema with multiple user, participant, device returns 400
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1,
+                                                                                              id_participant=1))
+            self.assertEqual(400, response.status_code)
+
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1,
+                                                                                              id_device=1))
+            self.assertEqual(400, response.status_code)
+
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1,
+                                                                                              id_participant=1,
+                                                                                              id_device=1))
+            self.assertEqual(400, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_with_no_session(self):
+        """
+        Test that a post request with valid schema with no session returns 200
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1))
+            self.assertEqual(200, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_with_invalid_session(self):
+        """
+        Test that a post request with valid schema with invalid session returns 403
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1,
+                                                                                              id_session=0))
+            self.assertEqual(403, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_with_valid_session(self):
+        """
+        Test that a post request with valid schema with valid session returns 200
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1,
+                                                                                              id_session=1))
+            self.assertEqual(200, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_update_count(self):
+        """
+        Test that a post request with valid schema updates count
+        """
+        with self._flask_app.app_context():
+            # Post a new invitation
+            response = self._post_with_user_http_auth(self.test_client,
+                                                      username='admin',
+                                                      password='admin',
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                              id_user=1))
+            self.assertEqual(200, response.status_code)
+            invitation_info = response.json[0]
+            self.assertNotEqual(invitation_info['id_test_invitation'], 0)
+
+            # increment count
+            invitation_info['test_invitation_count'] += 1
+
+            # Post the updated invitation
+            response = self._post_with_user_http_auth(self.test_client,
+                                                        username='admin',
+                                                        password='admin',
+                                                        json={'tests_invitations': [{'id_test_invitation': invitation_info['id_test_invitation'],
+                                                                                    'test_invitation_count': invitation_info['test_invitation_count']}]})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(1, len(response.json))
+            self.assertEqual(invitation_info['test_invitation_count'], response.json[0]['test_invitation_count'])
+
+
+    def _create_tests_invitations_json(self, id_test_type: int, id_user: int = None,
+                                id_participant: int = None, id_device: int = None, id_session: int = None) -> dict:
+        """
+        Create a json for an invitation
+        """
+        tests_invitations = {'tests_invitations': [
+                {
+                    'id_test_invitation': 0, # New invitation
+                    'id_test_type': id_test_type,
+                    'test_invitation_max_count': 1,
+                    'test_invitation_count': 0,
+                    'test_invitation_expiration_date': (datetime.now() + timedelta(days=1)).isoformat()
+                } | {k: v for k, v in {'id_user': id_user,
+                                       'id_participant': id_participant,
+                                       'id_device': id_device,
+                                       'id_session': id_session}.items() if v is not None}
+            ]}
+
+        return tests_invitations
 
     def _create_invitations(self, count: int,
                             id_test_type: int,
