@@ -6,4 +6,12 @@ module-naming-style = any
 # Set line long enough for modern editors
 max-line-length=160
 
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=
+    C0111,  # missing-docstring
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+
 
