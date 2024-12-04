@@ -134,9 +134,9 @@ class UserQuerySessionTypeServices(Resource):
                 TeraSessionTypeServices.commit()
             except exc.IntegrityError as e:
                 self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypeServices.__name__, 'delete',
-                                               500, 'Integrity error', str(e))
+                                               400, 'Integrity error', str(e))
                 return gettext('Can\'t remove associated service from session type: please delete all sessions using '
-                               'that type before deleting.'), 500
+                               'that type before deleting.'), 400
             # Build services association to add
             json_sts = [{'id_session_type': id_session_type, 'id_service': service_id}
                         for service_id in received_service_ids]
@@ -228,4 +228,37 @@ class UserQuerySessionTypeServices(Resource):
         """
         Delete specific session-type - service additional association
         """
-        return 501
+        user_access = DBManager.userAccess(current_user)
+        args = delete_parser.parse_args()
+        id_todel = args['id']
+
+        # Check if current user can delete
+        sts = TeraSessionTypeServices.get_session_type_service_by_id(id_todel)
+        if not sts:
+            return gettext('Not found'), 404
+
+        if sts.id_session_type not in user_access.get_accessible_session_types_ids(admin_only=True):
+            return gettext('Access denied'), 403
+
+        if sts.id_service not in user_access.get_accessible_services_ids(admin_only=True):
+            return gettext('Access denied'), 403
+
+        # If we are here, we are allowed to delete. Do so.
+        try:
+            TeraSessionTypeServices.delete(id_todel=id_todel)
+        except exc.IntegrityError as e:
+            # Causes that could make an integrity error when deleting:
+            # - Associated project still have sessions of that type
+            self.module.logger.log_warning(self.module.module_name, UserQuerySessionTypeServices.__name__, 'delete',
+                                           500, 'Integrity error', str(e))
+            return gettext('Can\'t remove associated service from session type: please delete all sessions of that type'
+                           ' before deleting.'), 500
+        except exc.SQLAlchemyError as e:
+            import sys
+            print(sys.exc_info())
+            self.module.logger.log_error(self.module.module_name,
+                                         UserQuerySessionTypeServices.__name__,
+                                         'delete', 500, 'Database error', e)
+            return gettext('Database error'), 500
+
+        return '', 200
