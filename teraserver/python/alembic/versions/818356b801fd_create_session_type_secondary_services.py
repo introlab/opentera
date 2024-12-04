@@ -26,10 +26,11 @@ def upgrade():
                     sa.Column('id_session_type', sa.Integer, sa.ForeignKey('t_sessions_types.id_session_type',
                                                                            ondelete='cascade'), nullable=False),
                     sa.Column('id_service', sa.Integer, sa.ForeignKey('t_services.id_service',
-                                                                      ondelete='cascade'), nullable=False))
+                                                                      ondelete='cascade'), nullable=False),
+                    sa.Column('deleted_at', sa.DateTime(timezone=True)))
+
     op.execute(CreateSequence(sa.Sequence('id_session_type_service_sequence')))
 
 
 def downgrade():
     op.drop_table('t_sessions_types_services')
-
