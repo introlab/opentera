@@ -286,7 +286,7 @@ class BaseMixin(object):
                     if 'boolean' in column_type:
                         data_type = 'boolean'
 
-                    pr_dict[name] = {'type': data_type, 'required': not value.prop.columns[0].nullable}
+                    pr_dict[name] = {'type': data_type}
                     if data_format:
                         pr_dict[name]['format'] = data_format
                     if default_value:
