@@ -1,2 +1,9 @@
+[BASIC]
+# Allow CamelCase and snake case
+module-naming-style = any
+
 [FORMAT]
+# Set line long enough for modern editors
 max-line-length=160
+
+
