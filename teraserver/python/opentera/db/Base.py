@@ -311,7 +311,6 @@ class BaseMixin(object):
         missing_fields = []
 
         # Browse each
-        pr_dict = dict()
         for name in dir(cls):
             value = getattr(cls, name)
             if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
