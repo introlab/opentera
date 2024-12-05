@@ -6,6 +6,8 @@ from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraProject import TeraProject
+from opentera.db.models.TeraService import TeraService
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError, IntegrityError
 from sqlalchemy import exc
@@ -186,6 +188,23 @@ class UserQuerySessionTypes(Resource):
             #         return gettext('No project admin access for at a least one project in the list'), 403
             update_st_projects = True
 
+        st_services_ids = []
+        admin_services_ids = []
+        update_st_services = False
+        if 'session_type_services' in json_session_type:
+            session_type_services = json_session_type.pop('session_type_services')
+            # Check if the current user has admin access to all services
+            st_services_ids = [service['id_service'] for service in session_type_services]
+            admin_services_ids = user_access.get_accessible_services_ids(admin_only=True)
+            if set(st_services_ids).difference(admin_services_ids):
+                # We have some projects where we are not admin
+                return gettext('No service admin access for at a least one service in the list'), 403
+
+            # for project_id in st_projects_ids:
+            #     if user_access.get_project_role(project_id) != 'admin':
+            #         return gettext('No project admin access for at a least one project in the list'), 403
+            update_st_services = True
+
         # Do the update!
         new_st = None
         if json_session_type['id_session_type'] > 0:
@@ -215,7 +234,8 @@ class UserQuerySessionTypes(Resource):
                                              'post', 500, 'Database error', e)
                 return gettext('Database error'), 500
 
-        update_session_type = TeraSessionType.get_session_type_by_id(json_session_type['id_session_type'])
+        update_session_type: TeraSessionType = (
+            TeraSessionType.get_session_type_by_id(json_session_type['id_session_type']))
 
         # Update session type sites, if needed
         if update_st_sites:
@@ -248,7 +268,6 @@ class UserQuerySessionTypes(Resource):
 
         # Update session type projects, if needed
         if update_st_projects:
-            from opentera.db.models.TeraProject import TeraProject
             if new_st:
                 # New session type - directly update the list
                 update_session_type.session_type_projects = [TeraProject.get_project_by_id(project_id)
@@ -277,13 +296,30 @@ class UserQuerySessionTypes(Resource):
                     if project_id in update_st_current_projects:
                         update_session_type.session_type_projects.remove(TeraProject.get_project_by_id(project_id))
 
-            # Check if it's a session type of type service and where the services are all associated to that project
-            # if update_session_type.session_type_category == TeraSessionType.SessionCategoryEnum.SERVICE.value:
-            #     service_projects_ids = [service.id_project for service in TeraServiceProject.get_projects_for_service(
-            #         update_session_type.id_service)]
-            #     current_projects_ids = [project.id_project for project in update_session_type.session_type_projects]
-            #     if set(current_projects_ids).difference(service_projects_ids):
-            #         return gettext('Session type has a service not associated to its project'), 400
+        # Update session type additional services, if needed
+        if update_st_services:
+            if new_st:
+                # New session type - directly update the list
+                update_session_type.session_type_secondary_services = [TeraService.get_service_by_id(service_id)
+                                                             for service_id in st_services_ids]
+            else:
+                # Updated session type - first, we add services not already there
+                update_st_current_services = [service.id_service for service in
+                                              update_session_type.session_type_secondary_services]
+                service_ids_to_add = set(st_services_ids).difference(update_st_current_services)
+                services_to_add = [TeraService.get_service_by_id(service_id) for service_id in
+                                   service_ids_to_add]
+
+                update_session_type.session_type_secondary_services.extend(services_to_add)
+
+                # Then, we delete services that the current user has access, but are not present in the posted list,
+                # without touching services already there
+                update_st_current_services.extend(list(services_to_add))
+                missing_services = set(admin_services_ids).difference(st_services_ids)
+                for service_id in missing_services:
+                    if service_id in update_st_current_services:
+                        update_session_type.session_type_secondary_services.remove(
+                            TeraService.get_service_by_id(service_id))
 
             # Commit the changes we made!
             update_session_type.commit()
