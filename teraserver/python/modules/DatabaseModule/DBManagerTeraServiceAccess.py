@@ -1,7 +1,7 @@
 from sqlalchemy import or_, not_, and_
 
 from opentera.db.models.TeraService import TeraService
-from opentera.db.models import TeraUser
+from opentera.db.models import TeraUser, TeraSessionTypeServices
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
@@ -65,8 +65,12 @@ class DBManagerTeraServiceAccess:
         return projects
 
     def get_accessible_sessions(self, admin_only=False) -> list[TeraSession]:
-        # SB - 2024-11-25 - Services only have access to the sessions they created
-        sessions = TeraSession.query.filter(TeraSession.id_creator_service == self.service.id_service).all()
+        # SB - 2024-11 - Services only have access to the sessions they created or where they are a
+        # secondary (associated) service
+        session_types_ids = self.get_accessible_sessions_types_ids()
+
+        sessions = TeraSession.query.filter(or_(TeraSession.id_creator_service == self.service.id_service,
+                                            TeraSession.id_session_type.in_(session_types_ids))).all()
 
         # part_ids = self.get_accessible_participants_ids(admin_only=admin_only)
         # user_ids = self.get_accessible_users_ids(admin_only=admin_only)
@@ -174,7 +178,9 @@ class DBManagerTeraServiceAccess:
         return [user.user_uuid for user in self.get_accessible_users(admin_only=admin_only)]
 
     def get_accessible_sessions_types(self) -> list[TeraSessionType]:
-        query = TeraSessionType.query.filter(TeraSessionType.id_service == self.service.id_service)\
+        query = TeraSessionType.query.join(TeraSessionType.session_type_secondary_services, isouter=True) \
+            .filter(or_(TeraSessionType.id_service == self.service.id_service,
+                        TeraService.id_service == self.service.id_service))\
             .order_by(TeraSessionType.session_type_name.asc())
 
         return query.all()

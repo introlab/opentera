@@ -1,9 +1,9 @@
 from typing import List
 from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
+from opentera.db.models.TeraSessionTypeServices import TeraSessionTypeServices
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraParticipant import TeraParticipant
 
@@ -92,7 +92,7 @@ class ServiceQuerySessionTypesTest(BaseServiceAPITest):
             target_count = len(TeraSessionTypeProject.get_sessions_types_for_project(participant.id_project))
             self.assertEqual(target_count, len(response.json))
 
-    def test_get_specific(self):
+    def test_get_specific_forbidden(self):
         with self._flask_app.app_context():
             params = {'id_session_type': 4}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -100,11 +100,24 @@ class ServiceQuerySessionTypesTest(BaseServiceAPITest):
             self.assertEqual(200, response.status_code, msg='No access to session type')
             self.assertEqual(0, len(response.json))
 
+    def test_get_specific_allowed_because_creator(self):
+        with self._flask_app.app_context():
             params = {'id_session_type': 1}
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                          params=params, endpoint=self.test_endpoint)
             self.assertEqual(200, response.status_code, msg='Get OK')
             self.assertEqual(1, len(response.json))
+
+    def test_get_specific_allowed_because_secondary(self):
+        with self._flask_app.app_context():
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            token = service.get_token(self.service_key)
+            for sts in TeraSessionTypeServices.get_sessions_types_for_service(service.id_service):
+                params = {'id_session_type': sts.id_session_type}
+                response = self._get_with_service_token_auth(client=self.test_client, token=token,
+                                                             params=params, endpoint=self.test_endpoint)
+                self.assertEqual(200, response.status_code, msg='Get OK')
+                self.assertEqual(1, len(response.json))
 
     def test_post_endpoint_no_auth(self):
         with self._flask_app.app_context():

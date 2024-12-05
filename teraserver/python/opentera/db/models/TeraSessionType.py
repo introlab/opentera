@@ -45,7 +45,7 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
                               'session_type_service', 'session_type_sessions', 'session_type_session_type_projects',
-                              'session_type_sites', 'session_type_session_type_sites'])
+                              'session_type_sites', 'session_type_session_type_sites', 'session_type_secondary_services'])
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',
