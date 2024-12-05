@@ -20,6 +20,7 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraTest import TeraTest
+from opentera.db.models.TeraTestInvitation import TeraTestInvitation
 from opentera.db.models.TeraSite import TeraSite
 
 from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
@@ -344,3 +345,23 @@ class DBManagerTeraServiceAccess:
                 users_groups[user_group] = projects[project_id]
 
         return users_groups
+
+
+    def get_accessible_tests_invitations(self) -> list[TeraTestInvitation]:
+        """
+        Get all test invitations accessible by the current service
+        """
+        accessible_test_type_ids = self.get_accessible_tests_types_ids()
+
+
+        test_invitations = TeraTestInvitation.query.filter(
+            TeraTestInvitation.id_test_type.in_(accessible_test_type_ids)
+        ).all()
+        return test_invitations
+
+    def get_accessible_tests_invitations_ids(self) -> list[int]:
+        """
+        Get all test invitations accessible by the current service
+        """
+        test_invitations = self.get_accessible_tests_invitations()
+        return [test_invitation.id_test_invitation for test_invitation in test_invitations]

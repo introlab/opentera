@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from modules.DatabaseModule.DBManager import DBManager
 from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 from opentera.db.models.TeraUser import TeraUser
@@ -9,9 +11,10 @@ from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSite import TeraSite
-from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraSession import TeraSession, TeraSessionStatus
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestInvitation import TeraTestInvitation
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraAsset import TeraAsset
@@ -665,3 +668,67 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 #                                         .with_entities(TeraUserGroup).all()
 
                 # self.assertEqual(len(usergroups), len(queried_usergroups))
+
+    def test_service_get_accessible_tests_invitations_ids(self):
+        """
+        This will test get_accessible_tests_invitations_ids.
+        """
+        with self._flask_app.app_context():
+            service : TeraService =  TeraService.get_service_by_key('VideoRehabService')
+            supp_service : TeraService = TeraService.get_service_by_key('LoggingService')
+            self.assertIsNotNone(service)
+            self.assertIsNotNone(supp_service)
+
+            # Create a test type with this service
+            test_type : TeraTestType = TeraTestType()
+            test_type.test_type_name = 'TestType'
+            test_type.test_type_key = 'TestType'
+            test_type.test_type_description = 'TestType'
+            test_type.id_service = service.id_service
+            TeraTestType.insert(test_type)
+
+
+            # Create a session type with this service
+            session_type : TeraSessionType = TeraSessionType()
+            session_type.session_type_name = 'SessionType'
+            session_type.session_type_online = False
+            session_type.session_type_config = str()
+            session_type.session_type_color = '#000000'
+            session_type.session_type_category = TeraSessionType.SessionCategoryEnum.SERVICE.value
+
+            session_type.id_service = service.id_service
+            session_type.session_type_secondary_services = [supp_service]
+
+            TeraSessionType.insert(session_type)
+
+            # Create a session with this session type
+            session : TeraSession = TeraSession()
+            session.id_session_type = session_type.id_session_type
+            session.id_creator_service = service.id_service
+            session.session_name = 'Session'
+            session.session_status = TeraSessionStatus.STATUS_NOTSTARTED.value
+            session.session_start_datetime = datetime.now()
+            session.session_duration = 0
+            session.session_participants = []
+            session.session_users = []
+            session.session_devices = []
+
+            TeraSession.insert(session)
+
+            # Create an invitation for this test type
+            invitation : TeraTestInvitation = TeraTestInvitation()
+            invitation.id_test_type = test_type.id_test_type
+            invitation.id_session = session.id_session
+            invitation.id_user = 1
+            invitation.test_invitation_creation_date = datetime.now()
+            invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+
+            TeraTestInvitation.insert(invitation)
+
+            # Service should have access to invitation
+            service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(service)
+            self.assertTrue(invitation.id_test_invitation in service_access.get_accessible_tests_invitations_ids())
+
+            # Supp service should also have access to invitation
+            service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(supp_service)
+            self.assertTrue(invitation.id_test_invitation in service_access.get_accessible_tests_invitations_ids())

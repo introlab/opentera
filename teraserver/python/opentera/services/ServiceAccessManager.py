@@ -320,6 +320,8 @@ class ServiceAccessManager:
             g.current_login_type = LoginType.USER_LOGIN
             return True
 
+        return False
+
     @staticmethod
     def validate_device_token(token: str, allow_dynamic_tokens: bool, allow_static_tokens: bool) -> bool:
         if allow_dynamic_tokens:  # Check for dynamic device token
