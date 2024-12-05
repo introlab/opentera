@@ -9,10 +9,10 @@ from sqlalchemy import and_
 
 from jsonschema.exceptions import SchemaError, ValidationError
 
-from modules.LoginModule.LoginModule import user_multi_auth, current_user
-from modules.FlaskModule.FlaskModule import user_api_ns as api
+from modules.LoginModule.LoginModule import LoginModule, current_service
+from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
-from modules.DatabaseModule.DBManagerTeraUserAccess import DBManagerTeraUserAccess
+from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 from opentera.db.models.TeraTestInvitation import TeraTestInvitation
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSession import TeraSession
@@ -92,9 +92,9 @@ delete_parser = api.parser()
 delete_parser.add_argument('id', type=int, help='Test type ID to delete', required=True)
 
 
-class UserQueryTestsInvitations(Resource):
+class ServiceQueryTestsInvitations(Resource):
     """
-    UserQueryTestsInvitations Resource.
+    ServiceQueryTestsInvitations Resource.
     """
     def __init__(self, _api, *args, **kwargs):
         Resource.__init__(self, _api, *args, **kwargs)
@@ -106,7 +106,7 @@ class UserQueryTestsInvitations(Resource):
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
-    @user_multi_auth.login_required
+    @LoginModule.service_token_or_certificate_required
     def get(self):
         """
         Get tests invitations information. Witout any parameters, this will return all accessible invitations.
@@ -124,11 +124,11 @@ class UserQueryTestsInvitations(Resource):
         - id_test_type
         - test_type_uuid
         """
-        user_access : DBManagerTeraUserAccess = DBManager.userAccess(current_user)
+        service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args(strict=True)
 
         # Get all accessible invitations
-        accessible_invitations : list[TeraTestInvitation] = user_access.get_accessible_tests_invitations()
+        accessible_invitations : list[TeraTestInvitation] = service_access.get_accessible_tests_invitations()
         accessible_invitations_ids : list[int] = [invitation.id_test_invitation for invitation in accessible_invitations]
 
         # Results will be stored here
@@ -202,7 +202,7 @@ class UserQueryTestsInvitations(Resource):
     @api.doc(description='Update/Create test invitation.',
              responses={501: 'Unable to update test from here - use service!'})
     @api.expect(post_schema)
-    @user_multi_auth.login_required
+    @LoginModule.service_token_or_certificate_required
     def post(self):
         """
         Create / update test invitation
@@ -212,7 +212,7 @@ class UserQueryTestsInvitations(Resource):
 
             # Validate JSON schema, will raise BadRequest if not valid
             post_schema.validate(request.json)
-            user_access : DBManagerTeraUserAccess = DBManager.userAccess(current_user)
+            service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 
             all_invitations = request.json['tests_invitations']
 
@@ -222,15 +222,15 @@ class UserQueryTestsInvitations(Resource):
             for invitation in all_invitations:
                 if invitation['id_test_invitation'] == 0:
                     # New invitation
-                    if 'id_user' in invitation and invitation['id_user'] not in user_access.get_accessible_users_ids():
+                    if 'id_user' in invitation and invitation['id_user'] not in service_access.get_accessible_users_ids():
                         return gettext('Forbidden'), 403
-                    if 'id_participant' in invitation and invitation['id_participant'] not in user_access.get_accessible_participants_ids():
+                    if 'id_participant' in invitation and invitation['id_participant'] not in service_access.get_accessible_participants_ids():
                         return gettext('Forbidden'), 403
-                    if 'id_device' in invitation and invitation['id_device'] not in user_access.get_accessible_devices_ids():
+                    if 'id_device' in invitation and invitation['id_device'] not in service_access.get_accessible_devices_ids():
                         return gettext('Forbidden'), 403
-                    if 'id_session' in invitation and invitation['id_session'] not in user_access.get_accessible_sessions_ids():
+                    if 'id_session' in invitation and invitation['id_session'] not in service_access.get_accessible_sessions_ids():
                         return gettext('Forbidden'), 403
-                    if 'id_test_type' in invitation and invitation['id_test_type'] not in user_access.get_accessible_tests_types_ids():
+                    if 'id_test_type' in invitation and invitation['id_test_type'] not in service_access.get_accessible_tests_types_ids():
                         return gettext('Forbidden'), 403
                     if 'id_test_type' not in invitation:
                         return gettext('Missing id_test_type'), 400
@@ -243,7 +243,7 @@ class UserQueryTestsInvitations(Resource):
                     if len([key for key in invitation.keys() if key in ['id_user', 'id_participant', 'id_device']]) != 1:
                         return gettext('You must specify one of id_user, id_participant or id_device'), 400
                 else:
-                    if invitation['id_test_invitation'] not in user_access.get_accessible_tests_invitations_ids():
+                    if invitation['id_test_invitation'] not in service_access.get_accessible_tests_invitations_ids():
                         return gettext('Forbidden'), 403
 
                     # Only allow update of count
@@ -274,7 +274,7 @@ class UserQueryTestsInvitations(Resource):
 
                 except exc.SQLAlchemyError as e:
                     self.module.logger.log_error(self.module.module_name,
-                                            UserQueryTestsInvitations.__name__,
+                                            ServiceQueryTestsInvitations.__name__,
                                             'post', 500, 'Database error', str(e))
                     continue
 
@@ -291,17 +291,18 @@ class UserQueryTestsInvitations(Resource):
                         500: 'Database error.'},
              params={'token': 'Secret token'})
     @api.expect(delete_parser)
-    @user_multi_auth.login_required
+    @LoginModule.service_token_or_certificate_required
     def delete(self):
         """
         Delete test invitation
         """
-        user_access : DBManagerTeraUserAccess = DBManager.userAccess(current_user)
+        service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
+
         args = delete_parser.parse_args(strict=True)
         id_todel = args['id']
 
         # Check if current user can delete
-        if id_todel not in user_access.get_accessible_tests_invitations_ids():
+        if id_todel not in service_access.get_accessible_tests_invitations_ids():
             return gettext('Forbidden'), 403
 
         # If we are here, we are allowed to delete. Do so.
@@ -310,7 +311,7 @@ class UserQueryTestsInvitations(Resource):
         except exc.SQLAlchemyError as e:
             print(sys.exc_info())
             self.module.logger.log_error(self.module.module_name,
-                                         UserQueryTestsInvitations.__name__,
+                                         ServiceQueryTestsInvitations.__name__,
                                          'delete', 500, 'Database error', e)
             return gettext('Database error'), 500
 

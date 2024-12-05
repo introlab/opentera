@@ -9,6 +9,7 @@ class TeraServiceClient:
     def __init__(self, token_dict: dict, token: str, config_man, service):
         self.__service_uuid = token_dict['service_uuid']
         self.__service_token = token
+        self.__config_man = config_man
         self.__service = service
 
     @property
@@ -26,6 +27,10 @@ class TeraServiceClient:
     @service_token.setter
     def service_token(self, token: str):
         self.__service_token = token
+
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        # TODO - Implement this
+        return False
 
     def do_get_request_to_backend(self, path: str, params: dict = None, override_token: str | None = None) -> Response:
         """

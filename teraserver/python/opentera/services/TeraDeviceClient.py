@@ -10,7 +10,9 @@ class TeraDeviceClient:
         self.__device_uuid = token_dict['device_uuid']
         self.__id_device = token_dict['id_device']
         self.__device_token = token
+        self.__config_man = config_man
         self.__service = service
+
 
     @property
     def device_uuid(self):
@@ -50,6 +52,10 @@ class TeraDeviceClient:
         params = {'id_session': str(id_session)}
         response = self.do_get_request_to_backend('/api/device/sessions', params)
         return response.status_code == 200
+
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        # TODO - Implement this
+        return False
 
     def get_device_infos(self) -> dict:
         response = self.do_get_request_to_backend('/api/device/devices')

@@ -1,10 +1,10 @@
-from werkzeug.local import LocalProxy
 from functools import wraps
-from flask import g, request
-from flask_restx import reqparse
 from typing import List
 from enum import Enum
 from flask_babel import gettext
+from flask import g, request
+from flask_restx import reqparse
+from werkzeug.local import LocalProxy
 import jwt
 
 from opentera.services.TeraUserClient import TeraUserClient
@@ -304,7 +304,7 @@ class ServiceAccessManager:
     def validate_user_token(token: str) -> bool:
         try:
             token_dict = jwt.decode(token, ServiceAccessManager.api_user_token_key, algorithms='HS256')
-        except jwt.PyJWTError as e:
+        except jwt.PyJWTError:
             # Not a user, or invalid token, will continue...
             pass
         else:
@@ -327,7 +327,7 @@ class ServiceAccessManager:
         if allow_dynamic_tokens:  # Check for dynamic device token
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_device_token_key, algorithms='HS256')
-            except jwt.PyJWTError as e:
+            except jwt.PyJWTError:
                 # Not a device, or invalid token, will continue...
                 pass
             else:
@@ -361,7 +361,7 @@ class ServiceAccessManager:
         if allow_dynamic_tokens:  # Check for dynamic participant token
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_participant_token_key, algorithms='HS256')
-            except jwt.PyJWTError as e:
+            except jwt.PyJWTError:
                 # Not a participant, or invalid token, will continue...
                 pass
             else:
@@ -401,7 +401,7 @@ class ServiceAccessManager:
     def validate_service_token(token: str) -> bool:
         try:
             token_dict = jwt.decode(token, ServiceAccessManager.api_service_token_key, algorithms='HS256')
-        except jwt.PyJWTError as e:
+        except jwt.PyJWTError:
             # Not a device, or invalid token, will continue...
             pass
         else:
@@ -487,3 +487,68 @@ class ServiceAccessManager:
     def service_user_roles_required(roles: List[str]):
         # For compatibility with old code
         return ServiceAccessManager.service_user_roles_all_required(roles)
+
+    @staticmethod
+    def service_test_invitation_required(param_name: str):
+        def wrap(f):
+            @wraps(f)
+            def decorated(*args, **kwargs):
+
+                # Check if service is initialized
+                if ServiceAccessManager.service is None or 'service_key' \
+                        not in ServiceAccessManager.service.service_info:
+                    return gettext('Forbidden'), 403
+
+                # Get the parameter from the request
+                parser = reqparse.RequestParser()
+                parser.add_argument(param_name, type=str, help='Test Invitation Key', required=True)
+                args = parser.parse_args(strict=False)
+
+                # Get the test invitation key
+                test_invitation_key = args[param_name]
+
+                # Use the service token to get the test invitation
+                response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
+                                                                            params={'test_invitation_key': test_invitation_key})
+
+                # Check if the test invitation is valid
+                if response.status_code != 200 or len(response.json()) != 1:
+                    return gettext('Forbidden'), 403
+
+                # Validate if invitation is for user, participant or device
+                invitation = response.json()[0]
+                if 'id_user' in invitation and invitation['id_user'] is not None:
+                    # This is a user invitation, configure user client with minimal information
+                    token_dict = {'id_user': invitation['id_user']}
+                    # TODO - What do we do with token ???
+                    g.current_user_client = TeraUserClient(token_dict, None,
+                                                        ServiceAccessManager.service.config_man,
+                                                        ServiceAccessManager.service)
+
+                    g.current_login_type = LoginType.USER_LOGIN
+                elif 'id_participant' in invitation and invitation['id_participant'] is not None:
+                    # This is a participant invitation, configure participant client with minimal information
+                    token_dict = {'id_participant': invitation['id_participant']}
+                    # TODO - What do we do with token ???
+                    g.current_participant_client = TeraParticipantClient(token_dict, None,
+                                                                    ServiceAccessManager.service.config_man,
+                                                                    ServiceAccessManager.service)
+                    g.current_login_type = LoginType.PARTICIPANT_LOGIN
+                elif 'id_device' in invitation and invitation['id_device'] is not None:
+                    # This is a device invitation, configure device client with minimal information
+                    token_dict = {'id_device': invitation['id_device']}
+                    # TODO - What do we do with token ???
+                    g.current_device_client = TeraDeviceClient(token_dict, None,
+                                                        ServiceAccessManager.service.config_man,
+                                                        ServiceAccessManager.service)
+                    g.current_login_type = LoginType.DEVICE_LOGIN
+                else :
+                    # Not a valid invitation
+                    return gettext('Forbidden'), 403
+
+
+                # Everything ok, continue
+                return f(*args, **kwargs)
+
+            return decorated
+        return wrap

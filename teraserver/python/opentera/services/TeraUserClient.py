@@ -1,8 +1,9 @@
+from typing import List
+import json
 import uuid
 from flask import request
 from requests import Response
-from typing import List
-import json
+
 
 class TeraUserClient:
 
@@ -13,6 +14,7 @@ class TeraUserClient:
         self.__user_token = token
         self.__user_superadmin = token_dict['user_superadmin']
         self.__service_access = token_dict['service_access']
+        self.__config_man = config_man
         self.__service = service
 
     @property
@@ -63,6 +65,11 @@ class TeraUserClient:
     def service_access(self, service_access: dict):
         self.__service_access = service_access
 
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        params = {'test_invitation_key': str(invitation_key)}
+        response = self.do_get_request_to_backend('/api/user/tests/invitations', params)
+        return (response.status_code == 200 and len(response.json() > 0))
+
     def do_get_request_to_backend(self, path: str, params: dict = None) -> Response:
         """
         Now using service function:
@@ -88,7 +95,6 @@ class TeraUserClient:
 
         if response.status_code == 200:
             # Parse JSON reply
-            import json
             sites = json.loads(response.text)
 
             # Find correct site in reply
