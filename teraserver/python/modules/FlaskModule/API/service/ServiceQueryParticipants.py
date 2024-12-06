@@ -11,10 +11,11 @@ from datetime import datetime
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query')
-get_parser.add_argument('id_project', type=int, help='Project ID to query all participants for')
-get_parser.add_argument('id_participant_group', type=int, help='Participant group to query all participants for')
-get_parser.add_argument('name', type=str, help='Return participants with at least a partial match on their name.')
+get_parser.add_argument('participant_uuid', type=str, help='Participant uuid of the participant to query', default=None)
+get_parser.add_argument('id_participant', type=int, help='Participant ID to query', default=None)
+get_parser.add_argument('id_project', type=int, help='Project ID to query all participants for', default=None)
+get_parser.add_argument('id_participant_group', type=int, help='Participant group to query all participants for', default=None)
+get_parser.add_argument('name', type=str, help='Return participants with at least a partial match on their name.', default=None)
 
 post_parser = api.parser()
 
@@ -65,11 +66,11 @@ class ServiceQueryParticipants(Resource):
         """
         Get participant
         """
-        args = get_parser.parse_args()
+        args = get_parser.parse_args(strict=True)
 
         service_access = DBManager.serviceAccess(current_service)
 
-        # args['participant_uuid'] Will be None if not specified in args
+        # args['participant_uuid'] will be None if not specified in args
         if args['participant_uuid']:
             if args['participant_uuid'] not in service_access.get_accessible_participants_uuids():
                 return gettext('Forbidden'), 403
@@ -77,6 +78,14 @@ class ServiceQueryParticipants(Resource):
             if participant:
                 return participant.to_json()
 
+        if args['id_participant']:
+            if args['id_participant'] not in service_access.get_accessible_participants_ids():
+                return gettext('Forbidden'), 403
+            participant = TeraParticipant.get_participant_by_id(args['id_participant'])
+            if participant:
+                return participant.to_json()
+
+        # args['id_project'] will be None if not specified in args
         if args['id_project']:
             if args['id_project'] not in service_access.get_accessible_projects_ids():
                 return gettext('Forbidden'), 403
@@ -87,6 +96,7 @@ class ServiceQueryParticipants(Resource):
                 participants = TeraParticipant.search_participant_by_name(args['name'], filters)
             return [participant.to_json() for participant in participants]
 
+        # args['id_participant_group'] will be None if not specified in args
         if args['id_participant_group']:
             if args['id_participant_group'] not in service_access.get_accessible_participants_groups_ids():
                 return gettext('Forbidden'), 403
@@ -97,6 +107,7 @@ class ServiceQueryParticipants(Resource):
                 participants = TeraParticipant.search_participant_by_name(args['name'], filters)
             return [participant.to_json() for participant in participants]
 
+        # args['name'] will be None if not specified in args
         if args['name']:
             # Search for participants with name in all availables
             participants = (TeraParticipant.query.filter(

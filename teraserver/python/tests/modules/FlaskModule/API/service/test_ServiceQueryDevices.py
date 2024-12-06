@@ -1,10 +1,12 @@
 from typing import List
 
 from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraDeviceSubType import TeraDeviceSubType
 from opentera.db.models.TeraDeviceType import TeraDeviceType
+from opentera.db.models.TeraService import TeraService
+
+from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 
 
 class ServiceQueryDevicesTest(BaseServiceAPITest):
@@ -32,8 +34,7 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
             # Get all devices from DB
             devices: List[TeraDevice] = TeraDevice.query.all()
             for device in devices:
-                device_uuid: str = device.device_uuid
-                params = {'device_uuid_wrong': device_uuid}
+                params = {'device_uuid_wrong': device.device_uuid}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
                 self.assertEqual(400, response.status_code)
@@ -42,79 +43,128 @@ class ServiceQueryDevicesTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             # Get all devices from DB
             devices: List[TeraDevice] = TeraDevice.query.all()
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            service_access : DBManagerTeraServiceAccess = DBManagerTeraServiceAccess(service)
+
             for device in devices:
-                device_uuid: str = device.device_uuid
-                params = {'device_uuid': device_uuid}
+                params = {'device_uuid': device.device_uuid}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
-                self.assertEqual(200, response.status_code)
-                self.assertFalse('device_type' in response.json)
-                self.assertFalse('device_subtype' in response.json)
-                self.assertFalse('device_assets' in response.json)
-                device_json = device.to_json()
-                self.assertEqual(device_json, response.json)
+                if device.id_device in service_access.get_accessible_devices_ids():
+                    self.assertEqual(200, response.status_code)
+                    self.assertFalse('device_type' in response.json)
+                    self.assertFalse('device_subtype' in response.json)
+                    self.assertFalse('device_assets' in response.json)
+                    device_json = device.to_json()
+                    self.assertEqual(device_json, response.json)
+                else:
+                    self.assertEqual(403, response.status_code)
+
+    def test_get_endpoint_with_token_auth_with_id_device(self):
+        with self._flask_app.app_context():
+            # Get all devices from DB
+            devices: List[TeraDevice] = TeraDevice.query.all()
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            service_access : DBManagerTeraServiceAccess = DBManagerTeraServiceAccess(service)
+
+            for device in devices:
+                params = {'id_device': device.id_device}
+                response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                             params=params, endpoint=self.test_endpoint)
+                if device.id_device in service_access.get_accessible_devices_ids():
+                    self.assertEqual(200, response.status_code)
+                    self.assertFalse('device_type' in response.json)
+                    self.assertFalse('device_subtype' in response.json)
+                    self.assertFalse('device_assets' in response.json)
+                    device_json = device.to_json()
+                    self.assertEqual(device_json, response.json)
+                else:
+                    self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_type(self):
         with self._flask_app.app_context():
             # Get all devices from DB
             devices: List[TeraDevice] = TeraDevice.query.all()
+
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            service_access : DBManagerTeraServiceAccess = DBManagerTeraServiceAccess(service)
+
             for device in devices:
-                device_uuid: str = device.device_uuid
-                params = {'device_uuid': device_uuid, 'with_device_type': True}
+                params = {'device_uuid': device.device_uuid, 'with_device_type': True}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
-                                                             params=params, endpoint=self.test_endpoint)
-                self.assertEqual(200, response.status_code)
-                self.assertTrue('device_type' in response.json)
-                self.assertFalse('device_subtype' in response.json)
-                self.assertFalse('device_assets' in response.json)
-                device_json = device.to_json()
-                device_json['device_type'] = TeraDeviceType.get_device_type_by_id(device.id_device_type).\
-                    to_json(minimal=True)
-                self.assertEqual(device_json, response.json)
+                                                            params=params, endpoint=self.test_endpoint)
+
+                if device.id_device in service_access.get_accessible_devices_ids():
+                    self.assertEqual(200, response.status_code)
+                    self.assertTrue('device_type' in response.json)
+                    self.assertFalse('device_subtype' in response.json)
+                    self.assertFalse('device_assets' in response.json)
+                    device_json = device.to_json()
+                    device_json['device_type'] = TeraDeviceType.get_device_type_by_id(device.id_device_type).\
+                        to_json(minimal=True)
+                    self.assertEqual(device_json, response.json)
+                else:
+                    self.assertEqual(403, response.status_code)
+
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_subtype(self):
         with self._flask_app.app_context():
             # Get all devices from DB
             devices: List[TeraDevice] = TeraDevice.query.all()
+
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            service_access : DBManagerTeraServiceAccess = DBManagerTeraServiceAccess(service)
+
             for device in devices:
                 device_uuid: str = device.device_uuid
                 params = {'device_uuid': device_uuid, 'with_device_subtype': True}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
-                self.assertEqual(200, response.status_code)
-                self.assertFalse('device_type' in response.json)
-                self.assertTrue('device_subtype' in response.json)
-                self.assertFalse('device_assets' in response.json)
 
-                device_json = device.to_json()
+                if device.id_device in service_access.get_accessible_devices_ids():
+                    self.assertEqual(200, response.status_code)
+                    self.assertFalse('device_type' in response.json)
+                    self.assertTrue('device_subtype' in response.json)
+                    self.assertFalse('device_assets' in response.json)
 
-                if device.id_device_subtype is not None:
-                    device_subtype = TeraDeviceSubType.get_device_subtype_by_id(device.id_device_subtype)
-                    device_json['device_subtype'] = device_subtype.to_json(minimal=True)
+                    device_json = device.to_json()
+
+                    if device.id_device_subtype is not None:
+                        device_subtype = TeraDeviceSubType.get_device_subtype_by_id(device.id_device_subtype)
+                        device_json['device_subtype'] = device_subtype.to_json(minimal=True)
+                    else:
+                        device_json['device_subtype'] = None
+                    self.assertEqual(device_json, response.json)
                 else:
-                    device_json['device_subtype'] = None
-                self.assertEqual(device_json, response.json)
+                    self.assertEqual(403, response.status_code)
 
     def test_get_endpoint_with_token_auth_with_device_uuid_and_device_assets(self):
         with self._flask_app.app_context():
             # Get all devices from DB
             devices: List[TeraDevice] = TeraDevice.query.all()
+
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            service_access : DBManagerTeraServiceAccess = DBManagerTeraServiceAccess(service)
+
             for device in devices:
-                device_uuid: str = device.device_uuid
-                params = {'device_uuid': device_uuid, 'with_device_assets': True}
+                params = {'device_uuid': device.device_uuid, 'with_device_assets': True}
                 response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
                                                              params=params, endpoint=self.test_endpoint)
-                self.assertEqual(200, response.status_code)
-                self.assertFalse('device_type' in response.json)
-                self.assertFalse('device_subtype' in response.json)
-                self.assertTrue('device_assets' in response.json)
-                device_json = device.to_json()
-                device_json['device_assets'] = []
 
-                for asset in device.device_assets:
-                    device_json['device_assets'].append(asset.to_json(minimal=True))
+                if device.id_device in service_access.get_accessible_devices_ids():
+                    self.assertEqual(200, response.status_code)
+                    self.assertFalse('device_type' in response.json)
+                    self.assertFalse('device_subtype' in response.json)
+                    self.assertTrue('device_assets' in response.json)
+                    device_json = device.to_json()
+                    device_json['device_assets'] = []
 
-                self.assertEqual(device_json, response.json)
+                    for asset in device.device_assets:
+                        device_json['device_assets'].append(asset.to_json(minimal=True))
+
+                    self.assertEqual(device_json, response.json)
+                else:
+                    self.assertEqual(403, response.status_code)
 
     def test_post_endpoint_without_token_auth(self):
         with self._flask_app.app_context():

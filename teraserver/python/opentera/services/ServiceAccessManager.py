@@ -540,6 +540,12 @@ class ServiceAccessManager:
 
                     g.current_login_type = LoginType.USER_LOGIN
                 elif 'id_participant' in invitation and invitation['id_participant'] is not None:
+
+                    # Get Participant information from server
+                    response = ServiceAccessManager.service.get_from_opentera('/api/service/participants',
+                                                                            params={'id_participant': invitation['id_participant']})
+
+
                     # This is a participant invitation, configure participant client with minimal information
                     token_dict = {'id_participant': invitation['id_participant']}
                     # TODO - What do we do with token ???

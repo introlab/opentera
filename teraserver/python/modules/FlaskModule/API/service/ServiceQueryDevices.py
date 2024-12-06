@@ -1,13 +1,16 @@
 from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
-from modules.LoginModule.LoginModule import LoginModule
+from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
+from modules.DatabaseModule.DBManager import DBManager
+from modules.DatabaseModule.DBManagerTeraServiceAccess import DBManagerTeraServiceAccess
 from opentera.db.models.TeraDevice import TeraDevice
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query')
+get_parser.add_argument('device_uuid', type=str, help='Device uuid of the device to query', default=None)
+get_parser.add_argument('id_device', type=int, help='Device ID to query', default=None)
 get_parser.add_argument('with_device_type', type=inputs.boolean, help='Give more information about type',
                         default=False)
 get_parser.add_argument('with_device_subtype', type=inputs.boolean, help='Give more information about subtype',
@@ -43,11 +46,20 @@ class ServiceQueryDevices(Resource):
         Query device information
         """
         args = get_parser.parse_args()
+        service_access : DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
+
         # args['device_uuid'] Will be None if not specified in args
-        if args['device_uuid']:
-            device: TeraDevice = TeraDevice.get_device_by_uuid(args['device_uuid'])
+        if args['device_uuid'] or args['id_device']:
+
+            if args['device_uuid']:
+                device: TeraDevice = TeraDevice.get_device_by_uuid(args['device_uuid'])
+            else:
+                device: TeraDevice = TeraDevice.get_device_by_id(args['id_device'])
 
             if device:
+                if device.id_device not in service_access.get_accessible_devices_ids():
+                    return gettext('Forbidden'), 403
+
                 device_json = device.to_json()
 
                 if args['with_device_type']:
@@ -114,6 +126,9 @@ class ServiceQueryDevices(Resource):
             # Will generate token, last online
             TeraDevice.insert(device)
         else:
+            if device_info['id_device'] not in DBManager.serviceAccess(current_service).get_accessible_devices_ids():
+                return gettext('Forbidden'), 403
+
             # Update device
             TeraDevice.update(device_info['id_device'], device_info)
             # Update info
