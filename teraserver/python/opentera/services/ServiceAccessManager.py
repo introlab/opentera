@@ -342,7 +342,7 @@ class ServiceAccessManager:
         if allow_static_tokens:  # Check for static device token
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_device_static_token_key, algorithms='HS256')
-            except jwt.PyJWTError as e:
+            except jwt.PyJWTError:
                 # Not a device, or invalid token, will continue...
                 pass
             else:
@@ -382,7 +382,7 @@ class ServiceAccessManager:
             try:
                 token_dict = jwt.decode(token, ServiceAccessManager.api_participant_static_token_key,
                                         algorithms='HS256', options={"verify_jti": False})
-            except jwt.PyJWTError as e:
+            except jwt.PyJWTError:
                 # Not a participant, or invalid token, will continue...
                 pass
             else:
@@ -489,7 +489,7 @@ class ServiceAccessManager:
         return ServiceAccessManager.service_user_roles_all_required(roles)
 
     @staticmethod
-    def service_test_invitation_required(param_name: str):
+    def service_test_invitation_required(invitation_key_param_name: str):
         def wrap(f):
             @wraps(f)
             def decorated(*args, **kwargs):
@@ -501,11 +501,11 @@ class ServiceAccessManager:
 
                 # Get the parameter from the request
                 parser = reqparse.RequestParser()
-                parser.add_argument(param_name, type=str, help='Test Invitation Key', required=True)
+                parser.add_argument(invitation_key_param_name, type=str, help='Test Invitation Key', required=True)
                 args = parser.parse_args(strict=False)
 
                 # Get the test invitation key
-                test_invitation_key = args[param_name]
+                test_invitation_key = args[invitation_key_param_name]
 
                 # Use the service token to get the test invitation
                 response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
@@ -540,22 +540,34 @@ class ServiceAccessManager:
 
                     g.current_login_type = LoginType.USER_LOGIN
                 elif 'id_participant' in invitation and invitation['id_participant'] is not None:
-
                     # Get Participant information from server
                     response = ServiceAccessManager.service.get_from_opentera('/api/service/participants',
                                                                             params={'id_participant': invitation['id_participant']})
-
+                    if response.status_code != 200:
+                        return gettext('Forbidden'), 403
+                    participant = response.json()
 
                     # This is a participant invitation, configure participant client with minimal information
-                    token_dict = {'id_participant': invitation['id_participant']}
+                    token_dict = {'id_participant': participant['id_participant'],
+                                  'participant_uuid': participant['participant_uuid']}
+
                     # TODO - What do we do with token ???
                     g.current_participant_client = TeraParticipantClient(token_dict, None,
                                                                     ServiceAccessManager.service.config_man,
                                                                     ServiceAccessManager.service)
                     g.current_login_type = LoginType.PARTICIPANT_LOGIN
                 elif 'id_device' in invitation and invitation['id_device'] is not None:
-                    # This is a device invitation, configure device client with minimal information
-                    token_dict = {'id_device': invitation['id_device']}
+                    # Get Device information from server
+                    response = ServiceAccessManager.service.get_from_opentera('/api/service/devices',
+                                                                            params={'id_device': invitation['id_device']})
+                    if response.status_code != 200:
+                        return gettext('Forbidden'), 403
+                    device = response.json()
+
+
+                    token_dict = {'id_device': device['id_device'],
+                                  'device_uuid': device['device_uuid']}
+
                     # TODO - What do we do with token ???
                     g.current_device_client = TeraDeviceClient(token_dict, None,
                                                         ServiceAccessManager.service.config_man,

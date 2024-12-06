@@ -55,7 +55,7 @@ class TestQueryWithTestInvitationKey(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
-    @ServiceAccessManager.service_test_invitation_required(param_name="test_invitation_key")
+    @ServiceAccessManager.service_test_invitation_required(invitation_key_param_name="test_invitation_key")
     def get(self):
         return 'OK', 200
 
@@ -240,15 +240,39 @@ class ServiceAccessManagerTests(unittest.TestCase):
             test_type.id_service = self.__service.get_service_id()
             TeraTestType.insert(test_type)
 
-            # Create test invitation
-            test_invitation : TeraTestInvitation = TeraTestInvitation()
-            test_invitation.id_test_type = test_type.id_test_type
-            test_invitation.test_invitation_key = str(uuid.uuid4())
-            test_invitation.id_user = 1 # admin
-            test_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
-            TeraTestInvitation.insert(test_invitation)
+            # Create test invitation with user
+            user_invitation : TeraTestInvitation = TeraTestInvitation()
+            user_invitation.id_test_type = test_type.id_test_type
+            user_invitation.test_invitation_key = str(uuid.uuid4())
+            user_invitation.id_user = 1 # admin
+            user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(user_invitation)
+
+            # Create test invitation with participant
+            participant_invitation : TeraTestInvitation = TeraTestInvitation()
+            participant_invitation.id_test_type = test_type.id_test_type
+            participant_invitation.test_invitation_key = str(uuid.uuid4())
+            participant_invitation.id_participant = 1
+            participant_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(participant_invitation)
+
+            # Create test invitation with device
+            device_invitation : TeraTestInvitation = TeraTestInvitation()
+            device_invitation.id_test_type = test_type.id_test_type
+            device_invitation.test_invitation_key = str(uuid.uuid4())
+            device_invitation.id_device = 1
+            device_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(device_invitation)
 
             # Call API with newly created key
             response = self.__service.test_client.get('/api/test_invitations',
-                                                      query_string={'test_invitation_key': test_invitation.test_invitation_key})
+                                                      query_string={'test_invitation_key': user_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': participant_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                        query_string={'test_invitation_key': device_invitation.test_invitation_key})
             self.assertEqual(200, response.status_code)
