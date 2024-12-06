@@ -518,9 +518,22 @@ class ServiceAccessManager:
                 # Validate if invitation is for user, participant or device
                 invitation = response.json()[0]
                 if 'id_user' in invitation and invitation['id_user'] is not None:
+
+                    # Get User information from server
+                    response = ServiceAccessManager.service.get_from_opentera('/api/service/users',
+                                                                            params={'id_user': invitation['id_user']})
+                    if response.status_code != 200:
+                        return gettext('Forbidden'), 403
+                    user = response.json()
+
                     # This is a user invitation, configure user client with minimal information
-                    token_dict = {'id_user': invitation['id_user']}
                     # TODO - What do we do with token ???
+                    token_dict = {'id_user': user['id_user'],
+                                  'user_uuid': user['user_uuid'],
+                                  'user_fullname': f"{user['user_firstname']} {user['user_lastname']}",
+                                  'user_superadmin': user['user_superadmin'],
+                                  'service_access': {}}
+
                     g.current_user_client = TeraUserClient(token_dict, None,
                                                         ServiceAccessManager.service.config_man,
                                                         ServiceAccessManager.service)
