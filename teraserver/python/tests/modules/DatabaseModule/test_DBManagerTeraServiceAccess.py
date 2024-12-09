@@ -120,8 +120,14 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 if session.id_creator_service == service.id_service:
                     accessible_sessions.add(session.id_session)
 
-                # Secondary ?
                 session_type : TeraSessionType = TeraSessionType.query.get(session.id_session_type)
+
+                # Same service ?
+                if session_type.id_service == service.id_service:
+                    accessible_sessions.add(session.id_session)
+                    continue
+
+                # Secondary services
                 for secondary_service in session_type.session_type_secondary_services:
                     if secondary_service.id_service == service.id_service:
                         accessible_sessions.add(session.id_session)
