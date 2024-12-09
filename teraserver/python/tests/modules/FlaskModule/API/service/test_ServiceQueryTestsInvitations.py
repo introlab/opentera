@@ -100,8 +100,39 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
 
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
+
             TeraTestType.delete(test_type_accessible.id_test_type)
             TeraTestType.delete(test_type_not_accessible.id_test_type)
+
+    def test_get_query_no_params_with_token_returns_all_accessible_invitations_with_uuids(self):
+        """
+        Test that an admin can access all invitations
+        """
+        with self._flask_app.app_context():
+            create_count = 10
+
+            # Create Test type for service
+            test_type_accessible = self._create_test_type_for_service(self.id_service)
+            test_type_not_accessible = self._create_test_type_for_service(1)
+
+            # Create invitations
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_user=1)
+
+            # Service should access only invitations of its test type
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params={'with_uuids': True})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(create_count, len(response.json))
+
+            for json_invitation in response.json:
+                self._validate_json(json_invitation, with_uuids=True)
+
+            TeraTestType.delete(test_type_accessible.id_test_type)
+            TeraTestType.delete(test_type_not_accessible.id_test_type)
+
+
 
     def test_get_query_with_id_test_invitation_or_key_with_service_token(self):
         """
@@ -120,12 +151,16 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                         params={'id_test_invitation': invitation.id_test_invitation})
                 self.assertEqual(200, response.status_code)
                 self.assertEqual(1, len(response.json))
+                for json_invitation in response.json:
+                    self._validate_json(json_invitation)
 
                 # Also test with test_invitation_key
                 response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
                                                         params={'test_invitation_key': invitation.test_invitation_key})
                 self.assertEqual(200, response.status_code)
                 self.assertEqual(1, len(response.json))
+                for json_invitation in response.json:
+                    self._validate_json(json_invitation)
 
             # Also test with invalid id_test_invitation
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -158,6 +193,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'id_user': 1})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test with user_uuid
             user : TeraUser = TeraUser.get_user_by_id(1)
@@ -165,6 +202,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'user_uuid': user.user_uuid})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test invalid id_user
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -190,6 +229,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'id_participant': 1})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test with participant_uuid
             participant : TeraParticipant = TeraParticipant.get_participant_by_id(1)
@@ -223,6 +264,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'id_device': 1})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test with device_uuid
             device : TeraDevice = TeraDevice.get_device_by_id(1)
@@ -230,6 +273,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'device_uuid': device.device_uuid})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test invalid id_device
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -255,17 +300,23 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'id_test_type': test_type_accessible1.id_test_type})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
                                                      params={'id_test_type': test_type_accessible2.id_test_type})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Also test with test_type_uuid
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
                                                         params={'test_type_uuid': test_type_accessible1.test_type_uuid})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
                                                         params={'test_type_uuid': test_type_accessible2.test_type_uuid})
@@ -294,6 +345,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                      params={'id_session': 1})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
             # Test with session_uuid
             session : TeraSession = TeraSession.get_session_by_id(1)
@@ -301,6 +354,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                         params={'session_uuid': session.session_uuid})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
 
             # Service should access all invitations
@@ -315,6 +370,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                         params={'session_uuid': session.session_uuid})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
+            for json_invitation in response.json:
+                self._validate_json(json_invitation)
 
 
             # Also test invalid id_session
@@ -442,6 +499,9 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                       json=self._create_tests_invitations_json(id_test_type=1,
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
+            for json_invitation in response.json:
+                self._validate_json(json_invitation, with_uuids=True)
+
 
     def test_post_query_with_service_token_with_valid_schema_with_invalid_session(self):
         """
@@ -470,6 +530,9 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                                                                 id_user=1,
                                                                                                 id_session=id_session))
                 self.assertEqual(200, response.status_code)
+                for json_invitation in response.json:
+                    self._validate_json(json_invitation, with_uuids=True)
+
 
     def test_post_query_with_service_token_with_valid_schema_update_count(self):
         """
@@ -496,6 +559,9 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(1, len(response.json))
             self.assertEqual(invitation_info['test_invitation_count'], response.json[0]['test_invitation_count'])
+            for json_invitation in response.json:
+                self._validate_json(json_invitation, with_uuids=True)
+
 
 
     def _create_tests_invitations_json(self, id_test_type: int, id_user: int = None,
@@ -569,3 +635,33 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             invitations = TeraTestInvitation.query.all()
             for invitation in invitations:
                 TeraTestInvitation.delete(invitation.id_test_invitation)
+
+    def _validate_json(self, json: dict, with_uuids: bool = False):
+        """
+        Validate a json
+        """
+        self.assertTrue('id_test_invitation' in json)
+        self.assertTrue('id_test_type' in json)
+        self.assertTrue('test_invitation_max_count' in json)
+        self.assertTrue('test_invitation_count' in json)
+        self.assertTrue('test_invitation_expiration_date' in json)
+        self.assertTrue('test_invitation_message' in json)
+        self.assertTrue('test_invitation_creation_date' in json)
+        self.assertTrue('id_user' in json)
+        self.assertTrue('id_participant' in json)
+        self.assertTrue('id_device' in json)
+        self.assertTrue('id_session' in json)
+        self.assertTrue('test_invitation_key' in json)
+
+        if with_uuids:
+            self.assertTrue('user_uuid' in json)
+            self.assertTrue('participant_uuid' in json)
+            self.assertTrue('device_uuid' in json)
+            self.assertTrue('session_uuid' in json)
+            self.assertTrue('test_type_uuid' in json)
+        else:
+            self.assertTrue('user_uuid' not in json)
+            self.assertTrue('participant_uuid' not in json)
+            self.assertTrue('device_uuid' not in json)
+            self.assertTrue('session_uuid' not in json)
+            self.assertTrue('test_type_uuid' not in json)

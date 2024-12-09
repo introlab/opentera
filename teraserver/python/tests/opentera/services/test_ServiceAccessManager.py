@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timedelta
 from flask_restx import Resource, inputs
 
-from opentera.services.ServiceAccessManager import ServiceAccessManager
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_test_invitation
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestInvitation import TeraTestInvitation
@@ -57,6 +57,10 @@ class TestQueryWithTestInvitationKey(Resource):
 
     @ServiceAccessManager.service_test_invitation_required(invitation_key_param_name="test_invitation_key")
     def get(self):
+
+        if current_test_invitation == None:
+            return 'No invitation', 400
+
         return 'OK', 200
 
 

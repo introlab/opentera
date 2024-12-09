@@ -22,6 +22,7 @@ current_device_client = LocalProxy(lambda: g.setdefault('current_device_client',
 current_participant_client = LocalProxy(lambda: g.setdefault('current_participant_client', None))
 current_service_client = LocalProxy(lambda: g.setdefault('current_service_client', None))
 current_login_type = LocalProxy(lambda: g.setdefault('current_login_type', LoginType.UNKNOWN_LOGIN))
+current_test_invitation = LocalProxy(lambda: g.setdefault('current_test_invitation', None))
 
 
 class LoginType(Enum):
@@ -509,7 +510,7 @@ class ServiceAccessManager:
 
                 # Use the service token to get the test invitation
                 response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
-                                                                            params={'test_invitation_key': test_invitation_key})
+                                                                            params={'test_invitation_key': test_invitation_key, 'with_uuids': True})
 
                 # Check if the test invitation is valid
                 if response.status_code != 200 or len(response.json()) != 1:
@@ -517,6 +518,8 @@ class ServiceAccessManager:
 
                 # Validate if invitation is for user, participant or device
                 invitation = response.json()[0]
+                g.current_test_invitation = invitation
+
                 if 'id_user' in invitation and invitation['id_user'] is not None:
 
                     # Get User information from server
