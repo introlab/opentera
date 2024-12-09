@@ -119,18 +119,13 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
                 # Creator
                 if session.id_creator_service == service.id_service:
                     accessible_sessions.add(session.id_session)
-                # Participants
-                # for participant in session.session_participants:
-                #     if participant.id_participant in service_access.get_accessible_participants_ids():
-                #         accessible_sessions.add(session.id_session)
-                # # Users
-                # for user in session.session_users:
-                #     if user.id_user in service_access.get_accessible_users_ids():
-                #         accessible_sessions.add(session.id_session)
-                # # Devices
-                # for device in session.session_devices:
-                #     if device.id_device in service_access.get_accessible_devices_ids():
-                #         accessible_sessions.add(session.id_session)
+
+                # Secondary ?
+                session_type : TeraSessionType = TeraSessionType.query.get(session.id_session_type)
+                for secondary_service in session_type.session_type_secondary_services:
+                    if secondary_service.id_service == service.id_service:
+                        accessible_sessions.add(session.id_session)
+                        break
 
             self.assertEqual(len(sessions_ids), len(accessible_sessions))
             self.assertEqual(sessions_ids, accessible_sessions)
