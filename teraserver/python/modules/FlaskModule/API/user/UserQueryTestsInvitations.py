@@ -69,6 +69,11 @@ get_parser.add_argument('test_type_uuid', type=str,
                         help='UUID of test type from which to request all test invitations',
                         default=None)
 
+# Additional parameters
+get_parser.add_argument('with_uuids', type=bool, help="Include UUIDs in results", default=False)
+
+post_parser = api.parser()
+
 
 post_parser = api.parser()
 
@@ -135,10 +140,10 @@ class UserQueryTestsInvitations(Resource):
         invitations : list[dict] = []
 
         # No arguments means we return all accessible invitations
-        if all(args[arg] is None for arg in args):
+        if all(args[arg] is None or arg == 'with_uuids' for arg in args):
             for invitation in accessible_invitations:
                 invitations.append(invitation.to_json())
-            return invitations
+            return self._insert_uuids_to_invitations(invitations) if args['with_uuids'] else invitations
 
         # Go through all args and get the requested information
         if args['id_test_invitation'] is not None:
@@ -197,7 +202,8 @@ class UserQueryTestsInvitations(Resource):
                     TeraTestInvitation.id_test_type == args['id_test_type'])).all():
                 invitations.append(invitation.to_json())
 
-        return invitations
+        # Default without UUIDs
+        return self._insert_uuids_to_invitations(invitations) if args['with_uuids'] else invitations
 
     @api.doc(description='Update/Create test invitation.',
              responses={501: 'Unable to update test from here - use service!'})
@@ -283,7 +289,7 @@ class UserQueryTestsInvitations(Resource):
         except SchemaError as e:
             return gettext('Invalid JSON schema') + str(e), 400
 
-        return response_data
+        return self._insert_uuids_to_invitations(response_data)
 
     @api.doc(description='Delete a specific test invitation',
              responses={200: 'Success',
@@ -315,3 +321,39 @@ class UserQueryTestsInvitations(Resource):
             return gettext('Database error'), 500
 
         return '', 200
+
+    def _insert_uuids_to_invitations(self, invitations : list[dict]) -> list[dict]:
+        """
+        Add UUIDs to invitations
+        """
+        for invitation in invitations:
+
+            # Prepare UUIDs with None
+            invitation['user_uuid'] = None
+            invitation['participant_uuid'] = None
+            invitation['device_uuid'] = None
+            invitation['session_uuid'] = None
+            invitation['test_type_uuid'] = None
+
+            if 'id_user' in invitation and invitation['id_user'] is not None:
+                user : TeraUser = TeraUser.get_user_by_id(invitation['id_user'])
+                if user:
+                    invitation['user_uuid'] = user.user_uuid
+            if 'id_participant' in invitation and invitation['id_participant'] is not None:
+                participant : TeraParticipant = TeraParticipant.get_participant_by_id(invitation['id_participant'])
+                if participant:
+                    invitation['participant_uuid'] = participant.participant_uuid
+            if 'id_device' in invitation and invitation['id_device'] is not None:
+                device : TeraDevice = TeraDevice.get_device_by_id(invitation['id_device'])
+                if device:
+                    invitation['device_uuid'] = device.device_uuid
+            if 'id_session' in invitation and invitation['id_session'] is not None:
+                session : TeraSession = TeraSession.get_session_by_id(invitation['id_session'])
+                if session:
+                    invitation['session_uuid'] = session.session_uuid
+            if 'id_test_type' in invitation and invitation['id_test_type'] is not None:
+                test_type : TeraTestType = TeraTestType.get_test_type_by_id(invitation['id_test_type'])
+                if test_type:
+                    invitation['test_type_uuid'] = test_type.test_type_uuid
+
+        return invitations
