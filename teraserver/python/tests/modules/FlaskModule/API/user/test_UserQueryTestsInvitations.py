@@ -386,6 +386,43 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json))
 
+
+    def test_get_query_as_admin_with_invalid_id_project_returns_empty_list(self):
+        """
+        Test that a get request with invalid id_project returns 200 with no data
+        """
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 0})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+    def test_get_query_as_admin_with_valid_id_project_returns_invitations(self):
+        """
+        Test that a get request with valid id_project returns 200 with data
+        """
+        with self._flask_app.app_context():
+            create_count = 10
+            # Create 10 invitations for p1
+            self._create_invitations(create_count, id_test_type=1, id_participant=1)
+            # Create 10 invitation for p2
+            self._create_invitations(create_count, id_test_type=1, id_participant=2)
+
+            # Admin should access all invitations
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(2 * create_count, len(response.json))
+            for invitation in response.json:
+                self._validate_json(invitation, with_uuids=False)
+
+
+            # Not access user should not see any invitation
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
     def test_post_query_as_admin_with_invalid_schema(self):
         """
         Test that a post request with invalid schema returns 400

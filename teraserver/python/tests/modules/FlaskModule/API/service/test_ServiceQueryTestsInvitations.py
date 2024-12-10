@@ -381,6 +381,32 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             self.assertEqual(0, len(response.json))
             TeraTestType.delete(test_type_accessible.id_test_type)
 
+    def test_get_query_with_service_token_with_invalid_id_project(self):
+        """
+        Test that a get request with invalid id_project returns empty list
+        """
+        with self._flask_app.app_context():
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
+                                                     params={'id_project': 0})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+    def test_get_query_with_service_token_with_valid_id_project(self):
+        """
+        Test that a get request with invalid id_project returns empty list
+        """
+        with self._flask_app.app_context():
+            create_count = 10
+            test_type_accessible = self._create_test_type_for_service(self.id_service)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=1, id_participant=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=2, id_participant=2)
+
+
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
+                                                     params={'id_project': 1})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(2 * create_count, len(response.json))
+
     def test_post_query_with_service_token_with_invalid_schema(self):
         """
         Test that a post request with invalid schema returns 400

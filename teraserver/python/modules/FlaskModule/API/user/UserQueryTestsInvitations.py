@@ -19,7 +19,7 @@ from opentera.db.models.TeraSession import TeraSession
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
-
+from opentera.db.models.TeraProject import TeraProject
 
 # Parser definition(s)
 # GET
@@ -67,6 +67,11 @@ get_parser.add_argument('id_test_type', type=int,
                         default=None)
 get_parser.add_argument('test_type_uuid', type=str,
                         help='UUID of test type from which to request all test invitations',
+                        default=None)
+
+# By project
+get_parser.add_argument('id_project', type=int,
+                        help='ID of project from which to request all test invitations',
                         default=None)
 
 # Additional parameters
@@ -201,6 +206,15 @@ class UserQueryTestsInvitations(Resource):
                     TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                     TeraTestInvitation.id_test_type == args['id_test_type'])).all():
                 invitations.append(invitation.to_json())
+        if args['id_project'] is not None:
+            project : TeraProject = TeraProject.get_project_by_id(args['id_project'])
+            if project and project.id_project in user_access.get_accessible_projects_ids():
+                for invitation in  TeraTestInvitation.query.join(TeraParticipant,
+                        TeraParticipant.id_participant == TeraTestInvitation.id_participant).filter(
+                    TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
+                    TeraParticipant.id_project == project.id_project).all():
+
+                    invitations.append(invitation.to_json())
 
         # Default without UUIDs
         return self._insert_uuids_to_invitations(invitations) if args['with_uuids'] else invitations
