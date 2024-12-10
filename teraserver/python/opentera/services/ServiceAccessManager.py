@@ -520,6 +520,10 @@ class ServiceAccessManager:
                 invitation = response.json()[0]
                 g.current_test_invitation = invitation
 
+                # Validate maximum count
+                if invitation['test_invitation_count'] >= invitation['test_invitation_max_count']:
+                    return gettext('Forbidden'), 403
+
                 if 'id_user' in invitation and invitation['id_user'] is not None:
 
                     # Get User information from server
