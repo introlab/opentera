@@ -268,6 +268,27 @@ class ServiceAccessManagerTests(unittest.TestCase):
             device_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             TeraTestInvitation.insert(device_invitation)
 
+            # Create test invitation with maximum count reached
+            max_invitation : TeraTestInvitation = TeraTestInvitation()
+            max_invitation.id_test_type = test_type.id_test_type
+            max_invitation.test_invitation_key = str(uuid.uuid4())
+            max_invitation.id_device = 1
+            max_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            max_invitation.test_invitation_max_count = 1
+            TeraTestInvitation.insert(max_invitation)
+            # Update (count originally set to 0)
+            TeraTestInvitation.update(max_invitation.id_test_invitation, {'test_invitation_count': 1})
+
+            # Create test invitation with expired date
+            expired_invitation : TeraTestInvitation = TeraTestInvitation()
+            expired_invitation.id_test_type = test_type.id_test_type
+            expired_invitation.test_invitation_key = str(uuid.uuid4())
+            expired_invitation.id_device = 1
+            expired_invitation.test_invitation_expiration_date = datetime.now() - timedelta(days=1)
+            expired_invitation.test_invitation_max_count = 1
+            TeraTestInvitation.insert(expired_invitation)
+
+
             # Call API with newly created key
             response = self.__service.test_client.get('/api/test_invitations',
                                                       query_string={'test_invitation_key': user_invitation.test_invitation_key})
@@ -280,3 +301,11 @@ class ServiceAccessManagerTests(unittest.TestCase):
             response = self.__service.test_client.get('/api/test_invitations',
                                                         query_string={'test_invitation_key': device_invitation.test_invitation_key})
             self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': max_invitation.test_invitation_key})
+            self.assertEqual(403, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                        query_string={'test_invitation_key': expired_invitation.test_invitation_key})
+            self.assertEqual(403, response.status_code)

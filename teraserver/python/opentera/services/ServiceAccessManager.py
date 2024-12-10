@@ -1,4 +1,5 @@
 from functools import wraps
+from datetime import datetime
 from typing import List
 from enum import Enum
 from flask_babel import gettext
@@ -522,6 +523,10 @@ class ServiceAccessManager:
 
                 # Validate maximum count
                 if invitation['test_invitation_count'] >= invitation['test_invitation_max_count']:
+                    return gettext('Forbidden'), 403
+
+                # Validate expiration date
+                if datetime.fromisoformat(invitation['test_invitation_expiration_date']) < datetime.now():
                     return gettext('Forbidden'), 403
 
                 if 'id_user' in invitation and invitation['id_user'] is not None:
