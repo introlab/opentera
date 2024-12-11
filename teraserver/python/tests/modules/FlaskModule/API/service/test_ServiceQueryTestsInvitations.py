@@ -132,7 +132,31 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             TeraTestType.delete(test_type_accessible.id_test_type)
             TeraTestType.delete(test_type_not_accessible.id_test_type)
 
+    def test_get_query_no_params_with_token_returns_all_accessible_invitations_with_urls(self):
+        """
+        Test that an admin can access all invitations
+        """
+        with self._flask_app.app_context():
+            create_count = 10
 
+            # Create Test type for service
+            test_type_accessible = self._create_test_type_for_service(self.id_service)
+            test_type_not_accessible = self._create_test_type_for_service(1)
+
+            # Create invitations
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_user=1)
+
+            # Service should access only invitations of its test type
+            response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params={'with_urls': True})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(create_count, len(response.json))
+
+            for json_invitation in response.json:
+                self._validate_json(json_invitation, with_urls=True)
+
+            TeraTestType.delete(test_type_accessible.id_test_type)
+            TeraTestType.delete(test_type_not_accessible.id_test_type)
 
     def test_get_query_with_id_test_invitation_or_key_with_service_token(self):
         """
@@ -635,6 +659,13 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
         invitations: list[TeraTestInvitation] = []
 
+
+        # Make sure test type has all required fields
+        test_type: TeraTestType = TeraTestType.get_test_type_by_id(id_test_type)
+        TeraTestType.update(test_type.id_test_type, {'test_type_has_json_format': True,
+                                                     'test_type_has_web_editor': True,
+                                                     'test_type_has_web_format': True})
+
         #  Make sure we have only one of id_user, id_participant, id_device
         if sum(x is not None for x in [id_user, id_participant, id_device]) != 1:
             raise ValueError('Only one of id_user, id_participant, id_device must be set')
@@ -662,7 +693,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             for invitation in invitations:
                 TeraTestInvitation.delete(invitation.id_test_invitation)
 
-    def _validate_json(self, json: dict, with_uuids: bool = False):
+    def _validate_json(self, json: dict, with_uuids: bool = False, with_urls: bool = False):
         """
         Validate a json
         """
@@ -691,3 +722,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             self.assertTrue('device_uuid' not in json)
             self.assertTrue('session_uuid' not in json)
             self.assertTrue('test_type_uuid' not in json)
+
+        if with_urls:
+            self.assertTrue('test_invitation_url' in json)
+        else:
+            self.assertFalse('test_invitation_url' in json)

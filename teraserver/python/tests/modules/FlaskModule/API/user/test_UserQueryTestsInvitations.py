@@ -142,6 +142,27 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(0, len(response.json))
 
+    def test_get_query_no_params_as_admin_with_urls_returns_all_accessible_invitations(self):
+        """
+        Test that an admin can access all invitations
+        """
+        with self._flask_app.app_context():
+            create_count = 10
+            # Create 10 invitations
+            self._create_invitations(create_count, id_test_type=1, id_user=1)
+
+            # Admin should access all invitations
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params={'with_urls': True})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(create_count, len(response.json))
+            for invitation in response.json:
+                self._validate_json(invitation, with_urls=True)
+
+            # Verify that invitations are not accessible to no access user
+            response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4')
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
     def test_get_query_with_id_test_invitation_or_key_as_admin(self):
         """
         Test that an admin can access an invitation with id_test_invitation or test_invitation_key
@@ -646,6 +667,11 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
         """
         Create a number of invitations.
         """
+        # Make sure test type has all required fields
+        test_type: TeraTestType = TeraTestType.get_test_type_by_id(id_test_type)
+        TeraTestType.update(test_type.id_test_type, {'test_type_has_json_format': True,
+                                                     'test_type_has_web_editor': True,
+                                                     'test_type_has_web_format': True})
 
         invitations: list[TeraTestInvitation] = []
 
@@ -676,7 +702,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             for invitation in invitations:
                 TeraTestInvitation.delete(invitation.id_test_invitation)
 
-    def _validate_json(self, json: dict, with_uuids: bool = False):
+    def _validate_json(self, json: dict, with_uuids: bool = False, with_urls: bool = False):
         """
         Validate a json
         """
@@ -705,3 +731,8 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertTrue('device_uuid' not in json)
             self.assertTrue('session_uuid' not in json)
             self.assertTrue('test_type_uuid' not in json)
+
+        if with_urls:
+            self.assertTrue('test_invitation_url' in json)
+        else:
+            self.assertFalse('test_invitation_url' in json)
