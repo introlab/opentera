@@ -504,10 +504,10 @@ class ServiceAccessManager:
                 # Get the parameter from the request
                 parser = reqparse.RequestParser()
                 parser.add_argument(invitation_key_param_name, type=str, help='Test Invitation Key', required=True)
-                args = parser.parse_args(strict=False)
+                request_args = parser.parse_args(strict=False)
 
                 # Get the test invitation key
-                test_invitation_key = args[invitation_key_param_name]
+                test_invitation_key = request_args[invitation_key_param_name]
 
                 # Use the service token to get the test invitation
                 response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
