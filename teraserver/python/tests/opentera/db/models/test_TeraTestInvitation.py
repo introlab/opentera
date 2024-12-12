@@ -150,6 +150,36 @@ class TeraTestInvitationTest(BaseModelsTest):
                 TeraTestInvitation.update(invitation.id_test_invitation,
                                           TeraTestInvitation.clean_values(invitation.to_json()))
 
+    def test_to_json(self):
+        """
+        Test to_json method
+        """
+        with self._flask_app.app_context():
+            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1)
+            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1)
+            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1)
+
+            for invitation in [invitation1, invitation2, invitation3, invitation4]:
+                self._verify_to_json(invitation, minimal=True)
+                self._verify_to_json(invitation, minimal=False)
+
+    def test_from_json(self):
+        """
+        Test from_json method
+        """
+        with self._flask_app.app_context():
+            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1)
+            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1)
+            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1)
+
+            for invitation in [invitation1, invitation2, invitation3, invitation4]:
+                invitation_json = invitation.to_json(minimal=True)
+                new_invitation = TeraTestInvitation()
+                new_invitation.from_json(invitation_json)
+                self.assertEqual(invitation_json, new_invitation.to_json(minimal=True))
+
     @staticmethod
     def new_test_invitation(id_test_type: int,
                        id_session: int = None,
@@ -172,3 +202,60 @@ class TeraTestInvitationTest(BaseModelsTest):
         invitation.test_invitation_message = "Test invitation message"
         TeraTestInvitation.insert(invitation)
         return invitation
+
+    def _verify_to_json(self, invitation : TeraTestInvitation, minimal: bool = False):
+
+        invitation_json = invitation.to_json(minimal=minimal)
+        self.assertTrue('id_test_invitation' in invitation_json)
+        self.assertEqual(invitation_json['id_test_invitation'], invitation.id_test_invitation)
+        self.assertTrue('id_test_type' in invitation_json)
+        self.assertEqual(invitation_json['id_test_type'], invitation.id_test_type)
+        self.assertTrue('id_user' in invitation_json)
+        self.assertEqual(invitation_json['id_user'], invitation.id_user)
+        self.assertTrue('id_participant' in invitation_json)
+        self.assertEqual(invitation_json['id_participant'], invitation.id_participant)
+        self.assertTrue('id_device' in invitation_json)
+        self.assertEqual(invitation_json['id_device'], invitation.id_device)
+        self.assertTrue('id_session' in invitation_json)
+        self.assertEqual(invitation_json['id_session'], invitation.id_session)
+        self.assertTrue('test_invitation_key' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_key'], invitation.test_invitation_key)
+        self.assertTrue('test_invitation_message' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_message'], invitation.test_invitation_message)
+        self.assertTrue('test_invitation_creation_date' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_creation_date'], invitation.test_invitation_creation_date.isoformat())
+        self.assertTrue('test_invitation_expiration_date' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_expiration_date'], invitation.test_invitation_expiration_date.isoformat())
+        self.assertTrue('test_invitation_max_count' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_max_count'], invitation.test_invitation_max_count)
+        self.assertTrue('test_invitation_count' in invitation_json)
+        self.assertEqual(invitation_json['test_invitation_count'], invitation.test_invitation_count)
+
+        if minimal:
+            self.assertEqual(len(invitation_json), 12)
+            self.assertFalse('test_invitation_test_type' in invitation_json)
+            self.assertFalse('test_invitation_session' in invitation_json)
+            self.assertFalse('test_invitation_user' in invitation_json)
+            self.assertFalse('test_invitation_participant' in invitation_json)
+            self.assertFalse('test_invitation_device' in invitation_json)
+        else:
+            count = 13
+            self.assertTrue('test_invitation_test_type' in invitation_json)
+
+            if invitation.id_session:
+                count += 1
+                self.assertTrue('test_invitation_session' in invitation_json)
+
+            if invitation.id_user:
+                count += 1
+                self.assertTrue('test_invitation_user' in invitation_json)
+
+            if invitation.id_participant:
+                count += 1
+                self.assertTrue('test_invitation_participant' in invitation_json)
+
+            if invitation.id_device:
+                count += 1
+                self.assertTrue('test_invitation_device' in invitation_json)
+
+            self.assertEqual(len(invitation_json), count)

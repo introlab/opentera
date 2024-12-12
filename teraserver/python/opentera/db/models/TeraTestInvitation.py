@@ -56,7 +56,60 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
                               'test_invitation_device'])
 
         json_value =  super().to_json(ignore_fields=ignore_fields)
+
+        if not minimal:
+            # Add minimum test type information
+            if self.test_invitation_test_type is not None:
+                json_value['test_invitation_test_type'] = {
+                        'test_type_uuid': self.test_invitation_test_type.test_type_uuid,
+                        'test_type_name': self.test_invitation_test_type.test_type_name,
+                        'test_type_description': self.test_invitation_test_type.test_type_description,
+                        'test_type_key': self.test_invitation_test_type.test_type_key
+                    }
+
+            # Add session information
+            if self.test_invitation_session is not None:
+                json_value['test_invitation_session'] = {
+                        'session_uuid': self.test_invitation_session.session_uuid,
+                        'session_name': self.test_invitation_session.session_name
+                    }
+
+            # Add user information
+            if self.test_invitation_user is not None:
+                json_value['test_invitation_user'] = {
+                        'user_uuid': self.test_invitation_user.user_uuid,
+                        'user_firstname': self.test_invitation_user.user_firstname,
+                        'user_lastname': self.test_invitation_user.user_lastname
+                    }
+
+            # Add participant information
+            if self.test_invitation_participant is not None:
+                json_value['test_invitation_participant'] = {
+                        'participant_uuid': self.test_invitation_participant.participant_uuid,
+                        'participant_name': self.test_invitation_participant.participant_name
+                    }
+
+            # Add device information
+            if self.test_invitation_device is not None:
+                json_value['test_invitation_device'] = {
+                        'device_uuid': self.test_invitation_device.device_uuid,
+                        'device_name': self.test_invitation_device.device_name
+                    }
+
         return json_value
+
+
+    def from_json(self, json, ignore_fields=None):
+        if ignore_fields is None:
+            ignore_fields = []
+
+        ignore_fields.extend(['test_invitation_test_type',
+                              'test_invitation_session'
+                              'test_invitation_user',
+                              'test_invitation_participant',
+                              'test_invitation_device'])
+
+        super().from_json(json, ignore_fields)
 
     @staticmethod
     def create_defaults(test=False):
