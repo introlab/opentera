@@ -511,7 +511,7 @@ class ServiceAccessManager:
 
                 # Use the service token to get the test invitation
                 response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
-                                                                            params={'test_invitation_key': test_invitation_key, 'with_uuids': True})
+                                                                            params={'test_invitation_key': test_invitation_key, 'full': True})
 
                 # Check if the test invitation is valid
                 if response.status_code != 200 or len(response.json()) != 1:

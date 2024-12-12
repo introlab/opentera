@@ -77,7 +77,7 @@ get_parser.add_argument('id_project', type=int,
                         default=None)
 
 # Additional parameters
-get_parser.add_argument('with_uuids', type=bool, help="Include UUIDs in results", default=False)
+get_parser.add_argument('full', type=bool, help="Include full information for session, test_type, user, participant, device", default=False)
 get_parser.add_argument('with_urls', type=bool, help="Include URLs in results", default=False)
 
 post_parser = api.parser()
@@ -154,9 +154,9 @@ class ServiceQueryTestsInvitations(Resource):
 
         # No arguments means we return all accessible invitations
 
-        if all(args[arg] is None or arg in ['with_uuids', 'with_urls'] for arg in args):
+        if all(args[arg] is None or arg in ['full', 'with_urls'] for arg in args):
             for invitation in accessible_invitations:
-                invitations.append(invitation.to_json())
+                invitations.append(invitation.to_json(minimal=not args['full']))
         else:
 
             # Go through all args and get the requested information
@@ -164,12 +164,12 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(
                     TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids)).filter_by(
                     id_test_invitation=args['id_test_invitation']).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['test_invitation_key'] is not None:
                 for invitation in TeraTestInvitation.query.filter(
                     TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids)).filter_by(
                     test_invitation_key=args['test_invitation_key']).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['user_uuid'] is not None:
                 user : TeraUser = TeraUser.get_user_by_uuid(args['user_uuid'])
                 if user:
@@ -178,7 +178,7 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraTestInvitation.id_user == args['id_user'])).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['participant_uuid'] is not None:
                 participant : TeraParticipant = TeraParticipant.get_participant_by_uuid(args['participant_uuid'])
                 if participant:
@@ -187,7 +187,7 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraTestInvitation.id_participant == args['id_participant'])).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['device_uuid'] is not None:
                 device : TeraDevice = TeraDevice.get_device_by_uuid(args['device_uuid'])
                 if device:
@@ -196,7 +196,7 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraTestInvitation.id_device == args['id_device'])).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['session_uuid'] is not None:
                 session : TeraSession = TeraSession.get_session_by_uuid(args['session_uuid'])
                 if session:
@@ -205,7 +205,7 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraTestInvitation.id_session == args['id_session'])).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['test_type_uuid'] is not None:
                 test_type : TeraTestType = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
                 if test_type:
@@ -214,7 +214,7 @@ class ServiceQueryTestsInvitations(Resource):
                 for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraTestInvitation.id_test_type == args['id_test_type'])).all():
-                    invitations.append(invitation.to_json())
+                    invitations.append(invitation.to_json(minimal=not args['full']))
             if args['id_project'] is not None:
                 project : TeraProject = TeraProject.get_project_by_id(args['id_project'])
                 if project and project.id_project in service_access.get_accessible_projects_ids():
@@ -223,10 +223,7 @@ class ServiceQueryTestsInvitations(Resource):
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
                         TeraParticipant.id_project == project.id_project).all():
 
-                        invitations.append(invitation.to_json())
-
-        if args['with_uuids']:
-            invitations = self._insert_uuids_to_invitations(invitations)
+                        invitations.append(invitation.to_json(minimal=not args['full']))
 
         if args['with_urls']:
             invitations = self._insert_urls_to_invitations(invitations)
@@ -291,17 +288,17 @@ class ServiceQueryTestsInvitations(Resource):
                 try:
                     if invitation['id_test_invitation'] == 0:
                         # create new invitation
-                        new_invitation = TeraTestInvitation()
+                        new_invitation : TeraTestInvitation  = TeraTestInvitation()
                         new_invitation.from_json(invitation)
                         TeraTestInvitation.insert(new_invitation)
-                        response_data.append(new_invitation.to_json())
+                        response_data.append(new_invitation.to_json(minimal=False))
                     else:
                         # Update existing invitation (only count)
-                        existing_invitation = TeraTestInvitation.get_test_invitation_by_id(test_invitation_id=invitation['id_test_invitation'])
+                        existing_invitation : TeraTestInvitation = TeraTestInvitation.get_test_invitation_by_id(test_invitation_id=invitation['id_test_invitation'])
                         if existing_invitation:
                             TeraTestInvitation.update(existing_invitation.id_test_invitation,
                                                       {'test_invitation_count': invitation['test_invitation_count']})
-                            response_data.append(existing_invitation.to_json())
+                            response_data.append(existing_invitation.to_json(minimal=False))
 
                 except KeyError:
                     return gettext('Required parameter is missing'), 400
@@ -317,7 +314,7 @@ class ServiceQueryTestsInvitations(Resource):
         except SchemaError as e:
             return gettext('Invalid JSON schema') + str(e), 400
 
-        return self._insert_uuids_to_invitations(response_data)
+        return response_data
 
     @api.doc(description='Delete a specific test invitation',
              responses={200: 'Success',
@@ -350,42 +347,6 @@ class ServiceQueryTestsInvitations(Resource):
             return gettext('Database error'), 500
 
         return '', 200
-
-    def _insert_uuids_to_invitations(self, invitations : list[dict]) -> list[dict]:
-        """
-        Add UUIDs to invitations
-        """
-        for invitation in invitations:
-
-            # Prepare UUIDs with None
-            invitation['user_uuid'] = None
-            invitation['participant_uuid'] = None
-            invitation['device_uuid'] = None
-            invitation['session_uuid'] = None
-            invitation['test_type_uuid'] = None
-
-            if 'id_user' in invitation and invitation['id_user'] is not None:
-                user : TeraUser = TeraUser.get_user_by_id(invitation['id_user'])
-                if user:
-                    invitation['user_uuid'] = user.user_uuid
-            if 'id_participant' in invitation and invitation['id_participant'] is not None:
-                participant : TeraParticipant = TeraParticipant.get_participant_by_id(invitation['id_participant'])
-                if participant:
-                    invitation['participant_uuid'] = participant.participant_uuid
-            if 'id_device' in invitation and invitation['id_device'] is not None:
-                device : TeraDevice = TeraDevice.get_device_by_id(invitation['id_device'])
-                if device:
-                    invitation['device_uuid'] = device.device_uuid
-            if 'id_session' in invitation and invitation['id_session'] is not None:
-                session : TeraSession = TeraSession.get_session_by_id(invitation['id_session'])
-                if session:
-                    invitation['session_uuid'] = session.session_uuid
-            if 'id_test_type' in invitation and invitation['id_test_type'] is not None:
-                test_type : TeraTestType = TeraTestType.get_test_type_by_id(invitation['id_test_type'])
-                if test_type:
-                    invitation['test_type_uuid'] = test_type.test_type_uuid
-
-        return invitations
 
     def _insert_urls_to_invitations(self, invitations : list[dict]) -> list[dict]:
         """

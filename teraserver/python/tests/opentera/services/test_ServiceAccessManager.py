@@ -234,7 +234,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             response = self.__service.test_client.get('/api/test_invitations')
             self.assertEqual(400, response.status_code)
 
-    def test_endpoint_invitation_key_with_key_for_user(self):
+    def test_endpoint_invitation_key_with_key_for_user_participant_device(self):
         with self.__service.app_context():
             # Create test type for this service
             test_type : TeraTestType = TeraTestType()

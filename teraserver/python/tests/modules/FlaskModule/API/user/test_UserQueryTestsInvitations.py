@@ -114,14 +114,14 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4')
             self.assertEqual(200, response.status_code)
             self.assertEqual(0, len(response.json))
 
-    def test_get_query_no_params_as_admin_with_uuids_returns_all_accessible_invitations(self):
+    def test_get_query_no_params_as_admin_with_full_returns_all_accessible_invitations(self):
         """
         Test that an admin can access all invitations
         """
@@ -131,11 +131,11 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self._create_invitations(create_count, id_test_type=1, id_user=1)
 
             # Admin should access all invitations
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params={'with_uuids': True})
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params={'full': True})
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=True)
+                self._validate_json(invitation, full=True)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4')
@@ -179,7 +179,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual(1, len(response.json))
                 for invitation_response in response.json:
-                    self._validate_json(invitation_response, with_uuids=False)
+                    self._validate_json(invitation_response)
 
                 # Also test with test_invitation_key
                 response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
@@ -187,7 +187,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
                 self.assertEqual(200, response.status_code)
                 self.assertEqual(1, len(response.json))
                 for invitation_response in response.json:
-                    self._validate_json(invitation_response, with_uuids=False)
+                    self._validate_json(invitation_response)
 
 
                 # Verify that invitations are not accessible to no access user
@@ -224,7 +224,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Also test with user_uuid
             user = TeraUser.get_user_by_id(1)
@@ -233,7 +233,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
@@ -263,7 +263,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Also test with participant_uuid
             participant = TeraParticipant.get_participant_by_id(1)
@@ -272,7 +272,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
@@ -302,7 +302,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Also test with device_uuid
             device = TeraDevice.get_device_by_id(1)
@@ -311,7 +311,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
@@ -341,7 +341,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Also test with test_type_uuid
             test_type = TeraTestType.get_test_type_by_id(1)
@@ -350,8 +350,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
-
+                self._validate_json(invitation)
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
                                                      params={'id_test_type': 1})
@@ -384,7 +383,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Test with session_uuid
             session = TeraSession.get_session_by_id(1)
@@ -393,7 +392,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
             # Verify that invitations are not accessible to no access user
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
@@ -435,7 +434,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(2 * create_count, len(response.json))
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=False)
+                self._validate_json(invitation)
 
 
             # Not access user should not see any invitation
@@ -576,7 +575,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=True)
+                self._validate_json(invitation, full=True)
 
 
     def test_post_query_as_admin_with_valid_schema_with_invalid_session(self):
@@ -605,7 +604,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
                                                                                               id_session=1))
             self.assertEqual(200, response.status_code)
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=True)
+                self._validate_json(invitation, full=True)
 
     def test_post_query_as_admin_with_valid_schema_update_count(self):
         """
@@ -635,7 +634,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(1, len(response.json))
             self.assertEqual(invitation_info['test_invitation_count'], response.json[0]['test_invitation_count'])
             for invitation in response.json:
-                self._validate_json(invitation, with_uuids=True)
+                self._validate_json(invitation, full=True)
 
 
     def _create_tests_invitations_json(self, id_test_type: int, id_user: int = None,
@@ -702,7 +701,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             for invitation in invitations:
                 TeraTestInvitation.delete(invitation.id_test_invitation)
 
-    def _validate_json(self, json: dict, with_uuids: bool = False, with_urls: bool = False):
+    def _validate_json(self, json: dict, full: bool = False, with_urls: bool = False):
         """
         Validate a json
         """
@@ -719,18 +718,22 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
         self.assertTrue('id_session' in json)
         self.assertTrue('test_invitation_key' in json)
 
-        if with_uuids:
-            self.assertTrue('user_uuid' in json)
-            self.assertTrue('participant_uuid' in json)
-            self.assertTrue('device_uuid' in json)
-            self.assertTrue('session_uuid' in json)
-            self.assertTrue('test_type_uuid' in json)
+        if full:
+            self.assertTrue('test_invitation_test_type' in json)
+            if json['id_user']:
+                self.assertTrue('test_invitation_user' in json)
+            if json['id_participant']:
+                self.assertTrue('test_invitation_participant' in json)
+            if json['id_device']:
+                self.assertTrue('test_invitation_device' in json)
+            if json['id_session']:
+                self.assertTrue('test_invitation_session' in json)
         else:
-            self.assertTrue('user_uuid' not in json)
-            self.assertTrue('participant_uuid' not in json)
-            self.assertTrue('device_uuid' not in json)
-            self.assertTrue('session_uuid' not in json)
-            self.assertTrue('test_type_uuid' not in json)
+            self.assertTrue('test_invitation_test_type' not in json)
+            self.assertTrue('test_invitation_session' not in json)
+            self.assertTrue('test_invitation_user' not in json)
+            self.assertTrue('test_invitation_participant' not in json)
+            self.assertTrue('test_invitation_device' not in json)
 
         if with_urls:
             self.assertTrue('test_invitation_url' in json)
