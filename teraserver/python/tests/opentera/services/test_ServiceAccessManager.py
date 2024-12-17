@@ -309,3 +309,32 @@ class ServiceAccessManagerTests(unittest.TestCase):
             response = self.__service.test_client.get('/api/test_invitations',
                                                         query_string={'test_invitation_key': expired_invitation.test_invitation_key})
             self.assertEqual(403, response.status_code)
+
+    def test_endpoint_invitation_key_with_key_for_user_participant_device_with_max_count_zero(self):
+        with self.__service.app_context():
+            # Create test type for this service
+            test_type : TeraTestType = TeraTestType()
+            test_type.test_type_name = 'TestType'
+            test_type.test_type_description = 'TestType description'
+            test_type.test_type_key = str(uuid.uuid4())
+            test_type.id_service = self.__service.get_service_id()
+            TeraTestType.insert(test_type)
+
+            # Create test invitation with user
+            user_invitation : TeraTestInvitation = TeraTestInvitation()
+            user_invitation.id_test_type = test_type.id_test_type
+            user_invitation.test_invitation_key = str(uuid.uuid4())
+            user_invitation.id_user = 1 # admin
+            user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            user_invitation.test_invitation_max_count = 0
+            TeraTestInvitation.insert(user_invitation)
+
+
+            # Update (count originally set to 0)
+            TeraTestInvitation.update(user_invitation.id_test_invitation, {'test_invitation_count': 1000})
+
+
+            # Call API with newly created key
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': user_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
