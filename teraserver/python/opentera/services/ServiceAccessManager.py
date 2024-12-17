@@ -1,5 +1,5 @@
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from enum import Enum
 from flask_babel import gettext
@@ -526,7 +526,9 @@ class ServiceAccessManager:
                     return gettext('Forbidden'), 403
 
                 # Validate expiration date
-                if datetime.fromisoformat(invitation['test_invitation_expiration_date']) < datetime.now():
+                expiration_date = datetime.fromisoformat(current_test_invitation['test_invitation_expiration_date']).astimezone(timezone.utc)
+                current_date = datetime.now(timezone.utc)
+                if current_date > expiration_date:
                     return gettext('Forbidden'), 403
 
                 if 'id_user' in invitation and invitation['id_user'] is not None:
@@ -539,7 +541,7 @@ class ServiceAccessManager:
                     user = response.json()
 
                     # This is a user invitation, configure user client with minimal information
-                    # TODO - What do we do with token ???
+                    # WARNING - Token will not be available
                     token_dict = {'id_user': user['id_user'],
                                   'user_uuid': user['user_uuid'],
                                   'user_fullname': f"{user['user_firstname']} {user['user_lastname']}",
@@ -563,7 +565,7 @@ class ServiceAccessManager:
                     token_dict = {'id_participant': participant['id_participant'],
                                   'participant_uuid': participant['participant_uuid']}
 
-                    # TODO - What do we do with token ???
+                    # WARNING - Token will not be available
                     g.current_participant_client = TeraParticipantClient(token_dict, None,
                                                                     ServiceAccessManager.service.config_man,
                                                                     ServiceAccessManager.service)
@@ -580,7 +582,7 @@ class ServiceAccessManager:
                     token_dict = {'id_device': device['id_device'],
                                   'device_uuid': device['device_uuid']}
 
-                    # TODO - What do we do with token ???
+                    # WARNING - Token will not be available
                     g.current_device_client = TeraDeviceClient(token_dict, None,
                                                         ServiceAccessManager.service.config_man,
                                                         ServiceAccessManager.service)
