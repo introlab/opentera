@@ -546,11 +546,11 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             for json_invitation in response.json:
-                self._validate_json(json_invitation, full=True)
+                self._validate_json(json_invitation, full=True, with_urls=True)
 
 
     def test_post_query_with_service_token_with_valid_schema_with_invalid_session(self):
@@ -576,12 +576,12 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             for id_session in service_access.get_accessible_sessions_ids():
                 response = self._post_with_service_token_auth(self.test_client,
                                                         token=self.service_token,
-                                                        json=self._create_tests_invitations_json(id_test_type=1,
+                                                        json=self._create_tests_invitations_json(id_test_type=2,
                                                                                                 id_user=1,
                                                                                                 id_session=id_session))
                 self.assertEqual(200, response.status_code)
                 for json_invitation in response.json:
-                    self._validate_json(json_invitation, full=True)
+                    self._validate_json(json_invitation, full=True, with_urls=True)
 
 
     def test_post_query_with_service_token_with_valid_schema_update_count(self):
@@ -592,7 +592,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             # Post a new invitation
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             invitation_info = response.json[0]
@@ -610,7 +610,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             self.assertEqual(1, len(response.json))
             self.assertEqual(invitation_info['test_invitation_count'], response.json[0]['test_invitation_count'])
             for json_invitation in response.json:
-                self._validate_json(json_invitation, full=True)
+                self._validate_json(json_invitation, full=True, with_urls=True)
 
 
 

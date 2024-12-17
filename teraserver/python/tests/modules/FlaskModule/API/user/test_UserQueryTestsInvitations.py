@@ -149,7 +149,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
         with self._flask_app.app_context():
             create_count = 10
             # Create 10 invitations
-            self._create_invitations(create_count, id_test_type=1, id_user=1)
+            self._create_invitations(create_count, id_test_type=2, id_user=1)
 
             # Admin should access all invitations
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', params={'with_urls': True})
@@ -506,7 +506,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1))
+                                                      json=self._create_tests_invitations_json(id_test_type=2))
             self.assertEqual(400, response.status_code)
 
     def test_post_query_as_admin_with_valid_schema_but_invalid_id_user_id_participant_(self):
@@ -517,20 +517,20 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1, id_user=0))
+                                                      json=self._create_tests_invitations_json(id_test_type=2, id_user=0))
             self.assertEqual(403, response.status_code)
 
             response = self._post_with_user_http_auth(self.test_client,
                                             username='admin',
                                             password='admin',
-                                            json=self._create_tests_invitations_json(id_test_type=1, id_participant=0))
+                                            json=self._create_tests_invitations_json(id_test_type=2, id_participant=0))
             self.assertEqual(403, response.status_code)
 
 
             response = self._post_with_user_http_auth(self.test_client,
                                             username='admin',
                                             password='admin',
-                                            json=self._create_tests_invitations_json(id_test_type=1, id_device=0))
+                                            json=self._create_tests_invitations_json(id_test_type=2, id_device=0))
             self.assertEqual(403, response.status_code)
 
     def test_post_query_as_admin_with_valid_schema_with_multiple_user_participant_device(self):
@@ -541,7 +541,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1,
                                                                                               id_participant=1))
             self.assertEqual(400, response.status_code)
@@ -549,7 +549,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1,
                                                                                               id_device=1))
             self.assertEqual(400, response.status_code)
@@ -557,7 +557,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1,
                                                                                               id_participant=1,
                                                                                               id_device=1))
@@ -571,11 +571,11 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             for invitation in response.json:
-                self._validate_json(invitation, full=True)
+                self._validate_json(invitation, full=True, with_urls=True)
 
 
     def test_post_query_as_admin_with_valid_schema_with_invalid_session(self):
@@ -586,7 +586,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1,
                                                                                               id_session=0))
             self.assertEqual(403, response.status_code)
@@ -599,12 +599,12 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1,
                                                                                               id_session=1))
             self.assertEqual(200, response.status_code)
             for invitation in response.json:
-                self._validate_json(invitation, full=True)
+                self._validate_json(invitation, full=True, with_urls=True)
 
     def test_post_query_as_admin_with_valid_schema_update_count(self):
         """
@@ -615,7 +615,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             response = self._post_with_user_http_auth(self.test_client,
                                                       username='admin',
                                                       password='admin',
-                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             invitation_info = response.json[0]
@@ -634,7 +634,7 @@ class UserQueryTestsInvitationsTest(BaseUserAPITest):
             self.assertEqual(1, len(response.json))
             self.assertEqual(invitation_info['test_invitation_count'], response.json[0]['test_invitation_count'])
             for invitation in response.json:
-                self._validate_json(invitation, full=True)
+                self._validate_json(invitation, full=True, with_urls=True)
 
 
     def _create_tests_invitations_json(self, id_test_type: int, id_user: int = None,

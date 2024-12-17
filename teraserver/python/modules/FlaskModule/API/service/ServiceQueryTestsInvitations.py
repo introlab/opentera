@@ -278,7 +278,7 @@ class ServiceQueryTestsInvitations(Resource):
                         return gettext('Forbidden'), 403
 
                     # Only allow update of count
-                    if 'test_invitation_count' in invitation:
+                    if 'test_invitation_count' in invitation or 'test_invitation_max_count' in invitation or 'test_invitation_expiration_date' in invitation:
                         continue
                     else:
                         return gettext('You can only update test_invitation_count'), 400
@@ -296,8 +296,16 @@ class ServiceQueryTestsInvitations(Resource):
                         # Update existing invitation (only count)
                         existing_invitation : TeraTestInvitation = TeraTestInvitation.get_test_invitation_by_id(test_invitation_id=invitation['id_test_invitation'])
                         if existing_invitation:
-                            TeraTestInvitation.update(existing_invitation.id_test_invitation,
-                                                      {'test_invitation_count': invitation['test_invitation_count']})
+                            update_values = {}
+                            if 'test_invitation_count' in invitation:
+                                update_values['test_invitation_count'] = invitation['test_invitation_count']
+                            if 'test_invitation_max_count' in invitation:
+                                update_values['test_invitation_max_count'] = invitation['test_invitation_max_count']
+                            if 'test_invitation_expiration_date' in invitation:
+                                update_values['test_invitation_expiration_date'] = invitation['test_invitation_expiration_date']
+
+                            TeraTestInvitation.update(existing_invitation.id_test_invitation, update_values)
+
                             response_data.append(existing_invitation.to_json(minimal=False))
 
                 except KeyError:
@@ -314,7 +322,7 @@ class ServiceQueryTestsInvitations(Resource):
         except SchemaError as e:
             return gettext('Invalid JSON schema') + str(e), 400
 
-        return response_data
+        return self._insert_urls_to_invitations(response_data), 200
 
     @api.doc(description='Delete a specific test invitation',
              responses={200: 'Success',
