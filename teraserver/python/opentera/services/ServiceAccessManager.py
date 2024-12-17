@@ -521,8 +521,9 @@ class ServiceAccessManager:
                 invitation = response.json()[0]
                 g.current_test_invitation = invitation
 
-                # Validate maximum count
-                if invitation['test_invitation_count'] >= invitation['test_invitation_max_count']:
+                # Validate maximum count if not zero
+                if invitation['test_invitation_max_count'] > 0 and \
+                    invitation['test_invitation_count'] >= invitation['test_invitation_max_count']:
                     return gettext('Forbidden'), 403
 
                 # Validate expiration date
