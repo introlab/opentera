@@ -155,7 +155,7 @@ class UserQueryForms(Resource):
                     rpc = RedisRPCClient(self.module.config.redis_config, timeout=5)
                     answer = rpc.call_service(session_type.session_type_service.service_key, 'session_type_config',
                                               json.dumps({'id_session_type': session_type.id_session_type}))
-                    if answer:
+                    if answer is not None:
                         return answer
                     else:
                         return gettext('No reply from service while querying session type config'), 408
