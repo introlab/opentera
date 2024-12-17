@@ -132,10 +132,10 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             urls['test_type_json_url'] = base_url + '/api/testtypes/form'
 
         if self.test_type_has_web_format:
-            urls['test_type_web_url'] = base_url + '/api/testtypes/web'
+            urls['test_type_web_url'] = base_url + '/viewer'
 
         if self.test_type_has_web_editor:
-            urls['test_type_web_editor_url'] = base_url + '/api/testtypes/web/edit'
+            urls['test_type_web_editor_url'] = base_url + '/editor'
 
         return urls
 

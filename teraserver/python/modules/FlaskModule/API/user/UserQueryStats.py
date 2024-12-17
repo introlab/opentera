@@ -378,6 +378,7 @@ class UserQueryUserStats(Resource):
             last_online_date = last_online.isoformat()
 
         stats = {'id_participant': participant.id_participant,
+                 'participant_uuid': participant.participant_uuid,
                  'participant_name': participant.participant_name,
                  'participant_enabled': participant.participant_enabled,
                  'participant_sessions_count':

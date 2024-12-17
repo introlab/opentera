@@ -362,7 +362,7 @@ class UserQueryTestsInvitations(Resource):
             if test_type and urls['test_type_web_url'] is not None:
                 service : TeraService = TeraService.get_service_by_id(test_type.id_service)
                 if service:
-                    invitation['test_invitation_url'] = f"{urls['test_type_web_url']}&invitation_key={invitation['test_invitation_key']}"
+                    invitation['test_invitation_url'] = f"{urls['test_type_web_url']}?invitation_key={invitation['test_invitation_key']}"
                 else:
                     invitation['test_invitation_url'] = None
 
