@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-20 09:49-0500\n"
-"PO-Revision-Date: 2024-11-20 09:29-0500\n"
+"POT-Creation-Date: 2024-12-18 10:39-0500\n"
+"PO-Revision-Date: 2024-12-18 10:39-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr "Seuls les utilisateurs peuvent accéder à cet API."
 #: API/QueryEmailTemplate.py:137 API/QueryEmailTemplate.py:153
 #: API/QueryEmailTemplate.py:185 API/QueryEmailTemplate.py:188
 #: API/QuerySendEmail.py:107 API/QuerySendEmail.py:114
-#: API/QuerySendEmail.py:120 API/QuerySendEmail.py:125
+#: API/QuerySendEmail.py:119 API/QuerySendEmail.py:124
 msgid "Forbidden"
 msgstr "Refusé"
 
@@ -47,7 +47,7 @@ msgstr "Gabarit manquant"
 
 #: API/QueryEmailTemplate.py:124
 msgid "Missing id_email_template"
-msgstr "id_email_template manquant"
+msgstr "ID du gabarit de courriel manquant"
 
 #: API/QueryEmailTemplate.py:128
 msgid "Can't specify both site and project for template"
@@ -74,26 +74,29 @@ msgid "At least one participant is not accessible"
 msgstr "Au moins un participant n'est pas accessible"
 
 #: API/QuerySendEmail.py:98
-msgid "Missing user and/or participant_uuid"
-msgstr "Identifiant unique de l'utilisateur et/ou du participant manquant"
+msgid "Missing email address"
+msgstr "Adresse courriel manquante"
 
 #: API/QuerySendEmail.py:101
 msgid "Can't specify both a template and an email body"
 msgstr "Impossible de spécifier à la fois un gabarit et un texte de courriel"
 
-#: API/QuerySendEmail.py:132
+#: API/QuerySendEmail.py:131
 msgid "Missing template ID or body text"
 msgstr "Identifiant du gabarit ou contenu du courriel manquant"
 
-#: API/QuerySendEmail.py:134
+#: API/QuerySendEmail.py:133
 msgid "(No subject)"
 msgstr "(Aucun sujet)"
 
-#: API/QuerySendEmail.py:152
+#: API/QuerySendEmail.py:151
 msgid "User doesn't have any email address set"
 msgstr "L'utilisateur n'a pas d'adresse courriel"
 
-#: API/QuerySendEmail.py:159
+#: API/QuerySendEmail.py:158
 msgid "Can't connect to SMTP server"
 msgstr "Impossible de se connecter au serveur SMTP"
+
+#~ msgid "Missing user and/or participant_uuid"
+#~ msgstr "Identifiant unique de l'utilisateur et/ou du participant manquant"
 

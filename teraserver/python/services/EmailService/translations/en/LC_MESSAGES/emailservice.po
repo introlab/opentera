@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-20 09:49-0500\n"
+"POT-Creation-Date: 2024-12-18 10:39-0500\n"
 "PO-Revision-Date: 2024-11-20 09:19-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -29,7 +29,7 @@ msgstr ""
 #: API/QueryEmailTemplate.py:137 API/QueryEmailTemplate.py:153
 #: API/QueryEmailTemplate.py:185 API/QueryEmailTemplate.py:188
 #: API/QuerySendEmail.py:107 API/QuerySendEmail.py:114
-#: API/QuerySendEmail.py:120 API/QuerySendEmail.py:125
+#: API/QuerySendEmail.py:119 API/QuerySendEmail.py:124
 msgid "Forbidden"
 msgstr ""
 
@@ -74,26 +74,29 @@ msgid "At least one participant is not accessible"
 msgstr ""
 
 #: API/QuerySendEmail.py:98
-msgid "Missing user and/or participant_uuid"
+msgid "Missing email address"
 msgstr ""
 
 #: API/QuerySendEmail.py:101
 msgid "Can't specify both a template and an email body"
 msgstr ""
 
-#: API/QuerySendEmail.py:132
+#: API/QuerySendEmail.py:131
 msgid "Missing template ID or body text"
 msgstr ""
 
-#: API/QuerySendEmail.py:134
+#: API/QuerySendEmail.py:133
 msgid "(No subject)"
 msgstr ""
 
-#: API/QuerySendEmail.py:152
+#: API/QuerySendEmail.py:151
 msgid "User doesn't have any email address set"
 msgstr ""
 
-#: API/QuerySendEmail.py:159
+#: API/QuerySendEmail.py:158
 msgid "Can't connect to SMTP server"
 msgstr ""
+
+#~ msgid "Missing user and/or participant_uuid"
+#~ msgstr ""
 

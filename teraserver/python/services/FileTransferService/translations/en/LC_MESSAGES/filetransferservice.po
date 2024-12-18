@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-20 09:49-0500\n"
+"POT-Creation-Date: 2024-12-18 10:39-0500\n"
 "PO-Revision-Date: 2021-01-19 16:16-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -90,7 +90,7 @@ msgstr ""
 msgid "Missing archive status"
 msgstr ""
 
-#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:242
+#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:243
 msgid "Access denied to asset"
 msgstr ""
 
@@ -111,20 +111,20 @@ msgstr ""
 msgid "Missing required field(s) in asset descriptor"
 msgstr ""
 
-#: API/QueryAssetFile.py:99 API/QueryAssetFile.py:119 API/QueryAssetFile.py:126
-#: API/QueryAssetFile.py:133
+#: API/QueryAssetFile.py:100 API/QueryAssetFile.py:120
+#: API/QueryAssetFile.py:127 API/QueryAssetFile.py:134
 msgid "Session access is forbidden"
 msgstr ""
 
-#: API/QueryAssetFile.py:140
+#: API/QueryAssetFile.py:141
 msgid "Missing at least one ID creator"
 msgstr ""
 
-#: API/QueryAssetFile.py:176
+#: API/QueryAssetFile.py:177
 msgid "Unable to create asset"
 msgstr ""
 
-#: API/QueryAssetFile.py:247
+#: API/QueryAssetFile.py:248
 msgid "Unable to delete asset"
 msgstr ""
 

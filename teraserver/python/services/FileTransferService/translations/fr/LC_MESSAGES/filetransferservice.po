@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-11-20 09:49-0500\n"
+"POT-Creation-Date: 2024-12-18 10:39-0500\n"
 "PO-Revision-Date: 2024-11-20 09:49-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
@@ -90,7 +90,7 @@ msgstr "Erreur lors de l'analyse des informations de l'archive"
 msgid "Missing archive status"
 msgstr "État de l'archive manquant"
 
-#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:242
+#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:243
 msgid "Access denied to asset"
 msgstr "Accès refusé à la ressource"
 
@@ -111,20 +111,20 @@ msgstr "Format de file_asset invalide"
 msgid "Missing required field(s) in asset descriptor"
 msgstr "Champ(s) obligatoire(s) manquant(s) dans la description de la ressource"
 
-#: API/QueryAssetFile.py:99 API/QueryAssetFile.py:119 API/QueryAssetFile.py:126
-#: API/QueryAssetFile.py:133
+#: API/QueryAssetFile.py:100 API/QueryAssetFile.py:120
+#: API/QueryAssetFile.py:127 API/QueryAssetFile.py:134
 msgid "Session access is forbidden"
 msgstr "L'accès à la séance est interdit"
 
-#: API/QueryAssetFile.py:140
+#: API/QueryAssetFile.py:141
 msgid "Missing at least one ID creator"
 msgstr "Au moins un ID de créateur est manquant"
 
-#: API/QueryAssetFile.py:176
+#: API/QueryAssetFile.py:177
 msgid "Unable to create asset"
 msgstr "Impossible de créer la ressource"
 
-#: API/QueryAssetFile.py:247
+#: API/QueryAssetFile.py:248
 msgid "Unable to delete asset"
 msgstr "Impossible de supprimer la ressource"
 

@@ -95,7 +95,7 @@ class QuerySendEmail(EmailResource):
                     participant_emails.append(participant_json['participant_email'])
 
         if not user_emails and not participant_emails:
-            return gettext('Missing user and/or participant_uuid'), 400
+            return gettext('Missing email address'), 400
 
         if 'id_template' in json_email and 'body' in json_email:
             return gettext('Can\'t specify both a template and an email body'), 400
@@ -112,7 +112,6 @@ class QuerySendEmail(EmailResource):
 
                 if not has_access:
                     return gettext('Forbidden'), 403
-
 
             if template.id_project:
                 has_access = self._verify_site_access(template.id_project)
