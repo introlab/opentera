@@ -26,6 +26,7 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
     id_participant = Column(Integer, ForeignKey("t_participants.id_participant", ondelete='cascade'),
                                            nullable=True)
     id_device = Column(Integer, ForeignKey("t_devices.id_device", ondelete='cascade'), nullable=True)
+    id_project = Column(Integer, ForeignKey("t_projects.id_project", ondelete='cascade'), nullable=False)
 
     test_invitation_key = Column(String(16), nullable=False, unique=True,
                                  default=lambda : TeraTestInvitation.generate_test_invitation_unique_key())
@@ -44,6 +45,7 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
     test_invitation_user = relationship("TeraUser")
     test_invitation_participant = relationship("TeraParticipant")
     test_invitation_device = relationship("TeraDevice")
+    test_invitation_project = relationship("TeraProject")
 
     def to_json(self, ignore_fields=None, minimal=False):
         if ignore_fields is None:
@@ -95,6 +97,11 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
                         'device_uuid': self.test_invitation_device.device_uuid,
                         'device_name': self.test_invitation_device.device_name
                     }
+
+            # Add project information
+            json_value['test_invitation_project'] = {
+                    'project_name': self.test_invitation_project.project_name
+                }
 
         return json_value
 

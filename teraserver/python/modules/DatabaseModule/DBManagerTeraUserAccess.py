@@ -1371,9 +1371,11 @@ class DBManagerTeraUserAccess:
         accessible_participant_ids = self.get_accessible_participants_ids()
         accessible_device_ids = self.get_accessible_devices_ids()
         accessible_session_ids = self.get_accessible_sessions_ids()
+        accessible_project_ids = self.get_accessible_projects_ids()
 
         test_invitations = TeraTestInvitation.query.filter(
-            TeraTestInvitation.id_test_type.in_(accessible_test_type_ids)
+            TeraTestInvitation.id_test_type.in_(accessible_test_type_ids),
+            TeraTestInvitation.id_project.in_(accessible_project_ids)
         ).filter(
             or_(
                 and_(TeraTestInvitation.id_user.isnot(None),

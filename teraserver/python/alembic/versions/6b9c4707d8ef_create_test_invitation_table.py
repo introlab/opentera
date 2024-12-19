@@ -34,6 +34,8 @@ def upgrade():
                                                                          ondelete='cascade'), nullable=True),
                     sa.Column('id_device', sa.Integer, sa.ForeignKey("t_devices.id_device",
                                                                      ondelete='cascade'), nullable=True),
+                    sa.Column('id_project', sa.Integer, sa.ForeignKey("t_projects.id_project",
+                                                                      ondelete='cascade'), nullable=False),
                     sa.Column('test_invitation_key', sa.String(16), nullable=False, unique=True),
                     sa.Column('test_invitation_max_count', sa.Integer, nullable=False, default=1),
                     sa.Column('test_invitation_count', sa.Integer, nullable=False, default=0),

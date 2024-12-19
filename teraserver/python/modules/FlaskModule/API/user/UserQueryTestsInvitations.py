@@ -219,14 +219,18 @@ class UserQueryTestsInvitations(Resource):
                         TeraTestInvitation.id_test_type == args['id_test_type'])).all():
                     invitations.append(invitation.to_json(minimal=not args['full']))
             if args['id_project'] is not None:
-                project : TeraProject = TeraProject.get_project_by_id(args['id_project'])
-                if project and project.id_project in user_access.get_accessible_projects_ids():
-                    for invitation in  TeraTestInvitation.query.join(TeraParticipant,
-                            TeraParticipant.id_participant == TeraTestInvitation.id_participant).filter(
+                for invitation in TeraTestInvitation.query.filter(and_(
                         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
-                        TeraParticipant.id_project == project.id_project).all():
+                        TeraTestInvitation.id_project == args['id_project'])).all():
+                    invitations.append(invitation.to_json(minimal=not args['full']))
+                # project : TeraProject = TeraProject.get_project_by_id(args['id_project'])
+                # if project and project.id_project in user_access.get_accessible_projects_ids():
+                #     for invitation in  TeraTestInvitation.query.join(TeraParticipant,
+                #             TeraParticipant.id_participant == TeraTestInvitation.id_participant).filter(
+                #         TeraTestInvitation.id_test_invitation.in_(accessible_invitations_ids),
+                #         TeraParticipant.id_project == project.id_project).all():
 
-                        invitations.append(invitation.to_json(minimal=not args['full']))
+                        # invitations.append(invitation.to_json(minimal=not args['full']))
 
         if args['with_urls']:
             invitations = self._insert_urls_to_invitations(invitations)
@@ -262,12 +266,16 @@ class UserQueryTestsInvitations(Resource):
                         return gettext('Forbidden'), 403
                     if 'id_device' in invitation and invitation['id_device'] not in user_access.get_accessible_devices_ids():
                         return gettext('Forbidden'), 403
+                    if 'id_project' in invitation and invitation['id_project'] not in user_access.get_accessible_projects_ids():
+                        return gettext('Forbidden'), 403
                     if 'id_session' in invitation and invitation['id_session'] not in user_access.get_accessible_sessions_ids():
                         return gettext('Forbidden'), 403
                     if 'id_test_type' in invitation and invitation['id_test_type'] not in user_access.get_accessible_tests_types_ids():
                         return gettext('Forbidden'), 403
                     if 'id_test_type' not in invitation:
                         return gettext('Missing id_test_type'), 400
+                    if 'id_project' not in invitation:
+                        return gettext('Missing id_project'), 400
                     if 'test_invitation_expiration_date' not in invitation:
                         return gettext('Missing test_invitation_expiration_date'), 400
                     if 'test_invitation_key' in invitation:

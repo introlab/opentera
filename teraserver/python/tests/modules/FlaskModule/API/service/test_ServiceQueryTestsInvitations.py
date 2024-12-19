@@ -92,8 +92,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             test_type_not_accessible = self._create_test_type_for_service(1)
 
             # Create invitations
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_project=1,
+                                     id_user=1)
 
             # Service should access only invitations of its test type
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token)
@@ -118,8 +120,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             test_type_not_accessible = self._create_test_type_for_service(1)
 
             # Create invitations
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_project=1,
+                                     id_user=1)
 
             # Service should access only invitations of its test type
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params={'full': True})
@@ -144,8 +148,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             test_type_not_accessible = self._create_test_type_for_service(1)
 
             # Create invitations
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_not_accessible.id_test_type, id_project=1,
+                                     id_user=1)
 
             # Service should access only invitations of its test type
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token, params={'with_urls': True})
@@ -167,7 +173,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
             # Create invitations
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            invitations = self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
+            invitations = self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type,
+                                                   id_project=1, id_user=1)
 
             # Service should access all invitations
             for invitation in invitations:
@@ -209,8 +216,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
             # Create 10 invitations
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_user=2)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=2,
+                                     id_user=2)
 
             # Service should access only invitations of id_user=1
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -245,8 +254,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             create_count = 10
             # Create 10 invitations
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_participant=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_participant=2)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_participant=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_participant=2)
 
             # Service should access all invitations
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -280,8 +291,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             create_count = 10
             # Create 10 invitations
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_device=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_device=2)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_device=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_project=1,
+                                     id_device=2)
 
             # Service should access all invitations
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -316,8 +329,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             # Create 10 invitations
             test_type_accessible1 = self._create_test_type_for_service(self.id_service)
             test_type_accessible2 = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible1.id_test_type, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible2.id_test_type, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible1.id_test_type, id_project=1,
+                                     id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible2.id_test_type, id_project=1,
+                                     id_user=1)
 
             # Service should access all invitations
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -361,8 +376,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             create_count = 10
             # Create 10 invitations
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=1, id_user=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=2, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=1,
+                                     id_project=1, id_user=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=2,
+                                     id_project=1, id_user=1)
 
             # Service should access all invitations
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
@@ -422,9 +439,10 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             create_count = 10
             test_type_accessible = self._create_test_type_for_service(self.id_service)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=1, id_participant=1)
-            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=2, id_participant=2)
-
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=1,
+                                     id_project=1, id_participant=1)
+            self._create_invitations(create_count, id_test_type=test_type_accessible.id_test_type, id_session=2,
+                                     id_project=1, id_participant=2)
 
             response = self._get_with_service_token_auth(self.test_client, token=self.service_token,
                                                      params={'id_project': 1})
@@ -481,6 +499,26 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                                                       json={'tests_invitations': [{'invalid': 'invalid'}]})
             self.assertEqual(400, response.status_code)
 
+    def test_post_query_as_admin_with_valid_schema_but_invalid_id_project(self):
+        """
+        Test that a post request with valid schema but invalid id_project
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
+                                                                                               id_project=0, id_user=1))
+            self.assertEqual(403, response.status_code)
+
+    def test_post_query_as_admin_with_valid_schema_but_forbidden_id_project(self):
+        """
+        Test that a post request with valid schema but invalid id_project
+        """
+        with self._flask_app.app_context():
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token,
+                                                      json=self._create_tests_invitations_json(id_test_type=2,
+                                                                                               id_project=2, id_user=1))
+            self.assertEqual(403, response.status_code)
+
     def test_post_query_with_service_token_with_valid_schema_but_missing_id_user_id_participant_id_device(self):
         """
         Test that a post request with valid schema but missing id_user, id_participant, id_device returns 400
@@ -488,7 +526,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
-                                                      json=self._create_tests_invitations_json(id_test_type=1))
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                               id_project=1))
             self.assertEqual(400, response.status_code)
 
     def test_post_query_with_service_token_with_valid_schema_but_invalid_id_user_id_participant_(self):
@@ -498,18 +537,21 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             response = self._post_with_service_token_auth(self.test_client,
                                                       self.service_token,
-                                                      json=self._create_tests_invitations_json(id_test_type=1, id_user=0))
+                                                      json=self._create_tests_invitations_json(id_test_type=1,
+                                                                                               id_project=1, id_user=0))
             self.assertEqual(403, response.status_code)
 
             response = self._post_with_service_token_auth(self.test_client,
                                             self.service_token,
-                                            json=self._create_tests_invitations_json(id_test_type=1, id_participant=0))
+                                            json=self._create_tests_invitations_json(id_test_type=1, id_project=1,
+                                                                                     id_participant=0))
             self.assertEqual(403, response.status_code)
 
 
             response = self._post_with_service_token_auth(self.test_client,
                                             self.service_token,
-                                            json=self._create_tests_invitations_json(id_test_type=1, id_device=0))
+                                            json=self._create_tests_invitations_json(id_test_type=1, id_project=1,
+                                                                                     id_device=0))
             self.assertEqual(403, response.status_code)
 
     def test_post_query_with_service_token_with_valid_schema_with_multiple_user_participant_device(self):
@@ -520,23 +562,26 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=1,
-                                                                                              id_user=1,
-                                                                                              id_participant=1))
+                                                                                               id_project=1,
+                                                                                               id_user=1,
+                                                                                               id_participant=1))
             self.assertEqual(400, response.status_code)
 
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=1,
-                                                                                              id_user=1,
-                                                                                              id_device=1))
+                                                                                               id_project=1,
+                                                                                               id_user=1,
+                                                                                               id_device=1))
             self.assertEqual(400, response.status_code)
 
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=1,
-                                                                                              id_user=1,
-                                                                                              id_participant=1,
-                                                                                              id_device=1))
+                                                                                               id_project=1,
+                                                                                               id_user=1,
+                                                                                               id_participant=1,
+                                                                                               id_device=1))
             self.assertEqual(400, response.status_code)
 
     def test_post_query_with_service_token_with_valid_schema_with_no_session(self):
@@ -547,7 +592,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=2,
-                                                                                              id_user=1))
+                                                                                               id_project=1,
+                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             for json_invitation in response.json:
                 self._validate_json(json_invitation, full=True, with_urls=True)
@@ -561,8 +607,9 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=1,
-                                                                                              id_user=1,
-                                                                                              id_session=0))
+                                                                                               id_project=1,
+                                                                                               id_user=1,
+                                                                                               id_session=0))
             self.assertEqual(403, response.status_code)
 
     def test_post_query_with_service_token_with_valid_schema_with_valid_session(self):
@@ -577,8 +624,9 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                 response = self._post_with_service_token_auth(self.test_client,
                                                         token=self.service_token,
                                                         json=self._create_tests_invitations_json(id_test_type=2,
-                                                                                                id_user=1,
-                                                                                                id_session=id_session))
+                                                                                                 id_project=1,
+                                                                                                 id_user=1,
+                                                                                                 id_session=id_session))
                 self.assertEqual(200, response.status_code)
                 for json_invitation in response.json:
                     self._validate_json(json_invitation, full=True, with_urls=True)
@@ -593,7 +641,8 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
             response = self._post_with_service_token_auth(self.test_client,
                                                       token=self.service_token,
                                                       json=self._create_tests_invitations_json(id_test_type=2,
-                                                                                              id_user=1))
+                                                                                               id_project=1,
+                                                                                               id_user=1))
             self.assertEqual(200, response.status_code)
             invitation_info = response.json[0]
             self.assertNotEqual(invitation_info['id_test_invitation'], 0)
@@ -614,7 +663,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
 
 
-    def _create_tests_invitations_json(self, id_test_type: int, id_user: int = None,
+    def _create_tests_invitations_json(self, id_test_type: int, id_project: int, id_user: int = None,
                                 id_participant: int = None, id_device: int = None, id_session: int = None) -> dict:
         """
         Create a json for an invitation
@@ -623,6 +672,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
                 {
                     'id_test_invitation': 0, # New invitation
                     'id_test_type': id_test_type,
+                    'id_project': id_project,
                     'test_invitation_max_count': 1,
                     'test_invitation_count': 0,
                     'test_invitation_expiration_date': (datetime.now() + timedelta(days=1)).isoformat()
@@ -649,6 +699,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
     def _create_invitations(self, count: int,
                             id_test_type: int,
+                            id_project: int,
                             id_user: int = None,
                             id_participant: int = None,
                             id_device: int = None,
@@ -672,6 +723,7 @@ class ServiceQueryTestsInvitationsTest(BaseServiceAPITest):
 
         for _ in range(count):
             invitation = TeraTestInvitation(id_test_type=id_test_type,
+                                            id_project=id_project,
                                             test_invitation_max_count=1,
                                             test_invitation_count=0,
                                             test_invitation_expiration_date=datetime.now() + timedelta(days=1),
