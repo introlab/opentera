@@ -476,7 +476,11 @@ class UserManagerModule(BaseModule):
 
             from opentera.db.models.TeraDevice import TeraDevice
             device_data = TeraDevice.get_device_by_uuid(device)
-            device_event.device_name = device_data.device_name
+            if device_data:
+                device_event.device_name = device_data.device_name
+            else:
+                # TODO: Find when this can happen!
+                pass
             self.send_event_message(device_event, self.event_topic_name())
 
     def handle_join_session_event(self, join_event: JoinSessionEvent):
@@ -536,13 +540,16 @@ class UserManagerModule(BaseModule):
         # Clear busy states of elements that refused to join session
         self.logger.log_info(self.module_name, 'JoinSessionReplyEvent', 'session', join_reply.session_uuid)
         if join_reply.join_reply != JoinSessionReplyEvent.REPLY_ACCEPTED:
-            self.set_users_in_session(session_uuid=join_reply.session_uuid, user_uuids=[join_reply.user_uuid],
-                                      in_session=False)
+            if join_reply.user_uuid:
+                self.set_users_in_session(session_uuid=join_reply.session_uuid, user_uuids=[join_reply.user_uuid],
+                                          in_session=False)
 
-            self.set_participants_in_session(session_uuid=join_reply.session_uuid,
-                                             participant_uuids=[join_reply.participant_uuid],
-                                             in_session=False)
+            if join_reply.participant_uuid:
+                self.set_participants_in_session(session_uuid=join_reply.session_uuid,
+                                                 participant_uuids=[join_reply.participant_uuid],
+                                                 in_session=False)
 
-            self.set_devices_in_session(session_uuid=join_reply.session_uuid,
-                                        device_uuids=[join_reply.device_uuid],
-                                        in_session=False)
+            if join_reply.device_uuid:
+                self.set_devices_in_session(session_uuid=join_reply.session_uuid,
+                                            device_uuids=[join_reply.device_uuid],
+                                            in_session=False)

@@ -153,7 +153,8 @@ class BaseWebRTCService(ServiceOpenTera):
             session_info = self.sessions[id_session]
 
             # Verify if it contains the user_uuid
-            if event.user_uuid in session_info['session_users']:
+            if (event.user_uuid in session_info['session_users'] or
+                    ('session_creator_user_uuid' in session_info and session_info['session_creator_user_uuid'] == event.user_uuid)):
                 # Verify the event type
                 if event.type == messages.UserEvent.USER_CONNECTED:
                     # Resend invitation to newly connected user
@@ -168,8 +169,6 @@ class BaseWebRTCService(ServiceOpenTera):
                         if session_info['session_creator_user_uuid'] == event.user_uuid:
                             manage_session_args = {'id_session': id_session}
                             self.manage_stop_session(manage_session_args)
-                            # End loop, sessions dict will be changed in manage_stop_session
-                            break
 
     def handle_participant_event(self, event: messages.ParticipantEvent):
         # print('BaseWebRTCService.handle_participant_event', event)
@@ -178,7 +177,9 @@ class BaseWebRTCService(ServiceOpenTera):
             session_info = self.sessions[id_session]
 
             # Verify if it contains the user_uuid
-            if event.participant_uuid in session_info['session_participants']:
+            if (event.participant_uuid in session_info['session_participants'] or
+                    ('session_creator_participant_uuid' in session_info and session_info[
+                        'session_creator_participant_uuid'] == event.participant_uuid)):
                 # Verify the event type
                 if event.type == messages.ParticipantEvent.PARTICIPANT_CONNECTED:
                     # Resend invitation to newly connected user
@@ -193,8 +194,6 @@ class BaseWebRTCService(ServiceOpenTera):
                         if session_info['session_creator_participant_uuid'] == event.participant_uuid:
                             manage_session_args = {'id_session': id_session}
                             self.manage_stop_session(manage_session_args)
-                            # End loop, sessions dict will be changed in manage_stop_session
-                            break
 
     def handle_device_event(self, event: messages.DeviceEvent):
         # print('BaseWebRTCService.handle_device_event', event)
@@ -203,7 +202,9 @@ class BaseWebRTCService(ServiceOpenTera):
             session_info = self.sessions[id_session]
 
             # Verify if it contains the user_uuid
-            if event.device_uuid in session_info['session_devices']:
+            if (event.device_uuid in session_info['session_devices'] or
+                    ('session_creator_device_uuid' in session_info and session_info[
+                        'session_creator_device_uuid'] == event.device_uuid)):
                 # Verify the event type
                 if event.type == messages.DeviceEvent.DEVICE_CONNECTED:
                     # Resend invitation to newly connected user
@@ -218,8 +219,6 @@ class BaseWebRTCService(ServiceOpenTera):
                         if session_info['session_creator_device_uuid'] == event.device_uuid:
                             manage_session_args = {'id_session': id_session}
                             self.manage_stop_session(manage_session_args)
-                            # End loop, sessions dict will be changed in manage_stop_session
-                            break
 
     def nodejs_webrtc_message_callback(self, pattern, channel, message):
         # print('WebRTCModule - nodejs_webrtc_message_callback', pattern, channel, message)
@@ -691,12 +690,18 @@ class BaseWebRTCService(ServiceOpenTera):
 
             join_session_reply = messages.JoinSessionReplyEvent()
             join_session_reply.session_uuid = session_info['session_uuid']
-            join_session_reply.join_reply = parameters['reply_code']
+            join_session_reply.join_reply = reply_code
             if 'reply_msg' in parameters:
                 join_session_reply.reply_msg = parameters['reply_msg']
             if 'user_uuid' in parameters:
                 join_session_reply.user_uuid = parameters['user_uuid']
-                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                if reply_code != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    if 'session_creator_user_uuid' in session_info:
+                        if session_info['session_creator_user_uuid'] == parameters['user_uuid']:
+                            # Creator cannot leave its own session
+                            self.manage_stop_session({'id_session': id_session})
+                            return {'status': 'error',
+                                    'error_text': gettext('Creator refused to join session - session ended')}
                     session_info['session_users'] = [item for item in session_info['session_users']
                                                      if item != parameters['user_uuid']]
                     # Create session join refused event
@@ -711,7 +716,13 @@ class BaseWebRTCService(ServiceOpenTera):
 
             if 'participant_uuid' in parameters:
                 join_session_reply.participant_uuid = parameters['participant_uuid']
-                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                if reply_code != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    if 'session_creator_participant_uuid' in session_info:
+                        if session_info['session_creator_participant_uuid'] == parameters['participant_uuid']:
+                            # Creator cannot leave its own session
+                            self.manage_stop_session({'id_session': id_session})
+                            return {'status': 'error',
+                                    'error_text': gettext('Creator refused to join session - session ended')}
                     session_info['session_participants'] = [item for item in session_info['session_participants']
                                                             if item != parameters['participant_uuid']]
                     # Create session join refused event
@@ -726,7 +737,14 @@ class BaseWebRTCService(ServiceOpenTera):
 
             if 'device_uuid' in parameters:
                 join_session_reply.device_uuid = parameters['device_uuid']
-                if parameters['reply_code'] != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                if reply_code != messages.JoinSessionReplyEvent.REPLY_ACCEPTED:
+                    if 'session_creator_device_uuid' in session_info:
+                        if session_info['session_creator_device_uuid'] == parameters['device_uuid']:
+                            # Creator cannot leave its own session
+                            self.manage_stop_session({'id_session': id_session})
+                            return {'status': 'error',
+                                    'error_text': gettext('Creator refused to join session - session ended')}
+
                     session_info['session_devices'] = [item for item in session_info['session_devices']
                                                        if item != parameters['device_uuid']]
                     # Create session join refused event
