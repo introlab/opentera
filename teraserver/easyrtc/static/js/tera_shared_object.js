@@ -67,7 +67,8 @@ function setupSharedObjectCallbacks(channel){
         selectAudioSource(settings.audio);
         selectVideoSource(settings.video);
         setLocalMirror(settings.mirror);
-        setLocalBlur(settings.blur);
+        if (settings.blur !== undefined)
+            setLocalBlur(settings.blur);
         selectSecondarySources(settings.secondAudioVideo);
         ptz = JSON.parse(settings.ptz);
         setPTZCapabilities(localContact.uuid, ptz.zoom, ptz.presets, ptz.settings, ptz.camera);
