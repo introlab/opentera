@@ -3,7 +3,7 @@ var https   = require("https");     // https server core module
 var http = require("http");         // http server core module
 var fs      = require("fs");        // file system core module
 var express = require("express");   // web framework external module
-var io      = require("socket.io"); // web socket external module
+var socketIo = require("socket.io") // web socket external module
 var easyrtc = require("open-easyrtc");   // EasyRTC external module
 var ejs = require("ejs");
 var redis = require('redis')
@@ -103,7 +103,7 @@ if (args.local_ssl == false){
 // Start Socket.io so it attaches itself to Express server
 var websocket_path = "/websocket/" + args.port + '/'
 //console.log('websocket path:', websocket_path)
-var socketServer = io.listen(webServer, {"log level":1, "path": websocket_path, "cookie": false});
+var socketServer = socketIo(webServer, {"allowEIO3": true, "log level":1, "path": websocket_path, "cookie": false});
 
 
 //TODO Set options here (ice servers)
@@ -149,8 +149,6 @@ client.on("connect", function() {
     console.log("Message published");
    });
 });
-
-
 
 // Start EasyRTC server
 var rtc = easyrtc.listen(httpApp, socketServer);

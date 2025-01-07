@@ -95,6 +95,22 @@
 		"preset-3": "Position 3",
 		"screenof": "Écran -",
 		"cameraof": "Caméra -",
-		"music": "Partage musique"
+		"music": "Partage musique",
+		"star": "Focus pour tous sur ce vidéo",
+		"swap": "Agrandir le vidéo (pour moi)",
+		"play": "Démarrer",
+		"stop": "Arrêter",
+		"pause": "Pause",
+		"minus": "Diminuer",
+		"plus": "Augmenter",
+		"config": "Paramètres",
+		"micro": "Activer/désactiver Microphone",
+		"camera": "Activer/désactiver Caméra",
+		"speaker": "Activer/désactiver Son",
+		"cam-change": "Changer de caméra",
+		"cam-settings": "Paramètres de caméra",
+		"cam-second": "Activer/désactiver source vidéo secondaire",
+		"share-screen": "Activer/désactiver le partage d'écran",
+		"music-icon": "Activer/désactiver le partage de musique"
 	}
 }

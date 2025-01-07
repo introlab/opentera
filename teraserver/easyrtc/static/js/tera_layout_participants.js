@@ -11,6 +11,7 @@ function initVideoAreas(){
                 $('#remoteRows').append(divdata);
             }
             initialUserLayout();
+            translator.translatePageTo(currentLang);
         }
     );
 }
