@@ -802,7 +802,7 @@ function showChronoButtons(local, index, playing, stopped){
     }
     let stop = $('#' + view_prefix + 'ChronoStop' + index);
     if (stop.length){
-        (playing) ? stop.show() : stop.hide();
+        (!stopped) ? stop.show() : stop.hide();
     }
 }
 
