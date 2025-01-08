@@ -249,6 +249,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             user_invitation.id_test_type = test_type.id_test_type
             user_invitation.test_invitation_key = str(uuid.uuid4())
             user_invitation.id_user = 1 # admin
+            user_invitation.id_project = 1
             user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             TeraTestInvitation.insert(user_invitation)
 
@@ -257,6 +258,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             participant_invitation.id_test_type = test_type.id_test_type
             participant_invitation.test_invitation_key = str(uuid.uuid4())
             participant_invitation.id_participant = 1
+            participant_invitation.id_project = 1
             participant_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             TeraTestInvitation.insert(participant_invitation)
 
@@ -265,6 +267,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             device_invitation.id_test_type = test_type.id_test_type
             device_invitation.test_invitation_key = str(uuid.uuid4())
             device_invitation.id_device = 1
+            device_invitation.id_project = 1
             device_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             TeraTestInvitation.insert(device_invitation)
 
@@ -273,6 +276,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             max_invitation.id_test_type = test_type.id_test_type
             max_invitation.test_invitation_key = str(uuid.uuid4())
             max_invitation.id_device = 1
+            max_invitation.id_project = 1
             max_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             max_invitation.test_invitation_max_count = 1
             TeraTestInvitation.insert(max_invitation)
@@ -284,6 +288,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             expired_invitation.id_test_type = test_type.id_test_type
             expired_invitation.test_invitation_key = str(uuid.uuid4())
             expired_invitation.id_device = 1
+            expired_invitation.id_project = 1
             expired_invitation.test_invitation_expiration_date = datetime.now() - timedelta(days=1)
             expired_invitation.test_invitation_max_count = 1
             TeraTestInvitation.insert(expired_invitation)
@@ -325,6 +330,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
             user_invitation.id_test_type = test_type.id_test_type
             user_invitation.test_invitation_key = str(uuid.uuid4())
             user_invitation.id_user = 1 # admin
+            user_invitation.id_project = 1
             user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
             user_invitation.test_invitation_max_count = 0
             TeraTestInvitation.insert(user_invitation)

@@ -23,7 +23,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test that db events are not None
         """
         with self._flask_app.app_context():
-            invitation : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
             self.assertIsNotNone(invitation.to_json_create_event())
             self.assertIsNotNone(invitation.to_json_update_event())
             self.assertIsNotNone(invitation.to_json_delete_event())
@@ -81,7 +81,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test creating an invitation with a valid test type and user.
         """
         with self._flask_app.app_context():
-            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
             self.assertIsNotNone(invitation)
 
     def test_create_with_missing_expiration_date(self):
@@ -100,7 +100,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test creating an invitation with missing message.
         """
         with self._flask_app.app_context():
-            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
             self.assertIsNotNone(invitation)
             self.assertEqual(len(invitation.test_invitation_key), 16)
 
@@ -123,7 +123,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         with self._flask_app.app_context():
             keys = set()
             for _ in range(1000):
-                invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+                invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
                 self.assertNotIn(invitation.test_invitation_key, keys)
                 keys.add(invitation.test_invitation_key)
 
@@ -133,7 +133,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test updating the test type of an invitation will raise an IntegrityError.
         """
         with self._flask_app.app_context():
-            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
             with self.assertRaises(IntegrityError):
                 invitation.id_test_type = 2
                 TeraTestInvitation.update(invitation.id_test_invitation,
@@ -144,7 +144,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test updating the key of an invitation will raise an IntegrityError.
         """
         with self._flask_app.app_context():
-            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
+            invitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
             with self.assertRaises(IntegrityError):
                 invitation.test_invitation_key = "New key"
                 TeraTestInvitation.update(invitation.id_test_invitation,
@@ -155,10 +155,10 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test to_json method
         """
         with self._flask_app.app_context():
-            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
-            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1)
-            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1)
-            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1)
+            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
+            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1, id_project=1)
+            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1, id_project=1)
+            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1, id_project=1)
 
             for invitation in [invitation1, invitation2, invitation3, invitation4]:
                 self._verify_to_json(invitation, minimal=True)
@@ -169,10 +169,10 @@ class TeraTestInvitationTest(BaseModelsTest):
         Test from_json method
         """
         with self._flask_app.app_context():
-            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1)
-            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1)
-            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1)
-            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1)
+            invitation1 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_user=1, id_project=1)
+            invitation2 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_participant=1, id_project=1)
+            invitation3 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_device=1, id_project=1)
+            invitation4 : TeraTestInvitation = TeraTestInvitationTest.new_test_invitation(id_test_type=1, id_session=1, id_user=1, id_project=1)
 
             for invitation in [invitation1, invitation2, invitation3, invitation4]:
                 invitation_json = invitation.to_json(minimal=True)
@@ -185,7 +185,8 @@ class TeraTestInvitationTest(BaseModelsTest):
                        id_session: int = None,
                        id_user: int = None,
                        id_participant: int = None,
-                       id_device: int = None) -> TeraTestInvitation:
+                       id_device: int = None,
+                       id_project: int = None) -> TeraTestInvitation:
         """
         Insert a new test invitation in database.
         """
@@ -197,6 +198,7 @@ class TeraTestInvitationTest(BaseModelsTest):
         invitation.id_user = id_user
         invitation.id_participant = id_participant
         invitation.id_device = id_device
+        invitation.id_project = id_project
 
         invitation.test_invitation_expiration_date = datetime.now(tz=timezone.utc) + timedelta(days=1)
         invitation.test_invitation_message = "Test invitation message"
@@ -216,6 +218,8 @@ class TeraTestInvitationTest(BaseModelsTest):
         self.assertEqual(invitation_json['id_participant'], invitation.id_participant)
         self.assertTrue('id_device' in invitation_json)
         self.assertEqual(invitation_json['id_device'], invitation.id_device)
+        self.assertTrue('id_project' in invitation_json)
+        self.assertEqual(invitation_json['id_project'], invitation.id_project)
         self.assertTrue('id_session' in invitation_json)
         self.assertEqual(invitation_json['id_session'], invitation.id_session)
         self.assertTrue('test_invitation_key' in invitation_json)
@@ -232,14 +236,14 @@ class TeraTestInvitationTest(BaseModelsTest):
         self.assertEqual(invitation_json['test_invitation_count'], invitation.test_invitation_count)
 
         if minimal:
-            self.assertEqual(len(invitation_json), 12)
+            self.assertEqual(len(invitation_json), 13)
             self.assertFalse('test_invitation_test_type' in invitation_json)
             self.assertFalse('test_invitation_session' in invitation_json)
             self.assertFalse('test_invitation_user' in invitation_json)
             self.assertFalse('test_invitation_participant' in invitation_json)
             self.assertFalse('test_invitation_device' in invitation_json)
         else:
-            count = 13
+            count = 14
             self.assertTrue('test_invitation_test_type' in invitation_json)
 
             if invitation.id_session:
@@ -257,5 +261,9 @@ class TeraTestInvitationTest(BaseModelsTest):
             if invitation.id_device:
                 count += 1
                 self.assertTrue('test_invitation_device' in invitation_json)
+
+            if invitation.id_project:
+                count += 1
+                self.assertTrue('test_invitation_project' in invitation_json)
 
             self.assertEqual(len(invitation_json), count)
