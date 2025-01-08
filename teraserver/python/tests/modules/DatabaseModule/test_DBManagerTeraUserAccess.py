@@ -88,11 +88,13 @@ class DBManagerTeraUserAccessTest(BaseModelsTest):
                                   id_session :int = None,
                                   id_user = None,
                                   id_participant: int = None,
-                                  id_device : int = None):
+                                  id_device : int = None,
+                                  id_project : int = None):
                 invitation : TeraTestInvitation = TeraTestInvitation()
                 invitation.id_test_type = id_test_type
                 invitation.id_session = id_session
                 invitation.id_user = id_user
+                invitation.id_project = id_project
                 invitation.id_participant = id_participant
                 invitation.id_device = id_device
                 invitation.test_invitation_max_count=1
@@ -108,9 +110,9 @@ class DBManagerTeraUserAccessTest(BaseModelsTest):
             self.assertEqual(len(items), 0)
 
             # Create invitation for user 1
-            invitation1 = create_invitation(1, id_user=1)
-            invitation2 = create_invitation(1, id_participant=1)
-            invitation3 = create_invitation(1, id_device=1)
+            invitation1 = create_invitation(1, id_user=1, id_project=1)
+            invitation2 = create_invitation(1, id_participant=1, id_project=1)
+            invitation3 = create_invitation(1, id_device=1, id_project=1)
             self.assertIsNotNone(invitation1)
             self.assertIsNotNone(invitation2)
             self.assertIsNotNone(invitation3)

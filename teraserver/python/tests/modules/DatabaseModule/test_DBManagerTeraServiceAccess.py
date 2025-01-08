@@ -721,6 +721,7 @@ class DBManagerTeraServiceAccessTest(BaseModelsTest):
             invitation.id_test_type = test_type.id_test_type
             invitation.id_session = session.id_session
             invitation.id_user = 1
+            invitation.id_project = 1
             invitation.test_invitation_creation_date = datetime.now()
             invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
 
