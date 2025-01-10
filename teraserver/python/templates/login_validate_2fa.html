@@ -12,36 +12,30 @@
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
 
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./static/js/login_functions.js"></script>
     <script type="text/javascript">
-        var qtObject = undefined;
-        if (typeof QWebChannel !== "undefined"){
-            new QWebChannel(qt.webChannelTransport, function(channel) {
-                qtObject = channel.objects.qtObject;
-            });
-        };
+        setEndpointUrl("{{ endpoint_url }}");
     </script>
 
     <!-- call function when document is loaded -->
     <script>
         let redirectTimerId = undefined;
+        let redirectTimeoutSeconds = 300;
         let timeoutSeconds = 0;
 
         function resetValidationTimeout(){
             if (redirectTimerId)
                 clearTimeout(redirectTimerId);
-            redirectTimerId = setTimeout(redirectToLogin.bind(null, "{{ gettext('Code validation timeout. Redirecting to login.') }}"), 60000*5);
-            timeoutSeconds = 300;
+            redirectTimerId = setTimeout(localRedirectToLogin.bind(null, "{{ gettext('Code validation timeout. Redirecting to login.') }}"), 1000*redirectTimeoutSeconds);
+            timeoutSeconds = redirectTimeoutSeconds;
             updateTimeLeft();
         }
 
-        function redirectToLogin(msg){
+        function localRedirectToLogin(msg){
             $('#redirectMsg').text(msg);
             $('#dlgRedirect').removeClass("d-none").addClass("d-flex");
             setTimeout(function() {
-                if (qtObject)
-                    qtObject.sendRedirectToLogin();
-                else
-                    window.location.href = '/login';
+                redirectToLogin();
              }, 5000);
         }
 
@@ -95,7 +89,7 @@
                     otp_code: otp_code,
                     with_websocket: true
                 },
-                success: function(data, textStatus, jqXHR) {
+                success: function(response, textStatus, jqXHR) {
                     $('#error_message').hide();
                     $('#auth_form').hide();
                     $('#ok_message').show();
@@ -107,7 +101,11 @@
                         // Send the token to the Qt application
                         // Answer will contain,user_uuid, user_token, websocket_url
                         if (qtObject)
-                            qtObject.sendLoginSuccess(data.user_token, data.websocket_url, data.user_uuid);
+                            qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
+
+                        if (endpointUrl) {
+                            sendPostToEndpointUrl(response, "{{ server_version }}");
+                        }
 
                     }
                 },

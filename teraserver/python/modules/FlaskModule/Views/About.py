@@ -28,3 +28,6 @@ class About(MethodView):
         return render_template('about.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
                                openteraplus_version=versions.get_client_version_with_name('OpenTeraPlus'))
+
+    def post(self):
+        return request.json

@@ -13,13 +13,9 @@
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
 
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./static/js/login_functions.js"></script>
     <script type="text/javascript">
-        var qtObject = undefined;
-        if (typeof QWebChannel !== "undefined"){
-            new QWebChannel(qt.webChannelTransport, function(channel) {
-                qtObject = channel.objects.qtObject;
-            });
-        };
+        setEndpointUrl("{{ endpoint_url }}");
     </script>
 </head>
 <body>
@@ -32,10 +28,7 @@
             if (timeoutSeconds-1 >= 0)
                 timeoutSeconds--;
             else{
-                if (qtObject)
-                    qtObject.sendRedirectToLogin();
-                else
-                    window.location.href = '/login';
+                redirectToLogin();
             }
         }
 
@@ -86,7 +79,7 @@
                     success: function(response) {
                         console.log("2FA setup success");
                         // Redirect to the main page
-                        window.location.href = response.redirect_url
+                        login_redirect(response.redirect_url);
                     },
                     error: function(response) {
                         //console.log(response);

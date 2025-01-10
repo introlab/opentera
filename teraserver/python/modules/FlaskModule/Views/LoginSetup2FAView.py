@@ -38,6 +38,11 @@ class LoginSetup2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
+        endpoint_url = ""
+        if 'endpoint' in request.args:
+            endpoint_url = request.args['endpoint']
+
         return render_template('login_setup_2fa.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
-                               user_has_email=current_user.user_email is not None and current_user.user_email != "")
+                               user_has_email=current_user.user_email is not None and current_user.user_email != "",
+                               endpoint_url=endpoint_url)

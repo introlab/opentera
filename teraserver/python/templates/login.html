@@ -10,14 +10,9 @@
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./static/js/login_functions.js"></script>
     <script type="text/javascript">
-        var qtObject = undefined;
-        if (typeof QWebChannel !== "undefined"){
-            new QWebChannel(qt.webChannelTransport, function(channel) {
-                qtObject = channel.objects.qtObject;
-            });
-        };
-
+        setEndpointUrl("{{ endpoint_url }}");
     </script>
     <script>
         $(document).ajaxSend(function(event, request, settings) {
@@ -76,11 +71,14 @@
                                     }
                                 }
                             }
-                            window.location.href = response.redirect_url;
+                            login_redirect(response.redirect_url);
                         }
                         else {
                             if (qtObject)
                                 qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
+                            if (endpointUrl){
+                                sendPostToEndpointUrl(response, "{{ server_version }}");
+                            }
                         }
                     },
                     error: function(response) {
