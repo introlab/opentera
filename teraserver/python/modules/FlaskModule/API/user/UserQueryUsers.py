@@ -273,8 +273,8 @@ class UserQueryUsers(Resource):
             if json_user['user_password'] is None or json_user['user_password'] == '':
                 return gettext('Invalid password'), 400
 
-            # Check if username is already taken
-            if TeraUser.get_user_by_username(json_user['user_username']) is not None:
+            # Check if username is already taken - since it's an unique constraint, deleted users are also considered
+            if TeraUser.get_user_by_username(json_user['user_username'], with_deleted=True) is not None:
                 return gettext('Username unavailable.'), 409
 
             # Ok so far, we can try to create the user!
