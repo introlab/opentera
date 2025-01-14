@@ -83,13 +83,13 @@ class UserLogin2FA(UserLoginBase):
             if version_info:
                 response.update(version_info)
 
-            if args['with_websocket']:
-                self._verify_user_already_logged_in()
-                response['websocket_url'] = self._generate_websocket_url()
-
-            # Generate user token
-            response['user_uuid'] = current_user.user_uuid
-            response['user_token'] = self._generate_user_token()
+            # if args['with_websocket']:
+            #     self._verify_user_already_logged_in()
+            #     response['websocket_url'] = self._generate_websocket_url()
+            #
+            # # Generate user token
+            # response['user_uuid'] = current_user.user_uuid
+            # response['user_token'] = self._generate_user_token()
 
         except OutdatedClientVersionError as e:
             self._user_logout()
@@ -115,7 +115,8 @@ class UserLogin2FA(UserLoginBase):
         else:
             # Everything went well, return response
             self._send_login_success_message()
-            return response, 200
+            # return response, 200
+            return self._generate_login_success_response(args['with_websocket'], response)
 
     @api.doc(description='Login to the server using Session Authentication and 2FA')
     @api.expect(get_parser, validate=True)

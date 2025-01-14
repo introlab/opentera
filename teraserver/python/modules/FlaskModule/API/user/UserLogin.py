@@ -1,3 +1,4 @@
+from flask import session
 from flask_restx import inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import current_user, user_http_login_auth
@@ -41,33 +42,25 @@ class UserLogin(UserLoginBase):
                 response['message'] = gettext('Password change required for this user.')
                 response['reason'] = 'password_change'
                 response['redirect_url'] = self._generate_password_change_url()
-
-            # 2FA enabled? Client will need to proceed to 2FA login step first
-            if current_user.user_2fa_enabled and not current_user.user_force_password_change:
-
-                # If user had too many 2FA login failures, stop login process
-                self._verify_2fa_login_attempts(current_user.user_uuid)
-
-                if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
-                    response['message'] = gettext('2FA required for this user.')
-                    response['reason'] = '2fa'
-                    response['redirect_url'] = self._generate_2fa_verification_url()
-                else:
-                    response['message'] = gettext('2FA enabled but OTP not set for this user.'
-                                                  'Please setup 2FA.')
-                    response['reason'] = '2fa_setup'
-                    response['redirect_url'] = self._generate_2fa_setup_url()
             else:
-                # Standard Login without 2FA. Check if user is already logged in.
-                if args['with_websocket']:
-                    self._verify_user_already_logged_in()
-                    response['websocket_url'] = self._generate_websocket_url()
+                # 2FA enabled? Client will need to proceed to 2FA login step first
+                if current_user.user_2fa_enabled:
 
-                # Generate user token
-                response['user_uuid'] = current_user.user_uuid
-                response['user_token'] = self._generate_user_token()
+                    # If user had too many 2FA login failures, stop login process
+                    self._verify_2fa_login_attempts(current_user.user_uuid)
 
-                self._send_login_success_message()
+                    if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
+                        response['message'] = gettext('2FA required for this user.')
+                        response['reason'] = '2fa'
+                        response['redirect_url'] = self._generate_2fa_verification_url()
+                    else:
+                        response['message'] = gettext('2FA enabled but OTP not set for this user.'
+                                                      'Please setup 2FA.')
+                        response['reason'] = '2fa_setup'
+                        response['redirect_url'] = self._generate_2fa_setup_url()
+                else:
+                    self._send_login_success_message()
+                    return self._generate_login_success_response(args['with_websocket'], response)
 
         except OutdatedClientVersionError as e:
             self._user_logout()
@@ -106,12 +99,12 @@ class UserLogin(UserLoginBase):
         return self._common_login_response(get_parser)
 
 
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
-             security='basicAuth')
-    @api.expect(post_parser)
-    @user_http_login_auth.login_required
-    def post(self):
-        """
-        Login to the server using HTTP Basic Authentication
-        """
-        return self._common_login_response(post_parser)
+    # @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
+    #          security='basicAuth')
+    # @api.expect(post_parser)
+    # @user_http_login_auth.login_required
+    # def post(self):
+    #     """
+    #     Login to the server using HTTP Basic Authentication
+    #     """
+    #     return self._common_login_response(post_parser), 200

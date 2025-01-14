@@ -1,3 +1,4 @@
+import secrets
 from sqlalchemy import or_, not_, and_
 
 from opentera.db.models.TeraService import TeraService
@@ -365,3 +366,6 @@ class DBManagerTeraServiceAccess:
         """
         test_invitations = self.get_accessible_tests_invitations()
         return [test_invitation.id_test_invitation for test_invitation in test_invitations]
+
+    def generate_auth_code(self, endpoint_url) -> str:
+        return secrets.token_urlsafe(32)

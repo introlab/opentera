@@ -6,10 +6,6 @@ if (typeof QWebChannel !== "undefined"){
     });
 };
 
-function setEndpointUrl(url) {
-    endpointUrl = url;
-}
-
 function login_redirect(target_url){
     let redirect_url;
     try{
@@ -25,12 +21,7 @@ function login_redirect(target_url){
         console.log("Error - Redirecting to " + redirect_url);
     }
     
-    if (endpointUrl){
-        console.log("Setting endpoint to " + endpointUrl);
-         redirect_url.searchParams.set('endpoint', endpointUrl);
-        //redirect_url += "?endpoint=" + endpointUrl;
-    }
-    console.log(redirect_url);
+    //console.log(redirect_url);
     window.location.href = redirect_url.toString();
 }
 
@@ -41,7 +32,7 @@ function redirectToLogin(){
         login_redirect("/login");
 }
 
-function sendPostToEndpointUrl(response, server_version="Unknown"){
+/*function sendPostToEndpointUrl(response, server_version="Unknown"){
     var headers = {
         "X-Client-Name":  "OpenTera-Web-Client",
         "X-Client-Version": server_version
@@ -52,12 +43,12 @@ function sendPostToEndpointUrl(response, server_version="Unknown"){
         headers: headers,
         data: JSON.stringify(response),
         contentType: "application/json",
-        dataType: "json"/*,
+        dataType: "json",
         success: function(response) {
             console.log(response);
         },
         error: function(response){
             console.error(response);
-        }*/
+        }
     });
-}
+}*/

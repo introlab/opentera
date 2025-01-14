@@ -13,9 +13,6 @@
 
     <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script src="./static/js/login_functions.js"></script>
-    <script type="text/javascript">
-        setEndpointUrl("{{ endpoint_url }}");
-    </script>
 
     <!-- call function when document is loaded -->
     <script>
@@ -102,11 +99,9 @@
                         // Answer will contain,user_uuid, user_token, websocket_url
                         if (qtObject)
                             qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
-
-                        if (endpointUrl) {
-                            sendPostToEndpointUrl(response, "{{ server_version }}");
+                        if (response.redirect_url) {
+                            login_redirect(response.redirect_url);
                         }
-
                     }
                 },
                 error: function() {

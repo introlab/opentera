@@ -11,9 +11,6 @@
     <script src="./static/js/jquery-3.7.1.min.js"></script>
     <script src="./static/bootstrap/js/bootstrap.min.js"></script>
     <script src="./static/js/login_functions.js"></script>
-    <script type="text/javascript">
-        setEndpointUrl("{{ endpoint_url }}");
-    </script>
     <script>
         $(document).ajaxSend(function(event, request, settings) {
             $('#loading').removeClass("d-none").addClass("d-flex");
@@ -76,9 +73,6 @@
                         else {
                             if (qtObject)
                                 qtObject.sendLoginSuccess(response.user_token, response.websocket_url, response.user_uuid);
-                            if (endpointUrl){
-                                sendPostToEndpointUrl(response, "{{ server_version }}");
-                            }
                         }
                     },
                     error: function(response) {

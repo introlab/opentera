@@ -302,8 +302,10 @@ class FlaskModule(BaseModule):
         kwargs |= additional_args
 
         # Services
-        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
+        from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
+        from modules.FlaskModule.API.service.ServiceQueryAuthCode import ServiceQueryAuthCode
+        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
         from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
         from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
         from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles \
@@ -320,15 +322,16 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQueryTestTypeProjects import ServiceQueryTestTypeProjects
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
         from modules.FlaskModule.API.service.ServiceQueryTestsInvitations import ServiceQueryTestsInvitations
-        from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
         from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
         from modules.FlaskModule.API.service.ServiceQueryParticipantGroups import ServiceQueryParticipantGroups
 
+
         namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAuthCode,                '/auth/code', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryParticipantGroups,       '/groups', resource_class_kwargs=kwargs)

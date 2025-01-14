@@ -1,5 +1,5 @@
 from flask.views import MethodView
-from flask import render_template, request
+from flask import render_template, request, session
 from opentera.utils.TeraVersions import TeraVersions
 
 
@@ -21,12 +21,13 @@ class LoginView(MethodView):
 
         show_logo = 'no_logo' not in request.args
 
-        endpoint_url = ""
-        if 'endpoint' in request.args:
-            endpoint_url = request.args['endpoint']
+        # if 'auth_code' in session:
+        #     session.pop('auth_code')
+        if 'auth_code' in request.args:
+            session['auth_code'] = request.args['auth_code']
 
         versions = TeraVersions()
         versions.load_from_db()
 
         return render_template('login.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, show_logo=show_logo, endpoint_url=endpoint_url)
+                               server_version=versions.version_string, show_logo=show_logo)

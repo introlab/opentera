@@ -42,9 +42,5 @@ class LoginValidate2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
-        endpoint_url = ""
-        if 'endpoint' in request.args:
-            endpoint_url = request.args['endpoint']
-
         return render_template('login_validate_2fa.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, endpoint_url=endpoint_url)
+                               server_version=versions.version_string)

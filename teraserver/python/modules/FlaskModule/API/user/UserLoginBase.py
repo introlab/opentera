@@ -1,4 +1,7 @@
-from flask import session, request
+import json
+import re
+
+from flask import session, request, Response, redirect
 from flask_login import logout_user
 from flask_restx import Resource
 from flask_babel import gettext
@@ -9,6 +12,7 @@ from opentera.utils.UserAgentParser import UserAgentParser
 from opentera.utils.TeraVersions import TeraVersions
 import opentera.messages.python as messages
 from opentera.redis.RedisVars import RedisVars
+from opentera.db.models.TeraService import TeraService
 
 
 class OutdatedClientVersionError(Exception):
@@ -230,3 +234,48 @@ class UserLoginBase(Resource):
                                             user_uuid=current_user.user_uuid,
                                             server_endpoint=user_agent_info['server_endpoint'],
                                             message=message)
+
+    def _generate_login_success_response(self, with_websocket: bool, base_response: dict) -> Response:
+        user_data = base_response
+        if with_websocket:
+            self._verify_user_already_logged_in()
+            user_data['websocket_url'] = self._generate_websocket_url()
+
+        # Generate user token
+        user_data['user_uuid'] = current_user.user_uuid
+        user_data['user_fullname'] = current_user.get_fullname()
+        user_data['user_token'] = self._generate_user_token()
+
+        if 'auth_code' in session:
+            # Get information from redis
+            try:
+                code_infos = json.loads(self.module.redisGet('service_auth_code_' + session['auth_code']))
+                # Generate redirect url
+                service: TeraService = TeraService.get_service_by_uuid(code_infos['service_uuid'])
+                if not service:
+                    self._user_logout()
+                    return Response(gettext('Invalid service'), status=400)
+
+                endpoint_url = service.service_clientendpoint + '/' + code_infos['endpoint_url'] + '/'
+                endpoint_url = re.sub(r'(?<!:)//+', '/', endpoint_url)
+
+            except json.JSONDecodeError:
+                self._user_logout()
+                return Response(gettext('Invalid authentication code'), status=400)
+            except KeyError:
+                self._user_logout()
+                return Response(gettext('Invalid informations'), status=400)
+            else:
+                # Redirect to url
+                # response = redirect(endpoint_url + '?auth_code=' + session['auth_code'])
+
+                # Add user infos in redis
+                auth_infos = self.module.redisGet('service_auth_code_' + session['auth_code'])
+                if auth_infos:
+                    auth_infos = json.loads(auth_infos)
+                    auth_infos['user_data'] = user_data
+                    self.module.redisSet('service_auth_code_' + session['auth_code'], json.dumps(auth_infos))
+
+                return {'redirect_url': endpoint_url + '?auth_code=' + session['auth_code']}
+
+        return user_data, 200

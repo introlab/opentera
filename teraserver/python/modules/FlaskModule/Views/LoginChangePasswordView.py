@@ -27,13 +27,8 @@ class LoginChangePasswordView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
-        endpoint_url = ""
-        if 'endpoint' in request.args:
-            endpoint_url = request.args['endpoint']
-
         return render_template('login_change_password.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, username=current_user.user_username,
-                               endpoint_url=endpoint_url)
+                               server_version=versions.version_string, username=current_user.user_username)
 
     # @LoginModule.user_session_required
     # def post(self):
