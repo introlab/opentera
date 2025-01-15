@@ -7,7 +7,7 @@ from modules.DatabaseModule.DBManager import DBManager
 
 # Parser definition(s)
 get_parser = api.parser()
-get_parser.add_argument('endpoint_url', type=str, help='Endpoint url requesting access')
+get_parser.add_argument('endpoint_url', type=str, help='Endpoint url requesting access', required=True)
 
 
 
@@ -47,7 +47,3 @@ class ServiceQueryAuthCode(Resource):
         self.module.redisSet('service_auth_code_' + auth_code, json.dumps(auth_code_data), 300)
 
         return {'auth_code': auth_code}, 200
-
-
-
-
