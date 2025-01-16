@@ -6,7 +6,7 @@ from modules.LoginModule.LoginModule import LoginModule, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
-     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError, InvalidAuthCodeError
 from opentera.db.models.TeraUser import TeraUser
 import opentera.messages.python as messages
 
@@ -41,6 +41,8 @@ class UserLoginSetup2FA(UserLoginBase):
             # Validate args (should not have any)
             get_parser.parse_args(strict=True)
             response = {}
+
+            self._verify_auth_code()
 
             # Current user is logged in with HTTPAuth, or session
             # Let's verify if 2FA is enabled and if OTP is valid
@@ -86,6 +88,9 @@ class UserLoginSetup2FA(UserLoginBase):
 #        except InvalidClientVersionError as e:
 #            # Invalid client version, will not be handled for now
 #            pass
+        except InvalidAuthCodeError as e:
+            self._user_logout()
+            return str(e), 403
         except UserAlreadyLoggedInError as e:
             self._user_logout()
             return str(e), 403

@@ -5,7 +5,7 @@ from modules.LoginModule.LoginModule import LoginModule, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
-     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError, InvalidAuthCodeError
 import opentera.messages.python as messages
 from opentera.redis.RedisVars import RedisVars
 
@@ -41,6 +41,8 @@ class UserLogin2FA(UserLoginBase):
             # Validate args
             args = parser.parse_args(strict=True)
             response = {}
+
+            self._verify_auth_code()
 
             # Current user is logged in with HTTPAuth, or session
             # Let's verify if 2FA is enabled and if OTP is valid
@@ -83,14 +85,6 @@ class UserLogin2FA(UserLoginBase):
             if version_info:
                 response.update(version_info)
 
-            # if args['with_websocket']:
-            #     self._verify_user_already_logged_in()
-            #     response['websocket_url'] = self._generate_websocket_url()
-            #
-            # # Generate user token
-            # response['user_uuid'] = current_user.user_uuid
-            # response['user_token'] = self._generate_user_token()
-
         except OutdatedClientVersionError as e:
             self._user_logout()
 
@@ -108,15 +102,18 @@ class UserLogin2FA(UserLoginBase):
         except TooMany2FALoginAttemptsError as e:
             self._user_logout()
             return str(e), 403
+        except InvalidAuthCodeError as e:
+            self._user_logout()
+            return str(e), 403
         except Exception as e:
             # Something went wrong, logout user
             self._user_logout()
             raise e
         else:
             # Everything went well, return response
+            response = self._generate_login_success_response(args['with_websocket'], response)
             self._send_login_success_message()
-            # return response, 200
-            return self._generate_login_success_response(args['with_websocket'], response)
+            return response
 
     @api.doc(description='Login to the server using Session Authentication and 2FA')
     @api.expect(get_parser, validate=True)

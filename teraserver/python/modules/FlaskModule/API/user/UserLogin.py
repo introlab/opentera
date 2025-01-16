@@ -1,11 +1,10 @@
-from flask import session
 from flask_restx import inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import current_user, user_http_login_auth
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase
 from modules.FlaskModule.API.user.UserLoginBase import OutdatedClientVersionError, \
-     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError
+     UserAlreadyLoggedInError, TooMany2FALoginAttemptsError, InvalidAuthCodeError
 
 
 
@@ -14,28 +13,33 @@ get_parser.add_argument('with_websocket', type=inputs.boolean, default=False,
                             help='If set, requires that a websocket url is returned.'
                             'If not possible to do so, return a 403 error.')
 
-post_parser = api.parser()
-post_parser.add_argument('with_websocket', type=inputs.boolean, default=False,
-                            help='If set, requires that a websocket url is returned.'
-                            'If not possible to do so, return a 403 error.')
-
 class UserLogin(UserLoginBase):
     """
     UserLogin Resource.
     """
-
     def __init__(self, _api, *args, **kwargs):
         UserLoginBase.__init__(self, _api, *args, **kwargs)
 
-    def _common_login_response(self, parser):
+
+    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
+             security='basicAuth')
+    @api.expect(get_parser)
+    @user_http_login_auth.login_required
+    def get(self):
+        """
+        Login to the server using HTTP Basic Authentication
+        """
         try:
             # Validate args
-            args = parser.parse_args(strict=True)
+            args = get_parser.parse_args(strict=True)
             response = {}
 
             version_info = self._verify_client_version()
             if version_info:
                 response.update(version_info)
+
+            # Verify if auth code is valid
+            self._verify_auth_code()
 
             # User needs to change password?
             if current_user.user_force_password_change:
@@ -45,7 +49,6 @@ class UserLogin(UserLoginBase):
             else:
                 # 2FA enabled? Client will need to proceed to 2FA login step first
                 if current_user.user_2fa_enabled:
-
                     # If user had too many 2FA login failures, stop login process
                     self._verify_2fa_login_attempts(current_user.user_uuid)
 
@@ -59,12 +62,12 @@ class UserLogin(UserLoginBase):
                         response['reason'] = '2fa_setup'
                         response['redirect_url'] = self._generate_2fa_setup_url()
                 else:
+                    response = self._generate_login_success_response(args['with_websocket'], response)
+                    # Only with non-2FA users, otherwise, we wait for 2FA to be completed
                     self._send_login_success_message()
-                    return self._generate_login_success_response(args['with_websocket'], response)
 
         except OutdatedClientVersionError as e:
             self._user_logout()
-
             return {
                 'version_latest': e.version_latest,
                 'current_version': e.current_version,
@@ -73,6 +76,9 @@ class UserLogin(UserLoginBase):
 #        except InvalidClientVersionError as e:
 #            # Invalid client version, will not be handled for now
 #            pass
+        except InvalidAuthCodeError as e:
+            self._user_logout()
+            return str(e), 403
         except UserAlreadyLoggedInError as e:
             self._user_logout()
             return str(e), 403
@@ -85,26 +91,4 @@ class UserLogin(UserLoginBase):
             raise e
         else:
             # Everything went well, return response
-            return response, 200
-
-
-    @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
-             security='basicAuth')
-    @api.expect(get_parser)
-    @user_http_login_auth.login_required
-    def get(self):
-        """
-        Login to the server using HTTP Basic Authentication
-        """
-        return self._common_login_response(get_parser)
-
-
-    # @api.doc(description='Login to the server using HTTP Basic Authentication (HTTPAuth)',
-    #          security='basicAuth')
-    # @api.expect(post_parser)
-    # @user_http_login_auth.login_required
-    # def post(self):
-    #     """
-    #     Login to the server using HTTP Basic Authentication
-    #     """
-    #     return self._common_login_response(post_parser), 200
+            return response

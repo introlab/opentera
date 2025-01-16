@@ -24,7 +24,7 @@ current_participant_client = LocalProxy(lambda: g.setdefault('current_participan
 current_service_client = LocalProxy(lambda: g.setdefault('current_service_client', None))
 current_login_type = LocalProxy(lambda: g.setdefault('current_login_type', LoginType.UNKNOWN_LOGIN))
 current_test_invitation = LocalProxy(lambda: g.setdefault('current_test_invitation', None))
-
+current_client_information = LocalProxy(lambda: g.setdefault('current_client_information', None))
 
 class LoginType(Enum):
     UNKNOWN_LOGIN = 0,
@@ -491,7 +491,12 @@ class ServiceAccessManager:
         return ServiceAccessManager.service_user_roles_all_required(roles)
 
     @staticmethod
-    def service_test_invitation_required(invitation_key_param_name: str):
+    def service_test_invitation_required(invitation_key_param_name: str = "invitation_key"):
+        """
+        This code is a decorator that will be used to check if a test invitation is valid and fetch information from the server.
+        It will also configure the current client with the right information.
+        Next OpenTera lib will contain this code, remove it from here.
+        """
         def wrap(f):
             @wraps(f)
             def decorated(*args, **kwargs):
@@ -511,19 +516,19 @@ class ServiceAccessManager:
 
                 # Use the service token to get the test invitation
                 response = ServiceAccessManager.service.get_from_opentera('/api/service/tests/invitations',
-                                                                            params={'test_invitation_key': test_invitation_key, 'full': True})
+                                                                            params={'test_invitation_key': test_invitation_key,
+                                                                                    'full': True})
 
                 # Check if the test invitation is valid
                 if response.status_code != 200 or len(response.json()) != 1:
                     return gettext('Forbidden'), 403
 
                 # Validate if invitation is for user, participant or device
-                invitation = response.json()[0]
-                g.current_test_invitation = invitation
+                g.current_test_invitation = response.json()[0]
 
                 # Validate maximum count if not zero
-                if invitation['test_invitation_max_count'] > 0 and \
-                    invitation['test_invitation_count'] >= invitation['test_invitation_max_count']:
+                if current_test_invitation['test_invitation_max_count'] > 0 and \
+                    current_test_invitation['test_invitation_count'] >= current_test_invitation['test_invitation_max_count']:
                     return gettext('Forbidden'), 403
 
                 # Validate expiration date
@@ -532,58 +537,64 @@ class ServiceAccessManager:
                 if current_date > expiration_date:
                     return gettext('Forbidden'), 403
 
-                if 'id_user' in invitation and invitation['id_user'] is not None:
+                if 'id_user' in current_test_invitation and current_test_invitation['id_user'] is not None:
 
                     # Get User information from server
                     response = ServiceAccessManager.service.get_from_opentera('/api/service/users',
-                                                                            params={'id_user': invitation['id_user']})
+                                                                            params={'id_user': current_test_invitation['id_user']})
                     if response.status_code != 200:
                         return gettext('Forbidden'), 403
                     user = response.json()
 
-                    # This is a user invitation, configure user client with minimal information
-                    # WARNING - Token will not be available
-                    token_dict = {'id_user': user['id_user'],
-                                  'user_uuid': user['user_uuid'],
-                                  'user_fullname': f"{user['user_firstname']} {user['user_lastname']}",
-                                  'user_superadmin': user['user_superadmin'],
-                                  'service_access': {}}
+                    g.current_client_information = user
 
+                    # This is a user invitation, configure user client with minimal information
+                    token_dict = {'id_user': user['id_user'],
+                                    'user_uuid': user['user_uuid'],
+                                    'user_fullname': f"{user['user_firstname']} {user['user_lastname']}",
+                                    'user_superadmin': user['user_superadmin'],
+                                    'service_access': {}}
+
+                    # WARNING - Token will not be available for user
                     g.current_user_client = TeraUserClient(token_dict, None,
                                                         ServiceAccessManager.service.config_man,
                                                         ServiceAccessManager.service)
 
                     g.current_login_type = LoginType.USER_LOGIN
-                elif 'id_participant' in invitation and invitation['id_participant'] is not None:
+                elif 'id_participant' in current_test_invitation and current_test_invitation['id_participant'] is not None:
                     # Get Participant information from server
                     response = ServiceAccessManager.service.get_from_opentera('/api/service/participants',
-                                                                            params={'id_participant': invitation['id_participant']})
+                                                                            params={'id_participant': current_test_invitation['id_participant']})
                     if response.status_code != 200:
                         return gettext('Forbidden'), 403
                     participant = response.json()
 
+                    g.current_client_information = participant
+
                     # This is a participant invitation, configure participant client with minimal information
                     token_dict = {'id_participant': participant['id_participant'],
-                                  'participant_uuid': participant['participant_uuid']}
+                                    'participant_uuid': participant['participant_uuid']}
 
-                    # WARNING - Token will not be available
+                    # WARNING - Token will not be available for participant
                     g.current_participant_client = TeraParticipantClient(token_dict, None,
                                                                     ServiceAccessManager.service.config_man,
                                                                     ServiceAccessManager.service)
                     g.current_login_type = LoginType.PARTICIPANT_LOGIN
-                elif 'id_device' in invitation and invitation['id_device'] is not None:
+                elif 'id_device' in current_test_invitation and current_test_invitation['id_device'] is not None:
                     # Get Device information from server
                     response = ServiceAccessManager.service.get_from_opentera('/api/service/devices',
-                                                                            params={'id_device': invitation['id_device']})
+                                                                            params={'id_device': current_test_invitation['id_device']})
                     if response.status_code != 200:
                         return gettext('Forbidden'), 403
                     device = response.json()
 
+                    g.current_client_information = device
 
+                    # This is a device invitation, configure device client with minimal information
                     token_dict = {'id_device': device['id_device'],
-                                  'device_uuid': device['device_uuid']}
+                                    'device_uuid': device['device_uuid']}
 
-                    # WARNING - Token will not be available
+                    # WARNING - Token will not be available for device
                     g.current_device_client = TeraDeviceClient(token_dict, None,
                                                         ServiceAccessManager.service.config_man,
                                                         ServiceAccessManager.service)

@@ -1,6 +1,4 @@
-import random
-import time
-import hashlib
+import secrets
 from datetime import datetime, timezone
 
 from sqlalchemy import event
@@ -136,23 +134,9 @@ class TeraTestInvitation(BaseModel, SoftDeleteMixin):
     @staticmethod
     def generate_test_invitation_unique_key() -> str:
         """
-        Generate a unique key of 16 hexadecimal number for a test invitation based on current time.
+        Generate a unique key that is url safe.
         """
-        timestamp = str(time.time_ns())
-
-        # Generate a 6-digit random number
-        random_seed = str(random.randint(0,999999)).zfill(6)
-
-        # Hash the timestamp + seed using SHA-256
-        # Hashing: The hashlib.sha256 function ensures that the output is evenly distributed,
-        # making the key appear random.
-        hash_object = hashlib.sha256((timestamp + random_seed).encode())
-
-        # Return the first 16 characters of the hash
-        # This method ensures the key is not only time-based but also includes additional randomness,
-        # further reducing the likelihood of collisions.
-        return hash_object.hexdigest()[:16]
-
+        return secrets.token_urlsafe(16)
 
     def to_json_create_event(self):
         """

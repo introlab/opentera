@@ -20,7 +20,7 @@ function login_redirect(target_url){
         }
         console.log("Error - Redirecting to " + redirect_url);
     }
-    
+
     //console.log(redirect_url);
     window.location.href = redirect_url.toString();
 }
@@ -31,24 +31,3 @@ function redirectToLogin(){
     else
         login_redirect("/login");
 }
-
-/*function sendPostToEndpointUrl(response, server_version="Unknown"){
-    var headers = {
-        "X-Client-Name":  "OpenTera-Web-Client",
-        "X-Client-Version": server_version
-    };
-    $.ajax({
-        type: "POST",
-        url: endpointUrl,
-        headers: headers,
-        data: JSON.stringify(response),
-        contentType: "application/json",
-        dataType: "json",
-        success: function(response) {
-            console.log(response);
-        },
-        error: function(response){
-            console.error(response);
-        }
-    });
-}*/

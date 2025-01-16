@@ -11,5 +11,5 @@
     "python.testing.unittestEnabled": true,
     "python.envFile": "${workspaceFolder}/.env.vscode",
     "cmake.buildDirectory": "${workspaceFolder}/../build",
-    "cmake.sourceDirectory": "${workspaceFolder}/../"
+    "cmake.sourceDirectory": "${workspaceFolder}/../",
 }
