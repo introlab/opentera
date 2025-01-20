@@ -5,7 +5,7 @@ message(STATUS "Building easyrtc")
 if(WIN32)
     set(NPM_EXECUTABLE npm.exe)
 else(WIN32)
-    set(NPM_EXECUTABLE /usr/local/bin/npm)
+    set(NPM_EXECUTABLE /usr/bin/npm)
 endif(WIN32)
 
 # Will always be considered out of date...
