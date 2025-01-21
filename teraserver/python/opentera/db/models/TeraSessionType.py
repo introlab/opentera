@@ -35,7 +35,7 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
     session_type_projects = relationship("TeraProject", secondary="t_sessions_types_projects",
                                          back_populates="project_session_types")
     session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites",
-                                      back_populates="site_session_types")
+                                      back_populates="site_sessions_types")
 
     session_type_service = relationship("TeraService")
 
