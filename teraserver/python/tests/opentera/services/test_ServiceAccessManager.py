@@ -1,8 +1,14 @@
 import unittest
-from tests.opentera.services.FakeService import FakeService, FakeFlaskModule
-from opentera.services.ServiceAccessManager import ServiceAccessManager
-import tests.opentera.services.utils as utils
+import uuid
+from datetime import datetime, timedelta
 from flask_restx import Resource, inputs
+
+from opentera.services.ServiceAccessManager import ServiceAccessManager, current_test_invitation
+from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraTestType import TeraTestType
+from opentera.db.models.TeraTestInvitation import TeraTestInvitation
+from tests.opentera.services.FakeService import FakeService, FakeFlaskModule
+import tests.opentera.services.utils as utils
 
 
 class TestQueryWithServiceRoles(Resource):
@@ -43,6 +49,21 @@ class TestQueryWithServiceRolesAll(Resource):
         return 'OK', 200
 
 
+class TestQueryWithTestInvitationKey(Resource):
+    def __init__(self, _api, *args, **kwargs):
+        Resource.__init__(self, _api, *args, **kwargs)
+        self.module = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
+
+    @ServiceAccessManager.service_test_invitation_required(invitation_key_param_name="test_invitation_key")
+    def get(self):
+
+        if current_test_invitation == None:
+            return 'No invitation', 400
+
+        return 'OK', 200
+
+
 class ServiceAccessManagerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -60,6 +81,8 @@ class ServiceAccessManagerTests(unittest.TestCase):
                                                     resource_class_kwargs=kwargs)
         cls.__service.flask_module.api.add_resource(TestQueryWithServiceRolesAll, '/test_all',
                                                     resource_class_kwargs=kwargs)
+        cls.__service.flask_module.api.add_resource(TestQueryWithTestInvitationKey, '/test_invitations',
+                                                    resource_class_kwargs=kwargs)
 
     @classmethod
     def tearDownClass(cls):
@@ -74,26 +97,26 @@ class ServiceAccessManagerTests(unittest.TestCase):
     def test_endpoint_no_token(self):
         with self.__service.app_context():
             # No token
-            response = self.__service.test_client.get('/test')
+            response = self.__service.test_client.get('/api/test')
             self.assertEqual(403, response.status_code)
 
     def test_endpoint_no_token_any(self):
         with self.__service.app_context():
             # No token
-            response = self.__service.test_client.get('/test_any')
+            response = self.__service.test_client.get('/api/test_any')
             self.assertEqual(403, response.status_code)
 
     def test_endpoint_no_token_all(self):
         with self.__service.app_context():
             # No token
-            response = self.__service.test_client.get('/test_all')
+            response = self.__service.test_client.get('/api/test_all')
             self.assertEqual(403, response.status_code)
 
     def test_endpoint_user_token_with_superadmin(self):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[], superadmin=True)
-            response = self.__service.test_client.get('/test',
+            response = self.__service.test_client.get('/api/test',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -101,7 +124,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[], superadmin=True)
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -109,7 +132,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[], superadmin=True)
-            response = self.__service.test_client.get('/test_all',
+            response = self.__service.test_client.get('/api/test_all',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -117,7 +140,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[])
-            response = self.__service.test_client.get('/test',
+            response = self.__service.test_client.get('/api/test',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(403, response.status_code)
 
@@ -125,7 +148,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[])
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(403, response.status_code)
 
@@ -133,7 +156,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=[])
-            response = self.__service.test_client.get('/test_all',
+            response = self.__service.test_client.get('/api/test_all',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(403, response.status_code)
 
@@ -141,7 +164,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=['test-role'])
-            response = self.__service.test_client.get('/test',
+            response = self.__service.test_client.get('/api/test',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -149,17 +172,17 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=['test-role1'])
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
             user_token = utils._generate_fake_user_token(roles=['test-role2'])
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
             user_token = utils._generate_fake_user_token(roles=['test-role1', 'test-role2'])
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -167,17 +190,17 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             user_token = utils._generate_fake_user_token(roles=['test-role1'])
-            response = self.__service.test_client.get('/test_all',
+            response = self.__service.test_client.get('/api/test_all',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(403, response.status_code)
 
             user_token = utils._generate_fake_user_token(roles=['test-role2'])
-            response = self.__service.test_client.get('/test_all',
+            response = self.__service.test_client.get('/api/test_all',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(403, response.status_code)
 
             user_token = utils._generate_fake_user_token(roles=['test-role1', 'test-role2'])
-            response = self.__service.test_client.get('/test_all',
+            response = self.__service.test_client.get('/api/test_all',
                                                       headers={'Authorization': 'OpenTera ' + user_token})
             self.assertEqual(200, response.status_code)
 
@@ -185,7 +208,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             participant_token = utils._generate_fake_dynamic_participant_token()
-            response = self.__service.test_client.get('/test',
+            response = self.__service.test_client.get('/api/test',
                                                       headers={'Authorization': 'OpenTera ' + participant_token})
             self.assertEqual(403, response.status_code)
 
@@ -193,7 +216,7 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             participant_token = utils._generate_fake_dynamic_participant_token()
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + participant_token})
             self.assertEqual(403, response.status_code)
 
@@ -201,6 +224,123 @@ class ServiceAccessManagerTests(unittest.TestCase):
         with self.__service.app_context():
             # User token with no role
             participant_token = utils._generate_fake_dynamic_participant_token()
-            response = self.__service.test_client.get('/test_any',
+            response = self.__service.test_client.get('/api/test_any',
                                                       headers={'Authorization': 'OpenTera ' + participant_token})
             self.assertEqual(403, response.status_code)
+
+    def test_endpoint_invitation_key_with_no_key(self):
+        with self.__service.app_context():
+            # No key
+            response = self.__service.test_client.get('/api/test_invitations')
+            self.assertEqual(400, response.status_code)
+
+    def test_endpoint_invitation_key_with_key_for_user_participant_device(self):
+        with self.__service.app_context():
+            # Create test type for this service
+            test_type : TeraTestType = TeraTestType()
+            test_type.test_type_name = 'TestType'
+            test_type.test_type_description = 'TestType description'
+            test_type.test_type_key = str(uuid.uuid4())
+            test_type.id_service = self.__service.get_service_id()
+            TeraTestType.insert(test_type)
+
+            # Create test invitation with user
+            user_invitation : TeraTestInvitation = TeraTestInvitation()
+            user_invitation.id_test_type = test_type.id_test_type
+            user_invitation.test_invitation_key = str(uuid.uuid4())
+            user_invitation.id_user = 1 # admin
+            user_invitation.id_project = 1
+            user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(user_invitation)
+
+            # Create test invitation with participant
+            participant_invitation : TeraTestInvitation = TeraTestInvitation()
+            participant_invitation.id_test_type = test_type.id_test_type
+            participant_invitation.test_invitation_key = str(uuid.uuid4())
+            participant_invitation.id_participant = 1
+            participant_invitation.id_project = 1
+            participant_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(participant_invitation)
+
+            # Create test invitation with device
+            device_invitation : TeraTestInvitation = TeraTestInvitation()
+            device_invitation.id_test_type = test_type.id_test_type
+            device_invitation.test_invitation_key = str(uuid.uuid4())
+            device_invitation.id_device = 1
+            device_invitation.id_project = 1
+            device_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            TeraTestInvitation.insert(device_invitation)
+
+            # Create test invitation with maximum count reached
+            max_invitation : TeraTestInvitation = TeraTestInvitation()
+            max_invitation.id_test_type = test_type.id_test_type
+            max_invitation.test_invitation_key = str(uuid.uuid4())
+            max_invitation.id_device = 1
+            max_invitation.id_project = 1
+            max_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            max_invitation.test_invitation_max_count = 1
+            TeraTestInvitation.insert(max_invitation)
+            # Update (count originally set to 0)
+            TeraTestInvitation.update(max_invitation.id_test_invitation, {'test_invitation_count': 1})
+
+            # Create test invitation with expired date
+            expired_invitation : TeraTestInvitation = TeraTestInvitation()
+            expired_invitation.id_test_type = test_type.id_test_type
+            expired_invitation.test_invitation_key = str(uuid.uuid4())
+            expired_invitation.id_device = 1
+            expired_invitation.id_project = 1
+            expired_invitation.test_invitation_expiration_date = datetime.now() - timedelta(days=1)
+            expired_invitation.test_invitation_max_count = 1
+            TeraTestInvitation.insert(expired_invitation)
+
+
+            # Call API with newly created key
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': user_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': participant_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                        query_string={'test_invitation_key': device_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': max_invitation.test_invitation_key})
+            self.assertEqual(403, response.status_code)
+
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                        query_string={'test_invitation_key': expired_invitation.test_invitation_key})
+            self.assertEqual(403, response.status_code)
+
+    def test_endpoint_invitation_key_with_key_for_user_participant_device_with_max_count_zero(self):
+        with self.__service.app_context():
+            # Create test type for this service
+            test_type : TeraTestType = TeraTestType()
+            test_type.test_type_name = 'TestType'
+            test_type.test_type_description = 'TestType description'
+            test_type.test_type_key = str(uuid.uuid4())
+            test_type.id_service = self.__service.get_service_id()
+            TeraTestType.insert(test_type)
+
+            # Create test invitation with user
+            user_invitation : TeraTestInvitation = TeraTestInvitation()
+            user_invitation.id_test_type = test_type.id_test_type
+            user_invitation.test_invitation_key = str(uuid.uuid4())
+            user_invitation.id_user = 1 # admin
+            user_invitation.id_project = 1
+            user_invitation.test_invitation_expiration_date = datetime.now() + timedelta(days=1)
+            user_invitation.test_invitation_max_count = 0
+            TeraTestInvitation.insert(user_invitation)
+
+
+            # Update (count originally set to 0)
+            TeraTestInvitation.update(user_invitation.id_test_invitation, {'test_invitation_count': 1000})
+
+
+            # Call API with newly created key
+            response = self.__service.test_client.get('/api/test_invitations',
+                                                      query_string={'test_invitation_key': user_invitation.test_invitation_key})
+            self.assertEqual(200, response.status_code)

@@ -1,5 +1,6 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraService import TeraService
 
 
 class UserQueryServiceSitesTest(BaseUserAPITest):
@@ -92,7 +93,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
-            self.assertEqual(5, len(response.json))
+            target_count = TeraService.get_count() - 1  # Ignore OpenTeraService
+            self.assertEqual(target_count, len(response.json))
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
@@ -106,7 +108,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
-            params = {'id_service': 5}  # Videorehab service
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            params = {'id_service': service.id_service}  # Videorehab service
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -118,7 +121,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
 
     def test_query_service_with_site_as_admin(self):
         with self._flask_app.app_context():
-            params = {'id_service': 3, 'with_sites': 1}
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            params = {'id_service': service.id_service, 'with_sites': 1}
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -130,7 +134,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
 
     def test_query_service_with_roles_as_admin(self):
         with self._flask_app.app_context():
-            params = {'id_service': 3, 'with_roles': 1}
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            params = {'id_service': service.id_service, 'with_roles': 1}
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -204,14 +209,16 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
-            params = {'id_service': 3}  # File transfer service
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            params = {'id_service': service.id_service}  # File transfer service
             response = self._get_with_user_http_auth(self.test_client,  username='user4', password='user4',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
-            params = {'id_service': 5}  # Videorehab service
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            params = {'id_service': service.id_service}  # Videorehab service
             response = self._get_with_user_http_auth(self.test_client,  username='user', password='user',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -223,7 +230,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
 
     def test_query_service_with_sites_as_user(self):
         with self._flask_app.app_context():
-            params = {'id_service': 5, 'with_sites': 1}  # Videorehab service
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            params = {'id_service': service.id_service, 'with_sites': 1}  # Videorehab service
             response = self._get_with_user_http_auth(self.test_client,  username='user', password='user',
                                                      params=params)
             self.assertEqual(200, response.status_code)
@@ -235,7 +243,8 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
 
     def test_query_list_as_user(self):
         with self._flask_app.app_context():
-            params = {'id_service': 5, 'list': 1}
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            params = {'id_service': service.id_service, 'list': 1}
 
             response = self._get_with_user_http_auth(self.test_client,  username='user4', password='user4',
                                                      params=params)
@@ -266,12 +275,15 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Missing id_service")
 
-            json_data = {'service': {'id_service': 3}}
+            file_service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            bureau_service: TeraService = TeraService.get_service_by_key('BureauActif')
+            video_service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            json_data = {'service': {'id_service': file_service.id_service}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Missing sites")
 
-            json_data = {'service': {'id_service': 4, 'sites': []}}
+            json_data = {'service': {'id_service': bureau_service.id_service, 'sites': []}}
             response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
                                                       json=json_data)
             self.assertEqual(403, response.status_code, msg="Only super admins can change things here")
@@ -280,24 +292,25 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(403, response.status_code, msg="Nope, not site admin either!")
 
-            json_data = {'service': {'id_service': 5, 'sites': []}}
+            json_data = {'service': {'id_service': video_service.id_service, 'sites': []}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(500, response.status_code, msg="Can't remove - has sessions types with sessions")
 
-            json_data = {'service': {'id_service': 4, 'sites': []}}
+            json_data = {'service': {'id_service': bureau_service.id_service, 'sites': []}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove from all projects OK")
 
-            params = {'id_service': 4}  # Video rehab
+            params = {'id_service': bureau_service.id_service}
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertEqual(0, len(response.json))  # Everything was deleted!
 
-            json_data = {'service': {'id_service': 4, 'sites': [{'id_site': 1},
-                                                                {'id_site': 2}]}}
+            json_data = {'service': {'id_service': bureau_service.id_service,
+                                     'sites': [{'id_site': 1},
+                                               {'id_site': 2}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Add all sites OK")
@@ -307,20 +320,23 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(2, len(response.json))  # Everything was added
 
-            json_data = {'service': {'id_service': 4, 'sites': [{'id_site': 1}]}}
+            json_data = {'service': {'id_service': bureau_service.id_service, 'sites': [{'id_site': 1}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove one site")
-            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=4))
-            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=1, service_id=4))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2,
+                                                                                service_id=bureau_service.id_service))
+            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=1,
+                                                                                   service_id=bureau_service.id_service))
 
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertEqual(1, len(response.json))
 
-            json_data = {'service': {'id_service': 4, 'sites': [{'id_site': 1},
-                                                                {'id_site': 2}]}}
+            json_data = {'service': {'id_service': bureau_service.id_service,
+                                     'sites': [{'id_site': 1},
+                                               {'id_site': 2}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Add all sites OK")
@@ -330,22 +346,23 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(2, len(response.json))  # Back to initial state
 
-            json_data = {'service': {'id_service': 4, 'sites': [{'id_site': 1}]}}
+            json_data = {'service': {'id_service': bureau_service.id_service, 'sites': [{'id_site': 1}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Back to initial sites OK")
 
             # Recreate default associations - projects
-            json_data = {'service': {'id_service': 3, 'projects': [{'id_project': 1},
-                                                                   {'id_project': 2},
-                                                                   {'id_project': 3}
-                                                                   ]}}
+            json_data = {'service': {'id_service': file_service.id_service,
+                                     'projects': [{'id_project': 1},
+                                                  {'id_project': 2},
+                                                  {'id_project': 3}
+                                                 ]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data,
                                                       endpoint='/api/user/services/projects')
             self.assertEqual(200, response.status_code)
 
-            json_data = {'service': {'id_service': 5, 'projects': [{'id_project': 1}]}}
+            json_data = {'service': {'id_service': video_service.id_service, 'projects': [{'id_project': 1}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data,
                                                       endpoint='/api/user/services/projects')
@@ -410,10 +427,15 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(0, len(response.json))  # Everything was deleted!
 
-            json_data = {'site': {'id_site': 2, 'services': [{'id_service': 2},
-                                                             {'id_service': 3},
-                                                             {'id_service': 4},
-                                                             {'id_service': 5}]}}
+            logging_service: TeraService = TeraService.get_service_by_key('LoggingService')
+            file_service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            bureau_service: TeraService = TeraService.get_service_by_key('BureauActif')
+            video_service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            json_data = {'site': {'id_site': 2,
+                                  'services': [{'id_service': logging_service.id_service},
+                                               {'id_service': file_service.id_service},
+                                               {'id_service': bureau_service.id_service},
+                                               {'id_service': video_service.id_service}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Add all services OK")
@@ -423,14 +445,18 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertEqual(200, response.status_code)
             self.assertEqual(4, len(response.json))  # Everything was added
 
-            json_data = {'site': {'id_site': 2, 'services': [{'id_service': 3}]}}
+            json_data = {'site': {'id_site': 2, 'services': [{'id_service': file_service.id_service}]}}
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(200, response.status_code, msg="Remove 1 service")
-            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=3))
-            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=4))
-            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=2))
-            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2, service_id=5))
+            self.assertIsNotNone(TeraServiceSite.get_service_site_for_service_site(site_id=2,
+                                                                                   service_id=file_service.id_service))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2,
+                                                                                service_id=bureau_service.id_service))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2,
+                                                                                service_id=logging_service.id_service))
+            self.assertIsNone(TeraServiceSite.get_service_site_for_service_site(site_id=2,
+                                                                                service_id=video_service.id_service))
 
             response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin',
                                                      params=params)
@@ -438,93 +464,98 @@ class UserQueryServiceSitesTest(BaseUserAPITest):
             self.assertEqual(1, len(response.json))  # Back to the default state
 
     def test_post_service_site_and_delete(self):
-        # Service-Project update
-        json_data = {'service_site': {}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data)
-        self.assertEqual(400, response.status_code, msg="Badly formatted request")
+        with self._flask_app.app_context():
+            # Service-Project update
+            json_data = {'service_site': {}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Badly formatted request")
 
-        json_data = {'service_site': {'id_site': 1}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data)
-        self.assertEqual(400, response.status_code, msg="Badly formatted request")
+            json_data = {'service_site': {'id_site': 1}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Badly formatted request")
 
-        json_data = {'service_site': {'id_site': 1, 'id_service': 4}}
-        response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
-                                                  json=json_data)
-        self.assertEqual(403, response.status_code, msg="Only super admins can change things here")
+            service: TeraService = TeraService.get_service_by_key('BureauActif')
+            json_data = {'service_site': {'id_site': 1, 'id_service': service.id_service}}
+            response = self._post_with_user_http_auth(self.test_client, username='user', password='user',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Only super admins can change things here")
 
-        response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                  json=json_data)
-        self.assertEqual(403, response.status_code, msg="Nope, not site admin either!")
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="Nope, not site admin either!")
 
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data)
-        self.assertEqual(200, response.status_code, msg="Add new association OK")
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Add new association OK")
 
-        params = {'id_site': 1}
-        response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin', params=params)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(4, len(response.json))
+            params = {'id_site': 1}
+            response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(4, len(response.json))
 
-        current_id = None
-        for sp in response.json:
-            if sp['id_service'] == 4:
-                current_id = sp['id_service_site']
-                break
-        self.assertFalse(current_id is None)
+            current_id = None
+            for sp in response.json:
+                if sp['id_service'] == service.id_service:
+                    current_id = sp['id_service_site']
+                    break
+            self.assertFalse(current_id is None)
 
-        params = {'id': current_id}
-        response = self._delete_with_user_http_auth(self.test_client, username='user', password='user',
-                                                    params=params)
-        self.assertEqual(403, response.status_code, msg="Delete denied")
+            params = {'id': current_id}
+            response = self._delete_with_user_http_auth(self.test_client, username='user', password='user',
+                                                        params=params)
+            self.assertEqual(403, response.status_code, msg="Delete denied")
 
-        response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
-                                                    params=params)
-        self.assertEqual(403, response.status_code, msg="Delete still denied")
+            response = self._delete_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                        params=params)
+            self.assertEqual(403, response.status_code, msg="Delete still denied")
 
-        response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                    params=params)
-        self.assertEqual(200, response.status_code, msg="Delete OK")
+            response = self._delete_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                        params=params)
+            self.assertEqual(200, response.status_code, msg="Delete OK")
 
-        params = {'id_site': 1}
-        response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin', params=params)
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(3, len(response.json))  # Back to initial state!
+            params = {'id_site': 1}
+            response = self._get_with_user_http_auth(self.test_client,  username='admin', password='admin', params=params)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(3, len(response.json))  # Back to initial state!
 
-        # Recreate default associations - projects
-        json_data = {'service': {'id_service': 3, 'projects': [{'id_project': 1},
-                                                               {'id_project': 2},
-                                                               {'id_project': 3}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data,
-                                                  endpoint='/api/user/services/projects')
-        self.assertEqual(200, response.status_code)
+            # Recreate default associations - projects
+            service: TeraService = TeraService.get_service_by_key('FileTransferService')
+            json_data = {'service': {'id_service': service.id_service,
+                                     'projects': [{'id_project': 1},
+                                                  {'id_project': 2},
+                                                  {'id_project': 3}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data,
+                                                      endpoint='/api/user/services/projects')
+            self.assertEqual(200, response.status_code)
 
-        json_data = {'service': {'id_service': 5, 'projects': [{'id_project': 1}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                  json=json_data,
-                                                  endpoint='/api/user/services/projects')
-        self.assertEqual(200, response.status_code)
+            service: TeraService = TeraService.get_service_by_key('VideoRehabService')
+            json_data = {'service': {'id_service': service.id_service, 'projects': [{'id_project': 1}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data,
+                                                      endpoint='/api/user/services/projects')
+            self.assertEqual(200, response.status_code)
 
-        # Recreate defaults associations - session types
-        json_data = {'site': {'id_site': 1, 'sessiontypes': [{'id_session_type': 1},
-                                                             {'id_session_type': 2},
-                                                             {'id_session_type': 3},
-                                                             {'id_session_type': 4},
-                                                             {'id_session_type': 5}]}}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data,
-                                                  endpoint='/api/user/sessiontypes/sites')
-        self.assertEqual(200, response.status_code)
+            # Recreate defaults associations - session types
+            json_data = {'site': {'id_site': 1, 'sessiontypes': [{'id_session_type': 1},
+                                                                 {'id_session_type': 2},
+                                                                 {'id_session_type': 3},
+                                                                 {'id_session_type': 4},
+                                                                 {'id_session_type': 5}]}}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data,
+                                                      endpoint='/api/user/sessiontypes/sites')
+            self.assertEqual(200, response.status_code)
 
-        json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
-                                              {'id_session_type': 2, 'id_project': 1},
-                                              {'id_session_type': 3, 'id_project': 1},
-                                              {'id_session_type': 4, 'id_project': 1},
-                                              {'id_session_type': 5, 'id_project': 1}]}
-        response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data,
-                                                  endpoint='/api/user/sessiontypes/projects')
-        self.assertEqual(200, response.status_code)
+            json_data = {'session_type_project': [{'id_session_type': 1, 'id_project': 1},
+                                                  {'id_session_type': 2, 'id_project': 1},
+                                                  {'id_session_type': 3, 'id_project': 1},
+                                                  {'id_session_type': 4, 'id_project': 1},
+                                                  {'id_session_type': 5, 'id_project': 1}]}
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin', json=json_data,
+                                                      endpoint='/api/user/sessiontypes/projects')
+            self.assertEqual(200, response.status_code)
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

@@ -1,7 +1,7 @@
 from opentera.db.Base import BaseModel
 from opentera.db.SoftDeleteMixin import SoftDeleteMixin
 from opentera.db.models.TeraSession import TeraSession
-from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean, TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String, Sequence, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import IntegrityError
 from enum import Enum, unique
@@ -30,10 +30,12 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
 
     session_type_session_type_projects = relationship("TeraSessionTypeProject", viewonly=True)
     session_type_session_type_sites = relationship("TeraSessionTypeSite", viewonly=True)
+    session_type_secondary_services = relationship("TeraService", secondary="t_sessions_types_services")
 
     session_type_projects = relationship("TeraProject", secondary="t_sessions_types_projects",
                                          back_populates="project_session_types")
-    session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites")
+    session_type_sites = relationship("TeraSite", secondary="t_sessions_types_sites",
+                                      back_populates="site_sessions_types")
 
     session_type_service = relationship("TeraService")
 
@@ -44,7 +46,7 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
             ignore_fields = []
         ignore_fields.extend(['session_type_projects', 'session_type_devices_types', 'SessionCategoryEnum',
                               'session_type_service', 'session_type_sessions', 'session_type_session_type_projects',
-                              'session_type_sites', 'session_type_session_type_sites'])
+                              'session_type_sites', 'session_type_session_type_sites', 'session_type_secondary_services'])
         if minimal:
             ignore_fields.extend(['session_type_online',
                                   'session_type_profile',

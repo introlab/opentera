@@ -42,6 +42,7 @@ add_custom_target(
     DEPENDS videorehabservice-python-translations
     DEPENDS loggingservice-python-translations
     DEPENDS filetransferservice-python-translations
+    DEPENDS emailservice-python-translations
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )
@@ -59,6 +60,7 @@ add_custom_target(
     DEPENDS videorehabservice-python-translations-compile-only
     DEPENDS loggingservice-python-translations-compile-only
     DEPENDS filetransferservice-python-translations-compile-only
+    DEPENDS emailservice-python-translations-compile-only
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     SOURCES babel.cfg
 )
@@ -69,7 +71,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/opentera/OpenTeraServerVersion.py.in 
 add_custom_target(python-server-version SOURCES opentera/OpenTeraServerVersion.py.in)
 
 # Will always be considered out of date...
-add_custom_target(python-all DEPENDS python-env python-messages python-server-version python-translations-compile-only opentera/OpenTeraServerVersion.py)
+add_custom_target(python-all ALL DEPENDS python-env python-messages python-server-version python-translations-compile-only opentera/OpenTeraServerVersion.py)
 
 # Build this target if you want to update translations too...
 add_custom_target(python-all-with-translations DEPENDS python-all python-translations)

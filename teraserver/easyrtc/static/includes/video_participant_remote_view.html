@@ -7,19 +7,19 @@
 
     <!-- Video controls -->
     <div id="remoteVideoControls{##view_id##}" class="overlay-top-right" style="">
-        <input id="remoteBtnSwapVideo{##view_id##}" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,{##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteBtnSwapVideo{##view_id##}" data-i18n-attr="title" data-i18n="ui.swap" type="image" alt="image" src="images/swap.png" class="image-icon" onclick="enlargeView(false,{##view_id##});event.stopPropagation();" style="display: none;"/>
     </div>
 
     <!-- Micro, video, sensors, ... controls -->
     <div id="remoteLockedViewControls{##view_id##}" class="overlay-bottom-center" >
-        <input id="remoteMicStatus{##view_id##}" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
-        <input id="remoteVideoStatus{##view_id##}" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
-        <input id="remoteSpeakerStatus{##view_id##}" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
+        <input id="remoteMicStatus{##view_id##}" data-i18n-attr="title" data-i18n="ui.micro" type="image" alt="image" src="images/mic.png" class="image-icon" style="display: none;"/>
+        <input id="remoteVideoStatus{##view_id##}" data-i18n-attr="title" data-i18n="ui.camera" type="image" alt="image" src="images/video.png" class="image-icon" style="display: none;"/>
+        <input id="remoteSpeakerStatus{##view_id##}" data-i18n-attr="title" data-i18n="ui.speaker" type="image" alt="image" src="images/speaker.png" class="image-icon" style="display: none;"/>
     </div>
 
     <!-- Picture in picture -->
     <div id="remoteStatus{##view_id##}" class="overlay-bottom-right status-zone" style="display: none;">
-        <img id="remoteMusic{##view_id##}" type="image" alt="image" class="image-status" src="images/music_on.png"/>
+        <img id="remoteMusic{##view_id##}" data-i18n-attr="title" data-i18n="ui.music-icon" type="image" alt="image" class="image-status" src="images/music_on.png"/>
         <div id="remoteStatusVideo{##view_id##}" class="h-100 w-100 video-pip" ></div>
     </div>
 

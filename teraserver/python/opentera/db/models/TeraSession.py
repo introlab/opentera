@@ -42,6 +42,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                                  lazy="selectin")
     session_devices = relationship("TeraDevice", secondary="t_sessions_devices", back_populates="device_sessions",
                                    lazy="selectin")
+    # session_services = relationship("TeraService", secondary="t_sessions_services", back_populates="service_sessions",
+    #                                 lazy="selectin")
 
     session_creator_user = relationship('TeraUser')
     session_creator_device = relationship('TeraDevice')
@@ -142,6 +144,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
             session_part = TeraParticipant.get_participant_by_name('Participant #1')
             session_part2 = TeraParticipant.get_participant_by_name('Participant #2')
             session_service = TeraService.get_service_by_key('VideoRehabService')
+            file_service = TeraService.get_service_by_key('FileTransferService')
             session_device = TeraDevice.get_device_by_id(2)
 
             default_status = [0, 0, 0, 1, 2, 2, 3, 4]
@@ -170,6 +173,11 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                     base_session.session_users = [base_session.session_creator_user, session_user2, session_user3]
                 if i == 3:
                     base_session.session_devices = [session_device]
+                if i == 1:
+                    base_session.id_creator_participant = session_part.id_participant
+                    base_session.session_users = [base_session.session_creator_user, session_user2]
+                if i == 1:
+                    base_session.id_creator_service = session_service.id_service
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
 
@@ -189,6 +197,8 @@ class TeraSession(BaseModel, SoftDeleteMixin):
                     base_session.session_participants = [session_part]
                 else:
                     base_session.session_participants = [session_part, session_part2]
+                if i == 0:
+                    base_session.id_creator_service = file_service.id_service
                 base_session.session_devices = [base_session.session_creator_device]
                 base_session.session_uuid = str(uuid.uuid4())
                 TeraSession.db().session.add(base_session)
@@ -290,6 +300,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -311,6 +322,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)
@@ -331,6 +343,7 @@ class TeraSession(BaseModel, SoftDeleteMixin):
         query = query.order_by(TeraSession.session_start_datetime.desc())
         # Safety in case we have planned sessions at the same time, to ensure consistent order with limit and offsets
         query = query.order_by(TeraSession.id_session.desc())
+        query = query.distinct(TeraSession.id_session, TeraSession.session_start_datetime)
 
         query = TeraSession._set_query_parameters(query=query, status=status, limit=limit, offset=offset,
                                                   start_date=start_date, end_date=end_date)

@@ -23,11 +23,13 @@ class UserQueryServiceAccessToken(Resource):
     @api.doc(description='Get access token for a specific service.',
              responses={200: 'Success - returns access token',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get service access token
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 

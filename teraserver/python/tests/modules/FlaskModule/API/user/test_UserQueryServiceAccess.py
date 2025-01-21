@@ -1,6 +1,7 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
+from opentera.db.models.TeraService import TeraService
 
 
 class UserQueryServiceAccessTest(BaseUserAPITest):
@@ -64,21 +65,22 @@ class UserQueryServiceAccessTest(BaseUserAPITest):
 
     def test_query_for_service(self):
         with self._flask_app.app_context():
+            service : TeraService = TeraService.get_service_by_key('BureauActif')
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params={'id_service': 4})
+                                                     params={'id_service': service.id_service})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params={'id_service': 4})
+                                                     params={'id_service': service.id_service})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(2, len(response.json))
 
             for data_item in response.json:
                 self._checkJson(json_data=data_item)
-                self.assertEqual(data_item['id_service'], 4)
+                self.assertEqual(data_item['id_service'], service.id_service)
 
     def test_query_for_user_group(self):
         with self._flask_app.app_context():

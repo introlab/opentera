@@ -1,4 +1,4 @@
-from BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
+from tests.services.LoggingService.BaseLoggingServiceAPITest import BaseLoggingServiceAPITest
 from services.LoggingService.libloggingservice.db.models.LoginEntry import LoginEntry
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.services.TeraUserClient import TeraUserClient

@@ -36,14 +36,13 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
         ignore_fields.extend(['test_type_service', 'test_type_sites', 'test_type_projects',
                               'test_type_test_type_projects', 'test_type_test_type_sites', 'test_type_tests'])
 
-        if minimal:
-            ignore_fields.extend(['test_type_description'])
         rval = super().to_json(ignore_fields=ignore_fields)
 
         if not minimal:
             # Also includes service key and uuid
-            rval['test_type_service_key'] = self.test_type_service.service_key
-            rval['test_type_service_uuid'] = self.test_type_service.service_uuid
+            if self.test_type_service is not None:
+                rval['test_type_service_key'] = self.test_type_service.service_key
+                rval['test_type_service_uuid'] = self.test_type_service.service_uuid
         return rval
 
     @staticmethod
@@ -96,7 +95,7 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             .filter_by(test_type_uuid=tt_uuid).first()
 
     @staticmethod
-    def get_test_types_for_service(id_service: int, with_deleted: bool = False):
+    def get_tests_types_for_service(id_service: int, with_deleted: bool = False):
         return TeraTestType.query.execution_options(include_deleted=with_deleted)\
             .filter_by(id_service=id_service).all()
 
@@ -133,10 +132,10 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             urls['test_type_json_url'] = base_url + '/api/testtypes/form'
 
         if self.test_type_has_web_format:
-            urls['test_type_web_url'] = base_url + '/api/testtypes/web'
+            urls['test_type_web_url'] = base_url + '/viewer'
 
         if self.test_type_has_web_editor:
-            urls['test_type_web_editor_url'] = base_url + '/api/testtypes/web/edit'
+            urls['test_type_web_editor_url'] = base_url + '/editor'
 
         return urls
 
@@ -145,9 +144,18 @@ class TeraTestType(BaseModel, SoftDeleteMixin):
             return IntegrityError('Test Type still has associated tests', self.id_test_type, 't_tests')
         return None
 
+    def to_json_create_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_update_event(self):
+        return self.to_json(minimal=True)
+
+    def to_json_delete_event(self):
+        # Minimal information, delete can not be filtered
+        return {'id_test_type': self.id_test_type, 'test_type_uuid': self.test_type_uuid}
+
     @classmethod
     def insert(cls, test_type):
         # Generate UUID
         test_type.test_type_uuid = str(uuid.uuid4())
-
         super().insert(test_type)

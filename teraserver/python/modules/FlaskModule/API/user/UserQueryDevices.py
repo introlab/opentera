@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSite import TeraSite
@@ -75,11 +74,13 @@ class UserQueryDevices(Resource):
              responses={200: 'Success - returns list of devices',
                         400: 'User Error : Too Many IDs',
                         403: 'Forbidden access',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get device information
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -242,11 +243,13 @@ class UserQueryDevices(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified device',
                         400: 'Badly formed JSON or missing fields(id_device) in the JSON body',
-                        500: 'Internal error occurred when saving device'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving device'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update devices
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'device' not in request.json:
@@ -395,11 +398,13 @@ class UserQueryDevices(Resource):
              responses={200: 'Success',
                         400: 'Wrong ID/ No ID',
                         403: 'Logged user can\'t delete device (can delete if superadmin)',
-                        500: 'Device not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Device not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific device
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

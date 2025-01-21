@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     # Remove site_name unique constraint on t_sites
-    op.drop_constraint(constraint_name='t_sites_site_name_key', table_name='t_sites', type_='unique')
+    op.drop_constraint(constraint_name='t_sites_site_name_key', table_name='t_sites', type='unique')
 
     # TeraSessionParticipants.id_session add ondelete='cascade'
     op.drop_constraint(constraint_name='t_sessions_participants_id_session_fkey', table_name='t_sessions_participants',

@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from opentera.db.models.TeraSession import TeraSession
@@ -7,7 +7,6 @@ from modules.DatabaseModule.DBManager import DBManager
 from modules.LoginModule.LoginModule import LoginModule, current_device
 from sqlalchemy import exc
 from modules.FlaskModule.FlaskModule import device_api_ns as api
-from opentera.db.models.TeraDevice import TeraDevice
 import datetime
 
 # Parser definition(s)
@@ -65,10 +64,13 @@ class DeviceQuerySessions(Resource):
 
     @api.doc(description='Get session',
              responses={403: 'Forbidden for security reasons.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.device_token_or_certificate_required
     def get(self):
+        """
+        Query device sessions
+        """
         return gettext('Forbidden for security reasons'), 403
 
     @api.doc(description='Update/Create session',
@@ -77,10 +79,13 @@ class DeviceQuerySessions(Resource):
                         500: 'Internal server error',
                         501: 'Not implemented',
                         403: 'Logged device doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(session_schema)
     @LoginModule.device_token_or_certificate_required
     def post(self):
+        """
+        Update / create a session
+        """
         # args = post_parser.parse_args()
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -190,4 +195,7 @@ class DeviceQuerySessions(Resource):
 
     @LoginModule.device_token_or_certificate_required
     def delete(self):
+        """
+        Delete a session
+        """
         return gettext('Forbidden for security reasons'), 403

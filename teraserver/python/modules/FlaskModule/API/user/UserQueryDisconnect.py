@@ -1,5 +1,4 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, inputs
+from flask_restx import Resource
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from opentera.db.models.TeraUser import TeraUser
@@ -33,11 +32,13 @@ class UserQueryDisconnect(Resource):
                         400: 'No parameters specified, at least one id / uuid must be used',
                         403: 'Forbidden access. Please check that the user has access to'
                              ' the requested id/uuid.',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Force disconnect a specific user / participant / device from server
+        """
         args = get_parser.parse_args()
         user_access: DBManagerTeraUserAccess = DBManager.userAccess(current_user)
 

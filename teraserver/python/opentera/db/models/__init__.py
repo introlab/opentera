@@ -20,12 +20,14 @@ from .TeraSession import TeraSession
 from .TeraSessionDevices import TeraSessionDevices
 from .TeraSessionEvent import TeraSessionEvent
 from .TeraSessionParticipants import TeraSessionParticipants
+from .TeraSessionTypeServices import TeraSessionTypeServices
 from .TeraSessionType import TeraSessionType
 from .TeraSessionTypeProject import TeraSessionTypeProject
 from .TeraSessionTypeSite import TeraSessionTypeSite
 from .TeraSessionUsers import TeraSessionUsers
 from .TeraSite import TeraSite
 from .TeraTest import TeraTest
+from .TeraTestInvitation import TeraTestInvitation
 from .TeraTestType import TeraTestType
 from .TeraTestTypeProject import TeraTestTypeProject
 from .TeraTestTypeSite import TeraTestTypeSite
@@ -33,10 +35,10 @@ from .TeraUser import TeraUser
 from .TeraUserGroup import TeraUserGroup
 from .TeraUserUserGroup import TeraUserUserGroup
 from .TeraUserPreference import TeraUserPreference
-from .TeraUserUserGroup import TeraUserUserGroup
+
 
 """
-    A map containing the event name and class, useful for event filtering. 
+    A map containing the event name and class, useful for event filtering.
     Insert only useful events here.
 """
 EventNameClassMap = {
@@ -52,8 +54,10 @@ EventNameClassMap = {
     TeraUserGroup.get_model_name(): TeraUserGroup,
     TeraTestType.get_model_name(): TeraTestType,
     TeraTest.get_model_name(): TeraTest,
+    TeraTestInvitation.get_model_name(): TeraTestInvitation,
     TeraService.get_model_name(): TeraService,
     TeraSessionTypeSite.get_model_name(): TeraSessionTypeSite,
+    TeraSessionTypeServices.get_model_name(): TeraSessionTypeServices,
     TeraSessionTypeProject.get_model_name(): TeraSessionTypeProject,
     TeraServerSettings.get_model_name(): TeraServerSettings
 }
@@ -81,12 +85,15 @@ __all__ = ['TeraAsset',
            'TeraSessionDevices',
            'TeraSessionEvent',
            'TeraSessionParticipants',
+           'TeraSessionTypeServices',
            'TeraSessionType',
            'TeraSessionTypeProject',
+           'TeraSessionTypeServices',
            'TeraSessionTypeSite',
            'TeraSessionUsers',
            'TeraSite',
            'TeraTest',
+           'TeraTestInvitation',
            'TeraTestType',
            'TeraTestTypeSite',
            'TeraTestTypeProject',

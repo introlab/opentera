@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Environment=PYTHONPATH=/opentera/teraserver/python
-ExecStart=/opentera/teraserver/python/env/python-3.6/bin/python3 /opentera/teraserver/python/TeraServer.py
+ExecStart=/opentera/teraserver/python/env/python-3.11/bin/python3 /opentera/teraserver/python/TeraServer.py
 WorkingDirectory=/opentera/teraserver/python
 StandardOutput=syslog+console
 StandardError=syslog+console

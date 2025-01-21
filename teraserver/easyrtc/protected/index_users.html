@@ -17,6 +17,8 @@
     <script src="easyrtc/easyrtc.js"></script>
     <script src="js/bowser/bowser.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+
     <script src="js/tera_layout.js"></script>
     <script src="js/tera_main.js"></script>
     <script src="js/tera_ui.js"></script>
@@ -27,6 +29,7 @@
     <script src="js/tera_medias.js"></script>
     <script src="js/tera_tools.js"></script>
     <script src="js/tera_screen_control.js"></script>
+    <script src="js/tera_processing.js"></script>
 
     <!-- Streams recorders -->
     <script src="js/recordrtc/RecordRTC.js"></script>
@@ -79,6 +82,10 @@
                 <div class="form-group">
                     <label for="videoSelect" class="form-label" data-i18n="configDialog.video1">Source vidéo principale: </label>
                     <select id="videoSelect" class="form-control"></select>
+                </div>
+                <div class="form-group" id="blurGroup">
+                    <input type="checkbox" id="blurCheck" name="blurCheck" value="Blur" class="">
+                    <label for="blurCheck" class="form-label ml-1" data-i18n="configDialog.blur">Flouter l'arrière-plan</label>
                 </div>
                 <div class="form-group">
                     <label for="audioSelect" class="form-label" data-i18n="configDialog.audio1">Source audio principale: </label>
@@ -273,40 +280,40 @@
                     <!--<span class="badge badge-danger text-white-50" id="localViewRec1" style="display:none;">REC</span>-->
                     <!-- Video controls -->
                     <div id="localVideoControls1" class="overlay-top-right" style="">
-                        <input id="localBtnStar1" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localBtnSwapVideo1" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnStar1" data-i18n-attr="title" data-i18n="ui.star" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnSwapVideo1" data-i18n-attr="title" data-i18n="ui.swap" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Chrono display -->
                     <div id="localTools" class="overlay-top-center">
                         <div id="localChrono1" style="display:none">
                             <label class="chrono" id="localChronoText1">xx:xx</label>
-                            <input class="image-icon chrono-button" id="localChronoPlay1" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
-                            <input class="image-icon chrono-button" id="localChronoPause1" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(true,1);"/>
-                            <input class="image-icon chrono-button" id="localChronoStop1" type="image" alt="image" src="images/stop.png" onclick="stopChrono(true, 1);"/>
+                            <input class="image-icon chrono-button" data-i18n-attr="title" data-i18n="ui.play" id="localChronoPlay1" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
+                            <input class="image-icon chrono-button" data-i18n-attr="title" data-i18n="ui.pause" id="localChronoPause1" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(true,1);"/>
+                            <input class="image-icon chrono-button" data-i18n-attr="title" data-i18n="ui.stop" id="localChronoStop1" type="image" alt="image" src="images/stop.png" onclick="stopChrono(true, 1);"/>
                         </div>
 
                         <!-- Counter display -->
                         <div id="localCounter1" style="display:none">
-                            <input class="image-icon chrono-button" id="localCounterMinus1" type="image" alt="image" src="images/minus.png" onclick="counterMinus(true, 1);"/>
+                            <input class="image-icon chrono-button" id="localCounterMinus1" data-i18n-attr="title" data-i18n="ui.minus" type="image" alt="image" src="images/minus.png" onclick="counterMinus(true, 1);"/>
                             <label class="chrono counter" id="localCounterText1">00</label>
-                            <input class="image-icon chrono-button" id="localCounterPlus1" type="image" alt="image" src="images/plus.png" onclick="counterPlus(true, 1);"/>
-                            <input class="image-icon chrono-button" id="localCounterStop1" type="image" alt="image" src="images/stop.png" onclick="stopCounter(true, 1);"/>
+                            <input class="image-icon chrono-button" id="localCounterPlus1" data-i18n-attr="title" data-i18n="ui.plus" type="image" alt="image" src="images/plus.png" onclick="counterPlus(true, 1);"/>
+                            <input class="image-icon chrono-button" id="localCounterStop1" data-i18n-attr="title" data-i18n="ui.stop" type="image" alt="image" src="images/stop.png" onclick="stopCounter(true, 1);"/>
                         </div>
                     </div>
 
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls1" class="overlay-bottom-center">
-                        <input id="localConfig1" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(true, 1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localMicStatus1" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localVideoStatus1" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
-                        <input id="localSpeakerStatus1" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localConfig1" data-i18n-attr="title" data-i18n="ui.config" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(true, 1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localMicStatus1" data-i18n-attr="title" data-i18n="ui.micro" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localVideoStatus1" data-i18n-attr="title" data-i18n="ui.camera" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(true,1);event.stopPropagation();" style="display: none;"/>
+                        <input id="localSpeakerStatus1" data-i18n-attr="title" data-i18n="ui.speaker" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(true,1);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Video sources controls -->
                     <div id="localViewCameras1" class="mb-5 mb-md-0 overlay-bottom-left">
-                        <input id="localVideoSwap1" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(true, 1); event.stopPropagation();" style="display:none;"/>
+                        <input id="localVideoSwap1" data-i18n-attr="title" data-i18n="ui.cam-change" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(true, 1); event.stopPropagation();" style="display:none;"/>
                     </div>
 
                     <!-- PTZ controls -->
@@ -347,14 +354,14 @@
                             </div>
                         </div>
                         <div class="dropdown">
-                            <input class="btn bg-secondary text-light image-icon" id="localSettingsButton1" type="image" alt="image" src="images/settings.png" onclick="camSettings(true, 1);event.stopPropagation();" style="display: none;"/>
+                            <input class="btn bg-secondary text-light image-icon" id="localSettingsButton1" data-i18n-attr="title" data-i18n="ui.cam-settings" type="image" alt="image" src="images/settings.png" onclick="camSettings(true, 1);event.stopPropagation();" style="display: none;"/>
                         </div>
                     </div>
                     <!-- Sources controls -->
                     <div id="localSourcesControls1" class="overlay-bottom-right">
                         <div style="background-color:rgba(0,0,0,0);">
-                            <input id="localBtnShow2ndVideo1" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
-                            <input id="localBtnShareScreen1" class="image-icon" type="image" alt="image" data-sound-only="false" src="images/sharescreen.png" onclick="btnShareScreenClicked($('#localBtnShareScreen1').data().soundOnly);event.stopPropagation();" style="display: none;"/>
+                            <input id="localBtnShow2ndVideo1" data-i18n-attr="title" data-i18n="ui.cam-second" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndLocalVideoClicked();event.stopPropagation();" style="display: none;"/>
+                            <input id="localBtnShareScreen1" data-i18n-attr="title" data-i18n="ui.share-screen" class="image-icon" type="image" alt="image" data-sound-only="false" src="images/sharescreen.png" onclick="btnShareScreenClicked($('#localBtnShareScreen1').data().soundOnly);event.stopPropagation();" style="display: none;"/>
                         </div>
                     </div>
                     <!-- Video ! -->
@@ -374,13 +381,13 @@
 
                     <!-- Video controls -->
                     <div id="localVideoControls2" class="overlay-top-right" style="">
-                        <input id="localBtnStar2" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 2);event.stopPropagation();" style="display: none;"/>
-                        <input id="localBtnSwapVideo2" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnStar2" data-i18n-attr="title" data-i18n="ui.star" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(true, 2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localBtnSwapVideo2" data-i18n-attr="title" data-i18n="ui.swap" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(true,2);event.stopPropagation();" style="display: none;"/>
                     </div>
 
                     <!-- Micro, video, sensors, ... controls -->
                     <div id="localViewControls2" class="overlay-bottom-center" >
-                        <input id="localMicStatus2" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,2);event.stopPropagation();" style="display: none;"/>
+                        <input id="localMicStatus2" data-i18n-attr="title" data-i18n="ui.micro" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(true,2);event.stopPropagation();" style="display: none;"/>
                         <!--<input id="localVideoStatus2" type="image" alt="image" src="images/video.png" height=32 onclick="muteVideo(true,2);event.stopPropagation();" style="display: none;"/>
                         <input id="localSpeakerStatus2" type="image" alt="image" src="images/speaker.png" height=32 onclick="muteSpeaker(true,2);event.stopPropagation();" style="display: none;"/>-->
                     </div>

@@ -81,6 +81,7 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
             stp.id_project = project.id_project
             TeraSessionTypeProject.db().session.add(stp)
 
+            project = TeraProject.get_project_by_projectname('Default Project #2')
             stp = TeraSessionTypeProject()
             stp.id_session_type = bureau_session.id_session_type
             stp.id_project = project.id_project
@@ -127,8 +128,9 @@ class TeraSessionTypeProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
     def check_integrity(obj_to_check):
         from opentera.db.models.TeraSessionType import TeraSessionType
         # If that session type is related to a service, make sure that the service is associated to that project
-        if obj_to_check.session_type_project_session_type.session_type_category == \
-                TeraSessionType.SessionCategoryEnum.SERVICE.value:
+        if (obj_to_check.session_type_project_session_type.session_type_category ==
+                TeraSessionType.SessionCategoryEnum.SERVICE.value
+                and obj_to_check.session_type_project_session_type.id_service):
             service_projects = [proj.id_project for proj in
                                 obj_to_check.session_type_project_session_type.session_type_service.service_projects]
             if obj_to_check.id_project not in service_projects:

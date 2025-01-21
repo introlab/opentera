@@ -13,6 +13,13 @@ class TeraTestTest(BaseModelsTest):
         with self._flask_app.app_context():
             pass
 
+    def test_db_events_not_none(self):
+        with self._flask_app.app_context():
+            test : TeraTest = TeraTestTest.new_test_test(id_session=1)
+            self.assertIsNotNone(test.to_json_create_event())
+            self.assertIsNotNone(test.to_json_update_event())
+            self.assertIsNotNone(test.to_json_delete_event())
+
     def test_soft_delete(self):
         with self._flask_app.app_context():
             # Create new
@@ -46,22 +53,22 @@ class TeraTestTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create new participant
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=1)
             id_participant = participant.id_participant
 
             # Create new device
-            from test_TeraDevice import TeraDeviceTest
+            from tests.opentera.db.models.test_TeraDevice import TeraDeviceTest
             device = TeraDeviceTest.new_test_device()
             id_device = device.id_device
 
             # Create new user
-            from test_TeraUser import TeraUserTest
+            from tests.opentera.db.models.test_TeraUser import TeraUserTest
             user = TeraUserTest.new_test_user(user_name='test_testuser')
             id_user = user.id_user
 
             # Create new session
-            from test_TeraSession import TeraSessionTest
+            from tests.opentera.db.models.test_TeraSession import TeraSessionTest
             ses = TeraSessionTest.new_test_session(participants=[participant], users=[user], devices=[device])
             id_session = ses.id_session
 

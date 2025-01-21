@@ -3,12 +3,14 @@ from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
+from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure, UserNewPasswordSameAsOld
 from opentera.db.models.TeraUserGroup import TeraUserGroup
 from flask_babel import gettext
 from modules.DatabaseModule.DBManager import DBManager
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
+
+from modules.FlaskModule.FlaskUtils import FlaskUtils
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -43,13 +45,32 @@ class UserQueryUsers(Resource):
         self.module = kwargs.get('flaskModule', None)
         self.test = kwargs.get('test', False)
 
+    @staticmethod
+    def get_password_weaknesses_text(weaknesses: list) -> str:
+        text_list = []
+        for weakness in weaknesses:
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_SPECIAL:
+                text_list.append(gettext('Password missing special character'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_NUMERIC:
+                text_list.append(gettext('Password missing numeric character'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.BAD_LENGTH:
+                text_list.append(gettext('Password not long enough'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_LOWER_CASE:
+                text_list.append(gettext('Password missing lower case letter'))
+            if weakness == UserPasswordInsecure.PasswordWeaknesses.NO_UPPER_CASE:
+                text_list.append(gettext('Password missing upper case letter'))
+
+        return ",".join(text for text in text_list)
+
     @api.doc(description='Get user information. If no id specified, returns all accessible users',
              responses={200: 'Success',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get users
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
@@ -147,14 +168,6 @@ class UserQueryUsers(Resource):
             return jsonify(users_list)
 
         return [], 200
-        # try:
-        #     users = TeraUser.query_data(my_args)
-        #     users_list = []
-        #     for user in users:
-        #         users_list.append(user.to_json())
-        #     return jsonify(users_list)
-        # except InvalidRequestError:
-        #     return '', 500
 
     @api.doc(description='Create / update user. id_user must be set to "0" to create a new user. User can be modified '
                          'if: current user is super admin or user is part of a project which the current user is admin.'
@@ -165,11 +178,13 @@ class UserQueryUsers(Resource):
                         400: 'Badly formed JSON or missing field(id_user or missing password when new user) in the '
                              'JSON body',
                         409: 'Username is already taken',
-                        500: 'Internal error when saving user'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving user'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update an user
+        """
         user_access = DBManager.userAccess(current_user)
 
         if 'user' not in request.json:
@@ -238,6 +253,12 @@ class UserQueryUsers(Resource):
                                              UserQueryUsers.__name__,
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
+            except UserPasswordInsecure as e:
+                return (gettext('Password not strong enough') + ': ' +
+                        FlaskUtils.get_password_weaknesses_text(e.weaknesses), 400)
+            except UserNewPasswordSameAsOld:
+                return gettext('New password same as old password'), 400
+
         else:
             # New user, check if password is set
             # if 'user_password' not in json_user:
@@ -252,8 +273,8 @@ class UserQueryUsers(Resource):
             if json_user['user_password'] is None or json_user['user_password'] == '':
                 return gettext('Invalid password'), 400
 
-            # Check if username is already taken
-            if TeraUser.get_user_by_username(json_user['user_username']) is not None:
+            # Check if username is already taken - since it's an unique constraint, deleted users are also considered
+            if TeraUser.get_user_by_username(json_user['user_username'], with_deleted=True) is not None:
                 return gettext('Username unavailable.'), 409
 
             # Ok so far, we can try to create the user!
@@ -270,6 +291,9 @@ class UserQueryUsers(Resource):
                                              UserQueryUsers.__name__,
                                              'post', 500, 'Database error', str(e))
                 return gettext('Database error'), 500
+            except UserPasswordInsecure as e:
+                return (gettext('Password not strong enough') + ': ' +
+                        FlaskUtils.get_password_weaknesses_text(e.weaknesses), 400)
 
         update_user = TeraUser.get_user_by_id(json_user['id_user'])
 
@@ -299,34 +323,18 @@ class UserQueryUsers(Resource):
 
                     update_user.commit()
 
-            # Check if there's some user groups for the updated user that we need to delete
-            # id_groups_to_delete = set([group.id_user_group for group in update_user.user_user_groups])\
-            #     .difference(user_user_groups_ids)
-            #
-            # for id_to_del in id_groups_to_delete:
-            #     uug_to_del = TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-            #                                                                              user_group_id=id_to_del)
-            #     TeraUserUserGroup.delete(id_todel=uug_to_del.id_user_user_group)
-            #
-            # # Update / insert user groups
-            # for user_group in user_user_groups:
-            #     if not TeraUserUserGroup.query_user_user_group_for_user_user_group(user_id=update_user.id_user,
-            #                                                                        user_group_id=
-            #                                                                        user_group['id_user_group']):
-            #         # Group not already associated - associates!
-            #         TeraUserUserGroup.insert_user_user_group(id_user_group=user_group['id_user_group'],
-            #                                                  id_user=update_user.id_user)
-
         return [update_user.to_json()]
 
     @api.doc(description='Delete a specific user',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user (only super admin can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete an user
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

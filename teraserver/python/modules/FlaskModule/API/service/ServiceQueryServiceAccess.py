@@ -36,10 +36,13 @@ class ServiceQueryServiceAccess(Resource):
              responses={200: 'Success - returns list of access roles',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get access roles for a specific item
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
@@ -72,10 +75,13 @@ class ServiceQueryServiceAccess(Resource):
                         403: 'Logged service can\'t modify association (only self access can be modified)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update service - access association
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -177,10 +183,13 @@ class ServiceQueryServiceAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not related to this service)',
                         500: 'Association not found or database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a specific service access
+        """
         service_access: DBManagerTeraServiceAccess = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         id_todel = args['id']

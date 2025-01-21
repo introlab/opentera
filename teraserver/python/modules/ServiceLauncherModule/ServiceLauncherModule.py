@@ -146,10 +146,10 @@ class ServiceLauncherModule(BaseModule):
             path = os.path.join(os.getcwd(), 'services', 'FileTransferService', 'FileTransferService.py')
             executable_args.append(path)
             working_directory = os.path.join(os.getcwd(), 'services', 'FileTransferService')
-        # elif service.service_key == 'BureauActif':
-        #     path = os.path.join(os.getcwd(), 'services', 'BureauActif', 'BureauActifService.py')
-        #     executable_args.append(path)
-        #     working_directory = os.path.join(os.getcwd(), 'services', 'BureauActif')
+        elif service.service_key == 'EmailService':
+            path = os.path.join(os.getcwd(), 'services', 'EmailService', 'EmailService.py')
+            executable_args.append(path)
+            working_directory = os.path.join(os.getcwd(), 'services', 'EmailService')
         elif service.service_key == 'VideoRehabService':
             path = os.path.join(os.getcwd(), 'services', 'VideoRehabService', 'VideoRehabService.py')
             executable_args.append(path)

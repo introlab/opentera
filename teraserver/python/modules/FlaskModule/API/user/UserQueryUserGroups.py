@@ -1,9 +1,8 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from opentera.db.models.TeraUserGroup import TeraUserGroup
@@ -72,11 +71,13 @@ class UserQueryUserGroups(Resource):
 
     @api.doc(description='Get user group information. If no id specified, returns all accessible users groups',
              responses={200: 'Success',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get usergroup
+        """
         args = get_parser.parse_args()
 
         user_access = DBManager.userAccess(current_user)
@@ -121,11 +122,13 @@ class UserQueryUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified user group',
                         400: 'Badly formed JSON or missing field(id_user_group) in the JSON body',
-                        500: 'Internal error when saving user group'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving user group'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update usergroup
+        """
         user_access = DBManager.userAccess(current_user)
 
         if 'user_group' not in request.json:
@@ -274,11 +277,13 @@ class UserQueryUserGroups(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete user group (only a site admin that includes that user group in '
                              'their site can delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete an usergroup
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

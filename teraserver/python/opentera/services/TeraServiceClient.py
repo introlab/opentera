@@ -6,14 +6,11 @@ from flask import request
 
 class TeraServiceClient:
 
-    def __init__(self, token_dict: dict, token: str, config_man):
+    def __init__(self, token_dict: dict, token: str, config_man, service):
         self.__service_uuid = token_dict['service_uuid']
         self.__service_token = token
-
-        backend_hostname = config_man.backend_config["hostname"]
-        backend_port = str(config_man.backend_config["port"])
-
-        self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
+        self.__config_man = config_man
+        self.__service = service
 
     @property
     def service_uuid(self):
@@ -31,15 +28,28 @@ class TeraServiceClient:
     def service_token(self, token: str):
         self.__service_token = token
 
-    def do_get_request_to_backend(self, path: str) -> Response:
-        from requests import get
-        request_headers = {'Authorization': 'OpenTera ' + self.__service_token}
-        # TODO: remove verify=False and check certificate
-        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
-        return backend_response
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        # TODO - Implement this
+        return False
+
+    def do_get_request_to_backend(self, path: str, params: dict = None, override_token: str | None = None) -> Response:
+        """
+        Now using service function:
+        def get_from_opentera_with_token(self, token: str, api_url: str, params: dict = {},
+                                     additional_headers: dict = {}) -> Response:
+        """
+        if params is None:
+            params = {}
+
+        token = self.__service_token
+        if override_token:
+            token = override_token
+
+        return self.__service.get_from_opentera_with_token(token, api_url=path, params=params)
 
     def get_service_infos(self) -> dict:
-        response = self.do_get_request_to_backend('/api/service/services?uuid_service=' + self.__service_uuid)
+        params = {'uuid_service': self.__service_uuid}
+        response = self.do_get_request_to_backend('/api/service/services', params)
         if response.status_code == 200:
             return response.json()[0]
         return {}

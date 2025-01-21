@@ -1,5 +1,10 @@
 from flask import request
 from flask_restx import Resource, reqparse, inputs
+
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy import exc, inspect
+from flask_babel import gettext
+
 from modules.LoginModule.LoginModule import current_service, LoginModule
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
@@ -7,9 +12,7 @@ from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraProject import TeraProject
 from modules.DatabaseModule.DBManager import DBManager
-from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy import exc, inspect
-from flask_babel import gettext
+
 
 # Parser definition(s)
 get_parser = api.parser()
@@ -42,10 +45,13 @@ class ServiceQueryTestTypeProjects(Resource):
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
                         500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get test types associated with a project
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = get_parser.parse_args()
 
@@ -102,10 +108,13 @@ class ServiceQueryTestTypeProjects(Resource):
                         403: 'Logged service can\'t modify association (not associated to project or test type)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update test types -> project association
+        """
         service_access = DBManager.serviceAccess(current_service)
 
         accessible_projects_ids = service_access.get_accessible_projects_ids(admin_only=True)
@@ -159,13 +168,13 @@ class ServiceQueryTestTypeProjects(Resource):
                 return gettext('Forbidden'), 403
 
             # Get all current association
-            current_test_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
-            current_test_types_ids = [tt.id_test_type for tt in current_test_types]
+            current_tests_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
+            current_tests_types_ids = [tt.id_test_type for tt in current_tests_types]
             received_tt_ids = [tt['id_test_type'] for tt in request.json['project']['testtypes']]
             # Difference - we must delete types not anymore in the list
-            todel_ids = set(current_test_types_ids).difference(received_tt_ids)
+            todel_ids = set(current_tests_types_ids).difference(received_tt_ids)
             # Also filter types already there
-            received_tt_ids = set(received_tt_ids).difference(current_test_types_ids)
+            received_tt_ids = set(received_tt_ids).difference(current_tests_types_ids)
             try:
                 for tt_id in todel_ids:
                     TeraTestTypeProject.delete_with_ids(test_type_id=tt_id, project_id=id_project, autocommit=False)
@@ -238,10 +247,13 @@ class ServiceQueryTestTypeProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged service can\'t delete association (no access to test-type or project)',
                         400: 'Association not found (invalid id?)'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a specific test type -> project association
+        """
         service_access = DBManager.serviceAccess(current_service)
         args = delete_parser.parse_args()
         id_todel = args['id']
@@ -251,7 +263,7 @@ class ServiceQueryTestTypeProjects(Resource):
         if not ttp:
             return gettext('Not found'), 400
 
-        if ttp.id_project not in service_access.get_accessible_tests_types_ids() or ttp.id_test_type \
+        if ttp.id_project not in service_access.get_accessible_projects_ids() or ttp.id_test_type \
                 not in service_access.get_accessible_tests_types_ids():
             return gettext('Forbidden'), 403
 

@@ -1,0 +1,15 @@
+
+{
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "${workspaceFolder}",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.envFile": "${workspaceFolder}/.env.vscode",
+    "cmake.buildDirectory": "${workspaceFolder}/../build",
+    "cmake.sourceDirectory": "${workspaceFolder}/../",
+}

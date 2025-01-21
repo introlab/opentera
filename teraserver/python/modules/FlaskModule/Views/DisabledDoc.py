@@ -7,6 +7,7 @@ class DisabledDoc(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     # Anybody can view this?
     # @user_multi_auth.login_required

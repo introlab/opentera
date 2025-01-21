@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11.4]
+        python-version: [3.11.9]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Set up Python ${{ matrix.python-version }}
@@ -44,6 +44,8 @@ jobs:
         sudo -u postgres psql -c "grant all privileges on database openteralogs to TeraAgent;"
         sudo -u postgres psql -c "create database openterafiles;" 
         sudo -u postgres psql -c "grant all privileges on database openterafiles to TeraAgent;"
+        sudo -u postgres psql -c "create database openteraemails;" 
+        sudo -u postgres psql -c "grant all privileges on database openteraemails to TeraAgent;"
         sudo -u postgres psql -c "\l"
         
     - name: Install Miniconda3
@@ -113,6 +115,11 @@ jobs:
         
     - name: Run LoggingService Tests
       working-directory: teraserver/python/tests/services/LoggingService
+      run: |
+        $OPENTERA_PYTHON -m unittest discover . "test_*.py"
+    
+    - name: Run EmailService Tests
+      working-directory: teraserver/python/tests/services/EmailService
       run: |
         $OPENTERA_PYTHON -m unittest discover . "test_*.py"
   

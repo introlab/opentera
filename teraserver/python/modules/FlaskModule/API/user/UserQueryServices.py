@@ -1,10 +1,9 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy import exc
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 from modules.DatabaseModule.DBManager import DBManager
@@ -41,11 +40,13 @@ class UserQueryServices(Resource):
 
     @api.doc(description='Get services information. Only one of the ID parameter is supported and required at once.',
              responses={200: 'Success - returns list of services',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get services
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -109,11 +110,13 @@ class UserQueryServices(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified service',
                         400: 'Badly formed JSON or missing fields(id_service) in the JSON body',
-                        500: 'Internal error occured when saving service'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving service'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update services
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Check if user is a super admin
@@ -217,11 +220,13 @@ class UserQueryServices(Resource):
                         400: 'Service doesn\'t exists',
                         403: 'Logged user can\'t delete service (only super admins can delete) or service is a system '
                              'service',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete service
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

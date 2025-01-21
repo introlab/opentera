@@ -1,6 +1,6 @@
 
 from opentera.db.Base import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, TIMESTAMP, Sequence
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Sequence
 
 
 class LogEntry(BaseModel):

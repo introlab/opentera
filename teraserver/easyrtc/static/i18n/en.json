@@ -12,7 +12,8 @@
 		"audio2": "Extra Audio Source",
 		"mirror": "Mirror Image",
 		"none": "None",
-		"screenaudio": "Share screen audio"
+		"screenaudio": "Share screen audio",
+		"blur": "Blur background"
 	},
 	"chronosDialog": {
 		"title": "Timers",
@@ -94,6 +95,22 @@
 		"preset-3": "Position 3",
 		"screenof": "Screen -",
 		"cameraof": "Camera -",
-		"music": "Share music"
+		"music": "Share music",
+		"star": "Focus everyone on that video",
+		"swap": "Enlarge video for myself",
+		"play": "Start",
+		"stop": "Stop",
+		"pause": "Pause",
+		"minus": "Decrease",
+		"plus": "Increase",
+		"config": "Settings",
+		"micro": "Microphone on/off",
+		"camera": "Camera on/off",
+		"speaker": "Sound on/off",
+		"cam-change": "Toggle active camera",
+		"cam-settings": "Camera settings",
+		"cam-second": "Enable/disable extra video source",
+		"share-screen": "Enable/disable screen sharing",
+		"music-icon": "Enable/disable music sharing"
 	}
 }

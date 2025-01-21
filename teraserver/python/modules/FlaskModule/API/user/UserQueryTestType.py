@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -16,6 +16,7 @@ from opentera.redis.RedisVars import RedisVars
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query')
+get_parser.add_argument('test_type_uuid', type=str, help='UUID of the test type to query')
 get_parser.add_argument('test_type_key', type=str, help='Key of the test type to query')
 get_parser.add_argument('id_project', type=int, help='ID of the project to get test types for')
 get_parser.add_argument('id_site', type=int, help='ID of the site to get test types for')
@@ -41,29 +42,43 @@ class UserQueryTestTypes(Resource):
 
     @api.doc(description='Get test type information. If no id_test_type specified, returns all available test types',
              responses={200: 'Success - returns list of test types',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test types
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
         if args['id_test_type']:
-            test_types = [user_access.query_test_type(args['id_test_type'])]
+            test_type = user_access.query_test_type(args['id_test_type'])
+            if not test_type:
+                return gettext('Test type not found'), 404
+            test_types = [test_type]
         elif args['test_type_key']:
             test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
+            if not test_type:
+                return gettext('Test type not found'), 404
             test_types = [user_access.query_test_type(test_type.id_test_type)]  # Call to filter access if needed
+        elif args['test_type_uuid']:
+            test_type = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
+            if not test_type:
+                return gettext('Test type not found'), 404
+            test_types = [user_access.query_test_type(test_type.id_test_type)]
         elif args['id_project']:
-            test_types_projects = user_access.query_test_types_for_project(args['id_project'])
+            if args['id_project'] not in user_access.get_accessible_projects_ids():
+                return gettext('Forbidden'), 403
+            test_types_projects = user_access.query_tests_types_for_project(args['id_project'])
             test_types = [ttp.test_type_project_test_type for ttp in test_types_projects]
         elif args['id_site']:
             if args['id_site'] not in user_access.get_accessible_sites_ids():
                 return gettext('Forbidden'), 403
-            test_types_sites = user_access.query_test_types_sites_for_site(args['id_site'])
+            test_types_sites = user_access.query_tests_types_sites_for_site(args['id_site'])
             test_types = [tts.test_type_site_test_type for tts in test_types_sites]
         else:
-            test_types = user_access.get_accessible_test_types()
+            test_types = user_access.get_accessible_tests_types()
 
         try:
             test_types_list = []
@@ -117,11 +132,13 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
-                        500: 'Internal error when saving test type'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving test type'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test types
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'test_type' not in request.json:
@@ -311,11 +328,13 @@ class UserQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete test type (no admin access to project related to that type '
                              'or tests of that type exists in the system somewhere)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete test type
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

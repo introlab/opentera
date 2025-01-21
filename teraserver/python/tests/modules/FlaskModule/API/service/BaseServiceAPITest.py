@@ -1,17 +1,21 @@
 import unittest
-from modules.DatabaseModule.DBManager import DBManager
-from modules.LoginModule.LoginModule import LoginModule
-from opentera.config.ConfigManager import ConfigManager
-from opentera.modules.BaseModule import BaseModule, ModuleNames
-from flask.testing import FlaskClient
-from opentera.redis.RedisVars import RedisVars
-from opentera.db.models.TeraService import TeraService
-from modules.FlaskModule.FlaskModule import FlaskModule, CustomAPI
-import redis
 import uuid
+
+import redis
+
+from flask.testing import FlaskClient
 from flask import Flask
 from flask_babel import Babel
+
+from modules.DatabaseModule.DBManager import DBManager
+from modules.LoginModule.LoginModule import LoginModule
+from modules.FlaskModule.FlaskModule import FlaskModule, CustomAPI
 import modules.Globals as Globals
+
+from opentera.config.ConfigManager import ConfigManager
+from opentera.modules.BaseModule import BaseModule, ModuleNames
+from opentera.redis.RedisVars import RedisVars
+from opentera.db.models.TeraService import TeraService
 
 
 class FakeFlaskModule(BaseModule):
@@ -119,7 +123,8 @@ class BaseServiceAPITest(unittest.TestCase):
             self.service_uuid = service.service_uuid
             self.id_service = service.id_service
 
-    def _get_with_service_token_auth(self, client: FlaskClient, token, params={}, endpoint=None):
+    def _get_with_service_token_auth(self, client: FlaskClient, token: str,
+                                     params : dict = None, endpoint : str =None):
         if params is None:
             params = {}
         if endpoint is None:
@@ -127,7 +132,7 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.get(endpoint, headers=headers, query_string=params)
 
-    def _post_with_service_token_auth(self, client: FlaskClient, token: str = '', json: dict = None,
+    def _post_with_service_token_auth(self, client: FlaskClient, token: str, json: dict = None,
                                       params: dict = None, endpoint: str = None):
         if params is None:
             params = {}
@@ -136,7 +141,7 @@ class BaseServiceAPITest(unittest.TestCase):
         headers = {'Authorization': 'OpenTera ' + token}
         return client.post(endpoint, headers=headers, query_string=params, json=json)
 
-    def _delete_with_service_token_auth(self, client: FlaskClient, token: str = '',
+    def _delete_with_service_token_auth(self, client: FlaskClient, token: str,
                                         params: dict = None, endpoint: str = None):
         if params is None:
             params = {}

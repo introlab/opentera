@@ -18,7 +18,7 @@ get_parser.add_argument('id_test_type', type=int, help='Test type ID to query as
 
 get_parser.add_argument('with_projects', type=inputs.boolean, help='Used with id_test_type. Also return projects '
                                                                    'that don\'t have any association with that type')
-get_parser.add_argument('with_test_types', type=inputs.boolean, help='Used with id_project. Also return types that '
+get_parser.add_argument('with_tests_types', type=inputs.boolean, help='Used with id_project. Also return types that '
                                                                      'don\'t have any association with that project')
 get_parser.add_argument('with_sites', type=inputs.boolean, help='Used with id_test_type. Also return site '
                                                                 'information of the returned projects.')
@@ -48,11 +48,13 @@ class UserQueryTestTypeProjects(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of test-types - projects association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test types - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -63,11 +65,11 @@ class UserQueryTestTypeProjects(Resource):
 
         if args['id_project']:
             if args['id_project'] in user_access.get_accessible_projects_ids():
-                test_type_projects = user_access.query_test_types_for_project(project_id=args['id_project'],
-                                                                              include_other_test_types=
-                                                                              args['with_test_types'])
+                test_type_projects = user_access.query_tests_types_for_project(project_id=args['id_project'],
+                                                                              include_other_tests_types=
+                                                                              args['with_tests_types'])
         elif args['id_test_type']:
-            if args['id_test_type'] in user_access.get_accessible_test_types_ids():
+            if args['id_test_type'] in user_access.get_accessible_tests_types_ids():
                 test_type_projects = user_access.query_projects_for_test_type(test_type_id=args['id_test_type'],
                                                                               include_other_projects=
                                                                               args['with_projects'])
@@ -113,11 +115,13 @@ class UserQueryTestTypeProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (project admin access required)',
                         400: 'Badly formed JSON or missing fields in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test-type -> project association
+        """
         user_access = DBManager.userAccess(current_user)
 
         accessible_projects_ids = user_access.get_accessible_projects_ids(admin_only=True)
@@ -129,7 +133,7 @@ class UserQueryTestTypeProjects(Resource):
                 return gettext('Missing projects'), 400
             id_test_type = request.json['test_type']['id_test_type']
 
-            if id_test_type not in user_access.get_accessible_test_types_ids():
+            if id_test_type not in user_access.get_accessible_tests_types_ids():
                 return gettext("Access denied"), 403
 
             # Get all current association for test type
@@ -171,13 +175,13 @@ class UserQueryTestTypeProjects(Resource):
                 return gettext('Access denied'), 403
 
             # Get all current association
-            current_test_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
-            current_test_types_ids = [tt.id_test_type for tt in current_test_types]
+            current_tests_types = TeraTestTypeProject.get_tests_types_for_project(project_id=id_project)
+            current_tests_types_ids = [tt.id_test_type for tt in current_tests_types]
             received_tt_ids = [tt['id_test_type'] for tt in request.json['project']['testtypes']]
             # Difference - we must delete types not anymore in the list
-            todel_ids = set(current_test_types_ids).difference(received_tt_ids)
+            todel_ids = set(current_tests_types_ids).difference(received_tt_ids)
             # Also filter types already there
-            received_tt_ids = set(received_tt_ids).difference(current_test_types_ids)
+            received_tt_ids = set(received_tt_ids).difference(current_tests_types_ids)
             try:
                 for tt_id in todel_ids:
                     TeraTestTypeProject.delete_with_ids(test_type_id=tt_id, project_id=id_project, autocommit=False)
@@ -256,11 +260,13 @@ class UserQueryTestTypeProjects(Resource):
     @api.doc(description='Delete a specific test-type - project association.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (no access to test-type or project)',
-                        400: 'Association not found (invalid id?)'},
-             params={'token': 'Secret token'})
+                        400: 'Association not found (invalid id?)'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific test type - project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']
@@ -271,7 +277,7 @@ class UserQueryTestTypeProjects(Resource):
             return gettext('Not found'), 400
 
         if ttp.id_project not in user_access.get_accessible_projects_ids(admin_only=True) or ttp.id_test_type not in \
-                user_access.get_accessible_test_types_ids():
+                user_access.get_accessible_tests_types_ids():
             return gettext('Access denied'), 403
 
         # If we are here, we are allowed to delete. Do so.

@@ -1,12 +1,14 @@
+import time
+import datetime
 from flask import Flask, request, g, url_for
-from flask_session import Session
 from flask_restx import Api, Namespace
-from opentera.config.ConfigManager import ConfigManager
 from flask_babel import Babel
+import redis
+
+from opentera.config.ConfigManager import ConfigManager
 from opentera.modules.BaseModule import BaseModule, ModuleNames
 from opentera.db.models.TeraServerSettings import TeraServerSettings
 from opentera.OpenTeraServerVersion import opentera_server_version_string
-import redis
 from modules.Globals import opentera_doc_url
 
 
@@ -37,16 +39,14 @@ babel = Babel(flask_app, locale_selector=get_locale, timezone_selector=get_timez
 
 # API
 authorizations = {
-    'HTTPAuth': {
-        'type': 'basic',
-        'in': 'header'
+    'basicAuth': {
+        'type': 'basic'
     },
-    'Token Authentication': {
+    'tokenAuth': {
         'type': 'apiKey',
         'in': 'header',
         'name': 'Authorization',
-        'default': 'OpenTera',
-        'bearerFormat': 'JWT'
+        'description': 'Enter token with the `OpenTera` prefix, e.g. "OpenTera 12345"'
     }
 }
 
@@ -66,7 +66,7 @@ class CustomAPI(Api):
 # if doc is set to False, documentation is disabled
 api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
-                authorizations=authorizations)
+                authorizations=authorizations, security='basicAuth')
 
 # Namespaces
 user_api_ns = api.namespace('user', description='API for user calls')
@@ -97,7 +97,9 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_REDIS': redis_url})
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
+        flask_app.config.update({'SESSION_COOKIE_SAMESITE': 'Strict'})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': flask_app.debug})
+        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5)})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -105,7 +107,7 @@ class FlaskModule(BaseModule):
         # Not sure.
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
-        self.session = Session(flask_app)
+        # self.session = Session(flask_app)
 
         # Init API
         FlaskModule.init_user_api(self, user_api_ns)
@@ -138,6 +140,9 @@ class FlaskModule(BaseModule):
 
         # Users...
         from modules.FlaskModule.API.user.UserLogin import UserLogin
+        from modules.FlaskModule.API.user.UserLogin2FA import UserLogin2FA
+        from modules.FlaskModule.API.user.UserLoginSetup2FA import UserLoginSetup2FA
+        from modules.FlaskModule.API.user.UserLoginChangePassword import UserLoginChangePassword
         from modules.FlaskModule.API.user.UserLogout import UserLogout
         from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
         from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
@@ -159,6 +164,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQuerySessions import UserQuerySessions
         from modules.FlaskModule.API.user.UserQuerySessionTypes import UserQuerySessionTypes
         from modules.FlaskModule.API.user.UserQuerySessionEvents import UserQuerySessionEvents
+        from modules.FlaskModule.API.user.UserQuerySessionTypeServices import UserQuerySessionTypeServices
         from modules.FlaskModule.API.user.UserQuerySessionTypeSites import UserQuerySessionTypeSites
         from modules.FlaskModule.API.user.UserQuerySessionTypeProjects import UserQuerySessionTypeProjects
         from modules.FlaskModule.API.user.UserQueryDeviceTypes import UserQueryDeviceTypes
@@ -180,26 +186,27 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserQueryTestTypeProjects import UserQueryTestTypeProjects
         from modules.FlaskModule.API.user.UserQueryTestType import UserQueryTestTypes
         from modules.FlaskModule.API.user.UserQueryTests import UserQueryTests
+        from modules.FlaskModule.API.user.UserQueryTestsInvitations import UserQueryTestsInvitations
         from modules.FlaskModule.API.user.UserQueryDisconnect import UserQueryDisconnect
         from modules.FlaskModule.API.user.UserQueryServerSettings import UserQueryServerSettings
-        from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
+        # from modules.FlaskModule.API.user.UserQueryUndelete import UserQueryUndelete
 
         # Resources
         namespace.add_resource(UserQueryAssets,               '/assets', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryAssetsArchive,        '/assets/archive', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDevices,              '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineDevices,        '/devices/online', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceSites,          '/devicesites', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSites,          '/devices/sites', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceProjects,       '/deviceprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceProjects,       '/devices/projects', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQueryDeviceParticipants,   '/deviceparticipants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceParticipants,   '/devices/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceTypes,          '/devicetypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryDeviceSubTypes,       '/devicesubtypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryForms,                '/forms', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipantGroup,     '/groups', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogin,                     '/login', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLogin2FA,                  '/login/2fa', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginSetup2FA,             '/login/setup_2fa', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginChangePassword,       '/login/change_password', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
@@ -209,9 +216,9 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySessions,             '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(UserSessionManager,            '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypes,         '/sessiontypes', resource_class_kwargs=kwargs)
-        # namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypeprojects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeProjects,  '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionTypeSites,     '/sessiontypes/sites', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQuerySessionTypeServices,  '/sessiontypes/services', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQuerySessionEvents,        '/sessions/events', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServerSettings,       '/server/settings', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryServices,             '/services', resource_class_kwargs=kwargs)
@@ -224,6 +231,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserQuerySiteAccess,           '/siteaccess', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryUserStats,            '/stats', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTests,                '/tests', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserQueryTestsInvitations,     '/tests/invitations', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypes,            '/testtypes', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypeProjects,     '/testtypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryTestTypeSites,        '/testtypes/sites', resource_class_kwargs=kwargs)
@@ -294,8 +302,10 @@ class FlaskModule(BaseModule):
         kwargs |= additional_args
 
         # Services
-        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
+        from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
         from modules.FlaskModule.API.service.ServiceQueryAssets import ServiceQueryAssets
+        from modules.FlaskModule.API.service.ServiceQueryAuthCode import ServiceQueryAuthCode
+        from modules.FlaskModule.API.service.ServiceQueryParticipants import ServiceQueryParticipants
         from modules.FlaskModule.API.service.ServiceQuerySessions import ServiceQuerySessions
         from modules.FlaskModule.API.service.ServiceQuerySessionEvents import ServiceQuerySessionEvents
         from modules.FlaskModule.API.service.ServiceQuerySiteProjectAccessRoles \
@@ -306,19 +316,22 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.service.ServiceQuerySites import ServiceQuerySites
         from modules.FlaskModule.API.service.ServiceSessionManager import ServiceSessionManager
         from modules.FlaskModule.API.service.ServiceQuerySessionTypes import ServiceQuerySessionTypes
+        from modules.FlaskModule.API.service.ServiceQuerySessionTypeProjects import ServiceQuerySessionTypeProjects
         from modules.FlaskModule.API.service.ServiceQueryDevices import ServiceQueryDevices
         from modules.FlaskModule.API.service.ServiceQueryTestTypes import ServiceQueryTestTypes
         from modules.FlaskModule.API.service.ServiceQueryTestTypeProjects import ServiceQueryTestTypeProjects
         from modules.FlaskModule.API.service.ServiceQueryTests import ServiceQueryTests
-        from modules.FlaskModule.API.service.ServiceQueryAccess import ServiceQueryAccess
+        from modules.FlaskModule.API.service.ServiceQueryTestsInvitations import ServiceQueryTestsInvitations
         from modules.FlaskModule.API.service.ServiceQueryDisconnect import ServiceQueryDisconnect
         from modules.FlaskModule.API.service.ServiceQueryRoles import ServiceQueryRoles
         from modules.FlaskModule.API.service.ServiceQueryServiceAccess import ServiceQueryServiceAccess
         from modules.FlaskModule.API.service.ServiceQueryUserGroups import ServiceQueryUserGroups
         from modules.FlaskModule.API.service.ServiceQueryParticipantGroups import ServiceQueryParticipantGroups
 
+
         namespace.add_resource(ServiceQueryAccess,                  '/access', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryAssets,                  '/assets', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryAuthCode,                '/auth/code', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDevices,                 '/devices', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryDisconnect,              '/disconnect', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryParticipantGroups,       '/groups', resource_class_kwargs=kwargs)
@@ -331,8 +344,10 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ServiceQuerySessionEvents,           '/sessions/events', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceSessionManager,               '/sessions/manager', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySessionTypes,            '/sessiontypes', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQuerySessionTypeProjects,     '/sessiontypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQuerySites,                   '/sites', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTests,                   '/tests', resource_class_kwargs=kwargs)
+        namespace.add_resource(ServiceQueryTestsInvitations,        '/tests/invitations', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTestTypes,               '/testtypes', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryTestTypeProjects,        '/testtypes/projects', resource_class_kwargs=kwargs)
         namespace.add_resource(ServiceQueryUserGroups,              '/usergroups', resource_class_kwargs=kwargs)
@@ -351,6 +366,10 @@ class FlaskModule(BaseModule):
     def init_views(self):
         from modules.FlaskModule.Views.About import About
         from modules.FlaskModule.Views.DisabledDoc import DisabledDoc
+        from modules.FlaskModule.Views.LoginView import LoginView
+        from modules.FlaskModule.Views.LoginChangePasswordView import LoginChangePasswordView
+        from modules.FlaskModule.Views.LoginSetup2FAView import LoginSetup2FAView
+        from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
 
         # Default arguments
         args = []
@@ -359,25 +378,37 @@ class FlaskModule(BaseModule):
         # About
         flask_app.add_url_rule('/about', view_func=About.as_view('about', *args, **kwargs))
 
+        # Login
+        flask_app.add_url_rule('/login', view_func=LoginView.as_view('login', *args, **kwargs))
+        flask_app.add_url_rule('/login_change_password', view_func=LoginChangePasswordView.as_view(
+            'login_change_password', *args, **kwargs))
+        flask_app.add_url_rule('/login_setup_2fa', view_func=LoginSetup2FAView.as_view(
+            'login_setup_2fa', *args, **kwargs))
+        flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(
+            'login_validate_2fa', *args, **kwargs))
+
         if not self.config.server_config['enable_docs']:
             # Disabled docs view
             flask_app.add_url_rule('/doc', view_func=DisabledDoc.as_view('doc', *args, **kwargs))
 
 
 @flask_app.after_request
-def apply_caching(response):
+def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+
+    # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up
+    if response.status_code == 401 and 'WWW-Authenticate' in response.headers:
+        del response.headers['WWW-Authenticate']
 
     # Request processing time
-    import time
     print(f"Process time: {(time.time() - g.start_time)*1000} ms")
     return response
 
 
 @flask_app.before_request
 def compute_request_time():
-    import time
     g.start_time = time.time()

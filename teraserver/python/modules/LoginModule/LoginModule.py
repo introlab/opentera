@@ -16,11 +16,11 @@ from opentera.services.DisabledTokenStorage import DisabledTokenStorage
 import datetime
 import redis
 
-from flask import request, g
+from flask import request, g, session, abort
 from flask_babel import gettext
 from werkzeug.local import LocalProxy
 from flask_restx import reqparse
-from functools import wraps
+from functools import wraps, partial
 
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth, Authorization
 
@@ -43,6 +43,7 @@ current_service = LocalProxy(lambda: g.setdefault('current_service', None))
 
 # Authentication schemes for users
 user_http_auth = HTTPBasicAuth(realm='user')
+user_http_login_auth = HTTPBasicAuth(realm='user')
 user_token_auth = HTTPTokenAuth("OpenTera")
 user_multi_auth = MultiAuth(user_http_auth, user_token_auth)
 
@@ -117,19 +118,23 @@ class LoginModule(BaseModule):
 
         # Cookie based configuration
         self.app.config.update({'REMEMBER_COOKIE_NAME': 'OpenTera',
-                                'REMEMBER_COOKIE_DURATION': 14,
+                                'REMEMBER_COOKIE_DURATION': datetime.timedelta(minutes=30),
                                 'REMEMBER_COOKIE_SECURE': True,
-                                'USE_PERMANENT_SESSION': True,
-                                'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
-                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True})
+                                'REMEMBER_COOKIE_SAMESITE': 'Strict',
+                                # 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=1),
+                                # 'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5),
+                                'REMEMBER_COOKIE_REFRESH_EACH_REQUEST': True
+                                })
 
         # Setup user loader function
         self.login_manager.user_loader(self.load_user)
 
         # Setup verify password function for users
-        user_http_auth.verify_password(self.user_verify_password)
+        user_http_auth.verify_password(partial(self.user_verify_password, is_login=False))
+        user_http_login_auth.verify_password(partial(self.user_verify_password, is_login=True))
         user_token_auth.verify_token(self.user_verify_token)
         user_http_auth.error_handler(self.auth_error)
+        user_http_login_auth.error_handler(self.auth_error)
         user_token_auth.error_handler(self.auth_error)
 
         # Setup verify password function for participants
@@ -162,8 +167,8 @@ class LoginModule(BaseModule):
 
         return None
 
-    def user_verify_password(self, username, password):
-        # print('LoginModule - user_verify_password ', username)
+    def user_verify_password(self, username, password, is_login):
+        # print('LoginModule - user_verify_password', username)
         tentative_user = TeraUser.get_user_by_username(username)
         if not tentative_user:
             # self.logger.log_warning(self.module_name, 'Invalid username', username)
@@ -207,15 +212,24 @@ class LoginModule(BaseModule):
         logged_user = TeraUser.verify_password(username=username, password=password, user=tentative_user)
 
         if logged_user and logged_user.is_active():
+
+            if not is_login:
+                if logged_user.user_force_password_change:
+                    # Prevent API access if password change was requested for that user
+                    abort(401, gettext('Unauthorized - User must login first to change password'))
+                if logged_user.user_2fa_enabled:
+                    # Prevent API access with username/password if 2FA is enabled
+                    abort(401, gettext('Unauthorized - 2FA is enabled, must login first and use token'))
+
             g.current_user = logged_user
 
-            # print('user_verify_password, found user: ', current_user)
-            # current_user.update_last_online()
+            # print('user_verify_password, found user:', current_user)
+            current_user.update_last_online()
 
             # Clear attempts counter
             self.redisDelete(attempts_key)
 
-            login_user(current_user, remember=True)
+            login_user(current_user, remember=False)
             # print('Setting key with expiration in 60s', session['_id'], session['_user_id'])
             # self.redisSet(session['_id'], session['_user_id'], ex=60)
             return True
@@ -321,7 +335,7 @@ class LoginModule(BaseModule):
             # TODO: Validate if user is also online?
             if current_user and current_user.is_active():
                 # current_user.update_last_online()
-                login_user(current_user, remember=True)
+                login_user(current_user, remember=False)
                 return True
 
             login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -341,7 +355,7 @@ class LoginModule(BaseModule):
         return False
 
     def participant_verify_password(self, username, password):
-        # print('LoginModule - participant_verify_password for ', username)
+        # print('LoginModule - participant_verify_password for', username)
 
         tentative_participant = TeraParticipant.get_participant_by_username(username)
         if not tentative_participant:
@@ -391,7 +405,7 @@ class LoginModule(BaseModule):
             # print('participant_verify_password, found participant: ', current_participant)
             # current_participant.update_last_online()
 
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
 
             # Flag that participant has full API access
             g.current_participant.fullAccess = True
@@ -445,7 +459,7 @@ class LoginModule(BaseModule):
         if current_participant and current_participant.is_active():
             # current_participant.update_last_online()
             g.current_participant.fullAccess = False
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
             return True
 
         # Second attempt, validate dynamic token
@@ -486,7 +500,7 @@ class LoginModule(BaseModule):
         import jwt
         try:
             token_dict = jwt.decode(token_value, self.redisGet(RedisVars.RedisVar_ParticipantTokenAPIKey),
-                                    algorithms='HS256')
+                                    algorithms='HS256', options={"verify_jti": False})
         except jwt.exceptions.PyJWTError as e:
             # print(e)
             # self.logger.log_error(self.module_name, 'Participant Token exception occurred')
@@ -534,7 +548,7 @@ class LoginModule(BaseModule):
             # Flag that participant has full API access
             g.current_participant.fullAccess = True
             # current_participant.update_last_online()
-            login_user(current_participant, remember=True)
+            login_user(current_participant, remember=False)
             return True
 
         login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -604,7 +618,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device:
                     if current_device.device_enabled:
-                        login_user(current_device, remember=True)
+                        login_user(current_device, remember=False)
                         return f(*args, **kwargs)
                     else:
                         login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -637,7 +651,7 @@ class LoginModule(BaseModule):
                     if current_device:
                         if current_device.device_enabled:
                             # Returns the function if authenticated with token
-                            login_user(current_device, remember=True)
+                            login_user(current_device, remember=False)
                             return f(*args, **kwargs)
                         else:
                             login_infos = UserAgentParser.parse_request_for_login_infos(request)
@@ -664,7 +678,7 @@ class LoginModule(BaseModule):
                 # Device must be found and enabled
                 if current_device and current_device.device_enabled:
                     # Returns the function if authenticated with token
-                    login_user(current_device, remember=True)
+                    login_user(current_device, remember=False)
                     return f(*args, **kwargs)
 
             # Any other case, do not call function since no valid auth found.
@@ -796,3 +810,25 @@ class LoginModule(BaseModule):
             return gettext('Unauthorized'), 401
 
         return decorated
+
+    @staticmethod
+    def user_session_required(f):
+        """
+        Use this decorator if a user session is required. A session is created when a user logs in. The session contains
+        the user UUID.
+        """
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if '_user_id' in session:
+                # Verify if we have a valid user
+                user = TeraUser.get_user_by_uuid(session['_user_id'])
+                if user and user.user_enabled:
+                    g.current_user = user
+                    return f(*args, **kwargs)
+                else:
+                    return gettext('Unauthorized'), 401
+            else:
+                return gettext('Unauthorized'), 401
+
+        return decorated
+

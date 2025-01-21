@@ -21,11 +21,13 @@ class UserQueryUndelete(Resource):
                         400: 'Required parameter is missing',
                         401: 'Requested item not found or is undeletable',
                         403: 'Access level insufficient to access that API or the item to undelete',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Undelete an item
+        """
         if not current_user.user_superadmin:
             return gettext('No access to this API'), 403
 

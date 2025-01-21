@@ -1,9 +1,6 @@
-from flask import jsonify, session
-from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
-from flask_babel import gettext
 
 from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraParticipantGroup import TeraParticipantGroup
@@ -27,7 +24,11 @@ from opentera.forms.TeraSessionTypeConfigForm import TeraSessionTypeConfigForm
 from opentera.forms.TeraTestTypeForm import TeraTestTypeForm
 
 from opentera.redis.RedisRPCClient import RedisRPCClient
+
 import json
+from flask_babel import gettext
+from flask_restx import Resource
+from flask import request
 
 get_parser = api.parser()
 get_parser.add_argument(name='type', type=str, help='Data type of the required form. Currently, the '
@@ -66,17 +67,29 @@ class UserQueryForms(Resource):
     @api.doc(description='Get json description of standard input form for the specified data type.',
              responses={200: 'Success',
                         400: 'Missing required parameter',
-                        500: 'Unknown or unsupported data type'},
-             params={'token': 'Secret token'})
+                        500: 'Unknown or unsupported data type'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get json description of form to display to edit a specific data type
+        """
         args = get_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 
-        # if args['type'] == 'user_profile':
-        #     return jsonify(TeraUserForm.get_user_profile_form())
         # If we have no arguments, return error
+        show_2fa_fields = True
+        if 'X-Client-Name' in request.headers and 'X-Client-Version' in request.headers:
+            client_name = request.headers['X-Client-Name']
+            client_version = request.headers['X-Client-Version']
+            client_version_parts = client_version.split('.')
+            if client_name == 'OpenTeraPlus':
+                # TODO: Remove when all OpenTeraPlus clients are updated at least to 1.3.0 version
+                if len(client_version_parts) >= 2:
+                    if int(client_version_parts[1]) < 3 and int(client_version_parts[0]) == 1:
+                        show_2fa_fields = False
+                else:
+                    show_2fa_fields = False
 
         if 'type' not in args:
             return gettext('Missing type'), 400
@@ -85,10 +98,10 @@ class UserQueryForms(Resource):
             return gettext('Missing arguments'), 400
 
         if args['type'] == 'user':
-            return TeraUserForm.get_user_form()
+            return TeraUserForm.get_user_form(show_2fa_fields=show_2fa_fields)
 
         if args['type'] == 'site':
-            return TeraSiteForm.get_site_form()
+            return TeraSiteForm.get_site_form(show_2fa_fields=show_2fa_fields)
 
         if args['type'] == 'device':
             return TeraDeviceForm.get_device_form()
@@ -142,7 +155,7 @@ class UserQueryForms(Resource):
                     rpc = RedisRPCClient(self.module.config.redis_config, timeout=5)
                     answer = rpc.call_service(session_type.session_type_service.service_key, 'session_type_config',
                                               json.dumps({'id_session_type': session_type.id_session_type}))
-                    if answer:
+                    if answer is not None:
                         return answer
                     else:
                         return gettext('No reply from service while querying session type config'), 408

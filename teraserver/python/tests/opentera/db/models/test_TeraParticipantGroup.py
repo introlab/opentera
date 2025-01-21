@@ -40,7 +40,7 @@ class TeraParticipantGroupTest(BaseModelsTest):
             id_participant_group = group.id_participant_group
 
             # Create a new participant in that group
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=1,
                                                                    id_participant_group=id_participant_group)
             self.assertIsNotNone(participant.id_participant)
@@ -66,7 +66,7 @@ class TeraParticipantGroupTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create a new project
-            from test_TeraProject import TeraProjectTest
+            from tests.opentera.db.models.test_TeraProject import TeraProjectTest
             project = TeraProjectTest.new_test_project(id_site=1)
             id_project = project.id_project
 
@@ -76,7 +76,7 @@ class TeraParticipantGroupTest(BaseModelsTest):
             id_participant_group = group.id_participant_group
 
             # Create a new participant in that group
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=id_project,
                                                                    id_participant_group=id_participant_group)
             self.assertIsNotNone(participant.id_participant)

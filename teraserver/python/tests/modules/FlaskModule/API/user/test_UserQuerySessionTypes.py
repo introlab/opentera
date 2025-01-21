@@ -3,6 +3,7 @@ from opentera.db.models.TeraSessionType import TeraSessionType
 from opentera.db.models.TeraSessionTypeProject import TeraSessionTypeProject
 from opentera.db.models.TeraSessionTypeSite import TeraSessionTypeSite
 from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraSession import TeraSession
 import datetime
 
@@ -115,7 +116,7 @@ class UserQuerySessionTypesTest(BaseUserAPITest):
     def test_query_specific_project_as_admin(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params="id_project=2")
+                                                     params="id_project=3")
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
             self.assertEqual(0, len(response.json))
@@ -310,6 +311,56 @@ class UserQuerySessionTypesTest(BaseUserAPITest):
             # Remove created project-service association
             sp = TeraServiceProject.get_service_project_for_service_project(project_id=3, service_id=3)
             TeraServiceProject.delete(sp.id_service_project)
+
+    def test_post_with_additional_services(self):
+        with self._flask_app.app_context():
+            email_service = TeraService.get_service_by_key('EmailService')
+            json_data = {
+                'session_type': {
+                    'id_session_type': 0,
+                    'id_service': 3,
+                    'session_type_category': 1,
+                    'session_type_color': 'red',
+                    'session_type_name': 'Test',
+                    'session_type_online': True,
+                    'session_type_services': [{'id_service': email_service.id_service}],
+                    'session_type_sites': [{'id_site': 1}]
+                }
+            }
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(403, response.status_code, msg="No admin access to service")
+
+            service = TeraService.get_service_by_key('FileTransferService')
+            json_data['session_type']['session_type_services'] = [{'id_service': service.id_service}]
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post OK")
+            self.assertEqual(1, len(response.json))
+
+            json_data['session_type']['session_type_services'] = [{'id_service': email_service.id_service},
+                                                                  {'id_service': service.id_service}]
+            json_data['session_type']['id_session_type'] = response.json[0]['id_session_type']
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post OK")
+            self.assertEqual(1, len(response.json))
+            session_type = TeraSessionType.get_session_type_by_id(response.json[0]['id_session_type'])
+            self.assertEqual(2, len(session_type.session_type_secondary_services))
+
+            json_data['session_type']['session_type_services'] = []
+            response = self._post_with_user_http_auth(self.test_client, username='siteadmin', password='siteadmin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Post OK")
+            self.assertEqual(1, len(response.json))
+
+            session_type = TeraSessionType.get_session_type_by_id(response.json[0]['id_session_type'])
+            self.assertEqual(1, len(session_type.session_type_secondary_services))
+            self.assertEqual(email_service.id_service, session_type.session_type_secondary_services[0].id_service)
+
+            id_session_type = response.json[0]['id_session_type']
+            TeraSessionType.delete(id_session_type)
+
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

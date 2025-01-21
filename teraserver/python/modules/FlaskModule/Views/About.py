@@ -8,6 +8,7 @@ class About(MethodView):
 
     def __init__(self, *args, **kwargs):
         self.flaskModule = kwargs.get('flaskModule', None)
+        self.test = kwargs.get('test', False)
 
     # Anybody can view this?
     # @user_multi_auth.login_required
@@ -27,3 +28,6 @@ class About(MethodView):
         return render_template('about.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
                                openteraplus_version=versions.get_client_version_with_name('OpenTeraPlus'))
+
+    # def post(self):
+    #     return request.json

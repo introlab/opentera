@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
+from flask import session, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from modules.DatabaseModule.DBManager import DBManager
 from sqlalchemy.exc import InvalidRequestError
@@ -47,11 +46,13 @@ class UserQueryServiceConfig(Resource):
                          'config the current user.',
              responses={200: 'Success - returns list of configurations',
                         400: 'No parameters specified - id_service is at least required',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get specific service configuration for an item
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -110,11 +111,13 @@ class UserQueryServiceConfig(Resource):
                         403: 'Logged user can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the'
                              ' JSON body',
-                        500: 'Internal error when saving service config'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving service config'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update service configuration for an item
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'service_config' not in request.json:
@@ -220,15 +223,17 @@ class UserQueryServiceConfig(Resource):
         else:
             return [update_config.to_json()]
 
-    @api.doc(description='Delete a specific session',
+    @api.doc(description='Delete a specific service configuration',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete config (must have admin access to the related object - user,'
                              'device or participant, or be its own config)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific service configuration for an item
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

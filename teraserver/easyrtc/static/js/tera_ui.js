@@ -459,6 +459,17 @@ function setConfigDialogValues(peer_id, audios, videos, config){
     let videoSelect = $('#videoSelect')[0];
     videoSelect.options.length = 0;
 
+    // Background blur
+    let blurCheck = $('#blurCheck')[0];
+    let blurGroup = $('#blurGroup')[0];
+    if (local_peerid === peer_id && browser.getBrowserName() !== 'Firefox'){
+        blurGroup.hidden = false;
+        blurCheck.checked = config['video1Blur'];
+    }else{
+        blurGroup.hidden = true;
+        blurCheck.checked = false;
+    }
+
     // Main audio source selector
     let audioSelect = $('#audioSelect')[0];
     audioSelect.options.length = 0;
@@ -510,11 +521,13 @@ function configDialogClosed(){
     let audioSelect2 = $('#audioSelect2')[0];
     let mirrorCheck = $('#mirrorCheck')[0];
     let screenAudio = $('#screenAudioCheck')[0];
+    let blurCheck = $('#blurCheck')[0];
 
     let new_config = {
         'currentVideoSourceIndex': videoSelect.selectedIndex,
         'currentAudioSourceIndex': audioSelect.selectedIndex,
         'video1Mirror': mirrorCheck.checked,
+        'video1Blur': blurCheck.checked,
         'currentVideoSource2Index': videoSelect2.selectedIndex-1,
         'currentAudioSource2Index': audioSelect2.selectedIndex-1,
         'screenAudio': screenAudio.checked
@@ -550,8 +563,14 @@ function updateLocalConfig(new_config){
         }
     }
 
+    if (new_config['video1Blur'] !== currentConfig['video1Blur']) {
+        // Blur changed
+        currentConfig['video1Blur'] = new_config['video1Blur'];
+        blur(currentConfig['video1Blur']);
+    }
+
     if (new_config['screenAudio'] !== currentConfig['screenAudio']){
-        // Mirror changed
+        // Share screen audio changed
         currentConfig['screenAudio'] = new_config['screenAudio'];
     }
 
@@ -783,7 +802,7 @@ function showChronoButtons(local, index, playing, stopped){
     }
     let stop = $('#' + view_prefix + 'ChronoStop' + index);
     if (stop.length){
-        (playing) ? stop.show() : stop.hide();
+        (!stopped) ? stop.show() : stop.hide();
     }
 }
 

@@ -1,11 +1,11 @@
 from typing import List
 
-from BaseServiceAPITest import BaseServiceAPITest
-from modules.FlaskModule.FlaskModule import flask_app
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraProject import TeraProject
-
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.db.models.TeraServiceSite import TeraServiceSite
 
 class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
     test_endpoint = '/api/service/users/access'
@@ -50,7 +50,8 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             user: TeraUser = TeraUser.get_user_by_username('admin')
             self.assertIsNotNone(user)
-            sites: List[TeraSite] = TeraSite.query.all()
+            #sites: List[TeraSite] = TeraSite.query.all()
+            sites: List[TeraSite] = TeraServiceSite.get_sites_for_service(self.id_service)
             for site in sites:
                 params = {
                     'uuid_user': user.user_uuid,
@@ -65,7 +66,8 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             user: TeraUser = TeraUser.get_user_by_username('admin')
             self.assertIsNotNone(user)
-            projects: List[TeraProject] = TeraProject.query.all()
+            # projects: List[TeraProject] = TeraProject.query.all()
+            projects: List[TeraProject] = TeraServiceProject.get_projects_for_service(self.id_service)
             for project in projects:
                 params = {
                     'uuid_user': user.user_uuid,
@@ -75,6 +77,31 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
                                                              params=params, endpoint=self.test_endpoint)
                 self.assertEqual(200, response.status_code)
                 self.assertEqual({'project_role': 'admin'}, response.json)
+
+    # def test_get_endpoint_with_token_auth_and_project_admin(self):
+    #     with self._flask_app.app_context():
+    #         # projects: List[TeraProject] = TeraProject.query.all()
+    #         projects: List[TeraProject] = TeraServiceProject.get_projects_for_service(self.id_service)
+    #         self.assertIsNotNone(projects)
+    #         user: TeraUser = TeraUser.get_user_by_username('user')
+    #         self.assertIsNotNone(user)
+    #         for project in projects:
+    #             users = project.service_project_project.get_users_in_project()
+    #             if user.id_user not in [p_user.id_user for p_user in users]:
+    #                 continue
+    #             all_roles = user.get_projects_roles(TeraService.get_openteraserver_service().id_service)
+    #             roles = [project_role.project_role for project_role in user.get_projects_roles(self.id_service)
+    #                     if project_role.key == project.id_project]
+    #             if not roles:
+    #                 continue
+    #             params = {
+    #                 'uuid_user': user.user_uuid,
+    #                 'id_project': project.id_project
+    #             }
+    #             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+    #                                                          params=params, endpoint=self.test_endpoint)
+    #             self.assertEqual(200, response.status_code)
+    #             self.assertEqual({'project_role': roles[0]}, response.json)
 
     def test_get_endpoint_with_token_auth_and_site_siteadmin(self):
         with self._flask_app.app_context():
@@ -102,7 +129,8 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
         with self._flask_app.app_context():
             user: TeraUser = TeraUser.get_user_by_username('siteadmin')
             self.assertIsNotNone(user)
-            projects: List[TeraProject] = TeraProject.query.all()
+            # projects: List[TeraProject] = TeraProject.query.all()
+            projects: List[TeraProject] = TeraServiceProject.get_projects_for_service(self.id_service)
 
             from modules.DatabaseModule.DBManager import DBManager
             user_access = DBManager.userAccess(user)
@@ -154,7 +182,8 @@ class ServiceQuerySiteProjectAccessRolesTest(BaseServiceAPITest):
             for user_name in user_names:
                 user: TeraUser = TeraUser.get_user_by_username(user_name)
                 self.assertIsNotNone(user)
-                projects: List[TeraProject] = TeraProject.query.all()
+                # projects: List[TeraProject] = TeraProject.query.all()
+                projects: List[TeraProject] = TeraServiceProject.get_projects_for_service(self.id_service)
 
                 from modules.DatabaseModule.DBManager import DBManager
                 user_access = DBManager.userAccess(user)

@@ -90,7 +90,8 @@ class QueryAssetFile(Resource):
                                                              token=current_service_client.service_token)
             else:
                 response = current_service_client.do_get_request_to_backend('/api/service/sessions?id_session=' +
-                                                                            str(asset_json['id_session']))
+                                                                            str(asset_json['id_session']),
+                                                                            override_token=current_service_client.service_token)
         else:
             response = Globals.service.get_from_opentera('/api/service/sessions',
                                                          {'id_session': asset_json['id_session']})

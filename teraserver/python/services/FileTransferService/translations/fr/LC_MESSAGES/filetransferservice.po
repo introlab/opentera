@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-03-04 11:09-0500\n"
-"PO-Revision-Date: 2023-02-28 08:22-0500\n"
+"POT-Creation-Date: 2025-01-08 11:51-0500\n"
+"PO-Revision-Date: 2024-11-20 09:49-0500\n"
 "Last-Translator: \n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -16,9 +16,81 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.16.0\n"
 
-#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:242
+#: API/QueryArchiveFile.py:53 API/QueryArchiveFile.py:109
+#: API/QueryArchiveFile.py:172 API/QueryArchiveFileInfos.py:64
+#: API/QueryArchiveFileInfos.py:131
+msgid "No archive found"
+msgstr "Aucune archive trouvée"
+
+#: API/QueryArchiveFile.py:57 API/QueryArchiveFile.py:175
+msgid "Access denied to the requested archive"
+msgstr "Accès refusé à l'archive demandé"
+
+#: API/QueryArchiveFile.py:87 API/QueryAssetFile.py:63
+msgid "Wrong content type"
+msgstr "Mauvais type de contenu"
+
+#: API/QueryArchiveFile.py:90
+msgid "Missing archive information"
+msgstr "Informations sur l'archive manquantes"
+
+#: API/QueryArchiveFile.py:93 API/QueryAssetFile.py:69
+msgid "Missing uploaded file"
+msgstr "Fichier à recevoir manquant"
+
+#: API/QueryArchiveFile.py:98 API/QueryAssetFile.py:74
+msgid "Missing filename"
+msgstr "Nom de fichier manquant"
+
+#: API/QueryArchiveFile.py:105
+msgid "Missing archive ID"
+msgstr "ID de l'archive manquant"
+
+#: API/QueryArchiveFile.py:112
+msgid "Archive has already been uploaded."
+msgstr "L'archive a été téléversée."
+
+#: API/QueryArchiveFile.py:115
+msgid "Filename does not match the archive information"
+msgstr "Le nom du fichier ne correspond pas aux informations de l'archive"
+
+#: API/QueryArchiveFile.py:146
+msgid "Error parsing archive information : "
+msgstr "Erreur lors de l'analyse des informations de l'archive : "
+
+#: API/QueryArchiveFile.py:185
+msgid "Archive deleted"
+msgstr "Archive supprimée"
+
+#: API/QueryArchiveFileInfos.py:68 API/QueryArchiveFileInfos.py:72
+#: API/QueryArchiveFileInfos.py:76 API/QueryArchiveFileInfos.py:81
+msgid "Access denied for that archive"
+msgstr "Accès refusé à cet archive"
+
+#: API/QueryArchiveFileInfos.py:91 API/QueryArchiveFileInfos.py:96
+#: API/QueryAssetFileInfos.py:69
+msgid "Badly formatted request"
+msgstr "Requête mal formattée"
+
+#: API/QueryArchiveFileInfos.py:99
+msgid "Missing original filename"
+msgstr "Nom de fichier original manquant"
+
+#: API/QueryArchiveFileInfos.py:102
+msgid "Missing owner UUID"
+msgstr "Identifiant du propriétaire manquant"
+
+#: API/QueryArchiveFileInfos.py:119 API/QueryArchiveFileInfos.py:140
+msgid "Error parsing archive information"
+msgstr "Erreur lors de l'analyse des informations de l'archive"
+
+#: API/QueryArchiveFileInfos.py:134
+msgid "Missing archive status"
+msgstr "État de l'archive manquant"
+
+#: API/QueryAssetFile.py:44 API/QueryAssetFile.py:243
 msgid "Access denied to asset"
 msgstr "Accès refusé à la ressource"
 
@@ -27,21 +99,9 @@ msgstr "Accès refusé à la ressource"
 msgid "No asset found"
 msgstr "Aucune ressource trouvée"
 
-#: API/QueryAssetFile.py:63
-msgid "Wrong content type"
-msgstr "Mauvais type de contenu"
-
 #: API/QueryAssetFile.py:66
 msgid "Missing file asset information"
 msgstr "Informations manquantes sur le fichier de la ressource"
-
-#: API/QueryAssetFile.py:69
-msgid "Missing uploaded file"
-msgstr "Fichier à recevoir manquant"
-
-#: API/QueryAssetFile.py:74
-msgid "Missing filename"
-msgstr "Nom de fichier manquant"
 
 #: API/QueryAssetFile.py:80
 msgid "Invalid file_asset format"
@@ -51,30 +111,26 @@ msgstr "Format de file_asset invalide"
 msgid "Missing required field(s) in asset descriptor"
 msgstr "Champ(s) obligatoire(s) manquant(s) dans la description de la ressource"
 
-#: API/QueryAssetFile.py:99 API/QueryAssetFile.py:119 API/QueryAssetFile.py:126
-#: API/QueryAssetFile.py:133
+#: API/QueryAssetFile.py:100 API/QueryAssetFile.py:120
+#: API/QueryAssetFile.py:127 API/QueryAssetFile.py:134
 msgid "Session access is forbidden"
 msgstr "L'accès à la séance est interdit"
 
-#: API/QueryAssetFile.py:140
+#: API/QueryAssetFile.py:141
 msgid "Missing at least one ID creator"
 msgstr "Au moins un ID de créateur est manquant"
 
-#: API/QueryAssetFile.py:176
+#: API/QueryAssetFile.py:177
 msgid "Unable to create asset"
 msgstr "Impossible de créer la ressource"
 
-#: API/QueryAssetFile.py:247
+#: API/QueryAssetFile.py:248
 msgid "Unable to delete asset"
 msgstr "Impossible de supprimer la ressource"
 
 #: API/QueryAssetFileInfos.py:49
 msgid "Access denied for that asset"
 msgstr "Accès refusé à cette ressource"
-
-#: API/QueryAssetFileInfos.py:69
-msgid "Badly formatted request"
-msgstr "Requête mal formattée"
 
 #: API/QueryAssetFileInfos.py:77
 msgid "Missing access token for at least one requested asset"

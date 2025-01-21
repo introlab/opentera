@@ -1,5 +1,6 @@
-from BaseParticipantAPITest import BaseParticipantAPITest
+from tests.modules.FlaskModule.API.participant.BaseParticipantAPITest import BaseParticipantAPITest
 from opentera.db.models.TeraParticipant import TeraParticipant
+from opentera.db.models.TeraSessionType import TeraSessionType
 
 
 class ParticipantLoginTest(BaseParticipantAPITest):
@@ -29,11 +30,20 @@ class ParticipantLoginTest(BaseParticipantAPITest):
             self.assertTrue('websocket_url' in response.json)
             self.assertTrue('participant_uuid' in response.json)
             self.assertTrue('participant_token' in response.json)
+            self.assertTrue('session_types_info' in response.json)
             self.assertTrue('base_token' in response.json)
             self.assertGreater(len(response.json['websocket_url']), 0)
             self.assertGreater(len(response.json['participant_uuid']), 0)
             self.assertGreater(len(response.json['participant_token']), 0)
             self.assertGreater(len(response.json['base_token']), 0)
+
+            participant = TeraParticipant.get_participant_by_username('participant1')
+            session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects) \
+                .filter_by(id_project=participant.id_project).all()
+            self.assertEqual(len(response.json['session_types_info']), len(session_types))
+            received_ids = [st['id_session_type'] for st in response.json['session_types_info']]
+            for st in session_types:
+                self.assertTrue(st.id_session_type in received_ids)
 
     def test_get_endpoint_login_invalid_participant_httpauth(self):
         with self._flask_app.app_context():
@@ -56,11 +66,19 @@ class ParticipantLoginTest(BaseParticipantAPITest):
                 self.assertTrue('websocket_url' in response.json)
                 self.assertTrue('participant_uuid' in response.json)
                 self.assertTrue('participant_name' in response.json)
+                self.assertTrue('session_types_info' in response.json)
                 self.assertTrue('base_token' in response.json)
                 self.assertGreater(len(response.json['websocket_url']), 0)
                 self.assertGreater(len(response.json['participant_uuid']), 0)
                 self.assertGreater(len(response.json['participant_name']), 0)
                 self.assertGreater(len(response.json['base_token']), 0)
+
+                session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects) \
+                    .filter_by(id_project=participant.id_project).all()
+                self.assertEqual(len(response.json['session_types_info']), len(session_types))
+                received_ids = [st['id_session_type'] for st in response.json['session_types_info']]
+                for st in session_types:
+                    self.assertTrue(st.id_session_type in received_ids)
 
     def test_get_endpoint_login_base_token_auth(self):
         # Get the token from http auth

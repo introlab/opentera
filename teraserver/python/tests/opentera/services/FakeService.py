@@ -1,18 +1,60 @@
-from services.FileTransferService.FlaskModule import CustomAPI, authorizations
+import redis
+import uuid
+from io import BytesIO
 from requests import Response
+
+from flask import Flask
+from flask import Response as FlaskResponse
+from flask_babel import Babel
+
+from modules.FlaskModule.FlaskModule import CustomAPI, authorizations
 from modules.DatabaseModule.DBManager import DBManager
-from services.FileTransferService.ConfigManager import ConfigManager
+from modules.FlaskModule.FlaskModule import FlaskModule
+from modules.LoginModule.LoginModule import LoginModule
+import modules.Globals as Globals
+
 from opentera.modules.BaseModule import BaseModule
 from opentera.services.ServiceOpenTera import ServiceOpenTera
 from opentera.redis.RedisVars import RedisVars
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-from flask import Flask
-from flask import Response as FlaskResponse
-from flask_babel import Babel
-import redis
-import uuid
-from io import BytesIO
+from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceSite import TeraServiceSite
+from opentera.db.models.TeraServiceProject import TeraServiceProject
+from opentera.services.ServiceConfigManager import ServiceConfigManager, DBConfig
+
 import opentera.messages.python as messages
+
+class ConfigManager(ServiceConfigManager, DBConfig):
+    def __init__(self):
+        ServiceConfigManager.__init__(self)
+
+    def create_defaults(self):
+        # Default service config
+        self.service_config['name'] = 'FakeService'
+        self.service_config['hostname'] = '127.0.0.1'
+        self.service_config['port'] = 4041
+        self.service_config['debug_mode'] = True
+        self.service_config['ServiceUUID'] = 'invalid'
+
+        # Default backend configuration
+        self.backend_config['hostname'] = '127.0.0.1'
+        self.backend_config['port'] = 40075
+
+        # Default redis configuration
+        self.redis_config['hostname'] = '127.0.0.1'
+        self.redis_config['port'] = 6379
+        self.redis_config['username'] = ''
+        self.redis_config['password'] = ''
+        self.redis_config['db'] = 0
+
+        # Default database configuration
+        self.db_config['db_type'] = 'ram'
+        self.db_config['name'] = 'fakeservice'
+        self.db_config['url'] = '127.0.0.1'
+        self.db_config['port'] = 5432
+        self.db_config['username'] = ''
+        self.db_config['password'] = ''
 
 
 class FakeFlaskModule(BaseModule):
@@ -23,8 +65,11 @@ class FakeFlaskModule(BaseModule):
         self.config.server_config = {'hostname': '127.0.0.1', 'port': 40075}
         self.flask_app = flask_app
         self.api = CustomAPI(self.flask_app, version='1.0.0', title='FakeService API',
-                             description='FakeService API Documentation', doc='/doc', prefix='/',
+                             description='FakeService API Documentation', doc='/doc', prefix='/api',
                              authorizations=authorizations)
+
+        self.service_api_namespace = self.api.namespace('service', description='Fake TeraServer service API')
+
         self.babel = Babel(self.flask_app)
 
         self.flask_app.debug = False
@@ -39,10 +84,15 @@ class FakeFlaskModule(BaseModule):
         self.flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         self.flask_app.config.update({'UPLOAD_FOLDER': '.'})
 
+        Globals.login_module = LoginModule(self.config, self.flask_app)
+
         self.setup_api()
 
     def setup_api(self):
-        pass
+        with self.flask_app.app_context():
+            additional_args = {'test': True,
+                        'flaskModule': self}
+            FlaskModule.init_service_api(self, self.service_api_namespace, additional_args)
 
 
 class FakeService(ServiceOpenTera):
@@ -69,28 +119,54 @@ class FakeService(ServiceOpenTera):
 
             self.setup_service_access_manager()
 
-            # Redis variables & db must be initialized before
-            ServiceOpenTera.__init__(self, self.config_man, {'service_key': 'FakeService'})
+            # Create Service in DB
+            db_service = TeraService()
+            db_service.service_name = 'FakeService'
+            db_service.service_key = 'FakeService'
+            db_service.service_hostname = 'localhost'
+            db_service.service_port = 40075
+            db_service.service_enabled = True
+            db_service.service_clientendpoint = '/api/fake'
+            db_service.service_endpoint = '/api/fake'
+            TeraService.insert(db_service)
+
+            # Make sure service is part of one site and project
+            service_site = TeraServiceSite()
+            service_site.id_service = db_service.id_service
+            service_site.id_site = 1
+            TeraServiceSite.insert(service_site)
+
+            service_project = TeraServiceProject()
+            service_project.id_service = db_service.id_service
+            service_project.id_project = 1
+            TeraServiceProject.insert(service_project)
+
 
             # Setup service
-            self.config['ServiceUUID'] = str(uuid.uuid4())
-            self.config_man.service_config['ServiceUUID'] = self.config['ServiceUUID']
+            self.config_man.service_config['ServiceUUID'] = db_service.service_uuid
+
+            # Redis variables & db must be initialized before
+            ServiceOpenTera.__init__(self, self.config_man, {'service_key': 'FakeService',
+                                                             'service_uuid': db_service.service_uuid})
+
+            self.config['ServiceUUID'] = db_service.service_uuid
+            self.config['id_service'] = db_service.id_service
 
         # Setup modules
         self.flask_module = FakeFlaskModule(self.config_man, self.flask_app)
         self.test_client = self.flask_app.test_client()
 
-        with self.flask_app.app_context():
-            self.service_token = self.generate_service_token()
 
-    def generate_service_token(self) -> str:
-        pass
+    def get_service_uuid(self):
+        return self.config['ServiceUUID']
+
+    def get_service_id(self):
+        return self.config['id_service']
 
     def app_context(self):
         return self.flask_app.app_context()
 
     def setup_service_access_manager(self):
-        from opentera.db.models.TeraServerSettings import TeraServerSettings
 
         self.redis = redis.Redis(host=self.config_man.redis_config['hostname'],
                                  port=self.config_man.redis_config['port'],
@@ -174,8 +250,4 @@ class FakeService(ServiceOpenTera):
 if __name__ == '__main__':
     service = FakeService()
     with service.app_context():
-      pass
-
-
-
-
+        pass

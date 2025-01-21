@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenTera Setup 2FA</title>
+    <link href="./static/img/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="./static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./static/css/login_style.css" />
+
+    <script src="./static/js/jquery-3.7.1.min.js"></script>
+    <script src="./static/bootstrap/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script src="./static/js/login_functions.js"></script>
+</head>
+<body>
+    <script>
+        let timeoutSeconds = 0;
+
+        function updateTimeLeft(){
+            let time_left = new Date(timeoutSeconds * 1000).toISOString().substr(14, 5);
+            $('#timeLeft').text(time_left);
+            if (timeoutSeconds-1 >= 0)
+                timeoutSeconds--;
+            else{
+                redirectToLogin();
+            }
+        }
+
+        $(document).ajaxSend(function(event, request, settings) {
+            $('#loading').removeClass("d-none").addClass("d-flex");
+        });
+
+        $(document).ajaxComplete(function(event, request, settings) {
+            $('#loading').removeClass("d-flex").addClass("d-none");
+            timeoutSeconds = 300;
+            updateTimeLeft();
+        });
+
+        $(document).ready(function() {
+
+            setInterval(updateTimeLeft, 1000);
+
+            // Get the QR Code from the server
+            $.ajax({
+                type: "GET",
+                url: "/api/user/login/setup_2fa",
+                success: function(response) {
+                    console.log("QR Code received");
+                    // Display the QR Code
+                    $('#qr_code').attr('src', 'data:image/png;base64,' + response.qr_code);
+                    $('#qr_code').show();
+                    // Add the otp_secret to the form
+                    $('#otp_secret').val(response.otp_secret);
+                },
+                error: function(response) {
+                    console.log("Error getting QR Code");
+                }
+            });
+
+            // Handle form submission
+            $('#setup_2fa_form').submit(function(event) {
+                $('#error_message').hide();
+                // Prevent the default form submission
+                event.preventDefault();
+
+                var form = $(this);
+
+                // Send the form data to the backend with a post request
+                $.ajax({
+                    type: "POST",
+                    url: "/api/user/login/setup_2fa",
+                    data: form.serialize(),
+                    success: function(response) {
+                        console.log("2FA setup success");
+                        // Redirect to the main page
+                        login_redirect(response.redirect_url);
+                    },
+                    error: function(response) {
+                        //console.log(response);
+                        $('#error_message').text(response.responseJSON);
+                        $('#error_message').show();
+                        //window.location.href = '/login';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Create a form to enable 2FA, will display QR Code to setup Authenticator App -->
+
+    <!-- First ask the user if they want to enable 2FA -->
+    <div class="container-fluid">
+        <div class="m-3 mt-1 text-warning text-center">
+            <h4>{{ gettext('You need to setup multi-factor authentication before continuing.') }}</h4>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <div class="card">
+                    <div id="loading" class="h-100 w-100 z-1 bg-black position-absolute opacity-75 d-none">
+                        <img src="./static/img/loading.gif" class="m-auto">
+                    </div>
+                    <div class="card-header d-flex flex-row-reverse">
+                        <div id="timeLeft" class="">5:00</div>
+                    </div>
+                    <div class="card-body">
+                        <form action="/login_enable_2fa" method="post" id="setup_2fa_form">
+                            <div class="form-group row">
+                                <label for="qr_code" class="col-md-2">{{ gettext('OTP configuration') }}</label>
+                                <div class="col">
+                                    <div class="d-flex">
+                                        <img id="qr_code" src="" alt="QR Code" style="display:none;" class="img-qr text-center">
+                                        <div class="d-flex flex-column">
+                                            <ol>
+                                                <li>{{ gettext('Scan the QR code with your authenticator app') }}</li>
+                                                <li class="mt-2">{{ gettext('Enter the generated code:') }}<br>
+
+                                                </li>
+                                            </ol>
+                                            <input type="text" id="otp_code" class="form-control w-50 ms-4 mt-0 m-2" name="otp_code"
+                                                           required autofocus maxlength="6">
+                                            <button type="submit" class="btn btn-primary ms-4 m-2">{{ gettext('Validate') }}</button>
+                                            <div class="text-danger ms-4 p-1 m-0 fw-bold" id="error_message" role="alert" style="display: none;"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <hr>
+                            <!--<div class="form-group row">
+                                <label for="with_email_enabled" class="col-md-2 col-form-label text-md-right">{{ gettext('Use email for authentication') }}</label>
+                                <div class="col">
+                                    {% if user_has_email %}
+                                    <input type="checkbox" id="with_email_enabled" class="col-1" name="with_email_enabled">
+                                    {% else %}
+                                    <div class="text-danger">{{ gettext('No email address configured. Please contact your administrator.') }}</div>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-primary">{{ gettext('Validate') }}</button>
+                                </div>
+                            </div>
+                            <hr>-->
+
+                            <!-- Add otp_secret to the form, not shown to the user -->
+                            <input type="hidden" name="otp_secret" id="otp_secret" value="invalid">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

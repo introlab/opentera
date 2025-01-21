@@ -333,6 +333,96 @@ class UserQueryUsersTest(BaseUserAPITest):
                 self.assertTrue(data_item.__contains__('projects'))
                 self.assertTrue(data_item.__contains__('sites'))
 
+    def test_password_strength(self):
+        with self._flask_app.app_context():
+            json_data = {
+                'user': {
+                    'id_user': 0,
+                    'user_username': 'new_test_user',
+                    'user_enabled': True,
+                    'user_firstname': 'Test',
+                    'user_lastname': 'Test',
+                    'user_profile': '',
+                    'user_user_groups': [{'id_user_group': 3}],
+                    'user_password': 'password'
+                }
+            }
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password not long enough")
+
+            json_data['user']['user_password'] = 'password12345!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without capital letters")
+
+            json_data['user']['user_password'] = 'PASSWORD12345!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without lower case letters")
+
+            json_data['user']['user_password'] = 'Password12345'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without special characters")
+
+            json_data['user']['user_password'] = 'Password!!!!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without numbers")
+
+            json_data['user']['user_password'] = 'Password12345!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Password OK")
+            self.assertGreater(len(response.json), 0)
+            json_data = response.json[0]
+            self._checkJson(json_data)
+            current_id = json_data['id_user']
+
+            # Modify password
+            json_data = {
+                'user': {
+                    'id_user': current_id,
+                    'user_password': 'password'
+                }
+            }
+
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password not long enough")
+
+            json_data['user']['user_password'] = 'password12345!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without capital letters")
+
+            json_data['user']['user_password'] = 'PASSWORD12345!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without lower case letters")
+
+            json_data['user']['user_password'] = 'Password12345'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without special characters")
+
+            json_data['user']['user_password'] = 'Password!!!!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password without numbers")
+
+            json_data['user']['user_password'] = 'Password12345!!'
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(200, response.status_code, msg="Password OK")
+
+            response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                      json=json_data)
+            self.assertEqual(400, response.status_code, msg="Password same as old")
+
+            TeraUser.delete(current_id)
+
     def test_post_and_delete(self):
         with self._flask_app.app_context():
             json_data = {
@@ -376,7 +466,7 @@ class UserQueryUsersTest(BaseUserAPITest):
                                                       json=json_data)
             self.assertEqual(400, response.status_code, msg="Invalid password")
 
-            json_data['user']['user_password'] = 'testtest'
+            json_data['user']['user_password'] = 'testTest11*&'
             response = self._post_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                       json=json_data)
             self.assertEqual(response.status_code, 409, msg="Username unavailable")

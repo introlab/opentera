@@ -126,7 +126,9 @@ class TeraServiceAccess(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
     @staticmethod
     # Returns all access related to a service
-    def get_service_access(id_service: int, id_project: int | None = None, id_site: int | None = None,
+    def get_service_access(id_service: int,
+                           id_project: int | Column[int] | None = None,
+                           id_site: int | Column[int] | None = None,
                            with_deleted: bool = False):
         query = TeraServiceAccess.query.execution_options(include_deleted=with_deleted) \
             .join(TeraServiceRole).filter_by(id_service=id_service)\

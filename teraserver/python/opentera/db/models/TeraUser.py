@@ -13,23 +13,26 @@ from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
 from passlib.hash import bcrypt
+from enum import Enum, unique
 import uuid
 import datetime
 import json
 import time
 import jwt
+import re
+import pyotp
 
 
 # Generator for jti
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(user_jti_generator) to get next sequence number
-user_jti_generator = infinite_jti_sequence()
+# def infinite_jti_sequence():
+#     num = 0
+#     while True:
+#         yield num
+#         num += 1
+#
+#
+# # Initialize generator, call next(user_jti_generator) to get next sequence number
+# user_jti_generator = infinite_jti_sequence()
 
 
 class TeraUser(BaseModel, SoftDeleteMixin):
@@ -46,6 +49,12 @@ class TeraUser(BaseModel, SoftDeleteMixin):
     user_notes = Column(String, nullable=True)
     user_lastonline = Column(TIMESTAMP(timezone=True), nullable=True)
     user_superadmin = Column(Boolean, nullable=False, default=False)
+    # Fields added for 2FA
+    user_2fa_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_otp_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_email_enabled = Column(Boolean, nullable=False, default=False)
+    user_2fa_otp_secret = Column(String, nullable=True)
+    user_force_password_change = Column(Boolean, nullable=False, default=False)
 
     # user_sites_access = relationship('TeraSiteAccess', cascade="all,delete")
     # user_projects_access = relationship("TeraProjectAccess", cascade="all,delete")
@@ -68,10 +77,11 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         if ignore_fields is None:
             ignore_fields = []
         ignore_fields.extend(['authenticated', 'user_password', 'user_user_groups',
-                              'user_sessions'])
+                              'user_sessions', 'user_2fa_otp_secret'])
         if minimal:
             ignore_fields.extend(['user_username', 'user_email', 'user_profile', 'user_notes', 'user_lastonline',
-                                  'user_superadmin'])
+                                  'user_superadmin' 'user_2fa_enabled', 'user_2fa_otp_enabled',
+                                  'user_2fa_email_enabled', 'user_force_password_change'])
         rval = super().to_json(ignore_fields=ignore_fields)
         rval['user_name'] = self.get_fullname()
         return rval
@@ -111,7 +121,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             'iat': int(now),
             'exp': int(now) + expiration,
             'iss': 'TeraServer',
-            'jti': next(user_jti_generator),
+            'jti': str(uuid.uuid4()),  # next(user_jti_generator),
             'user_uuid': self.user_uuid,
             'id_user': self.id_user,
             'user_fullname': self.get_fullname(),
@@ -120,6 +130,27 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         }
 
         return jwt.encode(payload, token_key, algorithm='HS256')
+
+    def enable_2fa_otp(self) -> bool:
+        if self.user_2fa_enabled and self.user_2fa_otp_enabled and self.user_2fa_otp_secret:
+            return False
+
+        self.user_2fa_enabled = True
+        self.user_2fa_otp_enabled = True
+        self.user_2fa_email_enabled = False
+        self.user_2fa_otp_secret = pyotp.random_base32()
+        return True
+
+    def verify_2fa(self, code: str) -> bool:
+        if not self.user_2fa_enabled:
+            return False
+
+        if self.user_2fa_otp_enabled:
+            # Default is 6 digits with interval of 30 seconds
+            totp = pyotp.TOTP(self.user_2fa_otp_secret)
+            return totp.verify(code, valid_window=1)
+
+        return False
 
     def get_service_access_dict(self):
         service_access = {}
@@ -297,8 +328,20 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         # Remove the password field is present and if empty
         if 'user_password' in values:
             if values['user_password'] == '':
-                del values['user_password']
+                del values['user_password']  # Don't change password if empty
             else:
+                # Check password strength
+                password_errors = TeraUser.validate_password_strength(str(values['user_password']))
+                if len(password_errors) > 0:
+                    raise UserPasswordInsecure("User password insufficient strength", password_errors)
+
+                # Check that old password != new password
+                current_user = TeraUser.get_user_by_id(id_user)
+                if current_user:
+                    if TeraUser.verify_password('', values['user_password'], current_user):
+                        # Same password as before
+                        raise UserNewPasswordSameAsOld("New password same as old")
+
                 # Forcing password to string
                 values['user_password'] = TeraUser.encrypt_password(str(values['user_password']))
 
@@ -315,8 +358,12 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
     @classmethod
     def insert(cls, user):
+        # Check password strength
+        password_errors = TeraUser.validate_password_strength(str(user.user_password))
+        if len(password_errors) > 0:
+            raise UserPasswordInsecure("User password insufficient strength", password_errors)
+
         # Encrypts password
-        # Forcing password to string
         user.user_password = TeraUser.encrypt_password(str(user.user_password))
 
         # Generate UUID
@@ -347,6 +394,27 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         return None
 
     @staticmethod
+    def validate_password_strength(password: str) -> list:
+        errors = []
+
+        if len(password) < 10:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.BAD_LENGTH)
+
+        if re.search(r"\d", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_NUMERIC)
+
+        if re.search(r"[A-Z]", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_UPPER_CASE)
+
+        if re.search(r"[a-z]", password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_LOWER_CASE)
+
+        if re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]', password) is None:
+            errors.append(UserPasswordInsecure.PasswordWeaknesses.NO_SPECIAL)
+
+        return errors
+
+    @staticmethod
     def create_defaults(test=False):
         # Admin
         admin = TeraUser()
@@ -355,9 +423,12 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         admin.user_lastname = "Admin"
         admin.user_profile = ""
         admin.user_password = TeraUser.encrypt_password("admin")
+        # Force reset password for admin on first login
+        admin.user_force_password_change = not test
         admin.user_superadmin = True
         admin.user_username = "admin"
         admin.user_uuid = str(uuid.uuid4())
+        admin.user_email = "admin@opentera.org"
         TeraUser.db().session.add(admin)
 
         if test:
@@ -422,6 +493,7 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             user.user_password = TeraUser.encrypt_password("user4")
             user.user_superadmin = False
             user.user_username = "user4"
+            user.user_email = "noaccess@opentera.org"
             user.user_uuid = str(uuid.uuid4())
             # user.user_user_group = TeraUserGroup.get_user_group_by_group_name("Users - Projects 1 & 2")
             TeraUser.db().session.add(user)
@@ -430,3 +502,30 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
     def get_undelete_cascade_relations(self) -> list:
         return ['user_service_config']
+
+
+class UserPasswordInsecure(Exception):
+    """
+    Raised when the user password doesn't meet minimal requirements
+    """
+
+    @unique
+    class PasswordWeaknesses(Enum):
+        BAD_LENGTH = 1
+        NO_LOWER_CASE = 2
+        NO_UPPER_CASE = 3
+        NO_NUMERIC = 4
+        NO_SPECIAL = 5
+
+    def __init__(self, message, weaknesses: list):
+        super().__init__(message)
+        self.weaknesses = weaknesses
+
+
+class UserNewPasswordSameAsOld(Exception):
+    """
+    Raised when the new password is equal to the old one
+    """
+    def __init__(self, message):
+        super().__init__(message)
+

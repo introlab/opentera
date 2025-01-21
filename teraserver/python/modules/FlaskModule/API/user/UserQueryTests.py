@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
@@ -41,11 +41,13 @@ class UserQueryTests(Resource):
     @api.doc(description='Get test information. Only one of the ID parameter is supported at once',
              responses={200: 'Success - returns list of assets',
                         400: 'Required parameter is missing',
-                        403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+                        403: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get test information
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -115,11 +117,13 @@ class UserQueryTests(Resource):
         return tests_list
 
     @api.doc(description='Delete test.',
-             responses={501: 'Unable to update test from here - use service!'},
-             params={'token': 'Secret token'})
+             responses={501: 'Unable to update test from here - use service!'})
     @api.expect(post_parser)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update test
+        """
         return gettext('Test information update and creation must be done directly into a service (such as '
                        'Test service)'), 501
 
@@ -131,6 +135,9 @@ class UserQueryTests(Resource):
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete test
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args(strict=True)
         id_todel = args['id']

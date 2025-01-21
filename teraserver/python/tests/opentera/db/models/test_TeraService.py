@@ -400,7 +400,7 @@ class TeraServiceTest(BaseModelsTest):
             id_service = service.id_service
 
             # Create a new site association for that service
-            from test_TeraServiceSite import TeraServiceSiteTest
+            from tests.opentera.db.models.test_TeraServiceSite import TeraServiceSiteTest
             site_service = TeraServiceSiteTest.new_test_service_site(id_site=1, id_service=id_service)
             self.assertIsNotNone(site_service.id_service_site)
             id_site_service = site_service.id_service_site
@@ -430,7 +430,7 @@ class TeraServiceTest(BaseModelsTest):
             id_service = service.id_service
 
             # Create service roles
-            from test_TeraServiceRole import TeraServiceRoleTest
+            from tests.opentera.db.models.test_TeraServiceRole import TeraServiceRoleTest
             role = TeraServiceRoleTest.new_test_service_role(id_service=id_service, role_name='admin')
             id_role_admin = role.id_service_role
 
@@ -438,12 +438,12 @@ class TeraServiceTest(BaseModelsTest):
             id_role_user = role.id_service_role
 
             # Create service sites association
-            from test_TeraServiceSite import TeraServiceSiteTest
+            from tests.opentera.db.models.test_TeraServiceSite import TeraServiceSiteTest
             service_site = TeraServiceSiteTest.new_test_service_site(id_site=1, id_service=id_service)
             id_service_site = service_site.id_service_site
 
             # Create service projects association
-            from test_TeraServiceProject import TeraServiceProjectTest
+            from tests.opentera.db.models.test_TeraServiceProject import TeraServiceProjectTest
             service_project = TeraServiceProjectTest.new_test_service_project(id_service=id_service, id_project=1)
             id_service_project = service_project.id_service_project
 

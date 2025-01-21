@@ -1,5 +1,5 @@
 from typing import List
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
@@ -114,6 +114,36 @@ class ServiceQueryTestTypesTest(BaseServiceAPITest):
             self.assertTrue(response.json[0]['id_test_type'] in accessible_types)
             self.assertEqual(response.json[0]['id_test_type'], 1)
 
+    def test_get_endpoint_with_token_auth_for_uuid(self):
+        with self._flask_app.app_context():
+
+            all_test_types = TeraTestType.query.all()
+            service: TeraService = TeraService.get_service_by_uuid(self.service_uuid)
+            for test_type in all_test_types:
+                response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                             params={'test_type_uuid': test_type.test_type_uuid},
+                                                             endpoint=self.test_endpoint)
+                self.assertEqual(200, response.status_code)
+
+                # Check if test type is accessible
+                from modules.DatabaseModule.DBManager import DBManager
+                service_access = DBManager.serviceAccess(service)
+                accessible_types = service_access.get_accessible_tests_types_ids()
+                if test_type.id_test_type in accessible_types:
+                    self.assertEqual(1, len(response.json))
+                    self.assertEqual(response.json[0]['id_test_type'], test_type.id_test_type)
+                    self.assertEqual(response.json[0]['test_type_uuid'], test_type.test_type_uuid)
+
+
+    def test_get_endpoint_with_token_auth_for_invalid_uuid(self):
+        with self._flask_app.app_context():
+            response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
+                                                         params={'test_type_uuid': '0000000000000000'},
+                                                         endpoint=self.test_endpoint)
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+
     def test_get_endpoint_with_token_auth_for_key(self):
         with self._flask_app.app_context():
             response = self._get_with_service_token_auth(client=self.test_client, token=self.service_token,
@@ -200,6 +230,28 @@ class ServiceQueryTestTypesTest(BaseServiceAPITest):
             response = self._delete_with_service_token_auth(self.test_client, token=self.service_token,
                                                             params={'uuid': current_uuid})
             self.assertEqual(200, response.status_code, msg="Delete OK")
+
+    def test_post_with_uuid(self):
+        with self._flask_app.app_context():
+            json_data = {
+                'test_type': {
+                    'test_type_name': 'Test',
+                    'id_test_type': 0
+                }
+            }
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(200, response.status_code, msg="Created new test")
+
+            test_type_uuid = response.json['test_type_uuid']
+
+            json_data['test_type'].pop('id_test_type')
+            json_data['test_type']['test_type_uuid'] = test_type_uuid
+            json_data['test_type']['test_type_name'] = "Test 2"
+
+            response = self._post_with_service_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(200, response.status_code, msg="Updated test with uuid")
+
+            TeraTestType.delete(response.json['id_test_type'])
 
     def _checkJson(self, json_data, minimal=False):
         self.assertGreater(len(json_data), 0)

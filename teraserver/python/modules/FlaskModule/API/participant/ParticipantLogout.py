@@ -1,6 +1,6 @@
-from flask import jsonify, session, request
+from flask import session, request
 from flask_login import logout_user
-from flask_restx import Resource, reqparse, fields
+from flask_restx import Resource
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant, LoginModule
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
@@ -22,10 +22,13 @@ class ParticipantLogout(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Logged user doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @participant_multi_auth.login_required
     def get(self):
+        """
+        Participant logout
+        """
         if current_participant:
             logout_user()
             session.clear()

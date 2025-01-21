@@ -1,5 +1,5 @@
 from typing import List
-from BaseDeviceAPITest import BaseDeviceAPITest
+from tests.modules.FlaskModule.API.device.BaseDeviceAPITest import BaseDeviceAPITest
 from opentera.db.models.TeraDevice import TeraDevice
 from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraSession import TeraSession

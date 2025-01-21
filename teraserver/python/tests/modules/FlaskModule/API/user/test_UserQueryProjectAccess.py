@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 
 
 class UserQueryProjectAccessTest(BaseUserAPITest):
@@ -165,7 +165,7 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
 
     def test_query_specific_user_group_by_users(self):
         with self._flask_app.app_context():
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', 
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params={'id_user_group': 1, 'by_users': True})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
@@ -243,7 +243,7 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
     def test_query_specific_user_group_by_users_with_projects_admins_with_sites(self):
         with self._flask_app.app_context():
             params = {'id_user_group': 4, 'by_users': True, 'with_empty': True, 'admins': True, 'with_sites': True}
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', 
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
@@ -291,7 +291,7 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
 
     def test_query_specific_project(self):
         with self._flask_app.app_context():
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', 
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params={'id_project': 1})
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)
@@ -471,7 +471,7 @@ class UserQueryProjectAccessTest(BaseUserAPITest):
         with self._flask_app.app_context():
             params = {'id_project': 2, 'by_users': True, 'with_empty': True, 'admins': True, 'with_sites': True}
 
-            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin', 
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertTrue(response.is_json)

@@ -1,9 +1,8 @@
-from flask import jsonify, session, request
+from flask import request
 from flask_restx import Resource, reqparse
 from flask_babel import gettext
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSessionEvent import TeraSessionEvent
 from opentera.db.models.TeraSession import TeraSession
 from modules.DatabaseModule.DBManager import DBManager
@@ -34,10 +33,13 @@ class ServiceQuerySessionEvents(Resource):
                         400: 'Required parameter is missing (id_session)',
                         403: 'Service doesn\'t have permission to access the requested data',
                         500: 'Database error'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get events for a session
+        """
         args = get_parser.parse_args()
         sessions_events = []
 
@@ -67,10 +69,13 @@ class ServiceQuerySessionEvents(Resource):
                         403: 'Logged user can\'t create/update the specified event',
                         400: 'Badly formed JSON or missing fields(id_session_event or id_session) in the JSON body',
                         500: 'Internal error when saving device'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update session events
+        """
         # Using request.json instead of parser, since parser messes up the json!
         if 'session_event' not in request.json:
             return gettext('Missing session_event field'), 400

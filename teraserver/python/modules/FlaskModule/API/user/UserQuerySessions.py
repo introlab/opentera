@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from flask_restx import Resource, reqparse, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -45,11 +45,13 @@ class UserQuerySessions(Resource):
     @api.doc(description='Get sessions information. Only one of the ID parameter is supported and required at once',
              responses={200: 'Success - returns list of sessions',
                         400: 'No parameters specified at least one id must be used',
-                        500: 'Database error'},
-             params={'token': 'Secret token'})
+                        500: 'Database error'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get session
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -109,11 +111,13 @@ class UserQuerySessions(Resource):
                         403: 'Logged user can\'t create/update the specified session',
                         400: 'Badly formed JSON or missing fields(session, id_session, session_participants_ids and/or '
                              'session_users_ids[for new sessions]) in the JSON body',
-                        500: 'Internal error when saving session'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error when saving session'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update session
+        """
         user_access = DBManager.userAccess(current_user)
         # Using request.json instead of parser, since parser messes up the json!
         if 'session' not in request.json:
@@ -225,11 +229,13 @@ class UserQuerySessions(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete session (must have access to all participants and users in the '
                              'session to delete)',
-                        500: 'Database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete session
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

@@ -1,8 +1,7 @@
-from flask import jsonify, session, request
-from flask_restx import Resource, reqparse, inputs
+from flask import request
+from flask_restx import Resource, inputs
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraDeviceProject import TeraDeviceProject
 from opentera.db.models.TeraDeviceSite import TeraDeviceSite
 from opentera.db.models.TeraDevice import TeraDevice
@@ -51,11 +50,13 @@ class UserQueryDeviceProjects(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of devices - project association',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error occurred when loading devices for projects'},
-             params={'token': 'Secret token'})
+                        500: 'Error occurred when loading devices for projects'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get devices associated with a project
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -127,11 +128,13 @@ class UserQueryDeviceProjects(Resource):
                         403: 'Logged user can\'t modify device association - the user isn\'t admin '
                              'of the project or current user can\'t access the device.',
                         400: 'Badly formed JSON or missing fields(id_project or id_device) in the JSON body',
-                        500: 'Internal error occured when saving device association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occured when saving device association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create/update devices associated with a project
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -281,11 +284,13 @@ class UserQueryDeviceProjects(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t delete device association (no admin access to project or one of the '
                              'device\'s site)',
-                        500: 'Device-project association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Device-project association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific device-project association
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

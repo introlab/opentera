@@ -1,8 +1,7 @@
-from flask import session, request
+from flask import request
 from flask_restx import Resource
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
-from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraService import TeraService
 from opentera.db.models.TeraSession import TeraSession
 from flask_babel import gettext
@@ -89,11 +88,13 @@ class UserSessionManager(Resource):
                         400: 'Required parameter is missing',
                         500: 'Internal server error',
                         501: 'Not implemented',
-                        403: 'Logged user doesn\'t have enough permission'},
-             params={'token': 'Secret token'})
+                        403: 'Logged user doesn\'t have enough permission'})
     @api.expect(session_manager_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Starts / stop a session related to a service
+        """
         args = post_parser.parse_args()
         user_access = DBManager.userAccess(current_user)
 

@@ -8,7 +8,7 @@ from flask.testing import FlaskClient
 import uuid
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
-from FakeFileTransferService import FakeFileTransferService
+from tests.services.FileTransferService.FakeFileTransferService import FakeFileTransferService
 from opentera.services.ServiceAccessManager import ServiceAccessManager
 from opentera.db.models.TeraService import TeraService
 from modules.LoginModule.LoginModule import LoginModule

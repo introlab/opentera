@@ -1,4 +1,4 @@
-from BaseServiceAPITest import BaseServiceAPITest
+from tests.modules.FlaskModule.API.service.BaseServiceAPITest import BaseServiceAPITest
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraSite import TeraSite
 from opentera.db.models.TeraServiceProject import TeraServiceProject

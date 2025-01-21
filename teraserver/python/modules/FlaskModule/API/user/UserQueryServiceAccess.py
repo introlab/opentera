@@ -1,5 +1,5 @@
-from flask import jsonify, request
-from flask_restx import Resource, reqparse, inputs
+from flask import request
+from flask_restx import Resource, reqparse
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from opentera.db.models.TeraServiceAccess import TeraServiceAccess
@@ -39,11 +39,13 @@ class UserQueryServiceAccess(Resource):
                          'supported at once.',
              responses={200: 'Success - returns list of access roles',
                         400: 'Required parameter is missing (must have at least one id)',
-                        500: 'Error when getting association'},
-             params={'token': 'Secret token'})
+                        500: 'Error when getting association'})
     @api.expect(get_parser)
     @user_multi_auth.login_required
     def get(self):
+        """
+        Get service access roles for a specific item
+        """
         user_access = DBManager.userAccess(current_user)
         args = get_parser.parse_args()
 
@@ -88,11 +90,13 @@ class UserQueryServiceAccess(Resource):
              responses={200: 'Success',
                         403: 'Logged user can\'t modify association (only site admin can modify association)',
                         400: 'Badly formed JSON or missing fields(id_project or id_service) in the JSON body',
-                        500: 'Internal error occurred when saving association'},
-             params={'token': 'Secret token'})
+                        500: 'Internal error occurred when saving association'})
     @api.expect(post_schema)
     @user_multi_auth.login_required
     def post(self):
+        """
+        Create / update service - access association
+        """
         user_access = DBManager.userAccess(current_user)
 
         # Using request.json instead of parser, since parser messes up the json!
@@ -194,11 +198,13 @@ class UserQueryServiceAccess(Resource):
     @api.doc(description='Delete a specific service access.',
              responses={200: 'Success',
                         403: 'Logged user can\'t delete association (not admin of the associated elements)',
-                        500: 'Association not found or database error.'},
-             params={'token': 'Secret token'})
+                        500: 'Association not found or database error.'})
     @api.expect(delete_parser)
     @user_multi_auth.login_required
     def delete(self):
+        """
+        Delete a specific service access for an item
+        """
         user_access = DBManager.userAccess(current_user)
         args = delete_parser.parse_args()
         id_todel = args['id']

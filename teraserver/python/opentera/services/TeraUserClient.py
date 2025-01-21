@@ -1,23 +1,21 @@
+from typing import List
+import json
 import uuid
 from flask import request
 from requests import Response
-from typing import List
 
 
 class TeraUserClient:
 
-    def __init__(self, token_dict: dict, token: str, config_man):
+    def __init__(self, token_dict: dict, token: str, config_man, service):
         self.__user_uuid = token_dict['user_uuid']
         self.__id_user = token_dict['id_user']
         self.__user_fullname = token_dict['user_fullname']
         self.__user_token = token
         self.__user_superadmin = token_dict['user_superadmin']
         self.__service_access = token_dict['service_access']
-
-        backend_hostname = config_man.backend_config["hostname"]
-        backend_port = str(config_man.backend_config["port"])
-
-        self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
+        self.__config_man = config_man
+        self.__service = service
 
     @property
     def user_uuid(self):
@@ -67,12 +65,21 @@ class TeraUserClient:
     def service_access(self, service_access: dict):
         self.__service_access = service_access
 
-    def do_get_request_to_backend(self, path: str) -> Response:
-        from requests import get
-        request_headers = {'Authorization': 'OpenTera ' + self.__user_token}
-        # TODO: remove verify=False and check certificate
-        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
-        return backend_response
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        params = {'test_invitation_key': str(invitation_key)}
+        response = self.do_get_request_to_backend('/api/user/tests/invitations', params)
+        return (response.status_code == 200 and len(response.json() > 0))
+
+    def do_get_request_to_backend(self, path: str, params: dict = None) -> Response:
+        """
+        Now using service function:
+        def get_from_opentera_with_token(self, token: str, api_url: str, params: dict = {},
+                                     additional_headers: dict = {}) -> Response:
+        """
+        if params is None:
+            params = {}
+
+        return self.__service.get_from_opentera_with_token(self.__user_token, api_url=path, params=params)
 
     def get_roles_for_service(self, service_key: str) -> List[str]:
         # Roles are stored in the token, in the service_access dictionary
@@ -83,11 +90,11 @@ class TeraUserClient:
         return roles
 
     def get_role_for_site(self, id_site: int) -> str:
-        response = self.do_get_request_to_backend('/api/user/sites?user_uuid=' + self.__user_uuid)
+        params= {'user_uuid': self.__user_uuid}
+        response = self.do_get_request_to_backend('/api/user/sites', params)
 
         if response.status_code == 200:
             # Parse JSON reply
-            import json
             sites = json.loads(response.text)
 
             # Find correct site in reply
@@ -98,11 +105,12 @@ class TeraUserClient:
         return 'Undefined'
 
     def get_role_for_project(self, id_project: int) -> str:
-        response = self.do_get_request_to_backend('/api/user/projects?user_uuid=' + self.__user_uuid)
+        params= {'user_uuid': self.__user_uuid}
+        response = self.do_get_request_to_backend('/api/user/projects', params)
 
         if response.status_code == 200:
             # Parse JSON reply
-            import json
+
             projects = json.loads(response.text)
 
             # Find correct site in reply
@@ -113,7 +121,8 @@ class TeraUserClient:
         return 'Undefined'
 
     def get_user_info(self):
-        response = self.do_get_request_to_backend('/api/user/users?user_uuid=' + self.__user_uuid)
+        params = {'user_uuid': self.__user_uuid}
+        response = self.do_get_request_to_backend('/api/user/users', params)
 
         if response.status_code == 200:
             return response.json()[0]

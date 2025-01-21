@@ -6,43 +6,42 @@
     <span class="badge badge-primary" id="remoteViewTitle{##view_id##}">Participant #{##view_id##}</span>
 
     <!-- Video controls -->
-    <div id="remoteVideoControls{##view_id##}"  class="overlay-top-right" style="">
-        <input id="remoteBtnStar{##view_id##}" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
-        <input id="remoteBtnSwapVideo{##view_id##}" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+    <div id="remoteVideoControls{##view_id##}" class="overlay-top-right" style="">
+        <input id="remoteBtnStar{##view_id##}" data-i18n-attr="title" data-i18n="ui.star" class="image-icon" type="image" alt="image" src="images/star.png" onclick="selectPrimaryView(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteBtnSwapVideo{##view_id##}" data-i18n-attr="title" data-i18n="ui.swap" class="image-icon" type="image" alt="image" src="images/swap.png" onclick="enlargeView(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
     </div>
-
 
     <div class="overlay-top-center" >
         <!-- Chrono display -->
         <div id="remoteChrono{##view_id##}" style="display:none">
             <label class="chrono" id="remoteChronoText{##view_id##}">Temps restant: xx:xx</label>
-            <input class="image-icon chrono-button" id="remoteChronoPlay{##view_id##}" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
-            <input class="image-icon chrono-button" id="remoteChronoPause{##view_id##}" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(false, {##view_id##});"/>
-            <input class="image-icon chrono-button" id="remoteChronoStop{##view_id##}" type="image" alt="image" src="images/stop.png" onclick="stopChrono(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteChronoPlay{##view_id##}" data-i18n-attr="title" data-i18n="ui.play" type="image" alt="image" src="images/play.png" onclick="startChrono();"/>
+            <input class="image-icon chrono-button" id="remoteChronoPause{##view_id##}" data-i18n-attr="title" data-i18n="ui.pause" type="image" alt="image" src="images/pause.png" onclick="pauseChrono(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteChronoStop{##view_id##}" data-i18n-attr="title" data-i18n="ui.stop" type="image" alt="image" src="images/stop.png" onclick="stopChrono(false, {##view_id##});"/>
         </div>
 
         <!-- Counter display -->
         <div id="remoteCounter{##view_id##}" style="display:none">
-            <input class="image-icon chrono-button" id="remoteCounterMinus{##view_id##}" type="image" alt="image" src="images/minus.png" onclick="counterMinus(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteCounterMinus{##view_id##}" data-i18n-attr="title" data-i18n="ui.minus" type="image" alt="image" src="images/minus.png" onclick="counterMinus(false, {##view_id##});"/>
             <label class="chrono counter" id="remoteCounterText{##view_id##}">00</label>
-            <input class="image-icon chrono-button" id="remoteCounterPlus{##view_id##}" type="image" alt="image" src="images/plus.png" onclick="counterPlus(false, {##view_id##});"/>
-            <input class="image-icon chrono-button" id="remoteCounterStop{##view_id##}" type="image" alt="image" src="images/stop.png" onclick="stopCounter(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteCounterPlus{##view_id##}" data-i18n-attr="title" data-i18n="ui.plus" type="image" alt="image" src="images/plus.png" onclick="counterPlus(false, {##view_id##});"/>
+            <input class="image-icon chrono-button" id="remoteCounterStop{##view_id##}" data-i18n-attr="title" data-i18n="ui.stop" type="image" alt="image" src="images/stop.png" onclick="stopCounter(false, {##view_id##});"/>
         </div>
     </div>
 
 
     <!-- Micro, video, sensors, ... controls -->
     <div id="remoteViewControls{##view_id##}" class="overlay-bottom-center" >
-        <input id="remoteConfig{##view_id##}" class="image-icon" type="image" alt="image" src="images/config.png" onclick="btnConfigClicked(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
-        <input id="remoteMicStatus{##view_id##}" class="image-icon" type="image" alt="image" src="images/mic.png" onclick="muteMicro(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
-        <input id="remoteVideoStatus{##view_id##}" class="image-icon" type="image" alt="image" src="images/video.png" onclick="muteVideo(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
-        <input id="remoteSpeakerStatus{##view_id##}" class="image-icon" type="image" alt="image" src="images/speaker.png" onclick="muteSpeaker(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteConfig{##view_id##}" class="image-icon" type="image" data-i18n-attr="title" data-i18n="ui.config" alt="image" src="images/config.png" onclick="btnConfigClicked(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteMicStatus{##view_id##}" class="image-icon" type="image" data-i18n-attr="title" data-i18n="ui.micro" alt="image" src="images/mic.png" onclick="muteMicro(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteVideoStatus{##view_id##}" class="image-icon" type="image" data-i18n-attr="title" data-i18n="ui.camera" alt="image" src="images/video.png" onclick="muteVideo(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteSpeakerStatus{##view_id##}" class="image-icon" type="image" data-i18n-attr="title" data-i18n="ui.speaker" alt="image" src="images/speaker.png" onclick="muteSpeaker(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
     </div>
 
     <!-- Video source controls -->
     <div id="remoteViewCameras{##view_id##}" class="overlay-bottom-left">
-        <input id="remoteVideoSwap{##view_id##}" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, {##view_id##}); event.stopPropagation();" style="display:none;"/>
-        <input id="remoteBtnShow2ndVideo{##view_id##}" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked({##view_id##});event.stopPropagation();" style="display: none;"/>
+        <input id="remoteVideoSwap{##view_id##}" data-i18n-attr="title" data-i18n="ui.cam-change" class="image-icon" type="image" alt="image" src="images/videoswap.png" onclick="swapVideoSource(false, {##view_id##}); event.stopPropagation();" style="display:none;"/>
+        <input id="remoteBtnShow2ndVideo{##view_id##}" data-i18n-attr="title" data-i18n="ui.cam-second" class="image-icon" type="image" alt="image" src="images/show2ndvideo.png" onclick="btnShow2ndRemoteVideoClicked({##view_id##});event.stopPropagation();" style="display: none;"/>
     </div>
 
     <!-- PTZ controls -->
@@ -83,20 +82,20 @@
             </div>
         </div>
         <div class="dropdown">
-            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton{##view_id##}" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
+            <input class="btn bg-secondary text-light image-icon" id="remoteSettingsButton{##view_id##}" data-i18n-attr="title" data-i18n="ui.cam-settings" type="image" alt="image" src="images/settings.png" onclick="camSettings(false, {##view_id##});event.stopPropagation();" style="display: none;"/>
         </div>
     </div>
 
     <!-- Sources controls -->
     <div id="remoteSourcesControls{##view_id##}" class="overlay-bottom-right">
         <div style="padding-left:20px;padding-top:20px;background-color:rgba(0,0,0,0);">
-            <input id="remoteBtnShareScreen{##view_id##}" type="image" alt="image" src="images/sharescreen.png" height=32 onclick="btnRemoteShareScreenClicked({##view_id##});event.stopPropagation();" style="display: none;"/>
+            <input id="remoteBtnShareScreen{##view_id##}" data-i18n-attr="title" data-i18n="ui.share-screen" type="image" alt="image" src="images/sharescreen.png" height=32 onclick="btnRemoteShareScreenClicked({##view_id##});event.stopPropagation();" style="display: none;"/>
         </div>
     </div>
 
     <!-- Picture in picture -->
     <div id="remoteStatus{##view_id##}" class="overlay-bottom-right status-zone" style="display: none;" onclick="">
-        <img id="remoteMusic{##view_id##}" type="image" alt="image" class="image-status" src="images/music_on.png" style="z-index: 5;"/>
+        <img id="remoteMusic{##view_id##}" data-i18n-attr="title" data-i18n="ui.music-icon" type="image" alt="image" class="image-status" src="images/music_on.png" style="z-index: 5;"/>
         <div id="remoteStatusVideo{##view_id##}" class="h-100 w-100 video-pip"></div>
     </div>
 

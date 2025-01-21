@@ -106,7 +106,7 @@ class TeraProjectTest(BaseModelsTest):
 
             # Create participants
             participants = []
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             for i in range(3):
                 part = TeraParticipantTest.new_test_participant(id_project=new_project.id_project, enabled=True)
                 participants.append(part)
@@ -116,7 +116,7 @@ class TeraProjectTest(BaseModelsTest):
 
             # Associate devices
             devices = []
-            from test_TeraDevice import TeraDeviceTest
+            from tests.opentera.db.models.test_TeraDevice import TeraDeviceTest
             for i in range(2):
                 device = TeraDeviceTest.new_test_device()
                 devices.append(device)
@@ -163,7 +163,7 @@ class TeraProjectTest(BaseModelsTest):
             id_project = project.id_project
 
             # Create a new participant in that project
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=id_project)
             self.assertIsNotNone(participant.id_participant)
             id_participant = participant.id_participant
@@ -188,7 +188,7 @@ class TeraProjectTest(BaseModelsTest):
     def test_undelete(self):
         with self._flask_app.app_context():
             # Create site
-            from test_TeraSite import TeraSiteTest
+            from tests.opentera.db.models.test_TeraSite import TeraSiteTest
             site = TeraSiteTest.new_test_site()
             id_site = site.id_site
 
@@ -198,7 +198,7 @@ class TeraProjectTest(BaseModelsTest):
             id_project = project.id_project
 
             # Create a new participant in that project
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=id_project)
             self.assertIsNotNone(participant.id_participant)
             id_participant = participant.id_participant
@@ -243,12 +243,12 @@ class TeraProjectTest(BaseModelsTest):
             id_project = project.id_project
 
             # Create participant groups
-            from test_TeraParticipantGroup import TeraParticipantGroupTest
+            from tests.opentera.db.models.test_TeraParticipantGroup import TeraParticipantGroupTest
             group = TeraParticipantGroupTest.new_test_group(id_project=id_project)
             self.assertIsNotNone(group.id_participant_group)
             id_participant_group1 = group.id_participant_group
 
-            from test_TeraParticipant import TeraParticipantTest
+            from tests.opentera.db.models.test_TeraParticipant import TeraParticipantTest
             participant = TeraParticipantTest.new_test_participant(id_project=1,
                                                                    id_participant_group=id_participant_group1)
             self.assertIsNotNone(participant.id_participant)

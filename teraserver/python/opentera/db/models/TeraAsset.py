@@ -79,7 +79,6 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
             from opentera.db.models.TeraSession import TeraSession
             from opentera.db.models.TeraDevice import TeraDevice
             from opentera.db.models.TeraParticipant import TeraParticipant
-            from opentera.db.models.TeraUser import TeraUser
 
             session2 = TeraSession.get_session_by_name("Séance #2")
             session3 = TeraSession.get_session_by_name("Séance #3")
@@ -94,7 +93,7 @@ class TeraAsset(BaseModel, SoftDeleteMixin):
                 if i == 0:
                     new_asset.id_participant = TeraParticipant.get_participant_by_name('Participant #1').id_participant
                 if i == 1:
-                    new_asset.id_user = TeraUser.get_user_by_id(1).id_user
+                    new_asset.id_user = 2 # TeraUser.get_user_by_id(2).id_user
                 TeraAsset.insert(new_asset)
 
             asset_device = TeraDevice.get_device_by_name('Apple Watch #W05P1')

@@ -6,22 +6,12 @@ from flask import request
 
 class TeraDeviceClient:
 
-    def __init__(self, token_dict: dict, token: str, config_man):
+    def __init__(self, token_dict: dict, token: str, config_man, service):
         self.__device_uuid = token_dict['device_uuid']
         self.__id_device = token_dict['id_device']
         self.__device_token = token
-
-        # A little trick here to get the right URL for the server if we are using a proxy
-        backend_hostname = config_man.backend_config["hostname"]
-        backend_port = str(config_man.backend_config["port"])
-
-        # if 'X-Externalhost' in request.headers:
-        #    backend_hostname = request.headers['X-Externalhost']
-
-        #if 'X-Externalport' in request.headers:
-        #    backend_port = request.headers['X-Externalport']
-
-        self.__backend_url = 'https://' + backend_hostname + ':' + backend_port
+        self.__config_man = config_man
+        self.__service = service
 
 
     @property
@@ -48,16 +38,24 @@ class TeraDeviceClient:
     def device_token(self, token: str):
         self.__device_token = token
 
-    def do_get_request_to_backend(self, path: str) -> Response:
-        from requests import get
-        request_headers = {'Authorization': 'OpenTera ' + self.__device_token}
-        # TODO: remove verify=False and check certificate
-        backend_response = get(url=self.__backend_url + path, headers=request_headers, verify=False)
-        return backend_response
+    def do_get_request_to_backend(self, path: str, params: dict = None) -> Response:
+        """
+        Now using service function:
+        def get_from_opentera_with_token(self, token: str, api_url: str, params: dict = {},
+                                     additional_headers: dict = {}) -> Response:
+        """
+        if params is None:
+            params = {}
+        return self.__service.get_from_opentera_with_token(self.__device_token, api_url=path, params=params)
 
     def can_access_session(self, id_session: int) -> bool:
-        response = self.do_get_request_to_backend('/api/device/sessions?id_session=' + str(id_session))
+        params = {'id_session': str(id_session)}
+        response = self.do_get_request_to_backend('/api/device/sessions', params)
         return response.status_code == 200
+
+    def can_access_test_invitation(self, invitation_key: str) -> bool:
+        # TODO - Implement this
+        return False
 
     def get_device_infos(self) -> dict:
         response = self.do_get_request_to_backend('/api/device/devices')

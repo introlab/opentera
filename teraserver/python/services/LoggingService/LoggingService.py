@@ -60,7 +60,7 @@ class LoggingService(ServiceOpenTera):
     def register_to_events(self):
         # Need to register to events produced by UserManagerModule
         ret1 = yield self.subscribe_pattern_with_callback('log.*', self.log_event_received)
-        print(ret1)
+        # print(ret1)
 
         log_levels = ['log.trace', 'log.debug', 'log.info', 'log.warning', 'log.critical', 'log.error', 'log.fatal']
 
@@ -179,15 +179,22 @@ if __name__ == '__main__':
 
     Globals.db_man.test = args.enable_tests
 
-    if not args.enable_tests:
-        try:
-            Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
-        except OperationalError as e:
-            print("Unable to connect to database - please check settings in config file!", e)
-            quit()
+    try:
+        if args.enable_tests:
+            db_infos = {'filename': ''}
+            Globals.db_man.open_local(db_infos, echo=True, ram=True)
 
-        with flask_app.app_context():
-            Globals.db_man.create_defaults(Globals.config_man)
+            # Create default values, if required
+            Globals.db_man.create_defaults(config=Globals.config_man, test=True)
+        else:
+            Globals.db_man.open(POSTGRES, Globals.config_man.service_config['debug_mode'])
+
+    except OperationalError as e:
+        print("Unable to connect to database - please check settings in config file!", e)
+        quit()
+
+    with flask_app.app_context():
+        Globals.db_man.create_defaults(Globals.config_man, test=args.enable_tests)
 
     # In test mode, db manager will not save anything into a database
 

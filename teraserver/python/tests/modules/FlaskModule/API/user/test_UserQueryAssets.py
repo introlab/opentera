@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraAsset import TeraAsset
 
 
@@ -66,7 +66,7 @@ class UserQueryAssetsTest(BaseUserAPITest):
                                                      params=params)
             self.assertEqual(200, response.status_code)
             self.assertEqual(len(response.json), 0)
-        
+
     def test_query_device_assets_as_admin(self):
         with self._flask_app.app_context():
             params = {'id_device': 1, 'with_urls': True}
@@ -178,7 +178,7 @@ class UserQueryAssetsTest(BaseUserAPITest):
 
     def test_query_assets_created_by_user_as_admin(self):
         with self._flask_app.app_context():
-            params = {'id_creator_user': 1, 'with_urls': True}
+            params = {'id_creator_user': 2, 'with_urls': True}
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
                                                      params=params)
             self.assertEqual(200, response.status_code)

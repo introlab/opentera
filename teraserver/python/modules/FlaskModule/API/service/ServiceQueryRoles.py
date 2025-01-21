@@ -27,10 +27,13 @@ class ServiceQueryRoles(Resource):
     @api.doc(description='Get service roles for that service',
              responses={200: 'Success - returns list of roles',
                         500: 'Database error'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get service roles for the current service
+        """
         args = get_parser.parse_args()
         roles = TeraServiceRole.get_service_roles(service_id=current_service.id_service)
         roles_list = []
@@ -43,10 +46,13 @@ class ServiceQueryRoles(Resource):
              responses={200: 'Success',
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error when saving roles'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update service roles for the current service
+        """
         # Using request.json instead of parser, since parser messes up the json!
         if 'service_role' not in request.json:
             return gettext('Missing service_role field'), 400
@@ -99,10 +105,13 @@ class ServiceQueryRoles(Resource):
              responses={200: 'Success',
                         403: 'Logged service can\'t delete role (not related to that service)',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a specific service role
+        """
         args = delete_parser.parse_args()
         id_todel = args['id']
 

@@ -1,4 +1,4 @@
-from BaseUserAPITest import BaseUserAPITest
+from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraTestTypeSite import TeraTestTypeSite
 from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
@@ -90,9 +90,9 @@ class UserQueryTestTypeSitesTest(BaseUserAPITest):
             for data_item in json_data:
                 self._checkJson(json_data=data_item)
 
-    def test_query_site_with_test_types_as_admin(self):
+    def test_query_site_with_tests_types_as_admin(self):
         with self._flask_app.app_context():
-            params = {'id_site': 1, 'with_test_types': 1}
+            params = {'id_site': 1, 'with_tests_types': 1}
             response = self._get_with_user_http_auth(username='admin', password='admin', params=params,
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)
@@ -179,9 +179,9 @@ class UserQueryTestTypeSitesTest(BaseUserAPITest):
             for data_item in json_data:
                 self._checkJson(json_data=data_item)
 
-    def test_query_site_with_test_types_as_user(self):
+    def test_query_site_with_tests_types_as_user(self):
         with self._flask_app.app_context():
-            params = {'id_site': 1, 'with_test_types': 1}
+            params = {'id_site': 1, 'with_tests_types': 1}
             response = self._get_with_user_http_auth(username='user', password='user', params=params,
                                                      client=self.test_client)
             self.assertEqual(response.status_code, 200)

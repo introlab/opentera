@@ -50,6 +50,7 @@ class TeraServiceConfigForm:
             # Items
             section1.add_item(TeraFormItem("camera", gettext("Camera"), "videoinputs", False))
             section1.add_item(TeraFormItem("mirror", gettext("Mirrored image"), "boolean", False, item_default=True))
+            section1.add_item(TeraFormItem("blur", gettext("Blurred background"), "boolean", False, item_default=False))
 
             item = TeraFormItem("teracam_src", gettext("URL"), "text", True,
                                 item_condition=TeraFormItemCondition("camera", "=", "OpenTeraCam"))

@@ -18,6 +18,7 @@ get_parser.add_argument('id_project', type=int, help='ID of the project to query
 get_parser.add_argument('id_participant', type=int, help='ID of the participant to query types for')
 get_parser.add_argument('test_type_key', type=str, help='Test type key to query for')
 get_parser.add_argument('id_test_type', type=int, help='ID of the test type to query for')
+get_parser.add_argument('test_type_uuid', type=str, help='UUID of the test type to query for')
 
 post_parser = api.parser()
 post_schema = api.schema_model('service_test_type', {'properties': TeraTestType.get_json_schema(), 'type': 'object',
@@ -39,16 +40,19 @@ class ServiceQueryTestTypes(Resource):
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
                         403: 'Service doesn\'t have permission to access the requested data'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(get_parser)
     @LoginModule.service_token_or_certificate_required
     def get(self):
+        """
+        Get test types
+        """
         args = get_parser.parse_args(strict=True)
         service_access = DBManager.serviceAccess(current_service)
 
         test_types = []
         if args['id_site']:
-            if args['id_site'] in service_access.get_accessibles_sites_ids():
+            if args['id_site'] in service_access.get_accessible_sites_ids():
                 test_types = [tt.test_type_site_test_type for tt in
                               TeraTestTypeSite.get_tests_types_for_site(args['id_site'])]
         elif args['id_project']:
@@ -63,6 +67,10 @@ class ServiceQueryTestTypes(Resource):
         elif args['id_test_type']:
             if args['id_test_type'] in service_access.get_accessible_tests_types_ids():
                 test_types = [TeraTestType.get_test_type_by_id(args['id_test_type'])]
+        elif args['test_type_uuid']:
+            test_type = TeraTestType.get_test_type_by_uuid(args['test_type_uuid'])
+            if test_type and test_type.id_test_type in service_access.get_accessible_tests_types_ids():
+                test_types = [test_type]
         elif args['test_type_key']:
             test_type = TeraTestType.get_test_type_by_key(args['test_type_key'])
             if test_type and test_type.id_test_type in service_access.get_accessible_tests_types_ids():
@@ -78,10 +86,13 @@ class ServiceQueryTestTypes(Resource):
                         403: 'Service can\'t create/update the specified test type',
                         400: 'Badly formed JSON or missing field in the JSON body',
                         500: 'Internal error when saving test type'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(post_schema)
     @LoginModule.service_token_or_certificate_required
     def post(self):
+        """
+        Create / update test types
+        """
         # Using request.json instead of parser, since parser messes up the json!
         if 'test_type' not in request.json:
             return gettext('Missing test_type'), 400
@@ -89,14 +100,19 @@ class ServiceQueryTestTypes(Resource):
         json_test_type = request.json['test_type']
 
         # Validate if we have an id
-        if 'id_test_type' not in json_test_type:
-            return gettext('Missing id_test_type'), 400
+        if 'id_test_type' not in json_test_type and 'test_type_uuid' not in json_test_type:
+            return gettext('Missing id_test_type or test_type_uuid'), 400
 
         if 'id_service' in json_test_type and json_test_type['id_service'] != current_service.id_service:
             return gettext('Forbidden'), 403
 
-        if json_test_type['id_test_type'] != 0:
-            test_type = TeraTestType.get_test_type_by_id(json_test_type['id_test_type'])
+        if (('id_test_type' in json_test_type and json_test_type['id_test_type'] != 0)
+                or 'test_type_uuid' in json_test_type):
+            if 'id_test_type' in json_test_type:
+                test_type = TeraTestType.get_test_type_by_id(json_test_type['id_test_type'])
+            else:
+                test_type = TeraTestType.get_test_type_by_uuid(json_test_type['test_type_uuid'])
+                json_test_type['id_test_type'] = test_type.id_test_type
             if not test_type or test_type.id_service != current_service.id_service:
                 return gettext('Forbidden'), 403
             # Updating
@@ -139,10 +155,13 @@ class ServiceQueryTestTypes(Resource):
              responses={200: 'Success',
                         403: 'Service can\'t delete test type',
                         500: 'Database error.'},
-             params={'token': 'Secret token'})
+             params={'token': 'Access token'})
     @api.expect(delete_parser)
     @LoginModule.service_token_or_certificate_required
     def delete(self):
+        """
+        Delete a test type
+        """
         args = delete_parser.parse_args()
         uuid_todel = args['uuid']
 

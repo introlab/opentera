@@ -259,6 +259,8 @@ class BaseMixin(object):
 
         # Browse each
         pr_dict = dict()
+        required_fields: list[str] = []
+
         for name in dir(cls):
             value = getattr(cls, name)
             if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
@@ -269,6 +271,9 @@ class BaseMixin(object):
                     data_type = 'object'
                     data_format = None
                     column_type = str(value.prop.columns[0].type).lower()
+                    # Add primary key to required fields
+                    if value.prop.columns[0].primary_key:
+                        required_fields.append(name)
                     default_value = value.prop.columns[0].default
                     if 'string' in column_type or 'timestamp' in column_type or 'varchar' in column_type:
                         data_type = 'string'
@@ -281,14 +286,18 @@ class BaseMixin(object):
                     if 'boolean' in column_type:
                         data_type = 'boolean'
 
-                    pr_dict[name] = {'type': data_type, 'required': not value.prop.columns[0].nullable}
+                    pr_dict[name] = {'type': data_type}
                     if data_format:
                         pr_dict[name]['format'] = data_format
                     if default_value:
                         if hasattr(default_value, 'arg'):
-                            pr_dict[name]['default'] = default_value.arg
+                            if not callable(default_value.arg):
+                                pr_dict[name]['default'] = default_value.arg
 
-        schema = {model_name: {'properties': pr_dict, 'type': 'object'}}
+        schema = {model_name: {'properties': pr_dict,
+                               'type': 'object',
+                               'required': required_fields,
+                               'additionalProperties': False}}
 
         return schema
 
@@ -302,7 +311,6 @@ class BaseMixin(object):
         missing_fields = []
 
         # Browse each
-        pr_dict = dict()
         for name in dir(cls):
             value = getattr(cls, name)
             if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \

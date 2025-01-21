@@ -25,6 +25,9 @@ class TeraService(BaseModel, SoftDeleteMixin):
     service_system = Column(Boolean, nullable=False, default=False)
     service_editable_config = Column(Boolean, nullable=False, default=False)
     service_default_config = Column(String, nullable=True, default='{}')
+    # Added in 80f6eb28aea5_add_service_assets_and_tests_flags.py
+    service_has_assets = Column(Boolean, nullable=False, default=False)
+    service_has_tests = Column(Boolean, nullable=False, default=False)
 
     service_roles = relationship('TeraServiceRole', cascade='delete')
     service_projects = relationship('TeraServiceProject', cascade='delete')
@@ -40,6 +43,10 @@ class TeraService(BaseModel, SoftDeleteMixin):
                                         back_populates='asset_service_owner', passive_deletes=True)
 
     service_tests = relationship("TeraTest", cascade='delete', back_populates='test_service', passive_deletes=True)
+
+    # service_sessions = relationship("TeraSession", secondary="t_sessions_services", back_populates="session_services",
+    #                              passive_deletes=True, cascade='delete')
+
 
     def __init__(self):
         pass
@@ -91,6 +98,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
         payload = {
             'iat': int(now),
             'exp': int(now) + expiration,
+            'jti': str(uuid.uuid4()),
             'iss': 'TeraServer',
             'service_uuid': self.service_uuid
         }
@@ -168,6 +176,19 @@ class TeraService(BaseModel, SoftDeleteMixin):
         new_service.service_clientendpoint = '/file'
         new_service.service_enabled = True
         new_service.service_system = True
+        new_service.service_has_assets = True
+        TeraService.db().session.add(new_service)
+
+        new_service = TeraService()
+        new_service.service_uuid = str(uuid.uuid4())
+        new_service.service_key = 'EmailService'
+        new_service.service_name = 'Email Service'
+        new_service.service_hostname = '127.0.0.1'
+        new_service.service_port = 4043
+        new_service.service_endpoint = '/'
+        new_service.service_clientendpoint = '/mail'
+        new_service.service_enabled = True
+        new_service.service_system = True
         TeraService.db().session.add(new_service)
 
         if test:
@@ -209,6 +230,7 @@ class TeraService(BaseModel, SoftDeleteMixin):
             new_service.service_endpoint = '/'
             new_service.service_clientendpoint = '/robot'
             new_service.service_enabled = True
+            new_service.service_has_tests = True
             TeraService.db().session.add(new_service)
             TeraService.db().session.commit()
 

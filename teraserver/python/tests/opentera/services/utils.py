@@ -1,22 +1,7 @@
-import unittest
-from flask_restx import Resource, inputs
 import time
 from opentera.services.ServiceAccessManager import ServiceAccessManager
-import opentera.redis.RedisVars as RedisVars
 import jwt
 import uuid
-
-
-def infinite_jti_sequence():
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
-# Initialize generator, call next(user_jti_generator) to get next sequence number
-user_jti_generator = infinite_jti_sequence()
-participant_jti_generator = infinite_jti_sequence()
 
 @staticmethod
 def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), roles=[],
@@ -29,7 +14,7 @@ def _generate_fake_user_token(name='FakeUser', user_uuid=str(uuid.uuid4()), role
         'iat': int(now),
         'exp': int(now) + expiration,
         'iss': 'TeraServer',
-        'jti': next(user_jti_generator),
+        'jti': str(uuid.uuid4()),
         'user_uuid': user_uuid,
         'id_user': 1,
         'user_fullname': name,
@@ -46,7 +31,7 @@ def _generate_fake_static_participant_token(participant_uuid=str(uuid.uuid4())):
     token_key = ServiceAccessManager.api_participant_static_token_key
     payload = {
         'iss': 'TeraServer',
-        'jti': next(participant_jti_generator),
+        'jti': str(uuid.uuid4()),
         'participant_uuid': participant_uuid,
         'id_participant': 1
     }
@@ -63,7 +48,7 @@ def _generate_fake_dynamic_participant_token(name='FakeParticipant', participant
         'iat': int(now),
         'exp': int(now) + expiration,
         'iss': 'TeraServer',
-        'jti': next(participant_jti_generator),
+        'jti': str(uuid.uuid4()),
         'participant_uuid': participant_uuid,
         'id_participant': 2,
         'user_fullname': name
