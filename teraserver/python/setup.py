@@ -8,7 +8,7 @@ with open("env/requirements.txt", "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="opentera",
-    version="1.3.0",
+    version="1.3.1",
     author="Dominic Létourneau, Simon Brière",
     author_email="dominic.letourneau@usherbrooke.ca, simon.briere@usherbrooke.ca",
     description="OpenTera base package",
