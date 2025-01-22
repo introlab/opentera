@@ -5,7 +5,6 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import event, inspect, update
 from sqlalchemy.engine import Engine
-from sqlalchemy.engine.reflection import Inspector
 from twisted.internet import task, reactor
 import opentera.messages.python as messages
 
@@ -463,7 +462,7 @@ class DBManager (BaseModule):
 
         with self.app.app_context():
             # Init tables
-            inspector = Inspector.from_engine(self.db.engine)
+            inspector = inspect(self.db.engine)
             tables = inspector.get_table_names()
 
             if not tables:

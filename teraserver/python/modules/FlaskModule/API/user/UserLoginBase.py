@@ -47,6 +47,13 @@ class TooMany2FALoginAttemptsError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class InvalidAuthCodeError(Exception):
+    """
+    Raised when the authentication code is invalid.
+    """
+    def __init__(self, message):
+        super().__init__(message)
+
 
 class UserLoginBase(Resource):
     """
@@ -106,6 +113,18 @@ class UserLoginBase(Resource):
                 self._send_login_failure_message(
                     messages.LoginEvent.LOGIN_STATUS_FAILED_WITH_MAX_ATTEMPTS_REACHED, message)
                 raise TooMany2FALoginAttemptsError(message)
+
+    def _verify_auth_code(self) -> dict | None:
+        if 'auth_code' not in session:
+            return None
+
+        auth_code = session['auth_code']
+        auth_infos = self.module.redisGet('service_auth_code_' + auth_code)
+        if not auth_infos:
+            raise InvalidAuthCodeError(gettext('Invalid authentication code'))
+
+        return json.loads(auth_infos)
+
 
     def _verify_client_version(self) -> dict | None:
         reply = {}
@@ -249,7 +268,7 @@ class UserLoginBase(Resource):
         if 'auth_code' in session:
             # Get information from redis
             try:
-                code_infos = json.loads(self.module.redisGet('service_auth_code_' + session['auth_code']))
+                code_infos = self._verify_auth_code()
                 # Generate redirect url
                 service: TeraService = TeraService.get_service_by_uuid(code_infos['service_uuid'])
                 if not service:

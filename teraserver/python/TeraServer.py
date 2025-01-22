@@ -26,16 +26,18 @@ import pathlib
 import sys
 import os
 import argparse
+import redis
 from sqlalchemy.exc import OperationalError
 from opentera.utils.TeraVersions import TeraVersions
 from opentera.config.ConfigManager import ConfigManager
+from opentera.db.models.TeraServerSettings import TeraServerSettings
+from opentera.db.models.TeraService import TeraService
+from opentera.redis.RedisVars import RedisVars
 import modules.Globals as Globals
 
 
 def init_shared_variables(config):
     # Create user token
-    from opentera.db.models.TeraServerSettings import TeraServerSettings
-
     # Dynamic key for users, updated at every restart (for now)
     # Server should rotate key every hour, day?
     user_token_key = TeraServerSettings.generate_token_key(32)
@@ -43,7 +45,6 @@ def init_shared_variables(config):
     service_token_key = TeraServerSettings.generate_token_key(32)
 
     # Create redis client
-    import redis
     redis_client = redis.Redis(host=config.redis_config['hostname'],
                                port=config.redis_config['port'],
                                db=config.redis_config['db'],
@@ -51,7 +52,6 @@ def init_shared_variables(config):
                                password=config.redis_config['password'])
 
     # Set API Token Keys
-    from opentera.redis.RedisVars import RedisVars
     # Set USER
     redis_client.set(RedisVars.RedisVar_UserTokenAPIKey, user_token_key)
 
@@ -81,8 +81,6 @@ def init_shared_variables(config):
 
 def init_opentera_service(config: ConfigManager):
     print('Initializing services...')
-    from opentera.db.models.TeraService import TeraService
-
     # Set python path to current folder so that import work from services
     tera_python_dir = pathlib.Path(__file__).parent.absolute()
     os.environ['PYTHONPATH'] = str(tera_python_dir)
@@ -189,9 +187,7 @@ if __name__ == '__main__':
         # Cleaning up
         service_launcher.terminate_processes()
 
-        # Flush redis database
-        import redis
-
+        # Close DB
         redis_client = redis.Redis(host=config_man.redis_config['hostname'],
                                    port=config_man.redis_config['port'],
                                    db=config_man.redis_config['db'],
