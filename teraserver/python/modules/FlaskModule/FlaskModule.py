@@ -402,6 +402,10 @@ def post_process_request(response):
 
     # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up
     if response.status_code == 401 and 'WWW-Authenticate' in response.headers:
+        # Backward compabitility for OpenTeraPlus < 1.3
+        if 'X-Client-Name' in request.headers and request.headers['X-Client-Name'] == 'OpenTeraPlus':
+            if 'X-Client-Version' in request.headers and int(request.headers['X-Client-Version'].replace('.','')) < 130:
+                return response
         del response.headers['WWW-Authenticate']
 
     # Request processing time
