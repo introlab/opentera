@@ -38,6 +38,10 @@ class LoginSetup2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
+        # Not specified or with no value will default to true
+        with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
+
         return render_template('login_setup_2fa.html', hostname=hostname, port=port,
                                server_version=versions.version_string,
-                               user_has_email=current_user.user_email is not None and current_user.user_email != "")
+                               user_has_email=current_user.user_email is not None and current_user.user_email != "",
+                               with_websocket=with_websocket)

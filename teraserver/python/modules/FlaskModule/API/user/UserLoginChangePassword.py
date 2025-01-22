@@ -1,11 +1,10 @@
+from flask_babel import gettext
+
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase, InvalidAuthCodeError
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from modules.LoginModule.LoginModule import LoginModule, current_user
-from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure, UserNewPasswordSameAsOld
 from modules.FlaskModule.FlaskUtils import FlaskUtils
-
-from flask_babel import gettext
-from flask import redirect
+from opentera.db.models.TeraUser import TeraUser, UserPasswordInsecure, UserNewPasswordSameAsOld
 
 post_parser = api.parser()
 post_parser.add_argument('new_password', type=str, required=True, help='New password for the user')

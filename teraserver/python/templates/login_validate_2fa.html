@@ -32,7 +32,7 @@
             $('#redirectMsg').text(msg);
             $('#dlgRedirect').removeClass("d-none").addClass("d-flex");
             setTimeout(function() {
-                redirectToLogin();
+                redirectToLogin({{ with_websocket|tojson }});
              }, 5000);
         }
 
@@ -84,7 +84,7 @@
                 url: "/api/user/login/2fa",
                 data: {
                     otp_code: otp_code,
-                    with_websocket: true
+                    with_websocket: {{ with_websocket|tojson }}
                 },
                 success: function(response, textStatus, jqXHR) {
                     $('#error_message').hide();
@@ -107,7 +107,7 @@
                 error: function() {
                     attempt++;
                     if (attempt >= 5){
-                        redirectToLogin("{{ gettext('Too many attempts - returning to login') }}");
+                        localRedirectToLogin("{{ gettext('Too many attempts - returning to login') }}");
                         return;
                     }
                     let msg = "{{ gettext('Invalid code') }}" + " - " + (5-attempt).toString() + " " + "{{ gettext('attempts left') }}";

@@ -41,7 +41,7 @@
                 };
 
                 var data = {
-                    with_websocket: true
+                    with_websocket: {{ with_websocket|tojson }}
                 };
 
                 // Send the form data to the backend with a post request

@@ -20,6 +20,10 @@ post_parser.add_argument('otp_secret', type=str, required=True, help='OTP Secret
 post_parser.add_argument('with_email_enabled', type=inputs.boolean,
                         help='Enable email notifications for 2FA', default=False)
 post_parser.add_argument('otp_code', type=str, required=True, help='OTP code for validation on setup')
+post_parser.add_argument('with_websocket', type=inputs.boolean,
+                        help='If set, requires that a websocket url is returned.'
+                             'If not possible to do so, return a 403 error.',
+                        default=False)
 
 
 class UserLoginSetup2FA(UserLoginBase):
@@ -149,7 +153,7 @@ class UserLoginSetup2FA(UserLoginBase):
 
             # Redirect to 2FA validation page
             response['message'] = gettext('2FA enabled for this user.')
-            response['redirect_url'] =  self._generate_2fa_verification_url() + "?code=" + args['otp_code']
+            response['redirect_url'] =  self._generate_2fa_verification_url(args['with_websocket']) + '&code=' + args['otp_code']
 
         except OutdatedClientVersionError as e:
             self._user_logout()
