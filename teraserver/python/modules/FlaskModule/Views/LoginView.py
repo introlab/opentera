@@ -21,6 +21,9 @@ class LoginView(MethodView):
 
         show_logo = 'no_logo' not in request.args
 
+        # Not specified or with no value will default to true
+        with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
+
         # if 'auth_code' in session:
         #     session.pop('auth_code')
         if 'auth_code' in request.args:
@@ -30,4 +33,4 @@ class LoginView(MethodView):
         versions.load_from_db()
 
         return render_template('login.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, show_logo=show_logo)
+                               server_version=versions.version_string, show_logo=show_logo, with_websocket=with_websocket)

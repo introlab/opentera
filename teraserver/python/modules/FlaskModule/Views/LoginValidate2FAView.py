@@ -42,5 +42,9 @@ class LoginValidate2FAView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
+        # Not specified or with no value will default to true
+        with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
+
         return render_template('login_validate_2fa.html', hostname=hostname, port=port,
-                               server_version=versions.version_string)
+                               server_version=versions.version_string,
+                               with_websocket=with_websocket)

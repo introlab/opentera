@@ -27,8 +27,12 @@ class LoginChangePasswordView(MethodView):
         versions = TeraVersions()
         versions.load_from_db()
 
+        # Not specified or with no value will default to true
+        with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
+
         return render_template('login_change_password.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, username=current_user.user_username)
+                               server_version=versions.version_string, username=current_user.user_username,
+                               with_websocket=with_websocket)
 
     # @LoginModule.user_session_required
     # def post(self):

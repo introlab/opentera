@@ -1,10 +1,10 @@
 import json
 import re
 
-from flask import session, request, Response, redirect
-from flask_login import logout_user
+from flask import session, request, Response
 from flask_restx import Resource
 from flask_babel import gettext
+from flask_login import logout_user
 from modules.LoginModule.LoginModule import current_user
 from opentera.redis.RedisRPCClient import RedisRPCClient
 from opentera.modules.BaseModule import ModuleNames
@@ -207,17 +207,17 @@ class UserLoginBase(Resource):
         token_key = self.module.redisGet(RedisVars.RedisVar_UserTokenAPIKey)
         return current_user.get_token(token_key)
 
-    def _generate_2fa_verification_url(self) -> str:
-        return "/login_validate_2fa"
+    def _generate_2fa_verification_url(self, with_websocket: bool = False) -> str:
+        return "/login_validate_2fa?with_websocket=" + str('true' if with_websocket else 'false')
 
-    def _generate_2fa_setup_url(self) -> str:
-        return "/login_setup_2fa"
+    def _generate_2fa_setup_url(self, with_websocket: bool = False) -> str:
+        return "/login_setup_2fa?with_websocket=" + str('true' if with_websocket else 'false')
 
-    def _generate_login_url(self) -> str:
-        return "/login"
+    def _generate_login_url(self, with_websocket: bool = False) -> str:
+        return "/login?with_websocket=" + str('true' if with_websocket else 'false')
 
-    def _generate_password_change_url(self) -> str:
-        return "/login_change_password"
+    def _generate_password_change_url(self, with_websocket: bool = False) -> str:
+        return "/login_change_password?with_websocket=" + str('true' if with_websocket else 'false')
 
     def _user_logout(self):
         logout_user()
