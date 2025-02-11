@@ -12,8 +12,8 @@ from autobahn.twisted.resource import WSGIRootResource
 
 # Twisted
 from twisted.internet import reactor
-from twisted.web.http import HTTPChannel
-from twisted.web.server import Site
+from twisted.web.http import HTTPChannel, parse_qs
+from twisted.web.server import Site, Request
 from twisted.web.static import File
 from twisted.web.wsgi import WSGIResource
 import os
@@ -84,6 +84,27 @@ class MySite(Site):
 
     def __init__(self, resource, requestFactory=None, *args, **kwargs):
         super().__init__(resource, requestFactory, *args, **kwargs)
+
+class MyRequest(Request):
+    def requestReceived(self, command, path, version):
+        # print('Request received', command, path, version)
+        if command == b"POST" and path == b"/api/assets":
+            self.content.seek(0, 0)
+            self.args = {}
+
+            self.method, self.uri = command, path
+            self.clientproto = version
+            x = self.uri.split(b"?", 1)
+
+            if len(x) == 1:
+                self.path = self.uri
+            else:
+                self.path, argstring = x
+                self.args = parse_qs(argstring, 1)
+
+            super().process()
+        else:
+            super().requestReceived(command, path, version)
 
 
 # Simple fix for API documentation used with reverse proxy
@@ -169,6 +190,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'BABEL_DEFAULT_LOCALE': 'fr'})
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
+        # flask_app.config.update({'USE_X_SENDFILE': True})
 
         # TODO set upload folder in config
         flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['files_directory']})
@@ -199,6 +221,7 @@ class FlaskModule(BaseModule):
 
         # Create a Twisted Web Site
         site = MySite(root_resource)
+        site.requestFactory = MyRequest
         # val = internet.TCPServer(self.config.service_config['port'], site)
         val = reactor.listenTCP(self.config.service_config['port'], site)
         return val
