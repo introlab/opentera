@@ -826,8 +826,8 @@ class DBManagerTeraUserAccess:
         session = TeraSession.get_session_by_id(session_id)
 
         if session:
-            # Check if we are the creator of that session
-            if session.id_creator_user == self.user.id_user:
+            # Check if we are the creator of that session or super admin
+            if session.id_creator_user == self.user.id_user or self.user.user_superadmin:
                 return session
 
             # Check if we are part of the users of that session
