@@ -144,15 +144,21 @@ class UserQuerySessions(Resource):
             if not ses_to_update:
                 return gettext('No access to session.'), 403
 
+        update_session_participants = False
+        update_session_users = False
+        update_session_devices = False
         if 'session_participants_ids' in json_session:
             session_parts_ids = json_session['session_participants_ids']
             del json_session['session_participants_ids']
+            update_session_participants = True
         if 'session_users_ids' in json_session:
             session_users_ids = json_session['session_users_ids']
             del json_session['session_users_ids']
+            update_session_users = True
         if 'session_devices_ids' in json_session:
             session_devices_ids = json_session['session_devices_ids']
             del json_session['session_devices_ids']
+            update_session_devices = True
 
         accessibles_part_ids = user_access.get_accessible_participants_ids()
         if set(session_parts_ids).difference(accessibles_part_ids):
@@ -200,21 +206,21 @@ class UserQuerySessions(Resource):
         update_session = TeraSession.get_session_by_id(json_session['id_session'])
 
         # Manage session participants
-        if len(session_parts_ids) > 0:
+        if update_session_participants:
             update_session.session_participants = [TeraParticipant.get_participant_by_id(part_id)
                                                    for part_id in session_parts_ids]
 
         # Manage session users
-        if len(session_users_ids) > 0:
+        if update_session_users:
             update_session.session_users = [TeraUser.get_user_by_id(user_id)
                                             for user_id in session_users_ids]
 
         # Manage session devices
-        if len(session_devices_ids) > 0:
+        if update_session_devices:
             update_session.session_devices = [TeraDevice.get_device_by_id(device_id)
                                               for device_id in session_devices_ids]
 
-        if session_users_ids or session_parts_ids or session_devices_ids:
+        if update_session_users or update_session_participants or update_session_devices:
             # Commit the changes
             update_session.commit()
 
