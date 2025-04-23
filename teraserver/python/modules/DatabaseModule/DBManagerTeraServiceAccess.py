@@ -319,8 +319,12 @@ class DBManagerTeraServiceAccess:
 
             # Check if we have access to the project of that session
             accessible_projects = self.get_accessible_projects_ids()
-            if session.get_associated_project_id() in accessible_projects:
-                return session
+            session_projects = session.get_associated_project_ids()
+            for session_project in session_projects:
+                if session_project in accessible_projects:
+                    return session
+            # if session.get_associated_project_id() in accessible_projects:
+            #     return session
 
         return None
 

@@ -419,6 +419,18 @@ class TeraSession(BaseModel, SoftDeleteMixin):
 
         return None  # No participant - we can't know, for sure, into which project this session is related...
 
+    def get_associated_project_ids(self) -> list:
+        project_ids = []
+        if self.session_participants:
+            for participant in self.session_participants:
+                if participant.id_project not in project_ids:
+                    project_ids.append(participant.id_project)
+
+        if self.session_creator_participant and self.session_creator_participant.id_project not in project_ids:
+            project_ids.append(self.session_creator_participant.id_project)
+
+        return project_ids
+
     def get_associated_site_id(self):
         if self.session_participants:
             # Return project id for the first participant, since they should all be the same...

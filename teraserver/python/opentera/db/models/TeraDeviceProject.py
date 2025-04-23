@@ -95,7 +95,7 @@ class TeraDeviceProject(BaseModel, SoftDeleteMixin, SoftInsertMixin):
         # Find sessions with matching device and project
         device_sessions = TeraSession.get_sessions_for_device(self.id_device, with_deleted=with_deleted)
         device_project_sessions = [ses.id_session for ses in device_sessions
-                                   if ses.get_associated_project_id() == self.id_project]
+                                   if self.id_project in ses.get_associated_project_ids()]
 
         if len(device_project_sessions) > 0:
             return IntegrityError('Device still has sessions in this project',
