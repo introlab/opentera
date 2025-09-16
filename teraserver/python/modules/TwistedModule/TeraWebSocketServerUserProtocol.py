@@ -3,9 +3,7 @@ from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from opentera.db.models.TeraUser import TeraUser
-
 from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-
 
 # Messages
 import opentera.messages.python as messages
@@ -15,9 +13,13 @@ from twisted.internet import defer
 
 # Event manager
 from modules.UserEventManager import UserEventManager
-
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 from opentera.redis.RedisVars import RedisVars
+
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
 
 
 class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
@@ -107,7 +109,12 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                 print('TeraWebSocketServerUserProtocol - user uuid ', user_uuid, self)
 
                 # User verification
-                self.user = TeraUser.get_user_by_uuid(user_uuid)
+                session_factory = sessionmaker(bind=TeraUser.db().engine)
+                db_session = scoped_session(session_factory)
+                self.user = db_session.scalars(select(TeraUser).filter_by(user_uuid=user_uuid)).first()
+                db_session.close()
+                # self.user = TeraUser.get_user_by_uuid(user_uuid)
+
                 if self.user is not None:
                     # Remove key
                     print('TeraWebSocketServerUserProtocol - OK! removing key', self)

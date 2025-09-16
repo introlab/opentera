@@ -192,7 +192,6 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': True})
         # flask_app.config.update({'USE_X_SENDFILE': True})
 
-        # TODO set upload folder in config
         flask_app.config.update({'UPLOAD_FOLDER': config.filetransfer_config['files_directory']})
 
         # Not sure.

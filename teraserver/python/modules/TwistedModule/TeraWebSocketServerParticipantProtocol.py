@@ -7,7 +7,6 @@ from opentera.modules.BaseModule import ModuleNames, create_module_message_topic
 
 # Messages
 import opentera.messages.python as messages
-
 from google.protobuf.any_pb2 import Any
 
 # Twisted
@@ -15,9 +14,13 @@ from twisted.internet import defer
 
 # Event manager
 from modules.ParticipantEventManager import ParticipantEventManager
-
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 from opentera.redis.RedisVars import RedisVars
+
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
 
 
 class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
@@ -94,8 +97,13 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
                 participant_uuid = value.decode("utf-8")
                 print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid, self)
 
-                # User verification
-                self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
+                # Participant verification
+                session_factory = sessionmaker(bind=TeraParticipant.db().engine)
+                db_session = scoped_session(session_factory)
+                self.participant = db_session.scalars(select(TeraParticipant).filter_by(participant_uuid=participant_uuid)).first()
+                db_session.close()
+                # self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
+
                 if self.participant is not None:
                     # Remove key
                     print('TeraWebSocketServerParticipantProtocol - OK! removing key', self)

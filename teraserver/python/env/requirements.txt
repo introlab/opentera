@@ -1,13 +1,13 @@
 pypiwin32==223; sys_platform == 'win32'
-Twisted==24.11.0
-treq==24.9.1
-cryptography==44.0.3
+Twisted==25.5.0
+treq==25.5.0
+cryptography==45.0.7
 autobahn==24.4.2
-SQLAlchemy==2.0.40
+SQLAlchemy==2.0.43
 sqlalchemy-schemadisplay==2.0
-pydot==4.0.0
+pydot==4.0.1
 psycopg2-binary==2.9.10
-Flask==3.1.0
+Flask==3.1.2
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
 Flask-Login-Multi==0.1.2
@@ -19,23 +19,23 @@ Flask-Security==5.6.2
 Flask-Babel==4.0.0
 Flask-BabelEx==0.9.4
 Flask-Migrate==4.1.0
-flask-swagger-ui==4.11.1
+flask-swagger-ui==5.21.0
 Flask-Limiter==3.12
 Flask-Mail==0.10.0
 Flask-Principal==0.4.0
-redis==6.0.0
+redis==6.4.0
 txredisapi==1.4.11
 passlib==1.7.4
 bcrypt==4.3.0
 WTForms==3.2.1
-pyOpenSSL==25.0.0
+pyOpenSSL==25.1.0
 service-identity==24.2.0
 PyJWT==2.10.1
 # pylzma==0.5.0
 bz2file==0.98
 python-slugify==8.0.4
 websocket-client==1.8.0
-pytest==8.3.5
+pytest==8.4.2
 Jinja2==3.1.6
 ua-parser==1.0.1
 pyotp==2.9.0

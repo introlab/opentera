@@ -18,6 +18,12 @@ from modules.DeviceEventManager import DeviceEventManager
 # Base class
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
+
+
 
 class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
@@ -91,8 +97,13 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                 device_uuid = value.decode("utf-8")
                 print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid, self)
 
-                # User verification
-                self.device = TeraDevice.get_device_by_uuid(device_uuid)
+                # Device verification
+                session_factory = sessionmaker(bind=TeraDevice.db().engine)
+                db_session = scoped_session(session_factory)
+                self.device = db_session.scalars(select(TeraDevice).filter_by(device_uuid=device_uuid)).first()
+                db_session.close()
+                # self.device = TeraDevice.get_device_by_uuid(device_uuid)
+
                 if self.device is not None:
                     # Remove key
                     print('TeraWebSocketServerDeviceProtocol - OK! removing key', self)
