@@ -27,7 +27,8 @@ class DBManager:
     }"""
 
     def __init__(self, app=flask_app, test: bool = False):
-        self.db = SQLAlchemy()
+        self.db = SQLAlchemy(engine_options={'future': True, "pool_pre_ping": True},
+                             session_options={'future': True})
         self.db_uri = None
         self.app = app
         self.test = test
