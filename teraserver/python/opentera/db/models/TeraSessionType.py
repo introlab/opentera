@@ -57,6 +57,13 @@ class TeraSessionType(BaseModel, SoftDeleteMixin):
         if self.session_type_service:
             rval['session_type_service_key'] = self.session_type_service.service_key
             rval['session_type_service_uuid'] = self.session_type_service.service_uuid
+
+        # Also includes secondary services
+        if not minimal:
+            rval['session_type_secondary_services'] = [{'service_key': service.service_key,
+                                                        'service_uuid': service.service_uuid}
+                                                       for service in self.session_type_secondary_services]
+
         return rval
 
     def to_json_create_event(self):

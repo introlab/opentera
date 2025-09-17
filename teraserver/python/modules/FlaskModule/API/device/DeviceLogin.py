@@ -70,7 +70,18 @@ class DeviceLogin(Resource):
         response['session_types_info'] = list()
 
         for st in session_types:
-            response['session_types_info'].append(st.to_json(minimal=True))
+            infos = st.to_json(minimal=True)
+            if st.session_type_service:
+                infos['session_type_service_clientendpoint'] = st.session_type_service.service_clientendpoint
+                infos['session_type_service_endpoint_device'] = st.session_type_service.service_endpoint_device
+
+            infos['session_type_secondary_services'] = [{'service_key': service.service_key,
+                                                         'service_uuid': service.service_uuid,
+                                                         'service_clientendpoint': service.service_clientendpoint,
+                                                         'service_endpoint_device': service.service_endpoint_device
+                                                         } for service in st.session_type_secondary_services
+                                                        ]
+            response['session_types_info'].append(infos)
 
         # Get login informations for log
         login_infos = UserAgentParser.parse_request_for_login_infos(request)
