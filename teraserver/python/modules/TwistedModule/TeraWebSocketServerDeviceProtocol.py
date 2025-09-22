@@ -30,6 +30,11 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
     def __init__(self, config):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.device = None
+        self.db_session = None
+
+    def __del__(self):
+        if self.db_session:
+            self.db_session.close()
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -99,9 +104,9 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
                 # Device verification
                 session_factory = sessionmaker(bind=TeraDevice.db().engine)
-                db_session = scoped_session(session_factory)
-                self.device = db_session.scalars(select(TeraDevice).filter_by(device_uuid=device_uuid)).first()
-                db_session.close()
+                self.db_session = scoped_session(session_factory)
+                self.device = self.db_session.scalars(select(TeraDevice).filter_by(device_uuid=device_uuid)).first()
+                # db_session.close()
                 # self.device = TeraDevice.get_device_by_uuid(device_uuid)
 
                 if self.device is not None:
@@ -173,6 +178,8 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
+        if self.db_session:
+            self.db_session.close()
         super().onClose(wasClean, code, reason)
 
     def answer_topic(self):

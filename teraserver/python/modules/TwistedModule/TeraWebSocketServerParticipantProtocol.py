@@ -28,6 +28,12 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
     def __init__(self, config):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.participant = None
+        self.db_session = None
+
+    def __del__(self):
+        if self.db_session:
+            self.db_session.close()
+
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -99,9 +105,9 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
 
                 # Participant verification
                 session_factory = sessionmaker(bind=TeraParticipant.db().engine)
-                db_session = scoped_session(session_factory)
-                self.participant = db_session.scalars(select(TeraParticipant).filter_by(participant_uuid=participant_uuid)).first()
-                db_session.close()
+                self.db_session = scoped_session(session_factory)
+
+                self.participant = self.db_session.scalars(select(TeraParticipant).filter_by(participant_uuid=participant_uuid)).first()
                 # self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
 
                 if self.participant is not None:
@@ -171,6 +177,9 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             # log information
             self.logger.log_info(self, "Participant websocket disconnected",
                                  self.participant.participant_name, self.participant.participant_uuid)
+
+        if self.db_session:
+            self.db_session.close()
 
         super().onClose(wasClean, code, reason)
 
