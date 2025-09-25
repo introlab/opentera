@@ -73,7 +73,7 @@ This step needs to be done only once.
     1. Select the existing Python 3.6 environment in "{PROJECT_ROOT}/python/env/python-3.6" in the app menu: PyCharm->Preferences->Project:python->Project Interpreter
         
 ### Step 4: Generate the TLS certicates (only once)
-1. Using PyCharm, run the CreateCretificates.py script. This will generate the TLS certificates used by nginx.
+1. Using PyCharm, run the CreateCertificates.py script. This will generate the TLS certificates used by nginx.
 
 ### Step 5 : Run the nginx reverse proxy (every time)
 1. Go to the **{PROJECT_ROOT}/teraserver/python/config** directory.
@@ -92,3 +92,4 @@ This step needs to be done only once.
 1.  In a near future, we hope to have everything in the QtCreator IDE. Stay tuned!
 
 Enjoy!    
+
