@@ -12,7 +12,7 @@ from opentera.db.models.TeraAsset import TeraAsset
 from opentera.db.models.TeraServiceRole import TeraServiceRole
 
 
-from passlib.hash import bcrypt
+import bcrypt
 from enum import Enum, unique
 import uuid
 import datetime
@@ -282,7 +282,8 @@ class TeraUser(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def encrypt_password(password):
-        return bcrypt.hash(password)
+        # return bcrypt.hash(password)
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     @staticmethod
     def verify_password(username, password, user=None):
@@ -299,7 +300,8 @@ class TeraUser(BaseModel, SoftDeleteMixin):
             return None
 
         # Check password
-        if bcrypt.verify(password, user.user_password):
+        # if bcrypt.verify(password, user.user_password):
+        if bcrypt.checkpw(password.encode("utf-8"), user.user_password.encode("utf-8")):
             user.authenticated = True
             return user
 

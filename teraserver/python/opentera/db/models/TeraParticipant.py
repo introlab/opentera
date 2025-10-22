@@ -14,7 +14,7 @@ from opentera.db.models.TeraProject import TeraProject
 import uuid
 import jwt
 import datetime
-from passlib.hash import bcrypt
+import bcrypt
 
 
 # Generator for jti
@@ -179,8 +179,10 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         # sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
         # if sessions:
         #     return sessions[-1]
-        session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant)
-                   .order_by(TeraSessionParticipants.id_session.desc()).limit(1).first())
+        # session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant)
+        #            .order_by(TeraSessionParticipants.id_session.desc()).limit(1).first())
+        session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant).join(TeraSession)
+                   .order_by(TeraSession.session_start_datetime.desc()).limit(1).first())
         if session:
             # Turn off lazy loading for session
             return TeraSession.query.filter_by(id_session=session.id_session).options(lazyload("*")).first()
@@ -188,7 +190,8 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def encrypt_password(password):
-        return bcrypt.hash(password)
+        # return bcrypt.hash(password)
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     # @staticmethod
     # def is_anonymous():
@@ -210,7 +213,8 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             return None
 
         # Check password
-        if bcrypt.verify(password, participant.participant_password):
+        # if bcrypt.verify(password, participant.participant_password):
+        if bcrypt.checkpw(password.encode("utf-8"), participant.participant_password.encode("utf-8")):
             participant.authenticated = True
             return participant
 
