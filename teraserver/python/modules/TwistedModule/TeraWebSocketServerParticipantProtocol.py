@@ -119,7 +119,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
                     self.event_manager = ParticipantEventManager(self.participant)
 
                     # log information
-                    self.logger.log_info(self, "Participant websocket connected",
+                    self.logger.log_info(self.module_name, "Participant websocket connected",
                                          self.participant.participant_name, self.participant.participant_uuid)
 
                     return
@@ -175,7 +175,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
-            self.logger.log_info(self, "Participant websocket disconnected",
+            self.logger.log_info(self.module_name, "Participant websocket disconnected",
                                  self.participant.participant_name, self.participant.participant_uuid)
 
         if self.db_session:

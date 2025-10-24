@@ -118,7 +118,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                     self.event_manager = DeviceEventManager(self.device)
 
                     # log information
-                    self.logger.log_info(self, "Device websocket connected",
+                    self.logger.log_info(self.module_name, "Device websocket connected",
                                          self.device.device_name, self.device.device_uuid)
 
                     return
@@ -172,7 +172,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
             yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
-            self.logger.log_info(self, "Device websocket disconnected",
+            self.logger.log_info(self.module_name, "Device websocket disconnected",
                                  self.device.device_name, self.device.device_uuid)
 
         # Unsubscribe to messages
