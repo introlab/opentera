@@ -262,6 +262,8 @@ class BaseMixin(object):
         required_fields: list[str] = []
 
         for name in dir(cls):
+            if name == 'query':
+                continue  # Prevent calling back the "QueryProperty" method
             value = getattr(cls, name)
             if cls.is_valid_property_name(name) and cls.is_valid_property_value(value) and \
                     (name.startswith(model_name) or name.startswith('id')):
