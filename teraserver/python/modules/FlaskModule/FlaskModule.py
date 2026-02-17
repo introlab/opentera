@@ -66,7 +66,7 @@ class CustomAPI(Api):
 # if doc is set to False, documentation is disabled
 api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
-                authorizations=authorizations, security=[{'basicAuth':[]}, {'tokenAuth':[]}],)
+                authorizations=authorizations, security=[{'basicAuth':[]}, {'tokenAuth':[]}])
 
 # Namespaces
 user_api_ns = api.namespace('user', description='API for user calls')

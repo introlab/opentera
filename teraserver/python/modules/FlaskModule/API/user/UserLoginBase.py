@@ -275,7 +275,7 @@ class UserLoginBase(Resource):
                     self._user_logout()
                     return Response(gettext('Invalid service'), status=400)
 
-                endpoint_url = service.service_clientendpoint + '/' + code_infos['endpoint_url'] + '/'
+                endpoint_url = service.service_clientendpoint + '/' + code_infos['endpoint_url'] # + '/'
                 endpoint_url = re.sub(r'(?<!:)//+', '/', endpoint_url)
 
             except json.JSONDecodeError:
