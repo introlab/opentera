@@ -100,6 +100,7 @@ Each system service will requires its own database. The default database that ne
 * `opentera`, the [main OpenTera service](../services/teraserver/teraserver.rst) database
 * `openterafiles`, the database for the [file transfer](../services/FileTransfer-Service) service
 * `openteralogs`, the database for the [logging service](../services/Logging-Service)
+* `openteraemails`, the database for the [email service](../services/Email-Service)
 
 The steps to create a database are as follow. Those steps should be repeated for each database to create.
   1. In pgAdmin, under `Servers`, right-click on the correct server instance (for example `PostgreSQL 13`).
@@ -123,14 +124,14 @@ If using PyCharm, the correct Python interpreter and environment will need to be
   1. Open PyCharm, loading the project from `<base folder>/teraserver/python`
   2. In `Files -> Settings-> Project : python -> Python Interpreter`, click on the `Show all` option in the selection bar.
   3. In the `Virtualenv` tab, choose the existing environment. Change the interpreter to the following :
-`...\teraserver\python\env\python-3.8\python.exe`  
+`...\teraserver\python\env\python-3.##\python.exe`, where `##` is the current python version of the project.
 The end result should look like this :  
 ![ ](images/Windows/PyCharm.PNG)
 
 **6. Self-signed certificates generation**
 Self-signed certificates should be generated for the development server and to sign device certificates.
 
-This can simply be done by running the `CreatesCertificates.py` script (directly in PyCharm if configured)
+This can simply be done by running the `CreateCertificates.py` script (directly in PyCharm if configured)
 
 ## Starting the main OpenTera service
 If all the configuration was properly done, you should now be able to run the main script, `TeraServer.py`.

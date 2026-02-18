@@ -61,7 +61,7 @@ class ParticipantQueryAssets(Resource):
             port = request.headers['X_EXTERNALPORT']
         services_infos = []
         if (args['with_urls'] or args['with_only_token']) and assets and current_participant.fullAccess:
-            services_infos = {service.service_uuid: service.service_clientendpoint
+            services_infos = {service.service_uuid: service
                               for service in participant_access.get_accessible_services()}
 
         assets_json = []
@@ -81,14 +81,17 @@ class ParticipantQueryAssets(Resource):
                                                           expiration=1800)
                 asset_json['access_token'] = access_token
             if args['with_urls'] and current_participant.fullAccess:
-                # We have previously verified that the service is available to the user
+                # We have previously verified that the service is available to the participant
                 if asset.asset_service_uuid in services_infos:
+                    base_endpoint = services_infos[asset.asset_service_uuid].service_clientendpoint + '/api'
+                    if services_infos[asset.asset_service_uuid].service_endpoint_participant:
+                        base_endpoint += services_infos[asset.asset_service_uuid].service_endpoint_participant
+
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                                    + services_infos[asset.asset_service_uuid] \
-                                                    + '/api/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
+                                                    + base_endpoint \
+                                                    + '/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                              + services_infos[asset.asset_service_uuid] \
-                                              + '/api/assets'  # ?asset_uuid=' + asset.asset_uuid
+                                              + base_endpoint + '/assets'  # ?asset_uuid=' + asset.asset_uuid
 
                 else:
                     # Service not found or unavaiable for current user

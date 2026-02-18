@@ -56,7 +56,7 @@ class DeviceQueryAssets(Resource):
         services_infos = []
 
         if (args['with_urls'] or args['with_only_token']) and assets:
-            services_infos = {service.service_uuid: service.service_clientendpoint
+            services_infos = {service.service_uuid: service
                               for service in device_access.get_accessible_services()}
 
         assets_json = []
@@ -79,12 +79,13 @@ class DeviceQueryAssets(Resource):
             if args['with_urls']:
                 # We have previously verified that the service is available to the user
                 if asset.asset_service_uuid in services_infos:
+                    base_endpoint = services_infos[asset.asset_service_uuid].service_clientendpoint + '/api'
+                    if services_infos[asset.asset_service_uuid].service_endpoint_device:
+                        base_endpoint += services_infos[asset.asset_service_uuid].service_endpoint_device
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                                    + services_infos[asset.asset_service_uuid] \
-                                                    + '/api/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
+                                                    + base_endpoint + '/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                              + services_infos[asset.asset_service_uuid] \
-                                              + '/api/assets'  # ?asset_uuid=' + asset.asset_uuid
+                                              + base_endpoint + '/assets'  # ?asset_uuid=' + asset.asset_uuid
 
                     # if not assets_json:
                     #     # Append access token to first item only

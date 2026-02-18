@@ -76,7 +76,8 @@ class DBManager (BaseModule):
         BaseModule.__init__(self, ModuleNames.DATABASE_MODULE_NAME.value, config)
 
         # Future parameters = use only SQLALchemy 2.x features
-        self.db = SQLAlchemy(engine_options={'future': True}, session_options={'future': True})
+        self.db = SQLAlchemy(engine_options={'future': True, "pool_pre_ping": True},
+                             session_options={'future': True})
         self.db_uri = None
         self.app = app
         self.db_in_ram = False

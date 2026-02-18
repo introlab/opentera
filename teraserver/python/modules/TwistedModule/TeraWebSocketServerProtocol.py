@@ -25,6 +25,7 @@ class TeraWebSocketServerProtocol(WebSocketServerProtocol, RedisClient):
         WebSocketServerProtocol.__init__(self)
 
         self.logger = LoggingClient(config, 'LoggingClient_' + self.__class__.__name__)
+        self.module_name = 'TeraServer.' + self.__class__.__name__
         self.event_manager = None
         self.registered_events = set()  # Collection of unique elements
 

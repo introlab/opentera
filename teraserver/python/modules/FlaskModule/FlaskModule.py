@@ -1,6 +1,6 @@
 import time
 import datetime
-from flask import Flask, request, g, url_for
+from flask import Flask, request, g, url_for, session
 from flask_restx import Api, Namespace
 from flask_babel import Babel
 import redis
@@ -21,6 +21,11 @@ def get_locale():
     user = getattr(g, 'user', None)
     if user is not None:
         return user.locale
+
+    # If a lang was set in a flask session, use that setting
+    if session and 'lang' in session:
+        return session['lang']
+
     # otherwise try to guess the language from the user accept
     # header the browser transmits.  We support fr/en in this
     # example.  The best match wins.
@@ -66,7 +71,7 @@ class CustomAPI(Api):
 # if doc is set to False, documentation is disabled
 api = CustomAPI(flask_app, version=opentera_server_version_string, title='OpenTeraServer API',
                 description='TeraServer API Documentation', doc=opentera_doc_url, prefix='/api',
-                authorizations=authorizations, security='basicAuth')
+                authorizations=authorizations, security=[{'basicAuth':[]}, {'tokenAuth':[]}])
 
 # Namespaces
 user_api_ns = api.namespace('user', description='API for user calls')
@@ -402,6 +407,10 @@ def post_process_request(response):
 
     # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up
     if response.status_code == 401 and 'WWW-Authenticate' in response.headers:
+        # Backward compabitility for OpenTeraPlus < 1.3
+        if 'X-Client-Name' in request.headers and request.headers['X-Client-Name'] == 'OpenTeraPlus':
+            if 'X-Client-Version' in request.headers and int(request.headers['X-Client-Version'].replace('.','')) < 130:
+                return response
         del response.headers['WWW-Authenticate']
 
     # Request processing time

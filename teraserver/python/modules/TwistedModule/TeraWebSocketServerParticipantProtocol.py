@@ -7,7 +7,6 @@ from opentera.modules.BaseModule import ModuleNames, create_module_message_topic
 
 # Messages
 import opentera.messages.python as messages
-
 from google.protobuf.any_pb2 import Any
 
 # Twisted
@@ -15,9 +14,13 @@ from twisted.internet import defer
 
 # Event manager
 from modules.ParticipantEventManager import ParticipantEventManager
-
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 from opentera.redis.RedisVars import RedisVars
+
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
 
 
 class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
@@ -25,6 +28,12 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
     def __init__(self, config):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.participant = None
+        self.db_session = None
+
+    def __del__(self):
+        if self.db_session:
+            self.db_session.close()
+
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -94,8 +103,13 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
                 participant_uuid = value.decode("utf-8")
                 print('TeraWebSocketServerParticipantProtocol - participant uuid ', participant_uuid, self)
 
-                # User verification
-                self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
+                # Participant verification
+                session_factory = sessionmaker(bind=TeraParticipant.db().engine)
+                self.db_session = scoped_session(session_factory)
+
+                self.participant = self.db_session.scalars(select(TeraParticipant).filter_by(participant_uuid=participant_uuid)).first()
+                # self.participant = TeraParticipant.get_participant_by_uuid(participant_uuid)
+
                 if self.participant is not None:
                     # Remove key
                     print('TeraWebSocketServerParticipantProtocol - OK! removing key', self)
@@ -105,7 +119,7 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
                     self.event_manager = ParticipantEventManager(self.participant)
 
                     # log information
-                    self.logger.log_info(self, "Participant websocket connected",
+                    self.logger.log_info(self.module_name, "Participant websocket connected",
                                          self.participant.participant_name, self.participant.participant_uuid)
 
                     return
@@ -161,8 +175,11 @@ class TeraWebSocketServerParticipantProtocol(TeraWebSocketServerProtocol):
             yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
-            self.logger.log_info(self, "Participant websocket disconnected",
+            self.logger.log_info(self.module_name, "Participant websocket disconnected",
                                  self.participant.participant_name, self.participant.participant_uuid)
+
+        if self.db_session:
+            self.db_session.close()
 
         super().onClose(wasClean, code, reason)
 

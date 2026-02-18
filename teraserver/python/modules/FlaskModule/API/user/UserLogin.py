@@ -45,7 +45,7 @@ class UserLogin(UserLoginBase):
             if current_user.user_force_password_change:
                 response['message'] = gettext('Password change required for this user.')
                 response['reason'] = 'password_change'
-                response['redirect_url'] = self._generate_password_change_url()
+                response['redirect_url'] = self._generate_password_change_url(args['with_websocket'])
             else:
                 # 2FA enabled? Client will need to proceed to 2FA login step first
                 if current_user.user_2fa_enabled:
@@ -55,12 +55,12 @@ class UserLogin(UserLoginBase):
                     if current_user.user_2fa_otp_enabled and current_user.user_2fa_otp_secret:
                         response['message'] = gettext('2FA required for this user.')
                         response['reason'] = '2fa'
-                        response['redirect_url'] = self._generate_2fa_verification_url()
+                        response['redirect_url'] = self._generate_2fa_verification_url(args['with_websocket'])
                     else:
                         response['message'] = gettext('2FA enabled but OTP not set for this user.'
                                                       'Please setup 2FA.')
                         response['reason'] = '2fa_setup'
-                        response['redirect_url'] = self._generate_2fa_setup_url()
+                        response['redirect_url'] = self._generate_2fa_setup_url(args['with_websocket'])
                 else:
                     response = self._generate_login_success_response(args['with_websocket'], response)
                     # Only with non-2FA users, otherwise, we wait for 2FA to be completed

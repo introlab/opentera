@@ -3,9 +3,7 @@ from autobahn.websocket.types import ConnectionDeny
 
 # OpenTera
 from opentera.db.models.TeraUser import TeraUser
-
 from opentera.modules.BaseModule import ModuleNames, create_module_message_topic_from_name, create_module_event_topic_from_name
-
 
 # Messages
 import opentera.messages.python as messages
@@ -15,9 +13,13 @@ from twisted.internet import defer
 
 # Event manager
 from modules.UserEventManager import UserEventManager
-
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 from opentera.redis.RedisVars import RedisVars
+
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
 
 
 class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
@@ -25,9 +27,12 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
     def __init__(self, config):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.user = None
+        self.db_session = None
 
-    # def __del__(self):
-    #     print("****- Deleting TeraWebSocketServerUserProtocol")
+    def __del__(self):
+        print("****- Deleting TeraWebSocketServerUserProtocol")
+        if self.db_session:
+            self.db_session.close()
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -107,7 +112,12 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                 print('TeraWebSocketServerUserProtocol - user uuid ', user_uuid, self)
 
                 # User verification
-                self.user = TeraUser.get_user_by_uuid(user_uuid)
+                session_factory = sessionmaker(bind=TeraUser.db().engine)
+                self.db_session = scoped_session(session_factory)
+                self.user = self.db_session.scalars(select(TeraUser).filter_by(user_uuid=user_uuid)).first()
+                # db_session.close()
+                # self.user = TeraUser.get_user_by_uuid(user_uuid)
+
                 if self.user is not None:
                     # Remove key
                     print('TeraWebSocketServerUserProtocol - OK! removing key', self)
@@ -117,7 +127,8 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
                     self.event_manager = UserEventManager(self.user)
 
                     # log information
-                    self.logger.log_info(self, "User websocket connected", self.user.user_username, self.user.user_uuid)
+                    self.logger.log_info(self.module_name,
+                                         "User websocket connected", self.user.user_username, self.user.user_uuid)
 
                     return
 
@@ -174,11 +185,14 @@ class TeraWebSocketServerUserProtocol(TeraWebSocketServerProtocol):
             ret = yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
-            self.logger.log_info(self, "User websocket disconnected", self.user.user_username, self.user.user_uuid)
+            self.logger.log_info(self.module_name,
+                                 "User websocket disconnected", self.user.user_username, self.user.user_uuid)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
+        if self.db_session:
+            self.db_session.close()
         super().onClose(wasClean, code, reason)
 
     def answer_topic(self):

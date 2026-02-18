@@ -25,9 +25,9 @@ function login_redirect(target_url){
     window.location.href = redirect_url.toString();
 }
 
-function redirectToLogin(){
+function redirectToLogin(with_websocket=false){
     if (qtObject)
         qtObject.sendRedirectToLogin();
     else
-        login_redirect("/login");
+        login_redirect("/login?with_websocket=" + with_websocket);
 }

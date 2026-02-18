@@ -117,8 +117,9 @@ class UserQueryAssets(Resource):
             # services_infos = {service.service_uuid: service.service_clientendpoint
             #                   for service in user_access.get_accessible_services()}
             # Load all enabled services
-            services_infos = {service.service_uuid: service.service_clientendpoint
-                              for service in TeraService.query_with_filters({'service_enabled': True})}
+            services_infos = {service.service_uuid: service
+                              for service in TeraService.query_with_filters({'service_enabled': True,
+                                                                             'service_has_assets': True})}
 
             # # Access token
             # from opentera.redis.RedisVars import RedisVars
@@ -148,12 +149,16 @@ class UserQueryAssets(Resource):
             if args['with_urls']:
                 # We have previously verified that the service is available to the user
                 if asset.asset_service_uuid in services_infos:
+                    base_endpoint = services_infos[asset.asset_service_uuid].service_clientendpoint + '/api'
+                    if services_infos[asset.asset_service_uuid].service_endpoint_user:
+                        base_endpoint += services_infos[asset.asset_service_uuid].service_endpoint_user
+
                     asset_json['asset_infos_url'] = 'https://' + servername + ':' + str(port) \
-                                                    + services_infos[asset.asset_service_uuid] \
-                                                    + '/api/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
+                                                    + base_endpoint \
+                                                    + '/assets/infos'  # ?asset_uuid=' + asset.asset_uuid
                     asset_json['asset_url'] = 'https://' + servername + ':' + str(port) \
-                                              + services_infos[asset.asset_service_uuid] \
-                                              + '/api/assets'  # ?asset_uuid=' + asset.asset_uuid
+                                              + base_endpoint \
+                                              + '/assets'  # ?asset_uuid=' + asset.asset_uuid
 
                 else:
                     # Service not found or unavaiable for current user

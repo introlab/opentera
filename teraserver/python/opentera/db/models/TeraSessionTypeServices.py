@@ -35,6 +35,10 @@ class TeraSessionTypeServices(BaseModel, SoftDeleteMixin, SoftInsertMixin):
 
         rval = super().to_json(ignore_fields=ignore_fields)
 
+        if not minimal:
+            rval['session_type_service_service_key'] = self.session_type_service_service.service_key
+            rval['session_type_service_service_uuid'] = self.session_type_service_service.service_uuid
+
         return rval
 
     def to_json_create_event(self):

@@ -1243,6 +1243,12 @@ async function shareScreen(local, start, sound_only = false){
     if (sound_only){
         streamName += "Audio";
     }
+
+    if (teraConnected){
+        if (SharedObject.setMusicSharing)
+            SharedObject.setMusicSharing(sound_only);
+    }
+
     if (start === true){
         // Start screen sharing
         let screenStream = undefined;

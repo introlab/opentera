@@ -99,27 +99,25 @@ class DeviceQuerySessions(Resource):
         if 'id_session' not in json_session:
             return gettext('Missing id_session value'), 400
 
-        # Validate if we have an id
-        if 'id_session_type' not in json_session:
-            return gettext('Missing id_session_type value'), 400
-
-        # Validate that we have session participants or users for new sessions
-        if ('session_participants' not in json_session and 'session_users' not in json_session) \
-                and 'session_devices' not in json_session and json_session['id_session'] == 0:
-            return gettext('Missing session participants and/or users and/or devices'), 400
-
         # We know we have a device
         # Avoid identity thief
         json_session['id_creator_device'] = current_device.id_device
 
-        # Validate session type
-        session_types = device_access.get_accessible_session_types_ids()
-
-        if not json_session['id_session_type'] in session_types:
-            return gettext('No access to session type'), 403
-
         # Check if a session of that type and name already exists. If so, don't create it, just returns it.
         if json_session['id_session'] == 0:
+            if 'id_session_type' not in json_session:
+                return gettext('Missing id_session_type value'), 400
+
+            # Validate session type
+            session_types = device_access.get_accessible_session_types_ids()
+
+            if not json_session['id_session_type'] in session_types:
+                return gettext('No access to session type'), 403
+
+            # Validate that we have session participants or users for new sessions
+            if ('session_participants' not in json_session and 'session_users' not in json_session) \
+                    and 'session_devices' not in json_session:
+                return gettext('Missing session participants and/or users and/or devices'), 400
             if 'session_name' not in json_session:
                 return gettext('Missing argument \'session name\''), 400
             if 'session_start_datetime' not in json_session:

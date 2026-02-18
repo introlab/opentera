@@ -18,12 +18,23 @@ from modules.DeviceEventManager import DeviceEventManager
 # Base class
 from modules.TwistedModule.TeraWebSocketServerProtocol import TeraWebSocketServerProtocol
 
+# SqlAlchemy
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
+
+
 
 class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
 
     def __init__(self, config):
         TeraWebSocketServerProtocol.__init__(self, config=config)
         self.device = None
+        self.db_session = None
+
+    def __del__(self):
+        if self.db_session:
+            self.db_session.close()
 
     @defer.inlineCallbacks
     def redisConnectionMade(self):
@@ -91,8 +102,13 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                 device_uuid = value.decode("utf-8")
                 print('TeraWebSocketServerDeviceProtocol - device uuid ', device_uuid, self)
 
-                # User verification
-                self.device = TeraDevice.get_device_by_uuid(device_uuid)
+                # Device verification
+                session_factory = sessionmaker(bind=TeraDevice.db().engine)
+                self.db_session = scoped_session(session_factory)
+                self.device = self.db_session.scalars(select(TeraDevice).filter_by(device_uuid=device_uuid)).first()
+                # db_session.close()
+                # self.device = TeraDevice.get_device_by_uuid(device_uuid)
+
                 if self.device is not None:
                     # Remove key
                     print('TeraWebSocketServerDeviceProtocol - OK! removing key', self)
@@ -102,7 +118,7 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
                     self.event_manager = DeviceEventManager(self.device)
 
                     # log information
-                    self.logger.log_info(self, "Device websocket connected",
+                    self.logger.log_info(self.module_name, "Device websocket connected",
                                          self.device.device_name, self.device.device_uuid)
 
                     return
@@ -156,12 +172,14 @@ class TeraWebSocketServerDeviceProtocol(TeraWebSocketServerProtocol):
             yield self.unsubscribe_pattern_with_callback(self.event_topic(), self.redis_event_message_received)
 
             # log information
-            self.logger.log_info(self, "Device websocket disconnected",
+            self.logger.log_info(self.module_name, "Device websocket disconnected",
                                  self.device.device_name, self.device.device_uuid)
 
         # Unsubscribe to messages
         # ret = yield self.unsubscribe_pattern_with_callback(self.answer_topic(), self.redis_tera_message_received)
         # print(ret)
+        if self.db_session:
+            self.db_session.close()
         super().onClose(wasClean, code, reason)
 
     def answer_topic(self):
