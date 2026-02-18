@@ -6,16 +6,16 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenTera Architecture Overview &mdash; OpenTera 1.3.0 documentation</title>
+  <title>OpenTera Architecture Overview &mdash; OpenTera 1.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=1f29e9d3"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=bb516dca"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -61,6 +61,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#system-services">System services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#email-service">Email service</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#file-transfer-service">File transfer service</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#logging-service">Logging service</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#videorehab-service">Videorehab service</a></li>
@@ -179,6 +180,11 @@
 <section id="system-services">
 <h2>System services<a class="headerlink" href="#system-services" title="Link to this heading"></a></h2>
 <p>Those services are features that are shared by modules and external services. Each of them serves a specific purpose and will run in a separate process. Communication between modules and services will be done using the <a class="reference internal" href="services/teraserver/api/API.html"><span class="doc std std-doc">Main OpenTera REST API</span></a> and the <a class="reference internal" href="developers/Internal-services-communication-module.html"><span class="doc std std-doc">internal communication protocols - subscribe-publish</span></a>.</p>
+<section id="email-service">
+<h3>Email service<a class="headerlink" href="#email-service" title="Link to this heading"></a></h3>
+<p>The email service is a service that manages sending emails from OpenTera using a secure API.</p>
+<p>More information on this service can be found <a class="reference internal" href="services/Email-Service.html"><span class="doc std std-doc">here</span></a>.</p>
+</section>
 <section id="file-transfer-service">
 <h3>File transfer service<a class="headerlink" href="#file-transfer-service" title="Link to this heading"></a></h3>
 <p>The file transfer service is a service that manages file transfers (upload and download) within OpenTera. It allows other services to upload files in a central repository. While specific services can also implements file storage and indexing, this service can be used to quickly reuse components.</p>
@@ -221,7 +227,7 @@ For more information on creating a new service, see the <a class="reference inte
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Simon Brière, Dominic Létourneau.</p>
+    <p>&#169; Copyright 2025, Simon Brière, Dominic Létourneau.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

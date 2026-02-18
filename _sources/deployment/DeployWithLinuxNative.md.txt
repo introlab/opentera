@@ -25,6 +25,7 @@ This section configures the depending packages and software before installing th
 5. Create required database and assign `teraagent` user to them:
     ```
     CREATE DATABASE opentera WITH OWNER=teraagent;
+	CREATE DATABASE openteraemails WITH OWNER=teraagent;
     CREATE DATABASE openterafiles WITH OWNER=teraagent;
     CREATE DATABASE openteralogs WITH OWNER=teraagent;
     ```
@@ -101,6 +102,7 @@ There is a few config files to edit. You should edit each of them and put the co
 
 * `teraserver/python/config/TeraServerConfig.ini`: the main config file. "port" and "hostname" shouldn't be changed.
 * `teraserver/python/config/nginx.conf`: nginx config file. Unless listening to a different port and setting correct ssl certificates, nothing should be changed in that file.
+* `teraserver/python/services/EmailService/EmailService.json`: the email service configuration.
 * `teraserver/python/services/FileTransferService/FileTransferService.json`: the file transfer service configuration.
 * `teraserver/python/services/LoggingService/LoggingService.json`: the logging service configuration.
 * `teraserver/python/services/VideoRehabService/VideoRehabService.json`: make sure to set the "WebRTC - hostname" value to the external server address.
@@ -129,8 +131,8 @@ Group=**PUT THE EXECUTING GROUP HERE**
 Environment=PYTHONPATH=**(path to opentera)**/opentera/teraserver/python
 ExecStart=**(path to opentera)**/opentera/teraserver/python/env/python-3.11/bin/python3 **(path to opentera)**/opentera/teraserver/python/TeraServer.py
 WorkingDirectory=**(path to opentera)**/opentera/teraserver/python
-StandardOutput=syslog+console
-StandardError=syslog+console
+StandardOutput=journal+console
+StandardError=journal+console
 Restart=always
 RestartSec=10s
 KillMode=process
