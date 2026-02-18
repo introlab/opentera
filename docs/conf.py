@@ -9,7 +9,7 @@
 project = 'OpenTera'
 copyright = '2025, Simon Brière, Dominic Létourneau'
 author = 'Simon Brière, Dominic Létourneau'
-release = '1.3.1'
+release = '1.3.2'
 version = release
 
 html_logo = 'images/LogoOpenTera200px.png'
