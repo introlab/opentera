@@ -60,6 +60,11 @@ This module can also automatically launch external services as stand-alone proce
 ## System services
 Those services are features that are shared by modules and external services. Each of them serves a specific purpose and will run in a separate process. Communication between modules and services will be done using the [Main OpenTera REST API](services/teraserver/api/API) and the [internal communication protocols - subscribe-publish](developers/Internal-services-communication-module).
 
+### Email service
+The email service is a service that manages sending emails from OpenTera using a secure API.
+
+More information on this service can be found [here](services/Email-Service).
+
 ### File transfer service
 The file transfer service is a service that manages file transfers (upload and download) within OpenTera. It allows other services to upload files in a central repository. While specific services can also implements file storage and indexing, this service can be used to quickly reuse components.
 
