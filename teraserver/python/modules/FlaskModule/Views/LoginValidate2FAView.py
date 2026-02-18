@@ -46,5 +46,5 @@ class LoginValidate2FAView(MethodView):
         with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
 
         return render_template('login_validate_2fa.html', hostname=hostname, port=port,
-                               server_version=versions.version_string,
+                               server_version=versions.version_string, theme_file=session['theme'],
                                with_websocket=with_websocket)

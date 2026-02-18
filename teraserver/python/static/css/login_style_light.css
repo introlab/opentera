@@ -1,0 +1,40 @@
+body{
+    background-color: #e5e5e5;
+}
+
+ .card-header, .card-footer{
+     border: none;
+     border-radius: 5px;
+     background-color: lightgray;
+     color: black;
+ }
+
+ .card-body{
+     background-color: white;
+     color: black;
+     border-radius: 5px;
+ }
+
+ .card{
+     border: 1px solid black;
+     border-radius: 5px;
+     box-shadow: 5px 5px 4px darkgray;
+ }
+
+ .img-logo{
+     max-height: 175px;
+     margin-top: 10px;
+     margin-bottom: 10px;
+     border-radius: 10px;
+}
+
+.img-qr{
+    width: 200px;
+}
+
+.btn-primary{
+    background-color: black;
+    border-color: dimgray;
+    --bs-btn-hover-bg: slategray;
+    --bs-btn-hover-border-color: gray;
+}

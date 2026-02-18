@@ -1,6 +1,6 @@
 import time
 import datetime
-from flask import Flask, request, g, url_for
+from flask import Flask, request, g, url_for, session
 from flask_restx import Api, Namespace
 from flask_babel import Babel
 import redis
@@ -21,6 +21,11 @@ def get_locale():
     user = getattr(g, 'user', None)
     if user is not None:
         return user.locale
+
+    # If a lang was set in a flask session, use that setting
+    if session and 'lang' in session:
+        return session['lang']
+
     # otherwise try to guess the language from the user accept
     # header the browser transmits.  We support fr/en in this
     # example.  The best match wins.
