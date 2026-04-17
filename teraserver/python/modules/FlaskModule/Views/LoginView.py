@@ -1,7 +1,8 @@
 from flask.views import MethodView
-from flask import render_template, request, session
+from flask import render_template, request, session, abort
 from modules.FlaskModule.FlaskModule import get_locale
 from opentera.utils.TeraVersions import TeraVersions
+import json
 
 
 class LoginView(MethodView):
@@ -27,8 +28,25 @@ class LoginView(MethodView):
 
         # if 'auth_code' in session:
         #     session.pop('auth_code')
+
         if 'auth_code' in request.args:
             session['auth_code'] = request.args['auth_code']
+            # Get client informations from code
+            auth_infos = self.flaskModule.redisGet('service_auth_code_' + session['auth_code'])
+            if not auth_infos:
+                abort(403)
+            auth_infos = json.loads(auth_infos)
+            client_name = auth_infos.get('client_name', 'OpenTera-Web-Client')
+            client_version = auth_infos.get('client_version', None)
+        else:
+            # Generate generic clients information
+            client_name = 'OpenTera-Web-Client'
+            versions = TeraVersions()
+            versions.load_from_db()
+            client_version = versions.version_short_string
+
+        session['client_name'] = client_name
+        session['client_version'] = client_version
 
         theme_file = 'login_style'
         if 'theme' in request.args:
@@ -41,9 +59,7 @@ class LoginView(MethodView):
         else:
             session['lang'] = get_locale()
 
-        versions = TeraVersions()
-        versions.load_from_db()
-
         return render_template('login.html', hostname=hostname, port=port,
-                               server_version=versions.version_string, show_logo=show_logo, theme_file=session['theme'],
+                               client_name=session['client_name'], client_version=session['client_version'],
+                               show_logo=show_logo, theme_file=session['theme'],
                                with_websocket=with_websocket, current_locale=session['lang'])

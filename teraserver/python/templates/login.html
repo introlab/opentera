@@ -36,8 +36,8 @@
                 var base64 = btoa($('#username').val() + ":" + $('#password').val());
                 var headers = {
                     Authorization: "Basic " + base64,
-                    "X-Client-Name":  "OpenTera-Web-Client",
-                    "X-Client-Version": "{{ server_version }}"
+                    "X-Client-Name":  "{{ client_name }}",
+                    "X-Client-Version": "{{ client_version }}"
                 };
 
                 var data = {
