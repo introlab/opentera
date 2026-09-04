@@ -87,6 +87,8 @@ class BaseEmailServiceAPITest(unittest.TestCase):
             service = TeraService.get_service_by_key('EmailService')
             Globals.service.service_info = service.to_json(minimal=False)
 
+            self.service_token = TeraService.get_service_by_key("VideoRehabService").get_token(ServiceAccessManager.api_service_token_key)
+
             user: TeraUser = TeraUser.get_user_by_username('admin')
             self.assertIsNotNone(user)
             self.assertIsNotNone(service)

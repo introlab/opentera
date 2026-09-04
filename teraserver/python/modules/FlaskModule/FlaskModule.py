@@ -401,7 +401,7 @@ class FlaskModule(BaseModule):
 def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     response.headers["Access-Control-Allow-Methods"] = "*"
     response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
 
