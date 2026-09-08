@@ -1,5 +1,5 @@
 #TODO MAKE THIS GENERIC
-set (PYTHON_VERSION 3.11)
+set (PYTHON_VERSION 3.14)
 
 # This will create environment from Anaconda
 add_subdirectory(env)
