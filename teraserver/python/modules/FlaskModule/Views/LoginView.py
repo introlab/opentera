@@ -1,6 +1,7 @@
 from flask.views import MethodView
 from flask import render_template, request, session, abort
 from modules.FlaskModule.FlaskModule import get_locale
+from opentera.db.models import TeraService
 from opentera.utils.TeraVersions import TeraVersions
 import json
 
@@ -59,7 +60,13 @@ class LoginView(MethodView):
         else:
             session['lang'] = get_locale()
 
+        # Indicate if EmailService is enabled
+        has_email_service = False
+        email_service = TeraService.get_service_by_key('EmailService')
+        if email_service:
+            has_email_service = email_service.service_enabled
+
         return render_template('login.html', hostname=hostname, port=port,
                                client_name=session['client_name'], client_version=session['client_version'],
-                               show_logo=show_logo, theme_file=session['theme'],
+                               show_logo=show_logo, theme_file=session['theme'], show_forgot_password=has_email_service,
                                with_websocket=with_websocket, current_locale=session['lang'])

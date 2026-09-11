@@ -148,6 +148,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserLogin2FA import UserLogin2FA
         from modules.FlaskModule.API.user.UserLoginSetup2FA import UserLoginSetup2FA
         from modules.FlaskModule.API.user.UserLoginChangePassword import UserLoginChangePassword
+        from modules.FlaskModule.API.user.UserLoginForgotPassword import UserLoginForgotPassword
         from modules.FlaskModule.API.user.UserLogout import UserLogout
         from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
         from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
@@ -212,6 +213,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserLogin2FA,                  '/login/2fa', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLoginSetup2FA,             '/login/setup_2fa', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLoginChangePassword,       '/login/change_password', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginForgotPassword,       '/login/forgot_password', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
@@ -375,6 +377,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.Views.LoginChangePasswordView import LoginChangePasswordView
         from modules.FlaskModule.Views.LoginSetup2FAView import LoginSetup2FAView
         from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
+        from modules.FlaskModule.Views.LoginForgotPasswordView import LoginForgotPasswordView
 
         # Default arguments
         args = []
@@ -391,6 +394,9 @@ class FlaskModule(BaseModule):
             'login_setup_2fa', *args, **kwargs))
         flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(
             'login_validate_2fa', *args, **kwargs))
+
+        flask_app.add_url_rule('/login_forgot_password', view_func=LoginForgotPasswordView.as_view(
+            'login_forgot_password', *args, **kwargs))
 
         if not self.config.server_config['enable_docs']:
             # Disabled docs view
