@@ -126,19 +126,15 @@
                                 </div>
                             </div>
                             <div class="row mt-2">
-                                <div class="col-4"></div>
+                                <div class="col-4 col-form-label text-end">
+                                    {% if show_forgot_password %}
+                                    <a class="small" href="/login_forgot_password">{{ gettext('Forgot password?') }}</a>
+                                    {% endif %}
+                                </div>
                                 <div class="col-8 col-md-6">
                                     <button type="submit" class="btn btn-primary w-100">{{ gettext('Login') }}</button>
                                 </div>
                             </div>
-                            {% if show_forgot_password %}
-                            <div class="row mt-2 text-center">
-                                <div class="col-4"></div>
-                                <div class="col-8 col-md-6">
-                                    <a href="/login_forgot_password">{{ gettext('Forgot password?') }}</a>
-                                </div>
-                            </div>
-                            {% endif %}
                             <div class="row ms-3 me-3 mt-2">
                                 <div class="text-danger p-1 m-0 text-center fw-bold" id="error_message" role="alert" style="display: none;"></div>
                             </div>

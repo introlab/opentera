@@ -3,6 +3,7 @@ import datetime
 from flask import Flask, request, g, url_for, session
 from flask_restx import Api, Namespace
 from flask_babel import Babel
+from flask_session import Session
 import redis
 
 from opentera.config.ConfigManager import ConfigManager
@@ -104,7 +105,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         flask_app.config.update({'SESSION_COOKIE_SAMESITE': 'Strict'})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': flask_app.debug})
-        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5)})
+        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=10)})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -113,6 +114,7 @@ class FlaskModule(BaseModule):
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
         # self.session = Session(flask_app)
+        Session(flask_app)  # Use sessions in Redis
 
         # Init API
         FlaskModule.init_user_api(self, user_api_ns)

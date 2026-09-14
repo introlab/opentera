@@ -26,6 +26,7 @@ class LoginChangePasswordView(MethodView):
         # Not specified or with no value will default to true
         with_websocket = request.args.get('with_websocket', '').lower() in ['true', '1', 'yes', 'on', '']
 
-        return render_template('login_change_password.html', hostname=hostname, port=port,
+        test = render_template('login_change_password.html', hostname=hostname, port=port,
                                server_version=versions.version_string, username=current_user.user_username,
                                with_websocket=with_websocket, theme_file=session['theme'])
+        return test

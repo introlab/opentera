@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-08 14:49-0400\n"
+"POT-Creation-Date: 2026-09-14 13:59-0400\n"
 "PO-Revision-Date: 2021-01-25 13:01-0500\n"
 "Last-Translator: \n"
 "Language: en\n"
@@ -19,26 +19,26 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:53
-#: modules/FlaskModule/FlaskUtils.py:13
+#: modules/FlaskModule/FlaskUtils.py:14
 msgid "Password missing special character"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:55
-#: modules/FlaskModule/FlaskUtils.py:15
+#: modules/FlaskModule/FlaskUtils.py:16
 msgid "Password missing numeric character"
 msgstr ""
 
-#: modules/FlaskModule/FlaskUtils.py:17
+#: modules/FlaskModule/FlaskUtils.py:18
 msgid "Password not long enough (10 characters)"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:59
-#: modules/FlaskModule/FlaskUtils.py:19
+#: modules/FlaskModule/FlaskUtils.py:20
 msgid "Password missing lower case letter"
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserQueryUsers.py:61
-#: modules/FlaskModule/FlaskUtils.py:21
+#: modules/FlaskModule/FlaskUtils.py:22
 msgid "Password missing upper case letter"
 msgstr ""
 
@@ -1198,21 +1198,53 @@ msgstr ""
 msgid "Invalid informations"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginChangePassword.py:35
+#: modules/FlaskModule/API/user/UserLoginChangePassword.py:36
 msgid "New password and confirm password do not match"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginChangePassword.py:38
+#: modules/FlaskModule/API/user/UserLoginChangePassword.py:39
 msgid "User not required to change password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginChangePassword.py:50
+#: modules/FlaskModule/API/user/UserLoginChangePassword.py:53
 #: modules/FlaskModule/API/user/UserQueryUsers.py:260
 msgid "New password same as old password"
 msgstr ""
 
-#: modules/FlaskModule/API/user/UserLoginChangePassword.py:52
+#: modules/FlaskModule/API/user/UserLoginChangePassword.py:55
 msgid "Password changed"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:81
+msgid "Password reset request"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:82
+msgid "Hi"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:83
+msgid ""
+"A password reset has been requested. Here's your code to initiate the "
+"reset"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:85
+msgid "This code is valid for 10 minutes."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:86
+msgid "If you didn't request a password reset, you can ignore this message."
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:88
+msgid "This email was sent from the server"
+msgstr ""
+
+#: modules/FlaskModule/API/user/UserLoginForgotPassword.py:90
+msgid ""
+"If you have any issue, contact your local support - don't reply to this "
+"email address."
 msgstr ""
 
 #: modules/FlaskModule/API/user/UserLoginSetup2FA.py:59
@@ -2371,12 +2403,12 @@ msgid "Port"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:72 opentera/forms/TeraUserForm.py:21
-#: templates/login.html:116
+#: templates/login.html:117
 msgid "Username"
 msgstr ""
 
 #: opentera/forms/TeraServiceConfigForm.py:75 opentera/forms/TeraUserForm.py:46
-#: templates/login.html:122
+#: templates/login.html:123
 msgid "Password"
 msgstr ""
 
@@ -2660,7 +2692,7 @@ msgstr ""
 msgid "OpenTeraServer patch version number"
 msgstr ""
 
-#: opentera/forms/TeraVersionsForm.py:43 templates/about.html:26
+#: opentera/forms/TeraVersionsForm.py:43 templates/about.html:27
 msgid "Versions"
 msgstr ""
 
@@ -2778,23 +2810,23 @@ msgstr ""
 msgid "Cannot create refused session event"
 msgstr ""
 
-#: templates/about.html:33
+#: templates/about.html:34
 msgid "Downloads"
 msgstr ""
 
-#: templates/about.html:39 templates/about.html:47 templates/about.html:55
+#: templates/about.html:40 templates/about.html:48 templates/about.html:56
 msgid "Latest version: "
 msgstr ""
 
-#: templates/about.html:64
+#: templates/about.html:65
 msgid "License"
 msgstr ""
 
-#: templates/about.html:78
+#: templates/about.html:79
 msgid "Authors"
 msgstr ""
 
-#: templates/about.html:88
+#: templates/about.html:89
 msgid "Contributors"
 msgstr ""
 
@@ -2802,100 +2834,151 @@ msgstr ""
 msgid "Documentation is disabled!"
 msgstr ""
 
-#: templates/login.html:5
+#: templates/login.html:6
 msgid "OpenTera Login Page"
 msgstr ""
 
-#: templates/login.html:81
+#: templates/login.html:82
 msgid "Invalid username or password"
 msgstr ""
 
-#: templates/login.html:130
+#: templates/login.html:131
+msgid "Forgot password?"
+msgstr ""
+
+#: templates/login.html:135
 msgid "Login"
 msgstr ""
 
-#: templates/login_change_password.html:5
+#: templates/login_change_password.html:6
 msgid "OpenTera - Change Password"
 msgstr ""
 
-#: templates/login_change_password.html:81
+#: templates/login_change_password.html:82
+#: templates/login_forgot_password.html:89
 msgid "Password successfully changed!"
 msgstr ""
 
-#: templates/login_change_password.html:82
+#: templates/login_change_password.html:83
+#: templates/login_forgot_password.html:90
 msgid "Redirecting to login screen..."
 msgstr ""
 
-#: templates/login_change_password.html:89
+#: templates/login_change_password.html:90
 msgid "Password change required"
 msgstr ""
 
-#: templates/login_change_password.html:95
+#: templates/login_change_password.html:96
 msgid "New Password"
 msgstr ""
 
-#: templates/login_change_password.html:100
+#: templates/login_change_password.html:101
 msgid "Confirm Password"
 msgstr ""
 
-#: templates/login_change_password.html:107
+#: templates/login_change_password.html:108
 msgid "Change Password"
 msgstr ""
 
-#: templates/login_setup_2fa.html:96
+#: templates/login_forgot_password.html:6
+msgid "OpenTera - Forgot Password"
+msgstr ""
+
+#: templates/login_forgot_password.html:46
+#: templates/login_forgot_password.html:70
+msgid "Too many requests. Try again later."
+msgstr ""
+
+#: templates/login_forgot_password.html:72
+msgid "Invalid code."
+msgstr ""
+
+#: templates/login_forgot_password.html:97
+msgid "Reset password request"
+msgstr ""
+
+#: templates/login_forgot_password.html:102
+msgid "Username / email address"
+msgstr ""
+
+#: templates/login_forgot_password.html:109
+msgid "Reset Password"
+msgstr ""
+
+#: templates/login_forgot_password.html:118
+msgid ""
+"A code has been sent to your email address if the username / email was "
+"found.\n"
+"                                Please enter that code to reset your "
+"password."
+msgstr ""
+
+#: templates/login_forgot_password.html:123
+msgid "Code"
+msgstr ""
+
+#: templates/login_forgot_password.html:128
+msgid "Verify"
+msgstr ""
+
+#: templates/login_forgot_password.html:131
+msgid "Cancel"
+msgstr ""
+
+#: templates/login_setup_2fa.html:97
 msgid "You need to setup multi-factor authentication before continuing."
 msgstr ""
 
-#: templates/login_setup_2fa.html:110
+#: templates/login_setup_2fa.html:111
 msgid "OTP configuration"
 msgstr ""
 
-#: templates/login_setup_2fa.html:116
+#: templates/login_setup_2fa.html:117
 msgid "Scan the QR code with your authenticator app"
 msgstr ""
 
-#: templates/login_setup_2fa.html:117
+#: templates/login_setup_2fa.html:118
 msgid "Enter the generated code:"
 msgstr ""
 
-#: templates/login_setup_2fa.html:123 templates/login_setup_2fa.html:140
-#: templates/login_validate_2fa.html:155
+#: templates/login_setup_2fa.html:124 templates/login_setup_2fa.html:141
+#: templates/login_validate_2fa.html:156
 msgid "Validate"
 msgstr ""
 
-#: templates/login_setup_2fa.html:133
+#: templates/login_setup_2fa.html:134
 msgid "Use email for authentication"
 msgstr ""
 
-#: templates/login_setup_2fa.html:138
+#: templates/login_setup_2fa.html:139
 msgid "No email address configured. Please contact your administrator."
 msgstr ""
 
-#: templates/login_validate_2fa.html:26
+#: templates/login_validate_2fa.html:27
 msgid "Code validation timeout. Redirecting to login."
 msgstr ""
 
-#: templates/login_validate_2fa.html:110
+#: templates/login_validate_2fa.html:111
 msgid "Too many attempts - returning to login"
 msgstr ""
 
-#: templates/login_validate_2fa.html:113
+#: templates/login_validate_2fa.html:114
 msgid "Invalid code"
 msgstr ""
 
-#: templates/login_validate_2fa.html:113
+#: templates/login_validate_2fa.html:114
 msgid "attempts left"
 msgstr ""
 
-#: templates/login_validate_2fa.html:137
+#: templates/login_validate_2fa.html:138
 msgid "Multi Factor Authentication"
 msgstr ""
 
-#: templates/login_validate_2fa.html:144
+#: templates/login_validate_2fa.html:145
 msgid "Authentication code"
 msgstr ""
 
-#: templates/login_validate_2fa.html:164
+#: templates/login_validate_2fa.html:165
 msgid "Successfully authenticated"
 msgstr ""
 

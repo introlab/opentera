@@ -115,5 +115,7 @@ class UserLoginForgotPassword(UserLoginBase):
         compare_code = self.module.redis.get(redis_key)
         reset_code = str(args['reset_code']).replace(' ', '')
         if compare_code and compare_code.decode('utf8') == reset_code:
+            self.module.redis.delete(redis_key)
+            session["password_resetting"] = True
             return 200
         return 'Unauthorized', 401
