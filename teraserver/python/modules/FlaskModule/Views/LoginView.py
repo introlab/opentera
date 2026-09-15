@@ -66,7 +66,10 @@ class LoginView(MethodView):
         if email_service:
             has_email_service = email_service.service_enabled
 
+        # Check if we are embedded (i.e. OpenTeraPlus)
+        embedded_view = 'X_CLIENT_NAME' in request.headers and request.headers['X_CLIENT_NAME'] == 'OpenTeraPlus'
+
         return render_template('login.html', hostname=hostname, port=port,
                                client_name=session['client_name'], client_version=session['client_version'],
                                show_logo=show_logo, theme_file=session['theme'], show_forgot_password=has_email_service,
-                               with_websocket=with_websocket, current_locale=session['lang'])
+                               with_websocket=with_websocket, current_locale=session['lang'], embedded=embedded_view)
