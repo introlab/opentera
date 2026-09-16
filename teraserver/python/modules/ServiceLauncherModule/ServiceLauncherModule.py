@@ -176,4 +176,5 @@ class ServiceLauncherModule(BaseModule):
     def terminate_processes(self):
         for process in self.processList:
             process['process'].terminate()
+            self.delete_specific_service_info(process['service']['service_key'])
         self.processList = []

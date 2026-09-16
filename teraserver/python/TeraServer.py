@@ -36,7 +36,7 @@ from opentera.redis.RedisVars import RedisVars
 import modules.Globals as Globals
 
 
-def init_shared_variables(config):
+def init_shared_variables(config:ConfigManager):
     # Create user token
     # Dynamic key for users, updated at every restart (for now)
     # Server should rotate key every hour, day?
@@ -77,6 +77,20 @@ def init_shared_variables(config):
     # Will update clients versions (hard coded in TeraVersions)
     versions.load_from_db()
     versions.save_to_db()
+
+def clear_shared_variables(config: ConfigManager):
+    # Create redis client
+    redis_client = redis.Redis(host=config.redis_config['hostname'],
+                               port=config.redis_config['port'],
+                               db=config.redis_config['db'],
+                               username=config.redis_config['username'],
+                               password=config.redis_config['password'])
+    redis_client.delete(RedisVars.RedisVar_UserTokenAPIKey)
+    redis_client.delete(RedisVars.RedisVar_ServiceTokenAPIKey)
+    redis_client.delete(RedisVars.RedisVar_DeviceTokenAPIKey)
+    redis_client.delete(RedisVars.RedisVar_DeviceStaticTokenAPIKey)
+    redis_client.delete(RedisVars.RedisVar_ParticipantTokenAPIKey)
+    redis_client.delete(RedisVars.RedisVar_ParticipantStaticTokenAPIKey)
 
 
 def init_opentera_service(config: ConfigManager):
@@ -186,6 +200,7 @@ if __name__ == '__main__':
 
         # Cleaning up
         service_launcher.terminate_processes()
+        clear_shared_variables(config=config_man)
 
         # Close DB
         redis_client = redis.Redis(host=config_man.redis_config['hostname'],
