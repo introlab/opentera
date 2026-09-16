@@ -108,7 +108,7 @@ class UserQueryServiceConfig(Resource):
                          'config. A config can be created/modified if the user has admin access to the user, device or '
                          'participant',
              responses={200: 'Success',
-                        403: 'Logged user can\'t create/update the specified session',
+                        403: 'Logged user can\'t create/update the specified config',
                         400: 'Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the'
                              ' JSON body',
                         500: 'Internal error when saving service config'})

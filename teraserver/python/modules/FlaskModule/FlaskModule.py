@@ -295,6 +295,8 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.participant.ParticipantQuerySessions import ParticipantQuerySessions
         from modules.FlaskModule.API.participant.ParticipantRefreshToken import ParticipantRefreshToken
         from modules.FlaskModule.API.participant.ParticipantQueryAssets import ParticipantQueryAssets
+        from modules.FlaskModule.API.participant.ParticipantQueryServiceConfigs import ParticipantQueryServiceConfig
+
         # Resources
         namespace.add_resource(ParticipantLogin,               '/login', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantLogout,              '/logout', resource_class_kwargs=kwargs)
@@ -303,6 +305,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ParticipantQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantRefreshToken,        '/refresh_token', resource_class_kwargs=kwargs)
+        namespace.add_resource(ParticipantQueryServiceConfig,  '/services/configs', resource_class_kwargs=kwargs)
 
     @staticmethod
     def init_service_api(module: object, namespace: Namespace, additional_args: dict = dict()):
