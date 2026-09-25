@@ -96,6 +96,11 @@ class UserLoginForgotPassword(UserLoginBase):
                     if answer:
                         session['_user_id'] = user.user_uuid
                         return 200
+
+        self.module.logger.log_warning(self.module.module_name,
+                                     'Password Reset',
+                                     'Invalid reset password request' + ': ' + args['requested_user'])
+
         # Sleep for a random time between 2 and 4 seconds, to simulate email sending
         sleep_time = 2 + secrets.randbelow(2000)/1000
         time.sleep(sleep_time)
@@ -117,5 +122,11 @@ class UserLoginForgotPassword(UserLoginBase):
         if compare_code and compare_code.decode('utf8') == reset_code:
             self.module.redis.delete(redis_key)
             session["password_resetting"] = True
+            self.module.logger.log_info(self.module.module_name,
+                                           'Password Reset',
+                                           'Password reset for user' + ': ' + current_user.user_username)
             return 200
+        self.module.logger.log_error(self.module.module_name,
+                                    'Password Reset',
+                                    'Invalid reset code for user' + ': ' + current_user.user_username)
         return 'Unauthorized', 401
