@@ -52,10 +52,13 @@ class QueryEmailTemplate(EmailResource):
                         400: 'Required parameter is missing',
                         403: 'Logged user doesn\'t have permission to access the requested data'})
     @api.expect(get_parser)
-    @ServiceAccessManager.token_required()
+    @ServiceAccessManager.service_or_others_token_required()
     def get(self):
-        if current_login_type != LoginType.USER_LOGIN:
-            return gettext('Only users can use this API.'), 401
+        if current_login_type not in (
+                LoginType.USER_LOGIN,
+                LoginType.SERVICE_LOGIN,
+        ):
+            return gettext('Only users or services can use this API.'), 401
 
         args = get_parser.parse_args()
 
