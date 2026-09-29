@@ -84,3 +84,4 @@ python-3.10
 /teraserver/python/tests/*.pem
 /teraserver/python/env/python-3.12
 /teraserver/python/env/python-3.13
+python-3.14

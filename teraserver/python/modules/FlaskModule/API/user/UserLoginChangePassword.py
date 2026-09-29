@@ -1,4 +1,5 @@
 from flask_babel import gettext
+from flask import session
 
 from modules.FlaskModule.API.user.UserLoginBase import UserLoginBase, InvalidAuthCodeError
 from modules.FlaskModule.FlaskModule import user_api_ns as api
@@ -34,7 +35,7 @@ class UserLoginChangePassword(UserLoginBase):
             if new_password != confirm_password:
                 return gettext('New password and confirm password do not match'), 400
 
-            if not current_user.user_force_password_change:
+            if not current_user.user_force_password_change and not "password_resetting" in session:
                 return gettext('User not required to change password'), 400
 
             # Change password, will be encrypted
@@ -42,6 +43,8 @@ class UserLoginChangePassword(UserLoginBase):
             try:
                 TeraUser.update(current_user.id_user, {'user_password': new_password,
                                                        'user_force_password_change': False})
+                if "password_resetting" in session:
+                    del session["password_resetting"]
             except InvalidAuthCodeError as e:
                 return str(e), 403
             except UserPasswordInsecure as e:

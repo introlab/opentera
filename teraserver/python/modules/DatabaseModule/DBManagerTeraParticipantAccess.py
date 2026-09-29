@@ -7,6 +7,7 @@ from opentera.db.models.TeraTestTypeProject import TeraTestTypeProject
 from opentera.db.models.TeraServiceProject import TeraServiceProject
 from opentera.db.models.TeraTestType import TeraTestType
 from opentera.db.models.TeraService import TeraService
+from opentera.db.models.TeraServiceConfig import TeraServiceConfig
 from opentera.db.models.TeraAsset import TeraAsset
 
 
@@ -41,6 +42,10 @@ class DBManagerTeraParticipantAccess:
     def get_accessible_services(self) -> list[TeraService]:
         service_projects = TeraServiceProject.get_services_for_project(id_project=self.participant.id_project)
         return [service_project.service_project_service for service_project in service_projects]
+
+    def get_accessible_services_ids(self) -> list[int]:
+        services = self.get_accessible_services()
+        return [service.id_service for service in services]
 
     def get_accessible_session_types(self) -> list[TeraSessionType]:
         session_types = TeraSessionType.query.join(TeraSessionType.session_type_projects)\
@@ -82,3 +87,10 @@ class DBManagerTeraParticipantAccess:
     def get_accessible_tests_types_ids(self) -> list[int]:
         test_types = self.get_accessible_tests_types()
         return [test_type.id_test_type for test_type in test_types]
+
+    def query_service_configs(self, service_id: int) -> TeraServiceConfig | None:
+        if service_id not in self.get_accessible_services_ids():
+            return None
+        service_config = TeraServiceConfig.get_service_config_for_service_for_participant(service_id=service_id,
+                                                                                          participant_id=self.participant.id_participant)
+        return service_config

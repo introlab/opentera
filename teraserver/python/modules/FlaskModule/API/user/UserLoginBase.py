@@ -179,21 +179,23 @@ class UserLoginBase(Resource):
                             current_version=client_version_parts,
                             version_error=reply['version_error'])
         else:
-            self.module.logger.send_login_event(sender=self.module.module_name,
-                                            level=messages.LogEvent.LOGLEVEL_ERROR,
-                                            login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
-                                            login_status=
-                                            messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
-                                            client_name=user_agent_info['client_name'],
-                                            client_version=user_agent_info['client_version'],
-                                            client_ip=user_agent_info['client_ip'],
-                                            os_name=user_agent_info['os_name'],
-                                            os_version=user_agent_info['os_version'],
-                                            user_uuid=current_user.user_uuid,
-                                            server_endpoint=user_agent_info['server_endpoint'],
-                                            message=gettext('Unknown client name :') + client_name)
-            # For now, simply log the error, this will allow unknown clients to login
-            # raise InvalidClientVersionError(gettext('Invalid client name :') + client_name)
+            if not TeraService.get_service_by_name(client_name):
+                # Allow client named after a service (this could happen when using the login web interface with an auth-code)
+                self.module.logger.send_login_event(sender=self.module.module_name,
+                                                level=messages.LogEvent.LOGLEVEL_WARNING,
+                                                login_type=messages.LoginEvent.LOGIN_TYPE_PASSWORD,
+                                                login_status=
+                                                messages.LoginEvent.LOGIN_STATUS_UNKNOWN,
+                                                client_name=user_agent_info['client_name'],
+                                                client_version=user_agent_info['client_version'],
+                                                client_ip=user_agent_info['client_ip'],
+                                                os_name=user_agent_info['os_name'],
+                                                os_version=user_agent_info['os_version'],
+                                                user_uuid=current_user.user_uuid,
+                                                server_endpoint=user_agent_info['server_endpoint'],
+                                                message=gettext('Unknown client name :') + client_name)
+                # For now, simply log the error, this will allow unknown clients to login
+                # raise InvalidClientVersionError(gettext('Invalid client name :') + client_name)
         return reply
 
     def _generate_websocket_url(self) -> str:

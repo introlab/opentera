@@ -1241,7 +1241,7 @@ class DBManagerTeraUserAccess:
         return sorted(users, key=lambda suser: suser.user_firstname)
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
-                              participant_id: int = None, include_services_without_config: bool = False) -> list[TeraServiceConfig]:
+                              participant_id: int = None, include_services_without_config: bool = False) -> list[TeraServiceConfig] | None:
         if service_id and service_id not in self.get_accessible_services_ids():
             return None
         if user_id and user_id not in self.get_accessible_users_ids():
