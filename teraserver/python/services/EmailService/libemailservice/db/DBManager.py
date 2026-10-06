@@ -59,6 +59,12 @@ class DBManager:
                 EmailTemplate.db().session.add(template)
 
                 template = EmailTemplate()
+                template.email_template_key = 'SITE_EMAIL_SERVICE'
+                template.email_template = 'This is a SITE test email, using $variable .'
+                template.id_site = 1
+                EmailTemplate.db().session.add(template)
+
+                template = EmailTemplate()
                 template.email_template_key = 'GENERAL_TEST_EMAIL'
                 template.email_template = 'This is a PROJECT test email overriding GLOBAL, using $variable .'
                 template.id_project = 1

@@ -58,7 +58,7 @@ class QueryEmailTemplate(EmailResource):
                 LoginType.USER_LOGIN,
                 LoginType.SERVICE_LOGIN,
         ):
-            return gettext('Only users or services can use this API.'), 401
+            return gettext('Only users and services can use this API.'), 401
 
         args = get_parser.parse_args()
 
@@ -113,10 +113,13 @@ class QueryEmailTemplate(EmailResource):
                         400: 'Badly formed JSON or missing fields in the JSON body',
                         500: 'Internal error when saving session'})
     @api.expect(post_schema)
-    @ServiceAccessManager.token_required()
+    @ServiceAccessManager.service_or_others_token_required()
     def post(self):
-        if current_login_type != LoginType.USER_LOGIN:
-            return gettext('Only users can use this API.'), 401
+        if current_login_type not in (
+                LoginType.USER_LOGIN,
+                LoginType.SERVICE_LOGIN,
+        ):
+            return gettext('Only users and services can use this API.'), 401
 
         if 'email_template' not in request.json:
             return gettext('Missing template'), 400
@@ -174,10 +177,13 @@ class QueryEmailTemplate(EmailResource):
                         403: 'Logged user can\'t delete email template',
                         500: 'Database error.'})
     @api.expect(delete_parser)
-    @ServiceAccessManager.token_required()
+    @ServiceAccessManager.service_or_others_token_required()
     def delete(self):
-        if current_login_type != LoginType.USER_LOGIN:
-            return gettext('Only users can use this API.'), 401
+        if current_login_type not in (
+                LoginType.USER_LOGIN,
+                LoginType.SERVICE_LOGIN,
+        ):
+            return gettext('Only users and services can use this API.'), 401
 
         args = delete_parser.parse_args()
         id_todel = args['id']
