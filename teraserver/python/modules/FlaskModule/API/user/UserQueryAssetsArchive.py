@@ -105,7 +105,7 @@ class UserQueryAssetsArchive(Resource):
                 get_assets_for_session(sess, path = path + f"/{participant.participant_name}")
 
         def get_assets_for_project(project: TeraProject, path: str = ''):
-            participants: list[TeraParticipant] = user_access.query_all_participants_for_project(project.id_project)
+            participants: list[TeraParticipant] = user_access.query_participants_for_project(project.id_project)
             for participant in participants:
                 get_assets_for_participant(participant, path + f"/{project.project_name}")
 

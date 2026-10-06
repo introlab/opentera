@@ -166,21 +166,9 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         if session:
             # Turn off lazy loading for session
             return TeraSession.query.filter_by(id_session=session.id_session).options(lazyload("*")).first()
-        # sessions = sorted(self.participant_sessions, key=lambda session: session.session_start_datetime)
-        # if sessions:
-        #     return sessions[0]
         return None
 
     def get_last_session(self):
-        # from opentera.db.models.TeraSession import TeraSessionStatus
-        # sessions = [session for session in self.participant_sessions
-        #             if session.session_status == TeraSessionStatus.STATUS_COMPLETED.value or
-        #             session.session_status == TeraSessionStatus.STATUS_TERMINATED.value]
-        # sessions = sorted(sessions, key=lambda session: session.session_start_datetime)
-        # if sessions:
-        #     return sessions[-1]
-        # session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant)
-        #            .order_by(TeraSessionParticipants.id_session.desc()).limit(1).first())
         session = (TeraSessionParticipants.query.filter_by(id_participant=self.id_participant).join(TeraSession)
                    .order_by(TeraSession.session_start_datetime.desc()).limit(1).first())
         if session:
@@ -190,12 +178,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
 
     @staticmethod
     def encrypt_password(password):
-        # return bcrypt.hash(password)
         return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-
-    # @staticmethod
-    # def is_anonymous():
-    #     return False
 
     @staticmethod
     def verify_password(username, password, participant=None):
@@ -213,7 +196,6 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
             return None
 
         # Check password
-        # if bcrypt.verify(password, participant.participant_password):
         if bcrypt.checkpw(password.encode("utf-8"), participant.participant_password.encode("utf-8")):
             participant.authenticated = True
             return participant
