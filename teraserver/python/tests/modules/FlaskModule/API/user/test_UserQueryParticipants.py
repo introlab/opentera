@@ -1,3 +1,4 @@
+from opentera.db.models import TeraSite
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraProject import TeraProject
@@ -43,7 +44,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_participant_as_admin(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_participant=1')
+                                                     params={'id_participant': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -54,7 +55,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # by uuid
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='participant_uuid=' + uuid_participant)
+                                                     params={'participant_uuid': uuid_participant})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -63,7 +64,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # by username
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='username=' + username)
+                                                     params={'username': username})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -72,7 +73,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # with minimal infos
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_participant=1&list=1')
+                                                     params={'id_participant': 1, 'list': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -81,13 +82,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_participant_as_user(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_participant=1')
+                                                     params={'id_participant': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='id_participant=1')
+                                                     params={'id_participant': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -98,7 +99,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # by uuid
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='participant_uuid=' + uuid_participant)
+                                                     params={'participant_uuid': uuid_participant})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -107,7 +108,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # by username
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='username=' + username)
+                                                     params={'username': username})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -116,7 +117,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # with minimal infos
             response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
-                                                     params='id_participant=1&list=1')
+                                                     params={'id_participant': 1, 'list': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -125,13 +126,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_site(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_site=1')
+                                                     params={'id_site': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_site=1')
+                                                     params={'id_site': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraParticipant.query.join(TeraProject).filter(TeraProject.id_site == 1).count()
@@ -141,7 +142,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # Only with enabled
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_site=1&enabled=1')
+                                                     params={'id_site': 1, 'enabled': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraParticipant.query.join(TeraProject).filter(TeraProject.id_site == 1,
@@ -154,13 +155,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_project(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_project=1')
+                                                     params={'id_project': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_project=1')
+                                                     params={'id_project': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraParticipant.query.join(TeraProject).filter(TeraProject.id_project == 1).count()
@@ -170,7 +171,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
 
             # Only with enabled
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_project=1&enabled=1')
+                                                     params={'id_project': 1, 'enabled': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraParticipant.query.join(TeraProject).filter(TeraProject.id_project == 1,
@@ -183,13 +184,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_participant_group(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_group=1')
+                                                     params={'id_group': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_group=1')
+                                                     params={'id_group': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = len(TeraParticipantGroup.get_participant_group_by_id(1).participant_group_participants)
@@ -200,13 +201,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_session(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_session=2')
+                                                     params={'id_session': 2})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_session=2')
+                                                     params={'id_session': 2})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraSessionParticipants.get_count(filters={'id_session': 2})
@@ -217,13 +218,13 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_specific_device(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='user4', password='user4',
-                                                     params='id_device=1')
+                                                     params={'id_device': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
-            self.assertEqual(json_data, None)
+            self.assertEqual(len(json_data), 0)
 
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_device=1')
+                                                     params={'id_device': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = len(TeraDeviceParticipant.query_participants_for_device(1))
@@ -234,7 +235,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_full_infos(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_participant=1&full=1')
+                                                     params={'id_participant': 1, 'full': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 1)
@@ -246,7 +247,7 @@ class UserQueryParticipantsTest(BaseUserAPITest):
     def test_query_recents(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_site=1&orderby_recents=1')
+                                                     params={'id_site': 1, 'orderby_recents': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             participants = TeraParticipant.query.join(TeraProject).filter(TeraProject.id_site == 1).all()
@@ -257,26 +258,244 @@ class UserQueryParticipantsTest(BaseUserAPITest):
             for i in range(len(json_data)):
                 self.assertEqual(participants[i].id_participant, json_data[i]['id_participant'])
 
-    def test_query_limit(self):
+    def test_query_limit_for_site(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_site=1&limit=2')
+                                                     params={'id_site': 1, 'limit': 2})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             self.assertEqual(len(json_data), 2)
             for part_data in json_data:
                 self._checkJson(json_data=part_data, minimal=False)
 
+    def test_query_offset_for_site(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1, 'offset': 2})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_site = TeraSite.get_site_by_id(1)
+            target_projects = target_site.site_projects
+            target_count = sum([len(proj.project_participants) for proj in target_projects])
+            self.assertEqual(len(json_data), target_count - 2)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_and_offset_for_site(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_site': 1, 'offset': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_site = TeraSite.get_site_by_id(1)
+            target_projects = target_site.site_projects
+            self.assertEqual(len(json_data), 1)
+            self.assertEqual(json_data[0]['id_participant'], target_projects[0].project_participants[1].id_participant)
+
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_for_project(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_offset_for_project(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1, 'offset': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_project = TeraProject.get_project_by_id(1)
+            target_count = len(target_project.project_participants)
+            self.assertEqual(len(json_data), target_count - 1)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_and_offset_for_project(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_project': 1, 'offset': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_project = TeraProject.get_project_by_id(1)
+            self.assertEqual(len(json_data), 1)
+            self.assertEqual(json_data[0]['id_participant'], target_project.project_participants[1].id_participant)
+
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_for_group(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_group': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_offset_for_group(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_group': 1, 'offset': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            # target_group = TeraParticipantGroup.get_participant_group_by_id(1)
+            # target_count = len(target_group.participant_group_project.project_participants)
+            # self.assertEqual(len(json_data), target_count - 1)
+            self.assertEqual(len(json_data), 0)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_and_offset_for_group(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_group': 1, 'offset': 0, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_group = TeraParticipantGroup.get_participant_group_by_id(1)
+            self.assertEqual(len(json_data), 1)
+            self.assertEqual(json_data[0]['id_participant'],
+                             target_group.participant_group_project.project_participants[0].id_participant)
+
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_for_device(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_device': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            self.assertEqual(len(json_data), 1)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_offset_for_device(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_device': 1, 'offset': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_participants = TeraDeviceParticipant.query_participants_for_device(1)
+            target_count = len(target_participants)
+            self.assertEqual(len(json_data), target_count - 1)
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_limit_and_offset_for_device(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'id_device': 1, 'offset': 1, 'limit': 1})
+            self.assertEqual(response.status_code, 200)
+            json_data = response.json
+            target_participants = TeraDeviceParticipant.query_participants_for_device(1)
+            self.assertEqual(len(json_data), 1)
+            self.assertEqual(json_data[0]['id_participant'],
+                             target_participants[1].id_participant)
+
+            for part_data in json_data:
+                self._checkJson(json_data=part_data, minimal=False)
+
     def test_query_no_group(self):
         with self._flask_app.app_context():
             response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
-                                                     params='id_project=1&no_group=1')
+                                                     params={'id_project': 1, 'no_group': 1})
             self.assertEqual(response.status_code, 200)
             json_data = response.json
             target_count = TeraParticipant.get_count(filters={'id_participant_group': None, 'id_project': 1})
             self.assertEqual(len(json_data), target_count)
             for part_data in json_data:
                 self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_search_wrong_type(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'bad', 'search_value': 'error'})
+            self.assertEqual(response.status_code, 400)
+
+    def test_query_search_missing_value(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'all'})
+            self.assertEqual(response.status_code, 400)
+
+    def test_query_search_name(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "missing"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name(' #'))
+            self.assertEqual(len(response.json), target_count)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "Participant"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), target_count)  # Should have the same count (no "Secret Participant")
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "participant"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), target_count)  # Validate case insensitivity
+
+    def test_query_search_email(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'email', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'email', 'search_value': "opentera"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+    def test_query_search_username(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'username', 'search_value': "opentera"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'username', 'search_value': "particip"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+    def test_query_search_all(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': "none"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name(' #'))
+            self.assertEqual(len(response.json), target_count)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': "@"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'all', 'search_value': "particip"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name('particip'))
+            self.assertEqual(len(response.json), target_count)
 
     def test_post_and_delete(self):
         with self._flask_app.app_context():
