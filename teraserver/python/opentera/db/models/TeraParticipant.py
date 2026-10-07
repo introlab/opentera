@@ -259,7 +259,7 @@ class TeraParticipant(BaseModel, SoftDeleteMixin):
         return TeraParticipant.query.filter_by(participant_username=username).first() is None
 
     @staticmethod
-    def search_participant_by_name(name: str, other_filters: dict | None):
+    def search_participant_by_name(name: str, other_filters: dict | None = None):
         if other_filters is None:
             other_filters = dict()
         search_query = (TeraParticipant.query.filter_by(**other_filters).

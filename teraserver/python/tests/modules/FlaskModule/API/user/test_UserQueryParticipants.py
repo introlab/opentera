@@ -414,6 +414,89 @@ class UserQueryParticipantsTest(BaseUserAPITest):
             for part_data in json_data:
                 self._checkJson(json_data=part_data, minimal=False)
 
+    def test_query_search_wrong_type(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'bad', 'search_value': 'error'})
+            self.assertEqual(response.status_code, 400)
+
+    def test_query_search_missing_value(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'all'})
+            self.assertEqual(response.status_code, 400)
+
+    def test_query_search_name(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "missing"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name(' #'))
+            self.assertEqual(len(response.json), target_count)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "Participant"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), target_count)  # Should have the same count (no "Secret Participant")
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'name', 'search_value': "participant"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), target_count)  # Validate case insensitivity
+
+    def test_query_search_email(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'email', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'email', 'search_value': "opentera"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+    def test_query_search_username(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'username', 'search_value': "opentera"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'username', 'search_value': "particip"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+    def test_query_search_all(self):
+        with self._flask_app.app_context():
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': "none"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 0)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': " #"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name(' #'))
+            self.assertEqual(len(response.json), target_count)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'search': 'all', 'search_value': "@"})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json), 1)
+
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'search': 'all', 'search_value': "particip"})
+            self.assertEqual(response.status_code, 200)
+            target_count = len(TeraParticipant.search_participant_by_name('particip'))
+            self.assertEqual(len(response.json), target_count)
+
     def test_post_and_delete(self):
         with self._flask_app.app_context():
             json_data = {

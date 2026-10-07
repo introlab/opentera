@@ -1410,3 +1410,26 @@ class DBManagerTeraUserAccess:
         """
         test_invitations = self.get_accessible_tests_invitations()
         return [test_invitation.id_test_invitation for test_invitation in test_invitations]
+
+    def search_participants(self, search_type: str, search_value: str):
+        filter_ids = self.get_accessible_participants_ids()
+        query = TeraParticipant.query.filter(TeraParticipant.id_participant.in_(filter_ids))
+
+        fields = []
+        if search_type == 'name' or search_type == 'all':
+            fields += [TeraParticipant.participant_name]
+
+        if search_type == 'email' or search_type == 'all':
+            fields += [TeraParticipant.participant_email]
+
+        if search_type == 'username' or search_type == 'all':
+            fields += [TeraParticipant.participant_username]
+
+        if fields:
+            escaped = search_value.replace('\\', '\\\\').replace('%', r'\%').replace('_', r'\_')
+            search_pattern = f'%{escaped}%'
+            conditions = [field.ilike(search_pattern) for field in fields]
+            query = query.filter(or_(*conditions))
+            return query.all()
+
+        return []

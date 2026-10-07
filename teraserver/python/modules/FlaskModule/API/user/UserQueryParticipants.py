@@ -34,6 +34,9 @@ get_parser.add_argument('orderby_recents', type=inputs.boolean, help='Returns pa
 get_parser.add_argument('limit', type=int, help='Returns at most "limit" participants')
 get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index', default=0)
 
+get_parser.add_argument('search', type=str, help='Perform a search on the specific field(name, username, email, all)')
+get_parser.add_argument('search_value', type=str, help='Search string when "search" argument is specified')
+
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
 # get_parser.add_argument('with_status', type=inputs.boolean, help='Include status information - offline, online, busy '
@@ -114,6 +117,14 @@ class UserQueryParticipants(Resource):
                     break
                 if participant.id_participant not in user_access.get_accessible_participants_ids():
                     participants = []
+        elif args['search']:
+            # Search participants based on criteria
+            if args['search'] not in ['name', 'email', 'username', 'all']:
+                return gettext('Invalid search field'), 400
+            if not args['search_value']:
+                return gettext('Invalid search value'), 400
+
+            participants = user_access.search_participants(args['search'], args['search_value'])
 
         # Sort by recently modified, if needed
         if args['orderby_recents']:
