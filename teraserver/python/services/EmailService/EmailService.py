@@ -82,7 +82,12 @@ class EmailService(ServiceOpenTera):
                                       'callback': self.rpc_send_email_template}
 
     def rpc_send_email(self, email_subject: str, email_body: str, email_recipients: str, sender_email: str):
-        email = Message(subject=email_subject, html=email_body, recipients=email_recipients,
+        recipients = email_recipients.split(',')
+        if not sender_email:
+            # Use default sender if none specified
+            sender_email = self.config_man.email_config['default_sender']
+
+        email = Message(subject=email_subject, html=email_body, recipients=recipients,
                         sender=sender_email, reply_to=sender_email)
         try:
             self.flaskModule.mail_man.send(email)
@@ -106,7 +111,13 @@ class EmailService(ServiceOpenTera):
             return False
 
         email_body = template.safe_substitute(variables)
-        email = Message(subject=email_subject, html=email_body, recipients=email_recipients,
+        recipients = email_recipients.split(',')
+
+        if not sender_email:
+            # Use default sender if none specified
+            sender_email = self.config_man.email_config['default_sender']
+
+        email = Message(subject=email_subject, html=email_body, recipients=recipients,
                         sender=sender_email, reply_to=sender_email)
         try:
             self.flaskModule.mail_man.send(email)

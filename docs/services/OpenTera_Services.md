@@ -19,6 +19,7 @@ the system, and should not be disabled unless specific requirements call for (su
 capability to a server setup).
   
 Currently, the system services are the following:
+- [**Email Service**](Email-Service), used to send emails from the system
 - [**FileTransfer Service**](FileTransfer-Service), used to manage the various files required to be stored on the system
 as assets
 - [**Logging Service**](Logging-Service), used for internal technical and access logging

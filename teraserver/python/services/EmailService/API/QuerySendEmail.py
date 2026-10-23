@@ -4,7 +4,7 @@ from flask_mail import Message
 
 from services.EmailService.FlaskModule import email_api_ns as api
 from opentera.services.ServiceAccessManager import (ServiceAccessManager, current_user_client, current_login_type,
-                                                    LoginType)
+                                                    LoginType, current_service_client)
 from services.EmailService.libemailservice.db.models.EmailTemplate import EmailTemplate
 from flask_babel import gettext
 from string import Template
@@ -54,10 +54,10 @@ class QuerySendEmail(EmailResource):
                         401: 'Unauthorized login type',
                         403: 'No access to target senders'})
     @api.expect(post_schema)
-    @ServiceAccessManager.token_required()
+    @ServiceAccessManager.service_or_others_token_required()
     def post(self):
-        if current_login_type != LoginType.USER_LOGIN:
-            return gettext('Only users can use this API.'), 401
+        if current_login_type != LoginType.USER_LOGIN and current_login_type != LoginType.SERVICE_LOGIN:
+            return gettext('Only users and services can use this API.'), 401
 
         # Check if we have at least one participant or user uuid
         json_email = request.json
@@ -141,12 +141,15 @@ class QuerySendEmail(EmailResource):
 
         # Send email!
         sender_email = None
-        if self.test:
-            user_json = self._get_user_infos(current_user_client.user_uuid)
-            if user_json:
-                sender_email = (current_user_client.user_fullname, user_json['user_email'])
-        else:
-            sender_email = (current_user_client.user_fullname, current_user_client.get_user_info()['user_email'])
+        if current_login_type == LoginType.USER_LOGIN:
+            if self.test:
+                user_json = self._get_user_infos(current_user_client.user_uuid)
+                if user_json:
+                    sender_email = (current_user_client.user_fullname, user_json['user_email'])
+            else:
+                sender_email = (current_user_client.user_fullname, current_user_client.get_user_info()['user_email'])
+        if current_login_type == LoginType.SERVICE_LOGIN:
+            sender_email = self.module.config.email_config['default_sender']
         if not sender_email:
             return gettext('User doesn\'t have any email address set'), 400
 

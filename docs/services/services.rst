@@ -8,6 +8,7 @@ The TeraServer service cannot be disabled, as it provides the base features for 
    :caption: Services
 
    teraserver/teraserver
+   Email-Service.md
    FileTransfer-Service.md
    Logging-Service.md
    Videorehab-Service.md

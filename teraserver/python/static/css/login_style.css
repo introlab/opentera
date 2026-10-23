@@ -13,8 +13,9 @@ body{
  }
 
  .card{
-    border: none;
-    box-shadow: 5px 5px 4px #424242;
+     border: none;
+     box-shadow: 5px 5px 4px #424242;
+     background-color: black;
  }
 
  .img-logo{

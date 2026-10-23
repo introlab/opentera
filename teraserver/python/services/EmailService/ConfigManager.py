@@ -66,6 +66,7 @@ class ConfigManager(ServiceConfigManager, EmailConfig, DBConfig):
         self.email_config['ssl'] = True
         self.email_config['username'] = ''
         self.email_config['password'] = ''
+        self.email_config['default_sender'] = 'noreply@localhost'
 
         # Default database configuration
         self.db_config['db_type'] = 'ram'

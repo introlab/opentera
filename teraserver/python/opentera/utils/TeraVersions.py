@@ -143,6 +143,10 @@ class TeraVersions:
         return self.server_version
 
     @property
+    def version_short_string(self):
+        return str(self.major_version) + '.' + str(self.minor_version) + "." + str(self.patch_version)
+
+    @property
     def major_version(self):
         return self.server_major_version
 

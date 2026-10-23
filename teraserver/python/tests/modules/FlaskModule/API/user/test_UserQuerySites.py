@@ -1,8 +1,10 @@
+from opentera.db.models import TeraServiceSite
 from tests.modules.FlaskModule.API.user.BaseUserAPITest import BaseUserAPITest
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraProject import TeraProject
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraSession import TeraSession
+from opentera.db.models.TeraService import TeraService
 import datetime
 
 
@@ -117,6 +119,36 @@ class UserQuerySitesTest(BaseUserAPITest):
                                                      params={'user_uuid': user.user_uuid})
             self.assertEqual(200, response.status_code)
             target_count = len(user.get_sites_roles())
+            self.assertEqual(target_count, len(response.json))
+            for part_data in response.json:
+                self._checkJson(json_data=part_data, minimal=False)
+
+    def test_query_specific_service_uuid(self):
+        with self._flask_app.app_context():
+            service_filetransfer = TeraService.get_service_by_key('FileTransferService')
+            email_service = TeraService.get_service_by_key('EmailService')
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'service_uuid': service_filetransfer.service_uuid})
+            self.assertEqual(200, response.status_code)
+            target_count = len(TeraServiceSite.get_sites_for_service(service_filetransfer.id_service))
+            self.assertEqual(target_count, len(response.json))
+            for site_data in response.json:
+                self._checkJson(json_data=site_data, minimal=False)
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'service_uuid': email_service.service_uuid})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+            response = self._get_with_user_http_auth(self.test_client, username='admin', password='admin',
+                                                     params={'service_uuid': 'BAD UUID'})
+            self.assertEqual(200, response.status_code)
+            self.assertEqual(0, len(response.json))
+
+            response = self._get_with_user_http_auth(self.test_client, username='user3', password='user3',
+                                                     params={'service_uuid': service_filetransfer.service_uuid})
+            self.assertEqual(200, response.status_code)
+            target_count = 1  # For now
             self.assertEqual(target_count, len(response.json))
             for part_data in response.json:
                 self._checkJson(json_data=part_data, minimal=False)

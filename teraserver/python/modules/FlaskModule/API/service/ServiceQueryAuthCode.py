@@ -1,13 +1,17 @@
 import json
 from flask_restx import Resource
 from flask_babel import gettext
+from flask import request
 from modules.LoginModule.LoginModule import LoginModule, current_service
 from modules.FlaskModule.FlaskModule import service_api_ns as api
 from modules.DatabaseModule.DBManager import DBManager
+from opentera.utils.TeraVersions import TeraVersions
 
 # Parser definition(s)
 get_parser = api.parser()
 get_parser.add_argument('endpoint_url', type=str, help='Endpoint url requesting access', required=True)
+get_parser.add_argument('client_name', type=str, help='Client name requesting access. If none, will use the service name.', required=False)
+get_parser.add_argument('client_version', type=str, help='Client version requesting access', required=False)
 
 
 
@@ -42,7 +46,16 @@ class ServiceQueryAuthCode(Resource):
         if not self.module:
             return gettext('Internal error'), 500
 
-        auth_code_data = {'service_uuid': current_service.service_uuid, 'endpoint_url': endpoint_url}
+        client_name = args['client_name'] if args['client_name'] else current_service.service_name
+        client_version = args['client_version']
+
+        if not client_version:
+            versions = TeraVersions()
+            versions.load_from_db()
+            client_version = versions.version_short_string  # Default version = OpenTera version
+
+        auth_code_data = {'service_uuid': current_service.service_uuid, 'endpoint_url': endpoint_url,
+                          'client_name': client_name, 'client_version': client_version}
 
         self.module.redisSet('service_auth_code_' + auth_code, json.dumps(auth_code_data), 300)
 

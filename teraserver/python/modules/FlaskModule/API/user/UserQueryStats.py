@@ -165,7 +165,7 @@ class UserQueryUserStats(Resource):
         # Add participants information?
         participants = []
         if with_parts:
-            participants = user_access.query_all_participants_for_site(item_id)
+            participants = user_access.query_participants_for_site(item_id)
             part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
             stats['participants'] = part_stats
 
@@ -175,7 +175,7 @@ class UserQueryUserStats(Resource):
 
             # Participants
             if len(participants) == 0:
-                participants = user_access.query_all_participants_for_site(item_id)
+                participants = user_access.query_participants_for_site(item_id)
             # Keep only enabled participants and with last session within the last 6 months
             participants = [part for part in participants if part.participant_enabled]
 
@@ -266,7 +266,7 @@ class UserQueryUserStats(Resource):
 
         # Add participants information?
         if with_parts:
-            participants = user_access.query_all_participants_for_project(item_id)
+            participants = user_access.query_participants_for_project(item_id)
             part_stats = [UserQueryUserStats.get_participant_list_stats(part) for part in participants]
             stats['participants'] = part_stats
 

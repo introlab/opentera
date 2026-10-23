@@ -32,6 +32,10 @@ get_parser.add_argument('full', type=inputs.boolean, help='Flag that expands the
 get_parser.add_argument('orderby_recents', type=inputs.boolean, help='Returns participants ordered by most recently '
                                                                      'updated')
 get_parser.add_argument('limit', type=int, help='Returns at most "limit" participants')
+get_parser.add_argument('offset', type=int, help='Number of items to ignore in results, offset from 0-index', default=0)
+
+get_parser.add_argument('search', type=str, help='Perform a search on the specific field(name, username, email, all)')
+get_parser.add_argument('search_value', type=str, help='Search string when "search" argument is specified')
 
 get_parser.add_argument('no_group', type=inputs.boolean,
                         help='Flag that limits the returned data with only participants without a group')
@@ -87,25 +91,23 @@ class UserQueryParticipants(Resource):
                 if participant.id_participant in user_access.get_accessible_participants_ids():
                     participants = [participant]
         elif args['id_site']:
-            if args['enabled'] is not None:
-                participants = user_access.query_enabled_participants_for_site(args['id_site'])
-            else:
-                participants = user_access.query_all_participants_for_site(args['id_site'])
+            participants = user_access.query_participants_for_site(args['id_site'], args['enabled'],
+                                                                   args['limit'], args['offset'])
         elif args['id_project']:
-            if args['enabled'] is not None:
-                participants = user_access.query_enabled_participants_for_project(args['id_project'])
-            else:
-                participants = user_access.query_all_participants_for_project(args['id_project'])
+            participants = user_access.query_participants_for_project(args['id_project'], args['enabled'],
+                                                                      args['limit'], args['offset'])
         elif args['id_group']:
-            participants = user_access.query_participants_for_group(args['id_group'])
+            participants = user_access.query_participants_for_group(args['id_group'], args['enabled'],
+                                                                      args['limit'], args['offset'])
         elif args['id_device']:
-            participants = user_access.query_participants_for_device(args['id_device'])
+            participants = user_access.query_participants_for_device(args['id_device'], args['enabled'],
+                                                                      args['limit'], args['offset'])
         elif args['id_session']:
             part_session = TeraSession.get_session_by_id(args['id_session'])
             participants = []
-            accessibles_parts = user_access.get_accessible_participants_ids()
+            accessible_parts = user_access.get_accessible_participants_ids()
             for part in part_session.session_participants:
-                if part.id_participant in accessibles_parts:
+                if part.id_participant in accessible_parts:
                     participants.append(part)
         elif args['name']:
             participants = [TeraParticipant.get_participant_by_name(args['name'])]
@@ -115,20 +117,22 @@ class UserQueryParticipants(Resource):
                     break
                 if participant.id_participant not in user_access.get_accessible_participants_ids():
                     participants = []
+        elif args['search']:
+            # Search participants based on criteria
+            if args['search'] not in ['name', 'email', 'username', 'all']:
+                return gettext('Invalid search field'), 400
+            if not args['search_value']:
+                return gettext('Invalid search value'), 400
+
+            participants = user_access.search_participants(args['search'], args['search_value'])
 
         # Sort by recently modified, if needed
         if args['orderby_recents']:
             participants = sorted(participants, key=lambda sort_part: sort_part.version_id, reverse=True)
 
-        # Apply limit to number of returned participants
-        if args['limit']:
-            if len(participants) > args['limit']:
-                participants = participants[0:args['limit']]
-
         try:
+            participant_list = []
             if participants:
-                participant_list = []
-                status_participants = {}
 
                 # Query status
                 if not self.test:
@@ -195,7 +199,7 @@ class UserQueryParticipants(Resource):
 
                         participant_list.append(participant_json)
 
-                return jsonify(participant_list)
+            return jsonify(participant_list)
 
         except InvalidRequestError as e:
             self.module.logger.log_error(self.module.module_name,

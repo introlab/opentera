@@ -3,6 +3,7 @@ import datetime
 from flask import Flask, request, g, url_for, session
 from flask_restx import Api, Namespace
 from flask_babel import Babel
+from flask_session import Session
 import redis
 
 from opentera.config.ConfigManager import ConfigManager
@@ -104,7 +105,7 @@ class FlaskModule(BaseModule):
         flask_app.config.update({'SESSION_COOKIE_SECURE': True})
         flask_app.config.update({'SESSION_COOKIE_SAMESITE': 'Strict'})
         flask_app.config.update({'PROPAGATE_EXCEPTIONS': flask_app.debug})
-        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=5)})
+        flask_app.config.update({'PERMANENT_SESSION_LIFETIME': datetime.timedelta(minutes=10)})
         # TODO set upload folder in config
         # TODO remove this configuration, it is not useful?
         flask_app.config.update({'UPLOAD_FOLDER': 'uploads'})
@@ -113,6 +114,7 @@ class FlaskModule(BaseModule):
         # flask_app.config.update({'BABEL_DEFAULT_TIMEZONE': 'UTC'})
 
         # self.session = Session(flask_app)
+        Session(flask_app)  # Use sessions in Redis
 
         # Init API
         FlaskModule.init_user_api(self, user_api_ns)
@@ -148,6 +150,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.user.UserLogin2FA import UserLogin2FA
         from modules.FlaskModule.API.user.UserLoginSetup2FA import UserLoginSetup2FA
         from modules.FlaskModule.API.user.UserLoginChangePassword import UserLoginChangePassword
+        from modules.FlaskModule.API.user.UserLoginForgotPassword import UserLoginForgotPassword
         from modules.FlaskModule.API.user.UserLogout import UserLogout
         from modules.FlaskModule.API.user.UserQueryUsers import UserQueryUsers
         from modules.FlaskModule.API.user.UserQueryUserPreferences import UserQueryUserPreferences
@@ -212,6 +215,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(UserLogin2FA,                  '/login/2fa', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLoginSetup2FA,             '/login/setup_2fa', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLoginChangePassword,       '/login/change_password', resource_class_kwargs=kwargs)
+        namespace.add_resource(UserLoginForgotPassword,       '/login/forgot_password', resource_class_kwargs=kwargs)
         namespace.add_resource(UserLogout,                    '/logout', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryParticipants,         '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(UserQueryOnlineParticipants,   '/participants/online', resource_class_kwargs=kwargs)
@@ -291,6 +295,8 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.API.participant.ParticipantQuerySessions import ParticipantQuerySessions
         from modules.FlaskModule.API.participant.ParticipantRefreshToken import ParticipantRefreshToken
         from modules.FlaskModule.API.participant.ParticipantQueryAssets import ParticipantQueryAssets
+        from modules.FlaskModule.API.participant.ParticipantQueryServiceConfigs import ParticipantQueryServiceConfig
+
         # Resources
         namespace.add_resource(ParticipantLogin,               '/login', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantLogout,              '/logout', resource_class_kwargs=kwargs)
@@ -299,6 +305,7 @@ class FlaskModule(BaseModule):
         namespace.add_resource(ParticipantQueryParticipants,   '/participants', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantQuerySessions,       '/sessions', resource_class_kwargs=kwargs)
         namespace.add_resource(ParticipantRefreshToken,        '/refresh_token', resource_class_kwargs=kwargs)
+        namespace.add_resource(ParticipantQueryServiceConfig,  '/services/configs', resource_class_kwargs=kwargs)
 
     @staticmethod
     def init_service_api(module: object, namespace: Namespace, additional_args: dict = dict()):
@@ -375,6 +382,7 @@ class FlaskModule(BaseModule):
         from modules.FlaskModule.Views.LoginChangePasswordView import LoginChangePasswordView
         from modules.FlaskModule.Views.LoginSetup2FAView import LoginSetup2FAView
         from modules.FlaskModule.Views.LoginValidate2FAView import LoginValidate2FAView
+        from modules.FlaskModule.Views.LoginForgotPasswordView import LoginForgotPasswordView
 
         # Default arguments
         args = []
@@ -392,6 +400,9 @@ class FlaskModule(BaseModule):
         flask_app.add_url_rule('/login_validate_2fa', view_func=LoginValidate2FAView.as_view(
             'login_validate_2fa', *args, **kwargs))
 
+        flask_app.add_url_rule('/login_forgot_password', view_func=LoginForgotPasswordView.as_view(
+            'login_forgot_password', *args, **kwargs))
+
         if not self.config.server_config['enable_docs']:
             # Disabled docs view
             flask_app.add_url_rule('/doc', view_func=DisabledDoc.as_view('doc', *args, **kwargs))
@@ -401,7 +412,7 @@ class FlaskModule(BaseModule):
 def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     response.headers["Access-Control-Allow-Methods"] = "*"
     response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
 
