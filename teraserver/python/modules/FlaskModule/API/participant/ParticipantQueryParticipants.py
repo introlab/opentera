@@ -1,6 +1,3 @@
-
-import bcrypt
-
 from flask import jsonify, request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
@@ -95,9 +92,6 @@ class ParticipantQueryParticipants(Resource):
         allowed_fields = {
             'participant_name',
             'participant_email',
-            'participant_password',
-            'current_password',
-            'confirm_password'
         }
 
         if any(field not in allowed_fields for field in json_participant):
