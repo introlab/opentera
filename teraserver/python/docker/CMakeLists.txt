@@ -7,7 +7,7 @@ set(GOOGLE_PROTO_PATH /usr/include/google/protobuf/)
 # Install python packages.
 add_custom_target(
     docker-python-packages-install
-    COMMAND python3 -m pip install -r requirements.txt protobuf==3.20.3 debugpy
+    COMMAND python3 -m pip install -r requirements.txt debugpy
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../env
 )
 
@@ -39,12 +39,20 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../services/VideoRehabService
 )
 
+# Generate translations for email service
+add_custom_target(
+    docker-translations-email-service
+    COMMAND ${PYBABEL_EXECUTABLE} compile -d translations -D emailservice
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../services/EmailService
+)
+
 add_custom_target(
     docker-translations
     DEPENDS docker-translations-teraserver 
     DEPENDS docker-translations-logging-service 
     DEPENDS docker-translations-filetransfer-service
     DEPENDS docker-translations-videorehab-service
+    DEPENDS docker-translations-email-service
 )
 
 FILE(GLOB_RECURSE protofiles RELATIVE "${MESSAGES_PATH}" "${MESSAGES_PATH}/proto/*.proto")
