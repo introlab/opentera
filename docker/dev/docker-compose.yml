@@ -3,7 +3,7 @@ version: '3.8'
 #name: opentera-dev
 services:
   db:
-    image: postgres:14.1-alpine
+    image: postgres:18.7-alpine
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -11,13 +11,14 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - db:/var/lib/postgresql/data
+      # PostgreSQL 18+ stores data in a version-specific subdirectory (/var/lib/postgresql/18/docker)
+      - db-pg18:/var/lib/postgresql
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       - app-network
 
   cache:
-    image: redis:6.2-alpine
+    image: redis:8.10-alpine
     restart: always
     ports:
       - '6380:6379'
@@ -33,10 +34,16 @@ services:
       dockerfile: ./docker/dev/certificates/Dockerfile
     image: opentera-cert-generator
     volumes:
-      - certificates:/teraserver/python/certificates
+      - certificates:/teraserver/python/config/certificates
+    healthcheck:
+      # Healthy once the certificates have been generated in the certificates volume.
+      test: ["CMD", "test", "-f", "/teraserver/python/config/certificates/site_cert.pem"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
 
   proxy:
-    image: nginx
+    image: nginx:1.30-alpine
     restart: always
     volumes:
       - ./nginx/opentera.conf:/etc/nginx/opentera.conf
@@ -44,8 +51,8 @@ services:
       - certificates:/etc/certificates
       - nginx-logs:/etc/nginx/logs
     depends_on:
-      - cert-generator
-
+      cert-generator:
+        condition: service_healthy
     ports:
       - '40075:40075'
     networks:
@@ -62,6 +69,7 @@ services:
       - ./teraserver/FileTransferService.json:/teraserver/python/services/FileTransferService/FileTransferService.json
       - ./teraserver/LoggingService.json:/teraserver/python/services/LoggingService/LoggingService.json
       - ./teraserver/VideoRehabService.json:/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - ./teraserver/EmailService.json:/teraserver/python/services/EmailService/EmailService.json
       - files:/teraserver/python/services/FileTransferService/files
     networks:
       - app-network
@@ -75,7 +83,7 @@ services:
       - db
 
 volumes:
-  db:
+  db-pg18:
     driver: local
 
   cache:

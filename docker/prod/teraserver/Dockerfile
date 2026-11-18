@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:trixie
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
@@ -16,11 +16,15 @@ ENV LC_ALL en_US.UTF-8
 
 # Install miniconda
 WORKDIR /root
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN bash ~/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+RUN ARCH=$(uname -m) && \
+    wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${ARCH}.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p $HOME/miniconda3 && \
+    rm ~/miniconda.sh && \
+    $HOME/miniconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    $HOME/miniconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
 # Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_26.x -o nodesource_setup.sh
 RUN bash ~/nodesource_setup.sh
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 
