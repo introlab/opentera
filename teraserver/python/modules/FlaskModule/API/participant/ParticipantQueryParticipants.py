@@ -1,11 +1,10 @@
-from flask import jsonify, request
+from flask import request
 from flask_restx import Resource, inputs
 from flask_babel import gettext
 from sqlalchemy import exc
 
 from modules.LoginModule.LoginModule import participant_multi_auth, current_participant
 from modules.FlaskModule.FlaskModule import participant_api_ns as api
-from modules.DatabaseModule.DBManager import DBManager
 from opentera.db.models.TeraParticipant import TeraParticipant
 
 
@@ -64,7 +63,7 @@ class ParticipantQueryParticipants(Resource):
             }
 
     @api.doc(description='Update current participant information. Name and email can be modified '
-                         'with limited access. Password changes require full access.',
+                         'with limited access.',
              responses={200: 'Success',
                         500: 'Required parameter is missing',
                         501: 'Not implemented.',
@@ -88,14 +87,14 @@ class ParticipantQueryParticipants(Resource):
         if not isinstance(json_participant, dict):
             return gettext('Invalid participant information'), 400
 
-        # Only allow participants to modify their name, email and password
+        # Only allow participants to modify their name & email
         allowed_fields = {
             'participant_name',
             'participant_email',
         }
 
         if any(field not in allowed_fields for field in json_participant):
-            return gettext('Invalid participant fields'), 400
+            return gettext('Invalid fields'), 400
 
         # Query current participant information
         participant = TeraParticipant.get_participant_by_id(
@@ -103,7 +102,7 @@ class ParticipantQueryParticipants(Resource):
         )
 
         if not participant:
-            return gettext('Participant not found'), 404
+            return gettext('Not found'), 404
 
         # No ID is required in the JSON, since the participant can only modify itself
         update_values = {}
@@ -113,7 +112,7 @@ class ParticipantQueryParticipants(Resource):
             participant_name = json_participant['participant_name']
 
             if not isinstance(participant_name, str) or not participant_name.strip():
-                return gettext('Invalid participant name'), 400
+                return gettext('Invalid name'), 400
 
             update_values['participant_name'] = participant_name.strip()
 
@@ -122,18 +121,18 @@ class ParticipantQueryParticipants(Resource):
             participant_email = json_participant['participant_email']
 
             if not isinstance(participant_email, str) or not participant_email.strip():
-                return gettext('Invalid participant email'), 400
+                return gettext('Invalid email'), 400
 
             try:
                 participant_email = inputs.email()(participant_email.strip())
             except ValueError:
-                return gettext('Invalid participant email'), 400
+                return gettext('Invalid email'), 400
 
             update_values['participant_email'] = participant_email
 
         # Check if we have anything to update
         if not update_values:
-            return gettext('No participant information to update'), 400
+            return gettext('No information to update'), 400
 
         # Do the update!
         try:
@@ -177,4 +176,4 @@ class ParticipantQueryParticipants(Resource):
                 'participant_email': update_participant.participant_email
             }
 
-        return jsonify([update_participant_json])
+        return [update_participant_json]
