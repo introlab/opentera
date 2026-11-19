@@ -5,7 +5,7 @@ To get started on Windows, the following components are needed:
 * [CMake](https://cmake.org) required to build the python environment and [translations](Translations). Could also be installed as part of [Qt](https://www.qt.io/download) if that optional component is installed
 * [Miniconda 3](https://conda.io/miniconda.html) required to build the python environment
 * [PostgreSQL](https://www.postgresql.org/download/) for the [database backend](Database-Structure)
-* [Redis Server](https://github.com/tporadowski/redis/releases) for the [internal communication system](Internal-services-communication-module)
+* [Redis Server](https://github.com/redis-windows/redis-windows) for the [internal communication system](Internal-services-communication-module)
 * [NGINX](https://nginx.org/en/download.html) for the system routing
 * [Node.js](https://nodejs.org) required for the [VideoRehab service](../services/Videorehab-Service)
 * [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html) required to generate device certificates and for self-signed certificate generation. The "light" version is sufficient if using the linked website for download.
@@ -28,6 +28,8 @@ The PostgreSQL should be run as a system service, though you could also manually
 Make sure to install the server as a service or to properly manually launch it before running the [OpenTera main script](../services/teraserver/teraserver.rst).
 
 If you are setting a user and a password, you will need to adjust the [configuration files](../Configuration-files) accordingly.
+
+On Windows, you can install the Redis Server from WSL, in Docker or by using that [project](https://github.com/redis-windows/redis-windows). Instructions for setup are easily available on those sources.
 
 ### Installing (and running) NGINX
 NGINX for Windows doesn't provide an installer. Installation should be done manually by extracting the archive in a specific folder (such as `C:\nginx`). Note that path for further use.

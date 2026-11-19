@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenTera Services Structure &mdash; OpenTera 1.3.1 documentation</title>
+  <title>OpenTera Services Structure &mdash; OpenTera 1.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=bb516dca"></script>
+      <script src="../_static/documentation_options.js?v=8ca9e7a0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -157,17 +157,17 @@ values such as specific devices to use or a specific UI configuration. Default c
 <code class="docutils literal notranslate"><span class="pre">TeraService</span></code> database model.</p>
 <p>The typical configuration structure is the following:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nx">Globals</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="c1">// Put &quot;default&quot; config values here with format:</span>
+<span class="w">                </span><span class="c1">// Put "default" config values here with format:</span>
 <span class="w">                </span><span class="p">{</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="nx">value</span><span class="p">}</span>
 <span class="w">             </span><span class="p">}</span>
 <span class="w">    </span><span class="nx">Specifics</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">                    </span><span class="p">{</span>
 <span class="w">                        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="nx">xxxx</span><span class="p">,</span><span class="w"> </span><span class="c1">// Specific id of that config, for example hardware ID</span>
-<span class="w">                        </span><span class="c1">// Put &quot;overriden&quot; config values here for that config id</span>
+<span class="w">                        </span><span class="c1">// Put "overriden" config values here for that config id</span>
 <span class="w">                    </span><span class="p">},</span>
 <span class="w">                    </span><span class="p">{</span>
 <span class="w">                        </span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="nx">xxxx</span><span class="p">,</span><span class="w"> </span><span class="c1">// Specific id of that config, for example hardware ID</span>
-<span class="w">                        </span><span class="c1">// Put &quot;overriden&quot; config values here for that config id</span>
+<span class="w">                        </span><span class="c1">// Put "overriden" config values here for that config id</span>
 <span class="w">                    </span><span class="p">},</span>
 <span class="w">               </span><span class="p">]</span>
 <span class="w">  </span><span class="p">}</span>

@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deploying OpenTera on a Linux Server &mdash; OpenTera 1.3.1 documentation</title>
+  <title>Deploying OpenTera on a Linux Server &mdash; OpenTera 1.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=bb516dca"></script>
+      <script src="../_static/documentation_options.js?v=8ca9e7a0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -139,13 +139,13 @@
 <li><p>Install Postgresql package: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">postgresql</span></code></p></li>
 <li><p>Change default <code class="docutils literal notranslate"><span class="pre">postgres</span></code> user password for a more secure installation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="n">psql</span>
-<span class="n">ALTER</span> <span class="n">USER</span> <span class="n">postgres</span> <span class="n">PASSWORD</span> <span class="s1">&#39;TypeThePasswordHere&#39;</span><span class="p">;</span>
+<span class="n">ALTER</span> <span class="n">USER</span> <span class="n">postgres</span> <span class="n">PASSWORD</span> <span class="s1">'TypeThePasswordHere'</span><span class="p">;</span>
 </pre></div>
 </div>
 </li>
 <li><p>(Optional) Setup a local pgAdmin instance to connect to postgresql database (optionally using a SSH tunnel)</p></li>
 <li><p>Create <code class="docutils literal notranslate"><span class="pre">teraagent</span></code> user in database (or name of your choice, but will have to be adjusted in the config section below):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">USER</span> <span class="n">teraagent</span> <span class="n">WITH</span> <span class="n">ENCRYPTED</span> <span class="n">PASSWORD</span> <span class="s1">&#39;TypeUserPasswordHere&#39;</span><span class="p">;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CREATE</span> <span class="n">USER</span> <span class="n">teraagent</span> <span class="n">WITH</span> <span class="n">ENCRYPTED</span> <span class="n">PASSWORD</span> <span class="s1">'TypeUserPasswordHere'</span><span class="p">;</span>
 </pre></div>
 </div>
 </li>
@@ -314,7 +314,7 @@ Only basic configuration is done here - specific OpenTera configuration is done 
 <span class="n">lt</span><span class="o">-</span><span class="n">cred</span><span class="o">-</span><span class="n">mech</span>
 
 <span class="c1"># Authentication to access the server (generate password with the turnadmin tool)</span>
-<span class="c1"># Don&#39;t forget to set the realm before generating the password!!</span>
+<span class="c1"># Don't forget to set the realm before generating the password!!</span>
 <span class="n">user</span><span class="o">=</span><span class="n">opentera</span><span class="p">:(</span><span class="n">generated</span> <span class="n">password</span><span class="p">)</span>
 
 <span class="c1"># Realm of the server. Typically the DNS name of the server (but can also be something else)</span>

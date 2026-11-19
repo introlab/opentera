@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started for Developers - Windows &mdash; OpenTera 1.3.1 documentation</title>
+  <title>Getting Started for Developers - Windows &mdash; OpenTera 1.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=bb516dca"></script>
+      <script src="../_static/documentation_options.js?v=8ca9e7a0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -133,7 +133,7 @@
 <li><p><a class="reference external" href="https://cmake.org">CMake</a> required to build the python environment and <a class="reference internal" href="Translations.html"><span class="doc std std-doc">translations</span></a>. Could also be installed as part of <a class="reference external" href="https://www.qt.io/download">Qt</a> if that optional component is installed</p></li>
 <li><p><a class="reference external" href="https://conda.io/miniconda.html">Miniconda 3</a> required to build the python environment</p></li>
 <li><p><a class="reference external" href="https://www.postgresql.org/download/">PostgreSQL</a> for the <a class="reference internal" href="Database-Structure.html"><span class="doc std std-doc">database backend</span></a></p></li>
-<li><p><a class="reference external" href="https://github.com/tporadowski/redis/releases">Redis Server</a> for the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a></p></li>
+<li><p><a class="reference external" href="https://github.com/redis-windows/redis-windows">Redis Server</a> for the <a class="reference internal" href="Internal-services-communication-module.html"><span class="doc std std-doc">internal communication system</span></a></p></li>
 <li><p><a class="reference external" href="https://nginx.org/en/download.html">NGINX</a> for the system routing</p></li>
 <li><p><a class="reference external" href="https://nodejs.org">Node.js</a> required for the <a class="reference internal" href="../services/Videorehab-Service.html"><span class="doc std std-doc">VideoRehab service</span></a></p></li>
 <li><p><a class="reference external" href="https://slproweb.com/products/Win32OpenSSL.html">OpenSSL</a> required to generate device certificates and for self-signed certificate generation. The “light” version is sufficient if using the linked website for download.</p></li>
@@ -155,6 +155,7 @@
 <h3>Installing Redis Server<a class="headerlink" href="#installing-redis-server" title="Link to this heading"></a></h3>
 <p>Make sure to install the server as a service or to properly manually launch it before running the <a class="reference internal" href="../services/teraserver/teraserver.html"><span class="std std-doc">OpenTera main script</span></a>.</p>
 <p>If you are setting a user and a password, you will need to adjust the <a class="reference internal" href="../Configuration-files.html"><span class="doc std std-doc">configuration files</span></a> accordingly.</p>
+<p>On Windows, you can install the Redis Server from WSL, in Docker or by using that <a class="reference external" href="https://github.com/redis-windows/redis-windows">project</a>. Instructions for setup are easily available on those sources.</p>
 </section>
 <section id="installing-and-running-nginx">
 <h3>Installing (and running) NGINX<a class="headerlink" href="#installing-and-running-nginx" title="Link to this heading"></a></h3>

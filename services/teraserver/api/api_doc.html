@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Documentation &mdash; OpenTera 1.3.1 documentation</title>
+  <title>API Documentation &mdash; OpenTera 1.3.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=bb516dca"></script>
+      <script src="../../../_static/documentation_options.js?v=8ca9e7a0"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -284,7 +284,7 @@
 <dd><p><strong>Create / update devices</strong></p>
 <p>Create / update devices. id_device must be set to “0” to create a new device. Only superadmins can create new devices, site admin can update and project admin can modify config and notes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device.device_certificate</strong> (<em>string</em>)</p></li>
 <li><p><strong>device.device_config</strong> (<em>string</em>)</p></li>
@@ -378,7 +378,7 @@
 <dd><p><strong>Assign / remove devices from a participant</strong></p>
 <p>Create/update devices associated with a participant.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_participant.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>device_participant.id_device_participant</strong> (<em>integer</em>) – (required)</p></li>
@@ -449,7 +449,7 @@
 <dd><p><strong>Create/update devices associated with a project</strong></p>
 <p>Create/update devices associated with a project.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_project.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>device_project.id_device_project</strong> (<em>integer</em>) – (required)</p></li>
@@ -519,7 +519,7 @@
 <dd><p><strong>Create/update devices association with a site</strong></p>
 <p>Create/update devices associated with a site.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_site.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>device_site.id_device_site</strong> (<em>integer</em>) – (required)</p></li>
@@ -588,7 +588,7 @@
 <dd><p><strong>Create / update devices subtypes</strong></p>
 <p>Create / update devices subtypes. id_device_subtype must be set to “0” to create a new subtype. Only site admins can create new devices subtypes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_subtype.device_subtype_name</strong> (<em>string</em>)</p></li>
 <li><p><strong>device_subtype.id_device_subtype</strong> (<em>integer</em>) – (required)</p></li>
@@ -659,7 +659,7 @@
 <dd><p><strong>Create / update devices types</strong></p>
 <p>Create / update devices types. id_device_type must be set to “0” to create a new type. Only site admins can create new devices types.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>device_type.device_type_key</strong> (<em>string</em>)</p></li>
 <li><p><strong>device_type.device_type_name</strong> (<em>string</em>)</p></li>
@@ -795,7 +795,7 @@ versions</p></li>
 <dd><p><strong>Create / update participant groups</strong></p>
 <p>Create / update participant groups. id_participant_group must be set to “0” to create a new group. A group can be created/modified if the user has admin rights to the project.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>participant_group.id_participant_group</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>participant_group.id_project</strong> (<em>integer</em>)</p></li>
@@ -892,6 +892,46 @@ versions</p></li>
 </dl>
 </dd></dl>
 
+<dl class="http put">
+<dt class="sig sig-object http" id="put--user-login-forgot_password">
+<span class="sig-name descname"><span class="pre">PUT</span> </span><span class="sig-name descname"><span class="pre">/user/login/forgot_password</span></span><a class="headerlink" href="#put--user-login-forgot_password" title="Link to this definition"></a></dt>
+<dd><p>Validate reset code for the current user in session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reset_code</strong> (<em>string</em>) – Reset code to validate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success - code is valid for the user in current session</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/401">401 Unauthorized</a></span> – Bad code or unauthorized access</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429">429 Too Many Requests</a></span> – Too many requests for the current user</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--user-login-forgot_password">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/user/login/forgot_password</span></span><a class="headerlink" href="#post--user-login-forgot_password" title="Link to this definition"></a></dt>
+<dd><p>Reset password for the specified user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requested_user</strong> (<em>string</em>) – Requested username or email to reset password</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success - will be returned even if specified user isn’t found</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">400 Bad Request</a></span> – Badly formed request</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429">429 Too Many Requests</a></span> – Too many requests for the current username / email</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="http get">
 <dt class="sig sig-object http" id="get--user-login-setup_2fa">
 <span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/user/login/setup_2fa</span></span><a class="headerlink" href="#get--user-login-setup_2fa" title="Link to this definition"></a></dt>
@@ -968,6 +1008,9 @@ Will use the OTP secret generated in the GET method.</p>
 <li><p><strong>full</strong> (<em>boolean</em>) – Flag that expands the returned data to include all information</p></li>
 <li><p><strong>orderby_recents</strong> (<em>boolean</em>) – Returns participants ordered by most recently updated</p></li>
 <li><p><strong>limit</strong> (<em>integer</em>) – Returns at most “limit” participants</p></li>
+<li><p><strong>offset</strong> (<em>integer</em>) – Number of items to ignore in results, offset from 0-index</p></li>
+<li><p><strong>search</strong> (<em>string</em>) – Perform a search on the specific field(name, username, email, all)</p></li>
+<li><p><strong>search_value</strong> (<em>string</em>) – Search string when “search” argument is specified</p></li>
 <li><p><strong>no_group</strong> (<em>boolean</em>) – Flag that limits the returned data with only participants without a group</p></li>
 </ul>
 </dd>
@@ -1008,7 +1051,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update participant</strong></p>
 <p>Create / update participants. id_participant must be set to “0” to create a new participant. A participant can be created/modified if the user has admin rights to the project.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>participant.id_participant</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>participant.id_participant_group</strong> (<em>integer</em>)</p></li>
@@ -1111,7 +1154,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update project roles for users / usergroups</strong></p>
 <p>Create/update project access for an user / usergroup.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project_access</strong> (<em>any</em>)</p></li>
 </ul>
@@ -1181,7 +1224,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update project</strong></p>
 <p>Create / update projects. id_project must be set to “0” to create a new project. A project can be created/modified if the user has admin rights to the related site.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project.id_project</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>project.id_site</strong> (<em>integer</em>)</p></li>
@@ -1299,7 +1342,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update services</strong></p>
 <p>Create / update services. id_service must be set to “0” to create a new service. A service can be created/modified only by super-admins. If data contains “roles”, also update the roles with the list.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service.id_service</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>service.service_clientendpoint</strong> (<em>string</em>)</p></li>
@@ -1383,7 +1426,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update service - access association</strong></p>
 <p>Create/update service - access association. A list can be posted - if an item with a id_service_access doesn’t have an id_service_role element, it will be deleted.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service_access.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_access.id_participant_group</strong> (<em>integer</em>)</p></li>
@@ -1458,7 +1501,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update service configuration for an item</strong></p>
 <p>Create / update service config. id_service_config must be set to “0” to create a new config. A config can be created/modified if the user has admin access to the user, device or participant</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service_config.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_config.id_participant</strong> (<em>integer</em>)</p></li>
@@ -1472,7 +1515,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd class="field-even"><ul class="simple">
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">400 Bad Request</a></span> – Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the JSON body</p></li>
-<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged user can’t create/update the specified session</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged user can’t create/update the specified config</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Internal error when saving service config</p></li>
 </ul>
 </dd>
@@ -1533,7 +1576,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update service-project association</strong></p>
 <p>Create/update service - project association. If a “service” json is received, the list of “projects” is replaced. If a “project” json is received, the list of “services” is replaced.If a “service_project” is received, each of the item in the list is added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project.id_project</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>project.id_site</strong> (<em>integer</em>)</p></li>
@@ -1602,7 +1645,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update service roles</strong></p>
 <p>Create/update service role.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service_role.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_role.id_service</strong> (<em>integer</em>)</p></li>
@@ -1675,7 +1718,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update service-site association</strong></p>
 <p>Create/update service - site association. If a “service” json is received, the list of “sites” is replaced. If a “site” json is received, the list of “services” is replaced.If a “service_site” is received, each of the item in the list is added.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>service_site.id_service</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_site.id_service_site</strong> (<em>integer</em>) – (required)</p></li>
@@ -1752,7 +1795,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session</strong></p>
 <p>Create / update session. id_session must be set to “0” to create a new session. A session can be created/modified if the user has access to all participants and users in the session.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session.id_creator_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session.id_creator_participant</strong> (<em>integer</em>)</p></li>
@@ -1828,7 +1871,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session events</strong></p>
 <p>Create / update session events. id_session_event must be set to “0” to create a new event. An event can be created/modified if the user has access to the session.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_event.id_session</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_event.id_session_event</strong> (<em>integer</em>) – (required)</p></li>
@@ -1855,7 +1898,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Starts / stop a session related to a service</strong></p>
 <p>Manage a specific session</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_manage.action</strong> (<em>string</em>) – (required)</p></li>
 <li><p><strong>session_manage.id_creator_device</strong> (<em>integer</em>)</p></li>
@@ -1935,7 +1978,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session type</strong></p>
 <p>Create / update session type. id_session_type must be set to “0” to create a new type. A session type can be created/modified if the user has access to a related session typeproject.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_type.id_service</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_type.id_session_type</strong> (<em>integer</em>) – (required)</p></li>
@@ -2010,7 +2053,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session types for a project</strong></p>
 <p>Create/update session-type - project association.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_type_project.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_type_project.id_session_type</strong> (<em>integer</em>)</p></li>
@@ -2078,7 +2121,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session types - service additional association</strong></p>
 <p>Create/update session-type - service additional association.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_type_service.id_service</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_type_service.id_session_type</strong> (<em>integer</em>)</p></li>
@@ -2148,7 +2191,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update session types associated with a site</strong></p>
 <p>Create/update session types associated with a site.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>session_type_site.id_session_type</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_type_site.id_session_type_site</strong> (<em>integer</em>) – (required)</p></li>
@@ -2220,7 +2263,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update site access for an user / usergroup</strong></p>
 <p>Create/update site access for a user group.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>site_access</strong> (<em>any</em>)</p></li>
 </ul>
@@ -2249,6 +2292,7 @@ Will use the OTP secret generated in the GET method.</p>
 <li><p><strong>id_device</strong> (<em>integer</em>) – ID of the device from which to get all related sites</p></li>
 <li><p><strong>user_uuid</strong> (<em>string</em>) – User UUID from which to get all sites that are accessible</p></li>
 <li><p><strong>name</strong> (<em>string</em>) – Site name to query</p></li>
+<li><p><strong>service_uuid</strong> (<em>string</em>) – UUID of the service to get all sites related to it</p></li>
 </ul>
 </dd>
 <dt class="field-even">Status Codes<span class="colon">:</span></dt>
@@ -2287,7 +2331,7 @@ Will use the OTP secret generated in the GET method.</p>
 <dd><p><strong>Create / update site</strong></p>
 <p>Create / update site. id_site must be set to “0” to create a new site. A site can be created/modified if the user has admin rights to the site itself or issuperadmin.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>site.id_site</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>site.site_2fa_required</strong> (<em>boolean</em>)</p></li>
@@ -2479,7 +2523,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update test invitation</strong></p>
 <p>Update/Create test invitation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tests_invitations[].id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>tests_invitations[].id_participant</strong> (<em>integer</em>)</p></li>
@@ -2558,7 +2602,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update test types</strong></p>
 <p>Create / update test type. id_test_type must be set to “0” to create a new type. A test type can be created/modified if the user has access to a related test typeproject.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_type.id_service</strong> (<em>integer</em>)</p></li>
 <li><p><strong>test_type.id_test_type</strong> (<em>integer</em>) – (required)</p></li>
@@ -2635,7 +2679,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update test-type -&gt; project association</strong></p>
 <p>Create/update test-type - project association.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_type_project.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>test_type_project.id_test_type</strong> (<em>integer</em>)</p></li>
@@ -2705,7 +2749,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update test types associated to a site</strong></p>
 <p>Create/update test types associated with a site.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>test_type_site.id_site</strong> (<em>integer</em>)</p></li>
 <li><p><strong>test_type_site.id_test_type</strong> (<em>integer</em>)</p></li>
@@ -2773,7 +2817,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update usergroup</strong></p>
 <p>Create / update user group. id_user_group must be set to “0” to create a new user group. User groups can be modified if the user has a site admin role.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_group.id_user_group</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>user_group.user_group_name</strong> (<em>string</em>)</p></li>
@@ -2848,7 +2892,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update an user</strong></p>
 <p>Create / update user. id_user must be set to “0” to create a new user. User can be modified if: current user is super admin or user is part of a project which the current user is admin. Promoting a user to super admin is restricted to super admins.”If data contains “user_user_groups, also set user groups for that user.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user.id_user</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>user.user_2fa_email_enabled</strong> (<em>boolean</em>)</p></li>
@@ -2929,7 +2973,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update user preferences</strong></p>
 <p>Create / update user preferences. Only one preference is allowed for a specific app_tag. Preference will be overwritten if app_tag already exists for the user, and will be deleted if empty or null. If id_user isn’t set, will update current user preferences</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_preference.id_user</strong> (<em>integer</em>)</p></li>
 <li><p><strong>user_preference.id_user_preference</strong> (<em>integer</em>) – (required)</p></li>
@@ -2998,7 +3042,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update user’s usergroups</strong></p>
 <p>Create / update user - user group relationship, creating it if it doesn’t exist, updating it otherwise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>user_user_group.id_user</strong> (<em>integer</em>)</p></li>
 <li><p><strong>user_user_group.id_user_group</strong> (<em>integer</em>)</p></li>
@@ -3038,7 +3082,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Update server versions</strong></p>
 <p>Post server versions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ClientVersions.client_description</strong> (<em>string</em>)</p></li>
 <li><p><strong>ClientVersions.client_documentation_url</strong> (<em>string</em>)</p></li>
@@ -3279,7 +3323,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session.id_session</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>session.id_session_type</strong> (<em>integer</em>) – (required)</p></li>
@@ -3368,7 +3412,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>status</strong> (<em>object</em>) – (required)</p></li>
 <li><p><strong>timestamp</strong> (<em>number</em>) – (required)</p></li>
@@ -3498,7 +3542,6 @@ Otherwise, you can filter by:</p>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
-<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/501">501 Not Implemented</a></span> – Not implemented.</p></li>
 </ul>
 </dd>
 </dl>
@@ -3508,11 +3551,17 @@ Otherwise, you can filter by:</p>
 <dt class="sig sig-object http" id="post--participant-participants">
 <span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/participant/participants</span></span><a class="headerlink" href="#post--participant-participants" title="Link to this definition"></a></dt>
 <dd><p><strong>Update current participant informations</strong></p>
-<p>To be documented To be documented</p>
+<p>Update current participant information. Name and email can be modified with limited access.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success - To be documented</p></li>
+<li><p><strong>participant.participant_email</strong> (<em>string</em>)</p></li>
+<li><p><strong>participant.participant_name</strong> (<em>string</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged user doesn’t have permission to access the requested data</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Required parameter is missing</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/501">501 Not Implemented</a></span> – Not implemented.</p></li>
@@ -3531,6 +3580,78 @@ Otherwise, you can filter by:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
 <li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Server error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http get">
+<dt class="sig sig-object http" id="get--participant-services-configs">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/participant/services/configs</span></span><a class="headerlink" href="#get--participant-services-configs" title="Link to this definition"></a></dt>
+<dd><p><strong>Get specific service configuration for the current participant</strong></p>
+<p>Get service configuration. Requires either service id or key. Returns only the config for thecurrent participant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_service</strong> (<em>integer</em>) – ID of service to get all configs from. Use in combination with another ID field to filter.</p></li>
+<li><p><strong>service_key</strong> (<em>string</em>) – Service key to query. Can be used instead of id_service. If usedwith id_service, service_key will be ignored.</p></li>
+<li><p><strong>id_specific</strong> (<em>string</em>) – ID of the specific configuration to get.</p></li>
+<li><p><strong>list</strong> (<em>boolean</em>) – Also includes a list of all available specifics configs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success - returns service configuration</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">400 Bad Request</a></span> – No parameters specified - id_service is at least required</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Database error</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http delete">
+<dt class="sig sig-object http" id="delete--participant-services-configs">
+<span class="sig-name descname"><span class="pre">DELETE</span> </span><span class="sig-name descname"><span class="pre">/participant/services/configs</span></span><a class="headerlink" href="#delete--participant-services-configs" title="Link to this definition"></a></dt>
+<dd><p><strong>Delete a specific service configuration for an item</strong></p>
+<p>Delete a specific service configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>integer</em>) – Service config ID to delete</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged participant can’t delete config (not for the participant or no access to service)</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Database error.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--participant-services-configs">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/participant/services/configs</span></span><a class="headerlink" href="#post--participant-services-configs" title="Link to this definition"></a></dt>
+<dd><p><strong>Create / update service configuration for the current participant</strong></p>
+<p>Create / update service config for the participant. id_service_config must be set to “0” to create a new config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_config.id_device</strong> (<em>integer</em>)</p></li>
+<li><p><strong>service_config.id_participant</strong> (<em>integer</em>)</p></li>
+<li><p><strong>service_config.id_service</strong> (<em>integer</em>)</p></li>
+<li><p><strong>service_config.id_service_config</strong> (<em>integer</em>) – (required)</p></li>
+<li><p><strong>service_config.id_user</strong> (<em>integer</em>)</p></li>
+<li><p><strong>service_config.service_config_config</strong> (<em>string</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Status Codes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200">200 OK</a></span> – Success</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/400">400 Bad Request</a></span> – Badly formed JSON or missing fields(service_config, id_service_config, id_service) in the JSON body</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/403">403 Forbidden</a></span> – Logged user can’t create/update the specified session</p></li>
+<li><p><span><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/500">500 Internal Server Error</a></span> – Internal error when saving service config</p></li>
 </ul>
 </dd>
 </dl>
@@ -3577,7 +3698,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session.id_session</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>session.id_session_type</strong> (<em>integer</em>) – (required)</p></li>
@@ -3720,6 +3841,8 @@ Otherwise, you can filter by:</p>
 <dt class="field-odd">Query Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>endpoint_url</strong> (<em>string</em>) – Endpoint url requesting access</p></li>
+<li><p><strong>client_name</strong> (<em>string</em>) – Client name requesting access. If none, will use the service name.</p></li>
+<li><p><strong>client_version</strong> (<em>string</em>) – Client version requesting access</p></li>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
@@ -3772,7 +3895,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>device.device_certificate</strong> (<em>string</em>)</p></li>
 <li><p><strong>device.device_config</strong> (<em>string</em>)</p></li>
@@ -3885,7 +4008,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>participant_group.id_participant_group</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>participant_group.id_project</strong> (<em>integer</em>)</p></li>
@@ -3941,7 +4064,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>participant.id_participant</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>participant.id_project</strong> (<em>integer</em>) – (required)</p></li>
@@ -4017,7 +4140,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>project.id_project</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>project.id_site</strong> (<em>integer</em>)</p></li>
@@ -4090,7 +4213,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>service_role.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_role.id_service</strong> (<em>integer</em>)</p></li>
@@ -4164,7 +4287,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>service_access.id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_access.id_participant_group</strong> (<em>integer</em>)</p></li>
@@ -4256,7 +4379,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session.id_creator_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session.id_creator_participant</strong> (<em>integer</em>)</p></li>
@@ -4318,7 +4441,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session_event.id_session</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_event.id_session_event</strong> (<em>integer</em>) – (required)</p></li>
@@ -4350,7 +4473,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session_manage.action</strong> (<em>string</em>) – (required)</p></li>
 <li><p><strong>session_manage.id_creator_device</strong> (<em>integer</em>)</p></li>
@@ -4416,7 +4539,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>service_session_type.id_participants[]</strong> (<em>integer</em>)</p></li>
 <li><p><strong>service_session_type.id_projects[]</strong> (<em>integer</em>)</p></li>
@@ -4498,7 +4621,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>session_type_project.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>session_type_project.id_session_type</strong> (<em>integer</em>)</p></li>
@@ -4693,7 +4816,7 @@ Otherwise, you can filter by:</p>
 <dd><p><strong>Create / update test invitation</strong></p>
 <p>Update/Create test invitation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-odd">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tests_invitations[].id_device</strong> (<em>integer</em>)</p></li>
 <li><p><strong>tests_invitations[].id_participant</strong> (<em>integer</em>)</p></li>
@@ -4779,7 +4902,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>test_type.id_service</strong> (<em>integer</em>)</p></li>
 <li><p><strong>test_type.id_test_type</strong> (<em>integer</em>) – (required)</p></li>
@@ -4860,7 +4983,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>test_type_project.id_project</strong> (<em>integer</em>)</p></li>
 <li><p><strong>test_type_project.id_test_type</strong> (<em>integer</em>)</p></li>
@@ -4934,7 +5057,7 @@ Otherwise, you can filter by:</p>
 <li><p><strong>token</strong> (<em>string</em>) – Access token</p></li>
 </ul>
 </dd>
-<dt class="field-even">Request JSON Object<span class="colon">:</span></dt>
+<dt class="field-even">Response JSON Object<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>user_group.id_user_group</strong> (<em>integer</em>) – (required)</p></li>
 <li><p><strong>user_group.user_group_name</strong> (<em>string</em>)</p></li>
