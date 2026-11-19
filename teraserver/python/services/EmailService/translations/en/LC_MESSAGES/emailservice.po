@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-14 13:59-0400\n"
+"POT-Creation-Date: 2026-11-19 10:58-0500\n"
 "PO-Revision-Date: 2024-11-20 09:19-0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,55 +18,51 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: API/QueryEmailTemplate.py:58 API/QueryEmailTemplate.py:116
-#: API/QueryEmailTemplate.py:177
-msgid "Only users can use this API."
+#: API/QueryEmailTemplate.py:61 API/QueryEmailTemplate.py:122
+#: API/QueryEmailTemplate.py:186 API/QuerySendEmail.py:60
+msgid "Only users and services can use this API."
 msgstr ""
 
-#: API/QueryEmailTemplate.py:66 API/QueryEmailTemplate.py:69
-#: API/QueryEmailTemplate.py:86 API/QueryEmailTemplate.py:93
-#: API/QueryEmailTemplate.py:98 API/QueryEmailTemplate.py:134
-#: API/QueryEmailTemplate.py:137 API/QueryEmailTemplate.py:153
-#: API/QueryEmailTemplate.py:185 API/QueryEmailTemplate.py:188
+#: API/QueryEmailTemplate.py:69 API/QueryEmailTemplate.py:72
+#: API/QueryEmailTemplate.py:89 API/QueryEmailTemplate.py:96
+#: API/QueryEmailTemplate.py:101 API/QueryEmailTemplate.py:140
+#: API/QueryEmailTemplate.py:143 API/QueryEmailTemplate.py:159
+#: API/QueryEmailTemplate.py:194 API/QueryEmailTemplate.py:197
 #: API/QuerySendEmail.py:107 API/QuerySendEmail.py:114
 #: API/QuerySendEmail.py:119 API/QuerySendEmail.py:124
 msgid "Forbidden"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:80
+#: API/QueryEmailTemplate.py:83
 msgid "Invalid project"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:102
+#: API/QueryEmailTemplate.py:105
 msgid "Missing identifying parameter"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:119
+#: API/QueryEmailTemplate.py:125
 msgid "Missing template"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:124
+#: API/QueryEmailTemplate.py:130
 msgid "Missing id_email_template"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:128
+#: API/QueryEmailTemplate.py:134
 msgid "Can't specify both site and project for template"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:145
+#: API/QueryEmailTemplate.py:151
 msgid "Invalid or missing data"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:157
+#: API/QueryEmailTemplate.py:163
 msgid "Missing fields"
 msgstr ""
 
-#: API/QueryEmailTemplate.py:165 API/QueryEmailTemplate.py:195
+#: API/QueryEmailTemplate.py:171 API/QueryEmailTemplate.py:204
 msgid "Database error"
-msgstr ""
-
-#: API/QuerySendEmail.py:60
-msgid "Only users and services can use this API."
 msgstr ""
 
 #: API/QuerySendEmail.py:77
@@ -102,5 +98,8 @@ msgid "Can't connect to SMTP server"
 msgstr ""
 
 #~ msgid "Missing user and/or participant_uuid"
+#~ msgstr ""
+
+#~ msgid "Only users can use this API."
 #~ msgstr ""
 

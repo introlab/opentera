@@ -411,9 +411,10 @@ class FlaskModule(BaseModule):
 @flask_app.after_request
 def post_process_request(response):
     # This is required to expose the backend API to rendered webpages from other sources, such as services
+    # FIXME: Implement a tighter origin control
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, PUT, POST, DELETE, OPTIONS"
     response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
 
     # Remove WWW-Authenticate from header to prevent browsers to prevent an authentication pop-up

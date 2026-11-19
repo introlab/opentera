@@ -7,68 +7,63 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-09-14 13:59-0400\n"
+"POT-Creation-Date: 2026-11-19 10:58-0500\n"
 "PO-Revision-Date: 2026-09-14 13:59-0400\n"
 "Last-Translator: \n"
-"Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.18.0\n"
-"X-Generator: Poedit 3.9\n"
 
-#: API/QueryEmailTemplate.py:58 API/QueryEmailTemplate.py:116
-#: API/QueryEmailTemplate.py:177
-msgid "Only users can use this API."
-msgstr "Seuls les utilisateurs peuvent accéder à cet API."
+#: API/QueryEmailTemplate.py:61 API/QueryEmailTemplate.py:122
+#: API/QueryEmailTemplate.py:186 API/QuerySendEmail.py:60
+msgid "Only users and services can use this API."
+msgstr "Seuls les utilisateurs et services peuvent accéder à cet API."
 
-#: API/QueryEmailTemplate.py:66 API/QueryEmailTemplate.py:69
-#: API/QueryEmailTemplate.py:86 API/QueryEmailTemplate.py:93
-#: API/QueryEmailTemplate.py:98 API/QueryEmailTemplate.py:134
-#: API/QueryEmailTemplate.py:137 API/QueryEmailTemplate.py:153
-#: API/QueryEmailTemplate.py:185 API/QueryEmailTemplate.py:188
+#: API/QueryEmailTemplate.py:69 API/QueryEmailTemplate.py:72
+#: API/QueryEmailTemplate.py:89 API/QueryEmailTemplate.py:96
+#: API/QueryEmailTemplate.py:101 API/QueryEmailTemplate.py:140
+#: API/QueryEmailTemplate.py:143 API/QueryEmailTemplate.py:159
+#: API/QueryEmailTemplate.py:194 API/QueryEmailTemplate.py:197
 #: API/QuerySendEmail.py:107 API/QuerySendEmail.py:114
 #: API/QuerySendEmail.py:119 API/QuerySendEmail.py:124
 msgid "Forbidden"
 msgstr "Refusé"
 
-#: API/QueryEmailTemplate.py:80
+#: API/QueryEmailTemplate.py:83
 msgid "Invalid project"
 msgstr "Projet invalide"
 
-#: API/QueryEmailTemplate.py:102
+#: API/QueryEmailTemplate.py:105
 msgid "Missing identifying parameter"
 msgstr "Paramètre d'identification manquant"
 
-#: API/QueryEmailTemplate.py:119
+#: API/QueryEmailTemplate.py:125
 msgid "Missing template"
 msgstr "Gabarit manquant"
 
-#: API/QueryEmailTemplate.py:124
+#: API/QueryEmailTemplate.py:130
 msgid "Missing id_email_template"
 msgstr "ID du gabarit de courriel manquant"
 
-#: API/QueryEmailTemplate.py:128
+#: API/QueryEmailTemplate.py:134
 msgid "Can't specify both site and project for template"
 msgstr "Impossible de spécifier à la fois le site et le projet"
 
-#: API/QueryEmailTemplate.py:145
+#: API/QueryEmailTemplate.py:151
 msgid "Invalid or missing data"
 msgstr "Donnée invalide ou manquante"
 
-#: API/QueryEmailTemplate.py:157
+#: API/QueryEmailTemplate.py:163
 msgid "Missing fields"
 msgstr "Champs manquants"
 
-#: API/QueryEmailTemplate.py:165 API/QueryEmailTemplate.py:195
+#: API/QueryEmailTemplate.py:171 API/QueryEmailTemplate.py:204
 msgid "Database error"
 msgstr "Erreur de base de données"
-
-#: API/QuerySendEmail.py:60
-msgid "Only users and services can use this API."
-msgstr "Seuls les utilisateurs et services peuvent accéder à cet API."
 
 #: API/QuerySendEmail.py:77
 msgid "At least one user is not accessible"
@@ -104,3 +99,7 @@ msgstr "Impossible de se connecter au serveur SMTP"
 
 #~ msgid "Missing user and/or participant_uuid"
 #~ msgstr "Identifiant unique de l'utilisateur et/ou du participant manquant"
+
+#~ msgid "Only users can use this API."
+#~ msgstr "Seuls les utilisateurs peuvent accéder à cet API."
+
