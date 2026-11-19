@@ -4,14 +4,15 @@ name: opentera-docker-prod
 services:
   db:
     # TODO: Use postgres latest image
-    image: postgres:14.1-alpine
+    image: postgres:18.7-alpine
     restart: always
     environment:
       # TODO: Change PostGresSQL default username/password
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - db:/var/lib/postgresql/data
+      # PostgreSQL 18+ stores data in a version-specific subdirectory (/var/lib/postgresql/18/docker)
+      - db-pg18:/var/lib/postgresql
       # This script will initialize the DB (once) at first startup.
       - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
@@ -20,7 +21,7 @@ services:
 
   cache:
     # TODO Use redis latest image
-    image: redis:6.2-alpine
+    image: redis:8.10-alpine
     restart: always
     command: redis-server --save 20 1 --loglevel warning
     volumes:
@@ -30,7 +31,7 @@ services:
 
   proxy:
     # TODO Use nginx latest image
-    image: nginx
+    image: nginx:1.30-alpine
     restart: always
     volumes:
       - ./nginx/opentera.conf:/etc/nginx/opentera.conf
@@ -58,6 +59,7 @@ services:
       - ./teraserver/FileTransferService.json:/root/opentera/teraserver/python/services/FileTransferService/FileTransferService.json
       - ./teraserver/LoggingService.json:/root/opentera/teraserver/python/services/LoggingService/LoggingService.json
       - ./teraserver/VideoRehabService.json:/root/opentera/teraserver/python/services/VideoRehabService/VideoRehabService.json
+      - ./teraserver/EmailService.json:/root/opentera/teraserver/python/services/EmailService/EmailService.json
       - ./teraserver/ice_servers.json:/root/opentera/teraserver/easyrtc/ice_servers.json
       - opentera-files:/root/opentera/teraserver/python/services/FileTransferService/files
       - certificates:/root/opentera/teraserver/python/config/certificates
@@ -69,7 +71,7 @@ services:
       - db
 
 volumes:
-  db:
+  db-pg18:
     driver: local
 
   redis-cache:

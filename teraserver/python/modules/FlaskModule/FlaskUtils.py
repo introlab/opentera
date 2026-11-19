@@ -1,5 +1,6 @@
-from flask_babel import gettext
 from opentera.db.models.TeraUser import UserPasswordInsecure
+import secrets
+import string
 
 
 class FlaskUtils:
@@ -21,3 +22,8 @@ class FlaskUtils:
                 text_list.append(gettext('Password missing upper case letter'))
 
         return separator.join(text for text in text_list)
+
+    @staticmethod
+    def generate_unique_code(length: int = 6) -> str:
+        digits = string.digits
+        return ''.join(secrets.choice(digits) for _ in range(length))

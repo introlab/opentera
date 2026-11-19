@@ -23,7 +23,7 @@ import opentera.messages.python as messages
 
 
 class FakeFlaskModule(BaseModule):
-    def __init__(self,  config: ConfigManager, flask_app):
+    def __init__(self, config: ConfigManager, flask_app):
         BaseModule.__init__(self, 'FakeFlaskModule', config)
 
         # Will allow for user api to work

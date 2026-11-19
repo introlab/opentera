@@ -1,11 +1,11 @@
-FROM python:3.11.5-bullseye
+FROM python:3.11-trixie
 
 # Change default shell to bash
 SHELL ["/bin/bash", "-c"]
 
 # Install build dependencies
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y \
-	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl python3 
+	build-essential cmake git sudo vim libprotobuf-dev protobuf-compiler locales wget curl
 
 # Install openssh-server
 # RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openssh-server
@@ -38,7 +38,7 @@ ADD ./teraserver/python/env/requirements.txt /requirements.txt
 RUN ["/bin/bash", "-c", "python3 -m pip install -r /requirements.txt"]
 
 # Install latest npm / nodejs
-RUN curl -sL https://deb.nodesource.com/setup_18.x -o /nodesource_setup.sh
+RUN curl -sL https://deb.nodesource.com/setup_26.x -o /nodesource_setup.sh
 RUN bash /nodesource_setup.sh
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y nodejs
 

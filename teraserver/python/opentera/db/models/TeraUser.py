@@ -322,6 +322,11 @@ class TeraUser(BaseModel, SoftDeleteMixin):
         return user
 
     @staticmethod
+    def get_user_by_email(email: str, with_deleted: bool = False):
+        user = TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_email=email).first()
+        return user
+
+    @staticmethod
     def get_superadmins(with_deleted: bool = False):
         return TeraUser.query.execution_options(include_deleted=with_deleted).filter_by(user_superadmin=True).all()
 

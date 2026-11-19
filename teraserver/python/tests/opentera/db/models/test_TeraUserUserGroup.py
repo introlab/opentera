@@ -78,7 +78,7 @@ class TeraUserUserGroupTest(BaseModelsTest):
                 self.assertEqual(uug_result.id_user, user_user_group.id_user)
                 self.assertEqual(uug_result.id_user_group, user_user_group.id_user_group)
                 self.assertEqual(user_user_group, uug_result)
-                self.assertNotEquals(uug, uug_result)
+                self.assertNotEqual(uug, uug_result)
                 self.assertEqual(initial_count, TeraUserUserGroup.query.count())
 
     def test_insert_with_invalid_uug(self):
@@ -106,7 +106,7 @@ class TeraUserUserGroupTest(BaseModelsTest):
                 self.assertEqual(uug_result.id_user, user_user_group.id_user)
                 self.assertEqual(uug_result.id_user_group, user_user_group.id_user_group)
                 self.assertEqual(user_user_group, uug_result)
-                self.assertNotEquals(uug, uug_result)
+                self.assertNotEqual(uug, uug_result)
                 self.assertIsNone(uug_result.deleted_at)
 
     def test_update_does_nothing(self):

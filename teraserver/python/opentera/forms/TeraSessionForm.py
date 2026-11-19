@@ -84,7 +84,7 @@ class TeraSessionForm:
         if not project_info:
             participants = user_access.get_accessible_participants()
         else:
-            participants = user_access.query_all_participants_for_project(project_info.id_project)
+            participants = user_access.query_participants_for_project(project_info.id_project)
         parts_list = list()
         for part in participants:
             parts_list.append(TeraFormValue(value_id=part.id_participant, value=part.participant_name))

@@ -627,42 +627,47 @@ class DBManagerTeraUserAccess:
         # Sort by project id
         return sorted(tt_projects, key=lambda tp: tp.test_type_project_project.project_name)
 
-    def query_all_participants_for_site(self, site_id: int) -> list[TeraParticipant]:
+    def query_participants_for_site(self, site_id: int, enabled: bool | None = None, limit: int | None = None,
+                                    offset: int | None = None) -> list[TeraParticipant]:
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.join(TeraProject) \
             .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.participant_name.asc()).all()
-        return participants
+            .order_by(TeraParticipant.participant_name.asc())
+        if enabled:
+            participants = participants.filter(TeraParticipant.participant_enabled == true())
+        if limit:
+            participants = participants.limit(limit)
+        if offset:
+            participants = participants.offset(offset)
+        return participants.all()
 
-    def query_enabled_participants_for_site(self, site_id: int) -> list[TeraParticipant]:
-        part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.join(TeraProject) \
-            .filter(TeraProject.id_site == site_id, TeraParticipant.id_participant.in_(part_ids)) \
-            .filter(TeraParticipant.participant_enabled == true()) \
-            .order_by(TeraParticipant.participant_name.asc()).all()
-        return participants
-
-    def query_all_participants_for_project(self, project_id: int) -> list[TeraParticipant]:
-        part_ids = self.get_accessible_participants_ids()
-        participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
-                                                    TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.participant_name.asc()).all()
-        return participants
-
-    def query_enabled_participants_for_project(self, project_id: int) -> list[TeraParticipant]:
+    def query_participants_for_project(self, project_id: int, enabled: bool | None = None, limit: int | None = None,
+                                       offset: int | None = None) -> list[TeraParticipant]:
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_project == project_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
-            .filter(TeraParticipant.participant_enabled == true()) \
-            .order_by(TeraParticipant.participant_name.asc()).all()
-        return participants
+            .order_by(TeraParticipant.participant_name.asc())
+        if enabled:
+            participants = participants.filter(TeraParticipant.participant_enabled == true())
+        if limit:
+            participants = participants.limit(limit)
+        if offset:
+            participants = participants.offset(offset)
+        return participants.all()
 
-    def query_participants_for_group(self, group_id: int) -> list[TeraParticipant]:
+    def query_participants_for_group(self, group_id: int, enabled: bool | None = None, limit: int | None = None,
+                                       offset: int | None = None) -> list[TeraParticipant]:
         part_ids = self.get_accessible_participants_ids()
         participants = TeraParticipant.query.filter(TeraParticipant.id_participant_group == group_id,
                                                     TeraParticipant.id_participant.in_(part_ids)) \
-            .order_by(TeraParticipant.participant_name.asc()).all()
-        return participants
+            .order_by(TeraParticipant.participant_name.asc())
+        if enabled:
+            participants = participants.filter(TeraParticipant.participant_enabled == true())
+        if limit:
+            participants = participants.limit(limit)
+        if offset:
+            participants = participants.offset(offset)
+        return participants.all()
 
     # def query_users_access_for_site(self, site_id: int, admin_only=False):
     #     users = self.get_accessible_users()
@@ -782,12 +787,19 @@ class DBManagerTeraUserAccess:
 
         return site_roles
 
-    def query_participants_for_device(self, device_id: int) -> list[TeraParticipant]:
+    def query_participants_for_device(self, device_id: int, enabled: bool | None = None, limit: int | None = None,
+                                       offset: int | None = None) -> list[TeraParticipant]:
         from opentera.db.models.TeraParticipant import TeraParticipant
         parts = TeraParticipant.query.join(TeraParticipant.participant_devices).filter_by(id_device=device_id) \
             .filter(TeraDevice.id_device.in_(self.get_accessible_devices_ids()),
-                    TeraParticipant.id_participant.in_(self.get_accessible_participants_ids())).all()
-        return parts
+                    TeraParticipant.id_participant.in_(self.get_accessible_participants_ids()))
+        if enabled:
+            parts = parts.filter(TeraParticipant.participant_enabled == true())
+        if limit:
+            parts = parts.limit(limit)
+        if offset:
+            parts = parts.offset(offset)
+        return parts.all()
 
     def query_device_participants_for_site(self, site_id: int) -> list[TeraDeviceParticipant]:
         device_parts = []
@@ -1241,7 +1253,7 @@ class DBManagerTeraUserAccess:
         return sorted(users, key=lambda suser: suser.user_firstname)
 
     def query_service_configs(self, service_id: int = None, user_id: int = None, device_id: int = None,
-                              participant_id: int = None, include_services_without_config: bool = False) -> list[TeraServiceConfig]:
+                              participant_id: int = None, include_services_without_config: bool = False) -> list[TeraServiceConfig] | None:
         if service_id and service_id not in self.get_accessible_services_ids():
             return None
         if user_id and user_id not in self.get_accessible_users_ids():
@@ -1398,3 +1410,26 @@ class DBManagerTeraUserAccess:
         """
         test_invitations = self.get_accessible_tests_invitations()
         return [test_invitation.id_test_invitation for test_invitation in test_invitations]
+
+    def search_participants(self, search_type: str, search_value: str):
+        filter_ids = self.get_accessible_participants_ids()
+        query = TeraParticipant.query.filter(TeraParticipant.id_participant.in_(filter_ids))
+
+        fields = []
+        if search_type == 'name' or search_type == 'all':
+            fields += [TeraParticipant.participant_name]
+
+        if search_type == 'email' or search_type == 'all':
+            fields += [TeraParticipant.participant_email]
+
+        if search_type == 'username' or search_type == 'all':
+            fields += [TeraParticipant.participant_username]
+
+        if fields:
+            escaped = search_value.replace('\\', '\\\\').replace('%', r'\%').replace('_', r'\_')
+            search_pattern = f'%{escaped}%'
+            conditions = [field.ilike(search_pattern) for field in fields]
+            query = query.filter(or_(*conditions))
+            return query.all()
+
+        return []

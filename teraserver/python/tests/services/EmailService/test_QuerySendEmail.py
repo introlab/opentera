@@ -50,15 +50,21 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             service_token = service.get_token(ServiceAccessManager.api_service_token_key)
             self.assertGreater(len(service_token), 0)
             response = self._post_with_token_auth(self.test_client, token=service_token)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 400)
 
-    def test_missing_uuids(self):
+    def test_missing_uuids_for_user(self):
         with self.app_context():
             json_data = {}
             response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
             self.assertEqual(response.status_code, 400)
 
-    def test_forbidden_user_uuids(self):
+    def test_missing_uuids_for_service(self):
+        with self.app_context():
+            json_data = {}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 400)
+
+    def test_forbidden_user_uuids_for_user(self):
         with self.app_context():
             admin_uuid = TeraUser.get_user_by_username('admin').user_uuid
             self.assertIsNotNone(admin_uuid)
@@ -70,7 +76,19 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-    def test_forbidden_participant_uuids(self):
+    def test_forbidden_user_uuids_for_service(self):
+        with self.app_context():
+            admin_uuid = TeraUser.get_user_by_username('user4').user_uuid
+            self.assertIsNotNone(admin_uuid)
+            json_data = {'user_uuid': admin_uuid}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+            json_data = {'user_uuid': [admin_uuid, '11111111']}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_forbidden_participant_uuids_for_user(self):
         with self.app_context():
             part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
             self.assertIsNotNone(part_uuid)
@@ -80,6 +98,18 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
 
             json_data = {'participant_uuid': [part_uuid, '11111111']}
             response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_forbidden_participant_uuids_for_service(self):
+        with self.app_context():
+            part_uuid = TeraParticipant.get_participant_by_name('Secret Participant').participant_uuid
+            self.assertIsNotNone(part_uuid)
+            json_data = {'participant_uuid': part_uuid}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+            json_data = {'participant_uuid': [part_uuid, '11111111']}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
     def test_template_and_body_content(self):
@@ -112,7 +142,7 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_admin_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-    def test_no_access_to_template_site(self):
+    def test_no_access_to_template_site_for_user(self):
         with self.app_context():
             user_uuid = TeraUser.get_user_by_username('user4').user_uuid
             self.assertIsNotNone(user_uuid)
@@ -122,7 +152,17 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_user4_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-    def test_no_access_to_template_project(self):
+    def test_no_access_to_template_site_for_service(self):
+        with self.app_context():
+            user_uuid = TeraUser.get_user_by_username('user4').user_uuid
+            self.assertIsNotNone(user_uuid)
+            template = EmailTemplate.get_template_by_key('SITE_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'user_uuid': user_uuid, 'id_template': template.id_email_template}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_no_access_to_template_project_for_user(self):
         with self.app_context():
             user_uuid = TeraUser.get_user_by_username('user4').user_uuid
             self.assertIsNotNone(user_uuid)
@@ -132,7 +172,17 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_user4_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-    def test_no_access_to_global_template(self):
+    def test_no_access_to_template_project_for_service(self):
+        with self.app_context():
+            user_uuid = TeraUser.get_user_by_username('user4').user_uuid
+            self.assertIsNotNone(user_uuid)
+            template = EmailTemplate.get_template_by_key('PROJECT_EMAIL')
+            self.assertIsNotNone(template)
+            json_data = {'user_uuid': user_uuid, 'id_template': template.id_email_template}
+            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+            self.assertEqual(response.status_code, 403)
+
+    def test_no_access_to_global_template_for_user(self):
         with self.app_context():
             part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
             self.assertIsNotNone(part_uuid)
@@ -142,7 +192,7 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_user3_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-    def test_send_success_with_template(self):
+    def test_send_success_with_template_for_user(self):
         with self.app_context():
             part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
             self.assertIsNotNone(part_uuid)
@@ -157,7 +207,7 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
                 self.assertTrue('GLOBAL' in outbox[0].html)
                 self.assertTrue('V1Test' in outbox[0].html)
 
-    def test_send_success(self):
+    def test_send_success_for_user(self):
         with self.app_context():
             part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
             self.assertIsNotNone(part_uuid)
@@ -168,8 +218,19 @@ class EmailSendEmailTest(BaseEmailServiceAPITest):
                 self.assertEqual(len(outbox), 1)
                 self.assertEqual(outbox[0].subject, "Test Email")
 
+    def test_send_success_for_service(self):
+        with self.app_context():
+            part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
+            self.assertIsNotNone(part_uuid)
+            json_data = {'participant_uuid': part_uuid, 'body': 'This is a test email', 'subject': 'Test Email'}
+            with Globals.service.flask_module.mail_man.record_messages() as outbox:
+                response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(outbox), 1)
+                self.assertEqual(outbox[0].subject, "Test Email")
 
-    def test_send_with_variables(self):
+
+    def test_send_with_variables_for_user(self):
         with self.app_context():
             part_uuid = TeraParticipant.get_participant_by_username('participant1').participant_uuid
             self.assertIsNotNone(part_uuid)

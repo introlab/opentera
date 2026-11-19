@@ -4,6 +4,8 @@ from sqlalchemy import exc
 from modules.LoginModule.LoginModule import user_multi_auth, current_user
 from modules.FlaskModule.FlaskModule import user_api_ns as api
 from sqlalchemy.exc import InvalidRequestError
+
+from opentera.db.models import TeraServiceSite, TeraService
 from opentera.db.models.TeraUser import TeraUser
 from opentera.db.models.TeraSite import TeraSite
 from modules.DatabaseModule.DBManager import DBManager
@@ -16,6 +18,7 @@ get_parser.add_argument('id', type=int, help='Alias for "id_site"')
 get_parser.add_argument('id_device', type=int, help='ID of the device from which to get all related sites')
 get_parser.add_argument('user_uuid', type=str, help='User UUID from which to get all sites that are accessible')
 get_parser.add_argument('name', type=str, help='Site name to query')
+get_parser.add_argument('service_uuid', type=str, help='UUID of the service to get all sites related to it')
 
 post_parser = api.parser()
 post_schema = api.schema_model('user_site', {'properties': TeraSite.get_json_schema(),
@@ -78,6 +81,11 @@ class UserQuerySites(Resource):
                 if site.id_site not in user_access.get_accessible_sites_ids():
                     # Current user doesn't have access to the requested site
                     sites = None
+        elif args['service_uuid']:
+            related_service = TeraService.get_service_by_uuid(args['service_uuid'])
+            if related_service:
+                sites = [service_site.service_site_site
+                        for service_site in user_access.query_sites_for_service(related_service.id_service)]
 
         if sites is None:
             sites = []
