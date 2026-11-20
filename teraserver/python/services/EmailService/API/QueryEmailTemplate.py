@@ -45,7 +45,10 @@ class QueryEmailTemplate(EmailResource):
         if not updating:
             return True
 
-        return current_user_client.user_superadmin
+        if current_login_type == LoginType.USER_LOGIN:
+            return current_user_client.user_superadmin
+        else:
+            return False
 
     @api.doc(description='Get email template. Can only use id_site or id_project, but not both.',
              responses={200: 'Success - returns template(s)',
