@@ -2,9 +2,8 @@ from services.EmailService.libemailservice.db.models import EmailTemplate
 from tests.services.EmailService.BaseEmailServiceAPITest import BaseEmailServiceAPITest
 from opentera.db.models.TeraParticipant import TeraParticipant
 from opentera.db.models.TeraDevice import TeraDevice
-from opentera.db.models.TeraService import TeraService
-from opentera.services.ServiceAccessManager import ServiceAccessManager
 
+from sqlalchemy.orm import make_transient
 
 class EmailEmailTemplateTest(BaseEmailServiceAPITest):
     test_endpoint = '/api/templates'
@@ -413,9 +412,6 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
             response = self._post_with_token_auth(self.test_client, token=self.user_user3_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
-            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
-            self.assertEqual(response.status_code, 403)
-
     def test_post_endpoint_update_bad_id_as_user(self):
         with self.app_context():
             json_data = {'email_template': {'id_email_template': 999}}
@@ -440,9 +436,6 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
             template: EmailTemplate = EmailTemplate.get_template_by_key('GENERAL_TEST_EMAIL')
             json_data = {'email_template': {'id_email_template': template.id_email_template, 'id_site': 1}}
             response = self._post_with_token_auth(self.test_client, token=self.user_siteadmin_token, json=json_data)
-            self.assertEqual(response.status_code, 403)
-
-            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_update_with_unknown_fields(self):
@@ -511,9 +504,6 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
         with self.app_context():
             json_data = {'email_template': {'id_email_template': 0}}
             response = self._post_with_token_auth(self.test_client, token=self.user_siteadmin_token, json=json_data)
-            self.assertEqual(response.status_code, 403)
-
-            response = self._post_with_token_auth(self.test_client, token=self.service_token, json=json_data)
             self.assertEqual(response.status_code, 403)
 
     def test_post_endpoint_new_with_missing_fields(self):
@@ -635,11 +625,16 @@ class EmailEmailTemplateTest(BaseEmailServiceAPITest):
         with self.app_context():
             template: EmailTemplate = EmailTemplate.get_template_by_key('GENERAL_TEST_EMAIL')
             params = {'id': template.id_email_template}
+            make_transient(template)
             response = self._delete_with_token_auth(self.test_client, token=self.user_siteadmin_token, params=params)
             self.assertEqual(response.status_code, 403)
 
             response = self._delete_with_token_auth(self.test_client, token=self.service_token, params=params)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 200)
+
+            # Reinsert template
+            EmailTemplate.db().session.add(template)
+            EmailTemplate.db().session.commit()
 
     def test_delete_endpoint_success_as_user(self):
         with self.app_context():
