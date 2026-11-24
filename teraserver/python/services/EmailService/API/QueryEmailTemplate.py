@@ -41,7 +41,7 @@ class QueryEmailTemplate(EmailResource):
         if template.id_site:
             return self._verify_site_access(template.id_site, requires_admin=updating)
 
-        # Global template
+        # Global template - always accessible to all services
         if not updating or current_login_type == LoginType.SERVICE_LOGIN:
             return True
 
